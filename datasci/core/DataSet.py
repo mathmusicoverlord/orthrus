@@ -29,7 +29,12 @@ class DataSet:
         self.data = data
         self.metadata = metadata
 
+class Test:
+    """
+    Test Class.
 
-
+    Attributes:
+        test (test): Test.
+    """
 
 
