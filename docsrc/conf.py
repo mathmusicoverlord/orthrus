@@ -13,7 +13,9 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append('/hdd/DataSci/')
+for root, subdirs, files in os.walk('../datasci/'):
+    for subdir in subdirs:
+        sys.path.append(os.path.join(root, subdir))
 
 # -- Project information -----------------------------------------------------
 

@@ -1,5 +1,5 @@
-DataSci
-=======
+core
+====
 
 .. toctree::
    :maxdepth: 4
