@@ -314,7 +314,7 @@ class DataSet:
 
 
 if __name__ == "__main__":
-    from datasci.core.DataSet import DataSet as DS
+    from datasci.core.dataset import DataSet as DS
     import pandas as pd
 
     data = pd.read_csv("F:/DataSci/iris_data.csv", index_col=0)

@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>dataset module &mdash; DataSci 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helper module" href="helper.html" />
+    <link rel="prev" title="core" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DataSci
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">core</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helper.html">helper module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">dataset module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helper.html">helper module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DataSci</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">core</a> &raquo;</li>
+        
+      <li>dataset module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/rst/dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dataset">
+<span id="dataset-module"></span><h1>dataset module<a class="headerlink" href="#module-dataset" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dataset.DataSet">
+<em class="property">class </em><code class="sig-prename descclassname">dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
+pre-processing, visualization, and classification.</p>
+<dl class="py attribute">
+<dt id="dataset.DataSet.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#dataset.DataSet.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference name for the dataset. Default is the empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataset.DataSet.path">
+<code class="sig-name descname">path</code><a class="headerlink" href="#dataset.DataSet.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>File path for saving DataSet instance and related outputs. Default is the empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataset.DataSet.data">
+<code class="sig-name descname">data</code><a class="headerlink" href="#dataset.DataSet.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numerical data or features of the data set arranged as samples x features.
+Default is the empty DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataset.DataSet.metadata">
+<code class="sig-name descname">metadata</code><a class="headerlink" href="#dataset.DataSet.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Categorical data or attributes of the dataset arranged as samples x attributes.
+The sample labels in the index column should be the same format as those used for the data DataFrame.
+If labels are missing or there are more labels than in the data, the class will automatically restrict
+to just those samples used in the data and fill in NaN where there are missing samples. Default is the
+empty DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataset.DataSet.normalization_method">
+<code class="sig-name descname">normalization_method</code><a class="headerlink" href="#dataset.DataSet.normalization_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label indicating the normalization used on the data. Future normalization will
+append as normalization_1/normalization_2/…/normalization_n indicating the sequence of normalizations
+used on the data. Default is the empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="dataset.DataSet.imputation_method">
+<code class="sig-name descname">imputation_method</code><a class="headerlink" href="#dataset.DataSet.imputation_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label indicating the imputation used on the data. Default is the empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataset.DataSet.autosummarize">
+<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gives a human-readable output of summary statistics for the metadata. It includes basic
+statistics such as mean, median, mode, etc. and gives value counts for discrete data attributes. When
+using dash am interactive dashboard will be created. The user will then be able to view histograms for each
+attribute in the metadata along with basic summary statistics. The user can interact with the dashboard to
+adjust the number of bins and attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_dash</strong> (<em>bool</em>) – Flag for indicating whether or not to use dash dashboard. Dafault is False.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to dash.Dash.app.run_server for configuring host server.
+See dash documentation for further details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataset.DataSet.reformat_metadata">
+<code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
+Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
+pandas infer_dtypes function to automatically infer the datatypes for each attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>convert_dtypes</strong> (<em>bool</em>) – Flag for whether or not to infer the datatypes for the metadata. Default is false.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataset.DataSet.visualize">
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transform</span></em>, <em class="sig-param"><span class="n">attrname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform</strong> (<em>object</em>) – Class instance which must contain the method fit_transform.</p></li>
+<li><p><strong>attrname</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – Series indicating</p></li>
+<li><p><strong>sample_ids</strong> (<em>list-like</em>) – </p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
+self.name_transform_attrname.png</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="helper.html" class="btn btn-neutral float-right" title="helper module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eric Kehoe.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

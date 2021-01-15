@@ -10,6 +10,10 @@ Welcome to DataSci's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   /rst/modules
+   /rst/dataset
+   /rst/helper
+
 
 
 Indices and tables

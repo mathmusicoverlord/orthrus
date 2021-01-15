@@ -14,6 +14,8 @@ help:
 
 github:
 	@make html
+	@rm -r ../docs/*
+	@touch ../docs/.nojekyll
 	@cp -a _build/html/. ../docs
 
 .PHONY: help Makefile

@@ -4,4 +4,5 @@ core
 .. toctree::
    :maxdepth: 4
 
-   DataSet
+   dataset
+   helper
