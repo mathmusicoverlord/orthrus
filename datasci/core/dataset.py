@@ -2,14 +2,17 @@
 This module contains the main DataSet class used for all preprocessing, visualization, and classification.
 """
 
-# Imports
+# imports
 import os
 import numpy as np
 import pandas as pd
+import pickle
 from numpy.core import ndarray
 from pandas.core.frame import DataFrame
 from pandas.core.frame import Series
 
+
+# classes
 class DataSet:
     """
     Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
@@ -36,6 +39,7 @@ class DataSet:
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
     """
 
+    # methods
     def __init__(self, name: str = '',
                  path: str = os.curdir,
                  data: DataFrame = pd.DataFrame(),
@@ -60,20 +64,23 @@ class DataSet:
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
 
     def visualize(self, transform,
-                  attrname: str,
-                  feature_ids = None,
-                  sample_ids = None,
+                  attr: str,
+                  cross_attr: str = None,
+                  feature_ids=None,
+                  sample_ids=None,
                   save: bool = False):
         """
 
         Args:
             transform (object): Class instance which must contain the method fit_transform.
 
-            attrname (str): Name of the metadata attribute to color samples by.
+            attr (str): Name of the metadata attribute to color samples by.
 
-            feature_ids (list-like): Series indicating
+            cross_attr (str): Name of the secondary metadata attribute to mark samples by.
 
-            sample_ids (list-like):
+            feature_ids (list-like or array-like): Series indicating
+
+            sample_ids (list-like or array-like):
 
             save (bool): Flag indicating to save the file. The file will save to self.path with the file name
                 self.name_transform_attrname.png
@@ -84,8 +91,7 @@ class DataSet:
         """
         pass
 
-
-    def reformat_metadata(self, convert_dtypes: bool =False):
+    def reformat_metadata(self, convert_dtypes: bool = False):
         """
         This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
         Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
@@ -113,7 +119,6 @@ class DataSet:
         if convert_dtypes:
             self.metadata = self.metadata.convert_dtypes()
 
-
     def autosummarize(self, use_dash=False, **kwargs):
         """
         This method gives a human-readable output of summary statistics for the metadata. It includes basic
@@ -133,7 +138,7 @@ class DataSet:
 
         """
         # set the data
-        df = self.data
+        df = self.metadata
 
         if use_dash:
             import dash
@@ -158,7 +163,8 @@ class DataSet:
                                            value=df.columns[0],
                                            clearable=False)]),
 
-                                   html.Div(children='''Choose the number of bins (0 = Auto).''', style={'padding': 10}),
+                                   html.Div(children='''Choose the number of bins (0 = Auto).''',
+                                            style={'padding': 10}),
 
                                    html.Div([
                                        dcc.Input(id="bins",
@@ -168,7 +174,7 @@ class DataSet:
                                                  min=0)]),
 
                                    html.Div([
-                                        dcc.Graph(id='freq-figure')], className="row"),
+                                       dcc.Graph(id='freq-figure')], className="row"),
 
                                    html.Hr(),
                                    ])
@@ -177,7 +183,6 @@ class DataSet:
             @app.callback(
                 Output('freq-figure', 'figure'),
                 [Input('attribute', 'value'), Input('bins', 'value')])
-
             # make a histogram figure
             def freq_fig(attr, bins):
                 bins = int(bins)
@@ -189,8 +194,8 @@ class DataSet:
                         bins = 'auto'
                     y, xx = np.histogram(series[-series.isna()], bins=bins)
                     x = (xx[1:] + xx[:-1]) / 2
-                    #xx = np.hstack((x, xx))
-                    #xx = np.sort(xx)
+                    # xx = np.hstack((x, xx))
+                    # xx = np.sort(xx)
                     xx = x
                     fig.add_trace(go.Bar(x=x, y=y))
 
@@ -289,7 +294,6 @@ class DataSet:
                                       tickvals=xx),
                                   )
 
-
                 return fig
 
             app.run_server(**kwargs)
@@ -300,7 +304,7 @@ class DataSet:
                 header = "Summary statistics for " + column + " attribute:"
                 print('-' * len(header))
                 print(header)
-                print('-'*len(header))
+                print('-' * len(header))
                 stats = series.describe()
                 stats.at['missing'] = np.sum(series.isna())
                 print(stats)
@@ -314,18 +318,58 @@ class DataSet:
                     print('-' * len(header))
                     print('\n')
 
+    def save(self, file_path: str = None):
+        """
+        This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
+        as self.path/self.name.ds where spaces in self.name are replaced with underscores.
 
+        Args:
+            file_path (str): Path of the file to save the instance of DataSet to. Default is None.
+
+        Returns:
+            inplace method.
+        """
+        # check path
+        if file_path is None:
+            file_path = self.path + '/' + self.name.replace(" ", "_") + '.ds'
+
+        # pickle class instance
+        with open(file_path, 'wb') as f:
+            pickle.dump(self, file=f)
+
+    # class methods
+    @classmethod
+    def load(cls, file_path: str):
+        """
+    `   This function loads and returns an instance of a DataSet class in pickle format.
+
+        Args:
+            file_path (str): Path of the file to load the instance of DataSet from.
+
+        Returns:
+            DataSet : Class instance encoded by pickle binary file_path.
+        """
+        # open file and unpickle
+        with open(file_path, 'rb') as f:
+            return pickle.load(f)
+
+# functions
 
 
 if __name__ == "__main__":
+    # imports
     from datasci.core.dataset import DataSet as DS
     import pandas as pd
 
-    data = pd.read_csv("F:/DataSci/iris_data.csv", index_col=0)
-    metadata_more = pd.read_csv("F:/DataSci/iris_metadata.csv", index_col=0)
+    # load data and metadata
+    data = pd.read_csv("/hdd/Test_Data/test_data.csv", index_col=0)
+    metadata = pd.read_csv("/hdd/Test_Data/test_metadata.csv", index_col=0)
 
-    ds = DS(name='iris', path='/hdd/Test_Data/', data=data, metadata=metadata_more)
+    # create DataSet instance
+    ds = DS(name='Test Set', path='/hdd/Test_Data', data=data, metadata=metadata)
+
+    # run analysis
     ds.reformat_metadata(convert_dtypes=True)
-    ds.autosummarize(use_dash=True)
-
+    # ds.autosummarize(use_dash=True)
+    ds.save()
 
