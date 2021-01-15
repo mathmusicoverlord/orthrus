@@ -236,8 +236,23 @@ used on the data. Default is the empty string.</p>
 
 <dl class="py method">
 <dt id="DataSet.DataSet.autosummarize">
-<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DataSet.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataSet.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gives a human-readable output of summary statistics for the metadata. It includes basic
+statistics such as mean, median, mode, etc. and gives value counts for discrete data attributes. When
+using dash am interactive dashboard will be created. The user will then be able to view histograms for each
+attribute in the metadata along with basic summary statistics. The user can interact with the dashboard to
+adjust the number of bins and attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_dash</strong> (<em>bool</em>) – Flag for indicating whether or not to use dash dashboard. Dafault is False.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to dash.Dash.app.run_server for configuring host server.
+See dash documentation for further details.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: inplace method.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="DataSet.DataSet.reformat_metadata">
@@ -260,15 +275,16 @@ used on the data. Default is the empty string.</p>
 
 <dl class="py method">
 <dt id="DataSet.DataSet.visualize">
-<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transform</span></em>, <em class="sig-param"><span class="n">attrname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="p">:</span> <span class="n">pandas.core.series.Series</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataSet.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transform</span></em>, <em class="sig-param"><span class="n">attrname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataSet.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>transform</strong> (<em>object</em>) – Class instance which must contain the method fit_transform.</p></li>
 <li><p><strong>attrname</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
-<li><p><strong>feature_ids</strong> (<em>pandas.Series</em>) – Series indicating</p></li>
-<li><p><strong>sample_ids</strong> (<em>pandas.Series</em>) – </p></li>
-<li><p><strong>save</strong> – </p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – Series indicating</p></li>
+<li><p><strong>sample_ids</strong> (<em>list-like</em>) – </p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
+self.name_transform_attrname.png</p></li>
 </ul>
 </dd>
 </dl>

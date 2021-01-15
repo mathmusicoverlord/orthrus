@@ -10,6 +10,7 @@ dependencies:
   - pandas=1.1.3
   - scikit-learn=0.23.2
   - sphinx=3.2.1
+  - sphinx-rtd-theme=0.5.1
   - pip:
     - imblearn==0.0
     - missingpy==0.2.0
