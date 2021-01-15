@@ -6,8 +6,6 @@
 Welcome to DataSci's documentation!
 ===================================
 
-Modules
--------
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
