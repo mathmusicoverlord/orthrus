@@ -6,7 +6,7 @@ In order to ensure proper behavior of python classes and functions between platf
 ```
 conda env create -f environment.yml
 ```
-This will generate the conda environment DataSci and install any dependencies required by the DataSci module.
+This will generate the conda environment DataSci and install any dependencies required by the DataSci module. If the user does not have a CUDA >=11 compatible graphics card, then the user can replace [environment.yml](environment.yml) with [environment_nocuda.yml](environment_nocuda.yml). The user can also use their own environment and install the packages listed in either [environment.yml](environment.yml) or [environment_nocuda.yml](environment_nocuda.yml).
 
 ## Installing the DataSci package
 To install the DataSci package first activate the DataSci environment and then navigate to your local DataSci directory:
