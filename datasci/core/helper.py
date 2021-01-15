@@ -1,5 +1,4 @@
-''' Helper function module.
-
+'''
 This module contains user-defined and general purpose helper functions use by the DataSci package.
 '''
 
