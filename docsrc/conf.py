@@ -15,7 +15,8 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 for root, subdirs, files in os.walk('../datasci/'):
     for subdir in subdirs:
-        sys.path.append(os.path.join(root, subdir))
+        sys.path.append(os.path.join(os.path.abspath('.'), os.path.join(root, subdir))+'/')
+        print(os.path.join(os.path.abspath('.'), os.path.join(root, subdir))+'/')
 
 # -- Project information -----------------------------------------------------
 

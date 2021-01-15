@@ -1,3 +1,7 @@
+"""
+This module contains the main DataSet class used for all preprocessing, visualization, and classification.
+"""
+
 # Imports
 import os
 import numpy as np
