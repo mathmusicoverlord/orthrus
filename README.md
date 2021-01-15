@@ -20,7 +20,7 @@ pip install -e .
 
 ```
 ## Basic Usage
-The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/dataset.html#dataset.DataSet) class to create an instance from within the [DataSci](DataSci) directory:
+The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/dataset.html#dataset.DataSet) class to create an instance from within the DataSci directory:
 
 ```python
 # imports
