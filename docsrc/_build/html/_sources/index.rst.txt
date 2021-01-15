@@ -6,13 +6,14 @@
 Welcome to DataSci's documentation!
 ===================================
 
+Modules
+-------
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    /rst/modules
-   /rst/dataset
-   /rst/helper
+
 
 
 
