@@ -82,13 +82,14 @@ class DataSet:
 
     def reformat_metadata(self, convert_dtypes: bool =False):
         """
-        Args:
-            convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata. Default is false.
-
         This method performs a basic reformatting of metadata including:
             * Replacing double-spaces with a single space
             * Stripping white space from string ends
             * Removing mixed-case and capitalizing strings
+
+        Args:
+            convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata. Default is false.
+
 
         Returns: inplace method.
         """
