@@ -17,4 +17,22 @@ cd /path/to/DataSci/
 Fianlly install the package with ```pip```
 ```
 pip install -e .
+
 ```
+## Basic Usage
+The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/dataset.html#dataset.DataSet) class to create an instance from within the [DataSci](DataSci) directory:
+
+```python
+# imports
+from datasci.core.dataset import DataSet as DS
+import pandas as pd
+
+# load data and metadata
+data = pd.read_csv("./test_data/iris_data.csv", index_col=0)
+metadata = pd.read_csv("./test_data/iris_metadata.csv", index_col=0)
+
+# create DataSet instance
+ds = DS(name='iris', path='./test_data', data=data, metadata=metadata)
+
+```
+here ```path``` indicates where ```ds``` will save figures and results outputed by the class methods.
