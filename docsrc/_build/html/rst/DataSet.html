@@ -250,21 +250,26 @@ adjust the number of bins and attribute.</p>
 See dash documentation for further details.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
 </dl>
-<p>Returns: inplace method.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="DataSet.DataSet.reformat_metadata">
 <code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataSet.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
-Stripping white space from string ends, Removing mixed-case and capitalizing strings.</p>
+Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
+pandas infer_dtypes function to automatically infer the datatypes for each attribute.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>convert_dtypes</strong> (<em>bool</em>) – Flag for whether or not to infer the datatypes for the metadata. Default is false.</p>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
 </dl>
-<p>Returns: inplace method.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -281,8 +286,10 @@ Stripping white space from string ends, Removing mixed-case and capitalizing str
 self.name_transform_attrname.png</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
 </dl>
-<p>Returns:</p>
 </dd></dl>
 
 </dd></dl>

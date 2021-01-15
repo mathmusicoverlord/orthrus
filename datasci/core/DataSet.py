@@ -75,6 +75,7 @@ class DataSet:
                 self.name_transform_attrname.png
 
         Returns:
+            inplace method.
 
         """
         pass
@@ -83,13 +84,15 @@ class DataSet:
     def reformat_metadata(self, convert_dtypes: bool =False):
         """
         This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
-        Stripping white space from string ends, Removing mixed-case and capitalizing strings.
+        Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
+        pandas infer_dtypes function to automatically infer the datatypes for each attribute.
 
         Args:
             convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata. Default is false.
 
 
-        Returns: inplace method.
+        Returns:
+            inplace method.
         """
 
         # perform basic cleaning
@@ -121,7 +124,8 @@ class DataSet:
             **kwargs (dict): Passed directly to dash.Dash.app.run_server for configuring host server.
                 See dash documentation for further details.
 
-        Returns: inplace method.
+        Returns:
+            inplace method.
 
         """
         # set the data
