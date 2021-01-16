@@ -7,6 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import pickle
+from copy import deepcopy
 from numpy.core import ndarray
 from pandas.core.frame import DataFrame
 from pandas.core.frame import Series
@@ -49,7 +50,7 @@ class DataSet:
 
         # Load attributes
         self.name = name
-        self.path = path
+        self.path = path.rstrip('/') + '/'
         self.data = data
         self.metadata = metadata
         self.normalization_method = normalization_method
@@ -63,33 +64,136 @@ class DataSet:
         missing_data = pd.DataFrame(index=missing_data_index)
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
 
-    def visualize(self, transform,
+        # sort data and metadata to be in same order
+        self.data.sort_index(inplace=True)
+        self.metadata.sort_index(inplace=True)
+
+    def visualize(self, embedding,
                   attr: str,
                   cross_attr: str = None,
                   feature_ids=None,
                   sample_ids=None,
-                  save: bool = False):
+                  backend: str = 'plotly',
+                  viz_name: str = None,
+                  save: bool = False,
+                  **kwargs):
         """
+        This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
+        :py:attr:`embedding`. The user can restrict both the sample indices and feature indices, as well
+        as color and mark the samples by chosen metadata attributes. The transformation will happen post
+        restricting the features and samples.
 
         Args:
-            transform (object): Class instance which must contain the method fit_transform.
+            embedding (object): Class instance which must contain the method fit_transform. The output of
+                embedding.fit_transform(:py:attr:`DataSet.data`) must have at most 3 columns.
 
             attr (str): Name of the metadata attribute to color samples by.
 
             cross_attr (str): Name of the secondary metadata attribute to mark samples by.
 
-            feature_ids (list-like or array-like): Series indicating
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
 
-            sample_ids (list-like or array-like):
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            backend (str): Plotting backend to use. Can be either ``pyplot`` or ``plotly``. The default is ``pyplot``.
+
+            viz_name (str): Common name for the embedding used. e.g. MDS, PCA, UMAP, etc... The default is
+                :py:attr`embedding`.__str__().
 
             save (bool): Flag indicating to save the file. The file will save to self.path with the file name
-                self.name_transform_attrname.png
+                :py:attr:`DataSet.name`_transform-name_attrname.png
+
+            **kwargs (dict): Keyword arguments passed directly to :py:func:`scatter_pandas`, for indicating plot
+                properties.
 
         Returns:
             inplace method.
 
+        Examples:
+            >>> from pydataset import data
+            >>> df = data('heart')
+            >>>
+
         """
-        pass
+        # set defaults
+        if viz_name is None:
+            viz_name = embedding.__str__()
+
+        # slice the data set
+        ds = self.slice_dataset(feature_ids, sample_ids)
+        data = ds.data
+        metadata = ds.metadata
+
+        # transform data
+        data_trans = embedding.fit_transform(data.values)
+        dim = data_trans.shape[1]
+
+        # create dataframe from transformed data
+        data_trans = data.__class__(index=data.index, data=data_trans)
+        data_trans = pd.DataFrame(data_trans)
+
+        # restrict metadata to attributes
+        if cross_attr is None:
+            metadata = metadata[[attr]]
+        else:
+            metadata = metadata[[attr, cross_attr]]
+
+        # replace nan values
+        metadata = deepcopy(metadata.fillna('nan'))
+
+        # create common dataframe
+        df = data_trans
+        if cross_attr is None:
+            df[[attr]] = metadata
+        else:
+            df[[attr, cross_attr]] = metadata
+
+        # generate plot labels
+        if self.imputation_method == '':
+            imputation_method = 'None'
+        else:
+            imputation_method = self.imputation_method
+
+        if self.normalization_method == '':
+            normalization_method = 'None'
+        else:
+            normalization_method = self.normalization_method
+
+        if cross_attr is None:
+            title = 'Visualization of data set ' + self.name + ' using\n' \
+                    + viz_name + ' with labels given by ' + attr
+            save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
+                normalization_method) + '_' + str(attr) + '_' + str(dim)
+        else:
+            title = 'Visualization of data set ' + self.name + ' using\n' \
+                    + viz_name + ' with labels given by ' + attr + ' and ' + cross_attr
+            save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
+                normalization_method) + '_' + str(attr) + '_' + str(cross_attr) + '_' + str(dim)
+
+        if not save:
+            save_name = None
+
+        sub_title = 'Imputation: ' + str(imputation_method) + '\nNormalization: ' + str(normalization_method)
+
+        # plot data
+        if backend == "pyplot":
+            # imports
+            from datasci.core.helper import scatter_pandas
+
+            scatter_pandas(df=df,
+                        grp_colors=attr,
+                        grp_mrkrs=cross_attr,
+                        title=title,
+                        dim=dim,
+                        x_label='',
+                        y_label='',
+                        sub_title=sub_title,
+                        save_name=save_name,
+                        **kwargs)
+
+        #
 
     def reformat_metadata(self, convert_dtypes: bool = False):
         """
@@ -118,6 +222,64 @@ class DataSet:
         # convert dtypes
         if convert_dtypes:
             self.metadata = self.metadata.convert_dtypes()
+
+    def slice_dataset(self, feature_ids=None, sample_ids=None, name=None):
+        """
+        This method slices a DataSet at the prescribed sample and features ids.
+
+        Args:
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            name (str): Reference name for slice DataSet. Defaults to :py:attr:`DataSet.name`_slice
+
+        Returns:
+            DataSet : Slice of DataSet.
+
+        """
+        # set defaults
+        if feature_ids is None:
+            feature_ids = self.data.columns
+        if sample_ids is None:
+            sample_ids = self.data.index
+        if name is None:
+            name = self.name + '_slice'
+
+        # sort data and metadata together to be safe
+        self.data.sort_index(inplace=True)
+        self.metadata.sort_index(inplace=True)
+
+        # slice data at features
+        columns = self.data.columns
+        try:
+            data = self.data[feature_ids]
+        except KeyError:
+            data = self.data[columns[feature_ids]]
+
+        # slice data at samples
+        index = self.data.index
+        try:
+            data = data.loc[sample_ids]
+        except KeyError:
+            data = data.loc[index[sample_ids]]
+
+        # slice metadata at samples
+        try:
+            metadata = self.metadata.loc[sample_ids]
+        except KeyError:
+            metadata = self.metadata.loc[index[sample_ids]]
+
+        # generate slice DataSet
+        ds = DataSet(data=deepcopy(data),
+                metadata=deepcopy(metadata),
+                name=name,
+                normalization_method=self.normalization_method,
+                imputation_method=self.imputation_method)
+
+        return ds
 
     def autosummarize(self, use_dash=False, **kwargs):
         """
@@ -321,7 +483,8 @@ class DataSet:
     def save(self, file_path: str = None):
         """
         This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-        as self.path/self.name.ds where spaces in self.name are replaced with underscores.
+        as :py:attr:`DataSet.path`/:py:attr:`DataSet.name`.ds where the spaces in :py:attr:`DataSet.name` are replaced
+        with underscores.
 
         Args:
             file_path (str): Path of the file to save the instance of DataSet to. Default is None.
@@ -341,7 +504,7 @@ class DataSet:
     @classmethod
     def load(cls, file_path: str):
         """
-    `   This function loads and returns an instance of a DataSet class in pickle format.
+        This function loads and returns an instance of a DataSet class in pickle format.
 
         Args:
             file_path (str): Path of the file to load the instance of DataSet from.
@@ -353,12 +516,15 @@ class DataSet:
         with open(file_path, 'rb') as f:
             return pickle.load(f)
 
+
 # functions
 
 
 if __name__ == "__main__":
     # imports
     from datasci.core.dataset import DataSet as DS
+    from sklearn.manifold import MDS
+    import umap
     import pandas as pd
 
     # load data and metadata
@@ -371,5 +537,20 @@ if __name__ == "__main__":
     # run analysis
     ds.reformat_metadata(convert_dtypes=True)
     # ds.autosummarize(use_dash=True)
-    ds.save()
+    #ds.save()
+    embedding = MDS(n_components=3)
+    #embedding = umap.UMAP(n_components=2, n_neighbors=5)
+    sample_ids = -ds.metadata['Group'].isna()
+    ds.visualize(embedding=embedding,
+                 attr='Group',
+                 cross_attr='Study_Site',
+                 feature_ids=None,
+                 sample_ids=sample_ids,
+                 backend='pyplot',
+                 viz_name=None,
+                 save=True,
+                 mrkr_size=100,
+                 mrkr_list=None,
+                 figsize=(14, 10),
+                 no_axes=False)
 
