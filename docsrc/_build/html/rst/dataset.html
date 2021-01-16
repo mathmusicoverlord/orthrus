@@ -302,7 +302,8 @@ pandas infer_dtypes function to automatically infer the datatypes for each attri
 <dt id="dataset.DataSet.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-as path/name.ds where spaces in name are replaced with underscores.</p>
+as <a class="reference internal" href="#dataset.DataSet.path" title="dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#dataset.DataSet.name" title="dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#dataset.DataSet.name" title="dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
+with underscores.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance of DataSet to. Default is None.</p>
@@ -314,24 +315,65 @@ as path/name.ds where spaces in name are replaced with underscores.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="dataset.DataSet.visualize">
-<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transform</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt id="dataset.DataSet.slice_dataset">
+<code class="sig-name descname">slice_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.slice_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method slices a DataSet at the prescribed sample and features ids.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>transform</strong> (<em>object</em>) – Class instance which must contain the method fit_transform.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>DataSet.name`_slice</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Slice of DataSet.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataset.DataSet" title="dataset.DataSet">DataSet</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataset.DataSet.visualize">
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'plotly'</span></em>, <em class="sig-param"><span class="n">viz_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>. The user can restrict both the sample indices and feature indices, as well
+as color and mark the samples by chosen metadata attributes. The transformation will happen post
+restricting the features and samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
+embedding.fit_transform(<a class="reference internal" href="#dataset.DataSet.data" title="dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
 <li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
 <li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
-<li><p><strong>feature_ids</strong> (<em>list-like</em><em> or </em><em>array-like</em>) – Series indicating</p></li>
-<li><p><strong>sample_ids</strong> (<em>list-like</em><em> or </em><em>array-like</em>) – </p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>backend</strong> (<em>str</em>) – Plotting backend to use. Can be either <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> or <code class="docutils literal notranslate"><span class="pre">plotly</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">pyplot</span></code>.</p></li>
+<li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
+:py:attr`embedding`.__str__().</p></li>
 <li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
-self.name_transform_attrname.png</p></li>
+:py:attr:<a href="#id3"><span class="problematic" id="id4">`</span></a>DataSet.name`_transform-name_attrname.png</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">scatter_pandas()</span></code>, for indicating plot
+properties.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>inplace method.</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">(</span><span class="s1">&#39;heart&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
