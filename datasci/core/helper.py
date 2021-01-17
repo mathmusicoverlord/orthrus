@@ -81,10 +81,12 @@ def scatter_pandas(df: pd.DataFrame,
 
     Examples:
         >>> import pandas as pd
-        >>> from sklearn import datasets
-        >>> iris = datasets.load_iris()
-        >>> df = pd.DataFrame(data=iris.data).iloc[:, :1]
-        >>> df['target'] = iris.target
+        >>> from pydataset import data as pydat
+        >>> from datasci.core.dataset import DataSet as DS
+        >>> df = pydat('iris')
+        >>> data = df[['Sepal.Length', 'Sepal.Width']]
+        >>> metadata = df[['Species']]
+        >>> ds = DS(name='Iris', data=data, metadata=metadata)
         >>> scatter_pandas(df=df, grp_colors='target', title='Iris Dataset', dim=2, x_label='sepal length(cm)', y_label='sepal width(cm)')
     """
 

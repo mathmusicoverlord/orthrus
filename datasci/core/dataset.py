@@ -73,7 +73,7 @@ class DataSet:
                   cross_attr: str = None,
                   feature_ids=None,
                   sample_ids=None,
-                  backend: str = 'plotly',
+                  backend: str = 'pyplot',
                   viz_name: str = None,
                   save: bool = False,
                   **kwargs):
@@ -112,10 +112,14 @@ class DataSet:
             inplace method.
 
         Examples:
-            >>> from pydataset import data
-            >>> df = data('heart')
-            >>>
-
+            >>> from pydataset import data as pydat
+            >>> from sklearn.manifold import MDS
+            >>> df = pydat('iris')
+            >>> data = df['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> embedding = MDS(n_components=3)
+            >>> ds.visualize(embedding=embedding, attr='Species', no_axes=True)
         """
         # set defaults
         if viz_name is None:

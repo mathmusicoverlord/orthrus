@@ -15,4 +15,5 @@ dependencies:
     - imblearn==0.0
     - missingpy==0.2.0
     - plotly==4.11.0
+    - pydataset=0.2.0
     - umap-learn==0.4.6
