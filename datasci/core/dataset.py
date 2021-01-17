@@ -542,24 +542,30 @@ class DataSet:
         with open(file_path, 'wb') as f:
             pickle.dump(self, file=f)
 
+    # TODO: Add conversion to cdd method.
+    # TODO: Add basic normalization methods
+    # TODO: Add imputation method
+    # TODO: Add varattr
+
     # class methods
-    @classmethod
-    def load(cls, file_path: str):
-        """
-        This function loads and returns an instance of a DataSet class in pickle format.
-
-        Args:
-            file_path (str): Path of the file to load the instance of DataSet from.
-
-        Returns:
-            DataSet : Class instance encoded by pickle binary file_path.
-        """
-        # open file and unpickle
-        with open(file_path, 'rb') as f:
-            return pickle.load(f)
 
 
 # functions
+def load(file_path: str):
+    """
+    This function loads and returns an instance of a DataSet class in pickle format.
+
+    Args:
+        file_path (str): Path of the file to load the instance of DataSet from.
+
+    Returns:
+        DataSet : Class instance encoded by pickle binary file_path.
+    """
+    # open file and unpickle
+    with open(file_path, 'rb') as f:
+        return pickle.load(f)
+
+# TODO: Add
 
 
 if __name__ == "__main__":
