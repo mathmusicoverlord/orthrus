@@ -11,7 +11,8 @@ from copy import deepcopy
 from numpy.core import ndarray
 from pandas.core.frame import DataFrame
 from pandas.core.frame import Series
-
+from datasci.core.helper import scatter_pandas
+from datasci.core.helper import scatter_plotly
 
 # classes
 class DataSet:
@@ -100,13 +101,15 @@ class DataSet:
             backend (str): Plotting backend to use. Can be either ``pyplot`` or ``plotly``. The default is ``pyplot``.
 
             viz_name (str): Common name for the embedding used. e.g. MDS, PCA, UMAP, etc... The default is
-                :py:attr`embedding`.__str__().
+                :py:attr:`embedding`.__str__().
 
             save (bool): Flag indicating to save the file. The file will save to self.path with the file name
-                :py:attr:`DataSet.name`_transform-name_attrname.png
+                :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.png for ``pyplot`` and
+                :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.html for ``plotly``
 
-            **kwargs (dict): Keyword arguments passed directly to :py:func:`scatter_pandas`, for indicating plot
-                properties.
+            **kwargs (dict): Keyword arguments passed directly to :py:func:`helper.scatter_pandas` when using the backend
+                ``pyplot`` and :py:func:`helper.scatter_plotly` when using the backend ``plotly``, for indicating
+                plot properties.
 
         Returns:
             inplace method.
@@ -121,6 +124,30 @@ class DataSet:
             >>> ds = DS(name='Iris', data=data, metadata=metadata)
             >>> embedding = MDS(n_components=3)
             >>> ds.visualize(embedding=embedding, attr='Species', no_axes=True)
+
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> from sklearn.decomposition import PCA
+            >>> import numpy as np
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> metadata['test'] = np.random.randint(1, 3, (metadata.shape[0],))
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> embedding = PCA(n_components=3)
+            >>> ds.visualize(embedding=embedding,
+            ...              attr='Species',
+            ...              cross_attr='test',
+            ...              x_label='PC 1',
+            ...              y_label='PC 2',
+            ...              z_label='PC 3',
+            ...              backend='plotly',
+            ...              mrkr_size=10,
+            ...              mrkr_list=['circle', 'cross'],
+            ...              figsize=(900,800),
+            ...              use_dash=True,
+            ...              debug=True,
+            ...              save=True)
         """
         # set defaults
         if viz_name is None:
@@ -180,25 +207,35 @@ class DataSet:
         if not save:
             save_name = None
 
-        sub_title = 'Imputation: ' + str(imputation_method) + '\nNormalization: ' + str(normalization_method)
-
         # plot data
         if backend == "pyplot":
-            # imports
-            from datasci.core.helper import scatter_pandas
+            # set subtitle
+            sub_title = 'Imputation: ' + str(imputation_method) + '\nNormalization: ' + str(normalization_method)
 
             scatter_pandas(df=df,
                         grp_colors=attr,
                         grp_mrkrs=cross_attr,
                         title=title,
                         dim=dim,
-                        x_label='',
-                        y_label='',
                         sub_title=sub_title,
                         save_name=save_name,
                         **kwargs)
 
-        #
+        elif backend== "plotly":
+            # set subtitle
+            sub_title = 'Imputation: ' + str(imputation_method) + ', Normalization: ' + str(normalization_method)
+
+            # make title fit with html
+            title = title.replace('\n', '<br>')
+
+            scatter_plotly(df=df,
+                        grp_colors=attr,
+                        grp_mrkrs=cross_attr,
+                        title=title,
+                        dim=dim,
+                        sub_title=sub_title,
+                        save_name=save_name,
+                        **kwargs)
 
     def reformat_metadata(self, convert_dtypes: bool = False):
         """
@@ -295,7 +332,7 @@ class DataSet:
         adjust the number of bins and attribute.
 
         Args:
-            use_dash (bool): Flag for indicating whether or not to use dash dashboard. Dafault is False.
+            use_dash (bool): Flag for indicating whether or not to use dash dashboard. Default is False.
 
             **kwargs (dict): Passed directly to dash.Dash.app.run_server for configuring host server.
                 See dash documentation for further details.
@@ -526,36 +563,28 @@ class DataSet:
 
 
 if __name__ == "__main__":
-    # imports
+    from pydataset import data as pydat
     from datasci.core.dataset import DataSet as DS
-    from sklearn.manifold import MDS
-    import umap
-    import pandas as pd
+    from sklearn.decomposition import PCA
+    import numpy as np
 
-    # load data and metadata
-    data = pd.read_csv("/hdd/Test_Data/test_data.csv", index_col=0)
-    metadata = pd.read_csv("/hdd/Test_Data/test_metadata.csv", index_col=0)
-
-    # create DataSet instance
-    ds = DS(name='Test Set', path='/hdd/Test_Data', data=data, metadata=metadata)
-
-    # run analysis
-    ds.reformat_metadata(convert_dtypes=True)
-    # ds.autosummarize(use_dash=True)
-    #ds.save()
-    embedding = MDS(n_components=3)
-    #embedding = umap.UMAP(n_components=2, n_neighbors=5)
-    sample_ids = -ds.metadata['Group'].isna()
+    df = pydat('iris')
+    data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+    metadata = df[['Species']]
+    metadata['test'] = np.random.randint(1, 3, (metadata.shape[0],))
+    ds = DS(name='Iris', data=data, metadata=metadata)
+    embedding = PCA(n_components=3)
     ds.visualize(embedding=embedding,
-                 attr='Group',
-                 cross_attr='Study_Site',
-                 feature_ids=None,
-                 sample_ids=sample_ids,
-                 backend='pyplot',
-                 viz_name=None,
-                 save=True,
-                 mrkr_size=100,
-                 mrkr_list=None,
-                 figsize=(14, 10),
-                 no_axes=False)
+                 attr='Species',
+                 cross_attr='test',
+                 x_label='PC 1',
+                 y_label='PC 2',
+                 z_label='PC 3',
+                 backend='plotly',
+                 mrkr_size=10,
+                 mrkr_list=['circle', 'cross', 'x-thin'],
+                 figsize=(900,800),
+                 use_dash=True,
+                 debug=True,
+                 save=True)
 
