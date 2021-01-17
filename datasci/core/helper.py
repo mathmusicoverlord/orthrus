@@ -231,8 +231,6 @@ def scatter_plotly(df: pd.DataFrame,
         figsize (tuple): Tuple whose x-coordinate determines the width of the figure and y-coordinate
             determines the height of the figure. The default is (900, 800).
 
-        no_axes (bool): Flag indicating whether or not to show the axes in the plot.
-
         save_name (str): The path of where to save the figure. If not given the figure will not be saved.
 
         use_dash (bool) = Flag indicating whether to host the figure through dash.
