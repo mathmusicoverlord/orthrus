@@ -17,6 +17,9 @@ github:
 	@rm -r ../docs/*
 	@touch ../docs/.nojekyll
 	@cp -a _build/html/. ../docs
+	@git add docs docsrc
+	@git commit -m "updated docs"
+	@git push
 
 .PHONY: help Makefile
 
