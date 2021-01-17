@@ -35,4 +35,4 @@ metadata = pd.read_csv("./test_data/iris_metadata.csv", index_col=0)
 ds = DS(name='iris', path='./test_data', data=data, metadata=metadata)
 
 ```
-here ```path``` indicates where ```ds``` will save figures and results outputed by the class methods.
+here ```path``` indicates where ```ds``` will save figures and results output by the class methods.
