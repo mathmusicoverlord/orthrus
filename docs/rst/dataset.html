@@ -266,23 +266,6 @@ See dash documentation for further details.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="dataset.DataSet.load">
-<em class="property">classmethod </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function loads and returns an instance of a DataSet class in pickle format.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance of DataSet from.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#dataset.DataSet" title="dataset.DataSet">DataSet</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="dataset.DataSet.reformat_metadata">
 <code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
@@ -409,6 +392,23 @@ plot properties.</p></li>
 </div>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt id="dataset.load">
+<code class="sig-prename descclassname">dataset.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads and returns an instance of a DataSet class in pickle format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance of DataSet from.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#dataset.DataSet" title="dataset.DataSet">DataSet</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
