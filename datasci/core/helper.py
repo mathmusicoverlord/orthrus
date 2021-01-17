@@ -85,11 +85,11 @@ def scatter_pandas(df: pd.DataFrame,
         >>> from datasci.core.helper import scatter_pandas
         >>> df = pydat('iris')
         >>> scatter_pandas(df=df,
-        ...                grp_colors='target',
+        ...                grp_colors='Species',
         ...                title='Iris Dataset',
         ...                dim=2,
-        ...                x_label='sepal length(cm)',
-        ...                y_label='sepal width(cm)')
+        ...                x_label='Sepal.Length',
+        ...                y_label='Sepal.Width')
     """
 
     from matplotlib import pyplot as plt
@@ -249,11 +249,11 @@ def scatter_plotly(df: pd.DataFrame,
         >>> from datasci.core.helper import scatter_plotly
         >>> df = pydat('iris')
         >>> scatter_plotly(df=df,
-        ...                grp_colors='target',
+        ...                grp_colors='Species',
         ...                title='Iris Dataset',
         ...                dim=2,
-        ...                x_label='sepal length(cm)',
-        ...                y_label='sepal width(cm)',
+        ...                x_label='Sepal.Length',
+        ...                y_label='Sepal.Width',
         ...                use_dash=True)
     """
 
