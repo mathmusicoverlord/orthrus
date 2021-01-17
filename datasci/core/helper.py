@@ -83,6 +83,7 @@ def scatter_pandas(df: pd.DataFrame,
         >>> import pandas as pd
         >>> from pydataset import data as pydat
         >>> from datasci.core.dataset import DataSet as DS
+        >>> from datasci.core.helper import scatter_pandas
         >>> df = pydat('iris')
         >>> data = df[['Sepal.Length', 'Sepal.Width']]
         >>> metadata = df[['Species']]

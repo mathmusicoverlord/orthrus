@@ -113,9 +113,10 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
             >>> from sklearn.manifold import MDS
             >>> df = pydat('iris')
-            >>> data = df['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
             >>> ds = DS(name='Iris', data=data, metadata=metadata)
             >>> embedding = MDS(n_components=3)
