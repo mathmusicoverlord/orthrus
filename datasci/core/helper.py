@@ -229,7 +229,7 @@ def scatter_plotly(df: pd.DataFrame,
         sub_title (str): A custom subtitle to the plot. The default is blank.
 
         figsize (tuple): Tuple whose x-coordinate determines the width of the figure and y-coordinate
-            determines the height of the figure. The default is (14, 10).
+            determines the height of the figure. The default is (900, 800).
 
         no_axes (bool): Flag indicating whether or not to show the axes in the plot.
 
