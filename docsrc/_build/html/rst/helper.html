@@ -185,56 +185,8 @@ is a method of the class instance.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="helper.scatter_pandas">
-<code class="sig-prename descclassname">helper.</code><code class="sig-name descname">scatter_pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">z_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">sub_title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#helper.scatter_pandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
-metadata.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
-must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
-attribute resp. The grp_mrkrs attribute is optional.</p></li>
-<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
-<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
-<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
-markers to such as .,+,x,etc..</p></li>
-<li><p><strong>mrkr_size</strong> (<em>int</em>) – The size to be used for the markers. Default is 100.</p></li>
-<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
-37 distinct markers.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – The title of the plot. The default is blank.</p></li>
-<li><p><strong>x_label</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
-<li><p><strong>y_label</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
-<li><p><strong>z_label</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
-<li><p><strong>sub_title</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
-determines the height of the figure. The default is (14, 10).</p></li>
-<li><p><strong>no_axes</strong> (<em>bool</em>) – Flag indicating whether or not to show the axes in the plot.</p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pandas</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pandas</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">x_label</span><span class="o">=</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Sepal.Width&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
 <dt id="helper.scatter_plotly">
-<code class="sig-prename descclassname">helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">z_label</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">sub_title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">sub_title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
 metadata.</p>
 <dl class="field-list simple">
@@ -250,17 +202,16 @@ markers to such as .,+,x,etc..</p></li>
 <li><p><strong>mrkr_size</strong> (<em>int</em>) – The size to be used for the markers. Default is 100.</p></li>
 <li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
 37 distinct markers.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – The title of the plot. The default is blank.</p></li>
-<li><p><strong>x_label</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
-<li><p><strong>y_label</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
-<li><p><strong>z_label</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
+<li><p><strong>zlabel</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
 <li><p><strong>sub_title</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
 <li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
 determines the height of the figure. The default is (900, 800).</p></li>
 <li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
 <li><p><strong>use_dash</strong> (<em>bool</em>) – </p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to dash.Dash.app.run_server for configuring host server.
-See dash documentation for further details.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to <code class="docutils literal notranslate"><span class="pre">plotly.express.scatter</span></code> and then to <code class="docutils literal notranslate"><span class="pre">dash.Dash.app.run_server</span></code> for
+configuring host server. See dash documentation for further details.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -274,11 +225,56 @@ See dash documentation for further details.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_plotly</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="helper.scatter_pyplot">
+<code class="sig-prename descclassname">helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sub_title</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
+metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
+must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
+attribute resp. The grp_mrkrs attribute is optional.</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
+<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
+<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
+markers to such as .,+,x,etc..</p></li>
+<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
+37 distinct markers.</p></li>
+<li><p><strong>sub_title</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
+determines the height of the figure. The default is (14, 10).</p></li>
+<li><p><strong>no_axes</strong> (<em>bool</em>) – Flag indicating whether or not to show the axes in the plot.</p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – All keyword arguments are passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim`=2</span>
+<span class="pre">or</span> <span class="pre">``mpl_toolkits.mplot3d.axes3d.Axes3D.update()`</span></code> if :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>dim`=3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pyplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">x_label</span><span class="o">=</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal.Width&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
