@@ -372,7 +372,7 @@ with underscores.</p>
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>DataSet.name`_slice</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="#dataset.DataSet.name" title="dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -419,9 +419,9 @@ embedding.fit_transform(<a class="reference internal" href="#dataset.DataSet.dat
 <li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
 <a class="reference internal" href="#dataset.DataSet.name" title="dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
 <a class="reference internal" href="#dataset.DataSet.name" title="dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments passed directly to <a class="reference internal" href="helper.html#helper.scatter_pyplot" title="helper.scatter_pyplot"><code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code></a> when using the backend
-<code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <a class="reference internal" href="helper.html#helper.scatter_plotly" title="helper.scatter_plotly"><code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code></a> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for indicating
-plot properties.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments passed directly to <a class="reference internal" href="helper.html#helper.scatter_pyplot" title="helper.scatter_pyplot"><code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code></a> when using the
+backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <a class="reference internal" href="helper.html#helper.scatter_plotly" title="helper.scatter_plotly"><code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code></a> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
+indicating plot properties.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
