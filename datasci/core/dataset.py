@@ -39,6 +39,14 @@ class DataSet:
             used on the data. Default is the empty string.
 
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
+
+    Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
     """
 
     # methods
@@ -249,6 +257,15 @@ class DataSet:
 
         Returns:
             inplace method.
+
+        Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> ds.reformat_metadata(convert_dtypes=True)
         """
 
         # perform basic cleaning
@@ -281,6 +298,15 @@ class DataSet:
         Returns:
             DataSet : Slice of DataSet.
 
+        Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> samples = ds.metadata['Species'] == 'setosa'
+            >>> ds_setosa = ds.slice_dataset(sample_ids=samples)
         """
         # set defaults
         if feature_ids is None:
@@ -340,6 +366,14 @@ class DataSet:
         Returns:
             inplace method.
 
+        Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> ds.autosummarize(use_dash=True, port=8787)
         """
         # set the data
         df = self.metadata
@@ -533,6 +567,15 @@ class DataSet:
 
         Returns:
             inplace method.
+
+        Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> ds.save()
         """
         # check path
         if file_path is None:
@@ -560,6 +603,9 @@ def load(file_path: str):
 
     Returns:
         DataSet : Class instance encoded by pickle binary file_path.
+
+    Examples:
+            >>> ds = load(file_path='./iris.ds')
     """
     # open file and unpickle
     with open(file_path, 'rb') as f:
