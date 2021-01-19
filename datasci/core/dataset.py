@@ -278,7 +278,7 @@ class DataSet:
         used to :py:attr:`DataSet.normalization_method`.
 
         Args:
-            normalizer: Class instance which must contain the method fit_transform. The output of
+            normalizer (object): Class instance which must contain the method fit_transform. The output of
                 normalizer.fit_transform(:py:attr:`DataSet.data`) must have the same number of columns
                 as :py:attr:`DataSet.data`.
 
@@ -317,11 +317,11 @@ class DataSet:
         data_trans = normalizer.fit_transform(data.values)
 
         # create dataframe from transformed data
-        data_trans = data.__class__(index=data.index, data=data_trans)
+        data_trans = data.__class__(index=data.index, columns =data.columns, data=data_trans)
 
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
-            self.data.loc[data.index] = data_trans
+            self.data.update(data_trans)
             self.normalization_method = norm_name
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")

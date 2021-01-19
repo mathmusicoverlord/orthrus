@@ -89,12 +89,6 @@ def scatter_pyplot(df: pd.DataFrame,
     from mpl_toolkits.mplot3d import Axes3D
     import seaborn as sns
 
-    # set pallete
-    num_colors = len(df[grp_colors].unique())
-    if palette is None:
-        palette = 'Accent'
-    palette = sns.color_palette(palette, num_colors)
-
     # set defaults
     if mrkr_list is None:
         mrkr_list = [".", "+", ",", "o", "v", "^", "<", ">", "1", "2", "3", "4", "8", "s", "p", "P", "*", "h", "H", "x",
@@ -104,55 +98,176 @@ def scatter_pyplot(df: pd.DataFrame,
         grp_mrkrs = str(np.random.rand())
         df[grp_mrkrs] = ''
 
-    if dim == 3:
-        fig = plt.figure(figsize=figsize)
-        ax = Axes3D(fig)
-        for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
-            grp_name0 = grp0[0]
-            grp_idx0 = grp0[1]
+    # get dtypes of attrs
+    color_type =  pd.api.types.infer_dtype(pd.df[grp_colors])
+    mrkr_type = pd.api.types.infer_dtype(pd.df[grp_mrkrs])
 
-            for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
-                grp_name1 = grp1[0]
-                grp_idx1 = grp1[1]
+    if color_type != 'floating' and mrkr_type != 'floating':
+        # data is discrete
 
-                grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
-                x = df.loc[grp_idx, df.columns[0]]
-                y = df.loc[grp_idx, df.columns[1]]
-                z = df.loc[grp_idx, df.columns[2]]
-                label = grp_name0 + '/' + grp_name1
-                label = label.rstrip('/')
+        # set pallete
+        num_colors = len(df[grp_colors].unique())
+        if palette is None:
+            palette = 'Accent'
+        palette = sns.color_palette(palette, num_colors)
 
-                mrkr_size = kwargs.get('s', 100)
-                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+        if dim == 3:
+            fig = plt.figure(figsize=figsize)
+            ax = Axes3D(fig)
+            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
+                grp_name0 = grp0[0]
+                grp_idx0 = grp0[1]
 
-        ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
-        #ax.set_zlabel(zlabel, fontsize=16)
+                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                    grp_name1 = grp1[0]
+                    grp_idx1 = grp1[1]
 
-
-    elif dim == 2:
-        fig, ax = plt.subplots(1, figsize=figsize)
-        for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
-            grp_name0 = grp0[0]
-            grp_idx0 = grp0[1]
-
-            for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
-                grp_name1 = grp1[0]
-                grp_idx1 = grp1[1]
-
-                grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
-                if len(grp_idx) > 0:
+                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
                     x = df.loc[grp_idx, df.columns[0]]
                     y = df.loc[grp_idx, df.columns[1]]
+                    z = df.loc[grp_idx, df.columns[2]]
                     label = grp_name0 + '/' + grp_name1
                     label = label.rstrip('/')
 
                     mrkr_size = kwargs.get('s', 100)
-                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+                    ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
 
-        ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
+            ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
+            #ax.set_zlabel(zlabel, fontsize=16)
 
-    else:
-        raise ValueError("Embedding dimension must be 2 or 3!")
+        elif dim == 2:
+            fig, ax = plt.subplots(1, figsize=figsize)
+            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
+                grp_name0 = grp0[0]
+                grp_idx0 = grp0[1]
+
+                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                    grp_name1 = grp1[0]
+                    grp_idx1 = grp1[1]
+
+                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
+                    if len(grp_idx) > 0:
+                        x = df.loc[grp_idx, df.columns[0]]
+                        y = df.loc[grp_idx, df.columns[1]]
+                        label = grp_name0 + '/' + grp_name1
+                        label = label.rstrip('/')
+
+                        mrkr_size = kwargs.get('s', 100)
+                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+
+            ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
+
+        else:
+            raise ValueError("Embedding dimension must be 2 or 3!")
+
+    if color_type == 'floating' and mrkr_type != 'floating':
+        # color is continuous
+
+        # set pallete
+        if palette is None:
+            palette = 'Accent'
+        palette = sns.color_palette(palette, as_cmap=True)
+        df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+
+        if dim == 3:
+            fig = plt.figure(figsize=figsize)
+            ax = Axes3D(fig)
+
+            for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                grp_name1 = grp1[0]
+                grp_idx1 = grp1[1]
+
+                x = df.loc[grp_idx1, df.columns[0]]
+                y = df.loc[grp_idx1, df.columns[1]]
+                z = df.loc[grp_idx1, df.columns[2]]
+                c = df.loc[grp_idx1, 'c']
+                label = grp_name1
+
+                mrkr_size = kwargs.get('s', 100)
+                ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size)
+
+            ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
+            #ax.set_zlabel(zlabel, fontsize=16)
+
+
+        elif dim == 2:
+            fig, ax = plt.subplots(1, figsize=figsize)
+            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
+                grp_name0 = grp0[0]
+                grp_idx0 = grp0[1]
+
+                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                    grp_name1 = grp1[0]
+                    grp_idx1 = grp1[1]
+
+                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
+                    if len(grp_idx) > 0:
+                        x = df.loc[grp_idx, df.columns[0]]
+                        y = df.loc[grp_idx, df.columns[1]]
+                        label = grp_name0 + '/' + grp_name1
+                        label = label.rstrip('/')
+
+                        mrkr_size = kwargs.get('s', 100)
+                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+
+            ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
+
+        else:
+            raise ValueError("Embedding dimension must be 2 or 3!")
+
+    if color_type == 'floating' and mrkr_type == 'floating':
+        # color is continuous
+
+        # set pallete
+        if palette is None:
+            palette = 'Accent'
+        palette = sns.color_palette(palette, as_cmap=True)
+        df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+        df['s'] = ((df[grp_mrkrs] - df[grp_mrkrs].min())+df[grp_colors].max())/df[grp_colors].max()
+
+        if dim == 3:
+            fig = plt.figure(figsize=figsize)
+            ax = Axes3D(fig)
+
+            x = df[df.columns[0]]
+            y = df[df.columns[1]]
+            z = df[df.columns[2]]
+            c = df['c']
+            s = df['s']
+            label = grp_name1
+
+            mrkr_size = kwargs.get('s', 100)
+            ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=s*mrkr_size)
+
+            ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
+            #ax.set_zlabel(zlabel, fontsize=16)
+
+
+        elif dim == 2:
+            fig, ax = plt.subplots(1, figsize=figsize)
+            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
+                grp_name0 = grp0[0]
+                grp_idx0 = grp0[1]
+
+                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                    grp_name1 = grp1[0]
+                    grp_idx1 = grp1[1]
+
+                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
+                    if len(grp_idx) > 0:
+                        x = df.loc[grp_idx, df.columns[0]]
+                        y = df.loc[grp_idx, df.columns[1]]
+                        label = grp_name0 + '/' + grp_name1
+                        label = label.rstrip('/')
+
+                        mrkr_size = kwargs.get('s', 100)
+                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+
+            ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
+
+        else:
+            raise ValueError("Embedding dimension must be 2 or 3!")
+
 
     if no_axes:
         ax.axis('off')
