@@ -11,7 +11,7 @@ from copy import deepcopy
 from numpy.core import ndarray
 from pandas.core.frame import DataFrame
 from pandas.core.frame import Series
-from datasci.core.helper import scatter_pandas
+from datasci.core.helper import scatter_pyplot
 from datasci.core.helper import scatter_plotly
 
 # classes
@@ -23,6 +23,8 @@ class DataSet:
     Attributes:
         name (str): Reference name for the dataset. Default is the empty string.
 
+        description (str): Short description of data set.
+
         path (str): File path for saving DataSet instance and related outputs. Default is the empty string.
 
         data (pandas.DataFrame): Numerical data or features of the data set arranged as samples x features.
@@ -33,6 +35,10 @@ class DataSet:
             If labels are missing or there are more labels than in the data, the class will automatically restrict
             to just those samples used in the data and fill in NaN where there are missing samples. Default is the
             empty DataFrame.
+
+        vardata (pandas.DataFrame): Categorical data or attributes of the features on the dataset arranged as
+            features x attributes. The feature labels in the index column should be the same format as those used for
+            the columns in the data DataFrame. Default is None.
 
         normalization_method (str): Label indicating the normalization used on the data. Future normalization will
             append as normalization_1/normalization_2/.../normalization_n indicating the sequence of normalizations
@@ -51,14 +57,17 @@ class DataSet:
 
     # methods
     def __init__(self, name: str = '',
+                 description: str = '',
                  path: str = os.curdir,
                  data: DataFrame = pd.DataFrame(),
                  metadata: DataFrame = pd.DataFrame(),
+                 vardata: DataFrame = pd.DataFrame(),
                  normalization_method: str = '',
                  imputation_method: str = ''):
 
         # Load attributes
         self.name = name
+        self._description = description
         self.path = path.rstrip('/') + '/'
         self.data = data
         self.metadata = metadata
@@ -68,7 +77,7 @@ class DataSet:
         # private attributes
 
         # restrict metadata to data
-        meta_index = self.metadata.index.drop(self.metadata.index.difference(self.data.index))
+        meta_index = self.metadata.index.intersection(self.data.index)
         missing_data_index = self.data.index.drop(meta_index)
         missing_data = pd.DataFrame(index=missing_data_index)
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
@@ -76,6 +85,16 @@ class DataSet:
         # sort data and metadata to be in same order
         self.data.sort_index(inplace=True)
         self.metadata.sort_index(inplace=True)
+
+        # Assign vardata
+        if vardata is None:
+            self.vardata = pd.DataFrame(index=self.data.columns)
+        else:
+            # restrict metadata to data
+            var_index = vardata.index.intersection(self.data.transpose().index)
+            missing_data_index = self.data.transpose().index.drop(var_index)
+            missing_data = pd.DataFrame(index=missing_data_index)
+            self.vardata = vardata.loc[var_index].append(missing_data)
 
     def visualize(self, embedding,
                   attr: str,
@@ -115,9 +134,9 @@ class DataSet:
                 :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.png for ``pyplot`` and
                 :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.html for ``plotly``
 
-            **kwargs (dict): Keyword arguments passed directly to :py:func:`helper.scatter_pandas` when using the backend
-                ``pyplot`` and :py:func:`helper.scatter_plotly` when using the backend ``plotly``, for indicating
-                plot properties.
+            **kwargs (dict): Keyword arguments passed directly to :py:func:`helper.scatter_pyplot` when using the
+                backend ``pyplot`` and :py:func:`helper.scatter_plotly` when using the backend ``plotly``, for
+                indicating plot properties.
 
         Returns:
             inplace method.
@@ -146,9 +165,9 @@ class DataSet:
             >>> ds.visualize(embedding=embedding,
             ...              attr='Species',
             ...              cross_attr='test',
-            ...              x_label='PC 1',
-            ...              y_label='PC 2',
-            ...              z_label='PC 3',
+            ...              xlabel='PC 1',
+            ...              ylabel='PC 2',
+            ...              zlabel='PC 3',
             ...              backend='plotly',
             ...              mrkr_size=10,
             ...              mrkr_list=['circle', 'cross'],
@@ -218,32 +237,94 @@ class DataSet:
         # plot data
         if backend == "pyplot":
             # set subtitle
-            sub_title = 'Imputation: ' + str(imputation_method) + '\nNormalization: ' + str(normalization_method)
+            subtitle = 'Imputation: ' + str(imputation_method) + '\nNormalization: ' + str(normalization_method)
+            if not ('subtitle' in kwargs.keys()):
+                kwargs['subtitle'] = subtitle
 
-            scatter_pandas(df=df,
+            # add to keyword arguments
+            if not ('title' in kwargs.keys()):
+                kwargs['title'] = title
+
+            scatter_pyplot(df=df,
                         grp_colors=attr,
                         grp_mrkrs=cross_attr,
-                        title=title,
                         dim=dim,
-                        sub_title=sub_title,
                         save_name=save_name,
                         **kwargs)
 
-        elif backend== "plotly":
+        elif backend == "plotly":
             # set subtitle
-            sub_title = 'Imputation: ' + str(imputation_method) + ', Normalization: ' + str(normalization_method)
+            subtitle = 'Imputation: ' + str(imputation_method) + ', Normalization: ' + str(normalization_method)
+            if not ('subtitle' in kwargs.keys()):
+                kwargs['subtitle'] = subtitle
 
             # make title fit with html
             title = title.replace('\n', '<br>')
 
+            # add to keyword arguments
+            if not ('title' in kwargs.keys()):
+                kwargs['title'] = title
+
             scatter_plotly(df=df,
                         grp_colors=attr,
                         grp_mrkrs=cross_attr,
-                        title=title,
                         dim=dim,
-                        sub_title=sub_title,
                         save_name=save_name,
                         **kwargs)
+
+    def normalize(self, normalizer, feature_ids=None, sample_ids=None, norm_name: str = None):
+        """
+        Normalizes the data of the dataset according to a normalizer class. Appeneds the normalization method
+        used to :py:attr:`DataSet.normalization_method`.
+
+        Args:
+            normalizer: Class instance which must contain the method fit_transform. The output of
+                normalizer.fit_transform(:py:attr:`DataSet.data`) must have the same number of columns
+                as :py:attr:`DataSet.data`.
+
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            norm_name (str): Common name for the normalization used. e.g. log, unit, etc... The default is
+                :py:attr:`normalizer`.__str__().
+
+        Returns:
+            inplace method.
+
+        Examples:
+            >>> from pydataset import data as pydat
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> from sklearn.preprocessing import StandardScaler  as SS
+            >>> df = pydat('iris')
+            >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+            >>> metadata = df[['Species']]
+            >>> ds = DS(name='Iris', data=data, metadata=metadata)
+            >>> normalizer = SS()
+            >>> ds.normalize(normalizer=normalizer, norm_name='standard')
+        """
+        # set defaults
+        if norm_name is None:
+            norm_name = normalizer.__str__()
+
+        # slice the data set
+        ds = self.slice_dataset(feature_ids, sample_ids)
+        data = ds.data
+
+        # transform data
+        data_trans = normalizer.fit_transform(data.values)
+
+        # create dataframe from transformed data
+        data_trans = data.__class__(index=data.index, data=data_trans)
+
+        # set data
+        if self.data.shape[1] == data_trans.shape[1]:
+            ds.data.loc[data.index] = data_trans
+            self.normalization_method = norm_name
+        else:
+            raise ValueError("Argument \"normalizer\" should not change the number of features.")
 
     def reformat_metadata(self, convert_dtypes: bool = False):
         """
@@ -293,7 +374,7 @@ class DataSet:
             sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
                 ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
 
-            name (str): Reference name for slice DataSet. Defaults to :py:attr:`DataSet.name`_slice
+            name (str): Reference name for slice DataSet. Defaults to :py:attr:`DataSet.name` _slice
 
         Returns:
             DataSet : Slice of DataSet.
@@ -349,15 +430,18 @@ class DataSet:
 
         return ds
 
-    def autosummarize(self, use_dash=False, **kwargs):
+    def autosummarize(self, which='metadata', use_dash=False, **kwargs):
         """
-        This method gives a human-readable output of summary statistics for the metadata. It includes basic
-        statistics such as mean, median, mode, etc. and gives value counts for discrete data attributes. When
-        using dash am interactive dashboard will be created. The user will then be able to view histograms for each
-        attribute in the metadata along with basic summary statistics. The user can interact with the dashboard to
-        adjust the number of bins and attribute.
+        This method gives a human-readable output of summary statistics for the data/metadata/vardata.
+        It includes basic statistics such as mean, median, mode, etc. and gives value counts for discrete data
+        attributes. When using dash am interactive dashboard will be created. The user will then be able to view
+        histograms for each attribute in the metadata along with basic summary statistics. The user can interact
+        with the dashboard to adjust the number of bins and attribute.
 
         Args:
+            which (str): String indicating which data to use. Choices are 'data', 'metadata', or 'vardata'. Default
+                is 'metadata'.
+
             use_dash (bool): Flag for indicating whether or not to use dash dashboard. Default is False.
 
             **kwargs (dict): Passed directly to dash.Dash.app.run_server for configuring host server.
@@ -376,7 +460,14 @@ class DataSet:
             >>> ds.autosummarize(use_dash=True, port=8787)
         """
         # set the data
-        df = self.metadata
+        if which == 'metadata':
+            df = self.metadata
+        elif which == 'data':
+            df = self.data
+        elif which == 'vardata':
+            df = self.vardata
+        else:
+            raise ValueError("argument which must be either 'metadata', 'data', or 'vardata'!")
 
         if use_dash:
             import dash
@@ -391,7 +482,7 @@ class DataSet:
 
             # the html.Div should open for html code
             # dcc is dash core component sets up the dash element. The first one here is a dropdown menu
-            app.layout = html.Div([html.H1(children=self.name + " Metadata Auto-Summary"),
+            app.layout = html.Div([html.H1(children=self.name + ' ' + which.capitalize() + " Auto-Summary"),
                                    html.Div(children='''Choose an attribute below.''', style={'padding': 10}),
 
                                    html.Div([
@@ -585,6 +676,20 @@ class DataSet:
         with open(file_path, 'wb') as f:
             pickle.dump(self, file=f)
 
+    def print_description(self, line_width: int = 50):
+        """
+        This method prints the description of the dataset in a human-readable format.
+
+        Args:
+            line_width (int): Number of characters per line to print for description.
+
+        Returns:
+            inplace method.
+        """
+
+        import textwrap
+        print(textwrap.fill(self._description, line_width))
+
     # TODO: Add conversion to cdd method.
     # TODO: Add basic normalization methods
     # TODO: Add imputation method
@@ -594,7 +699,7 @@ class DataSet:
 
 
 # functions
-def load(file_path: str):
+def load_dataset(file_path: str):
     """
     This function loads and returns an instance of a DataSet class in pickle format.
 
@@ -605,38 +710,53 @@ def load(file_path: str):
         DataSet : Class instance encoded by pickle binary file_path.
 
     Examples:
-            >>> ds = load(file_path='./iris.ds')
+            >>> ds = load_dataset(file_path='./iris.ds')
     """
     # open file and unpickle
     with open(file_path, 'rb') as f:
         return pickle.load(f)
 
+#def load_geo(**kwargs):
+    # imports
+    #import GEOparse
+
+    # load geo file
+    #gse = GEOparse.get_GEO(**kwargs)
+
+    # grab metadata
+    #metadata = gse.phenotype_data
+
+    # grab data
+    #data = pd.DataFrame(index=metadata.index)
+    #for sample in gse.gsms:
+        #data.loc[sample] = gse.gsms[sample].table['VALUE']
+
+    # get name
+    #name = gse.name
+
+
+
 # TODO: Add
 
 
 if __name__ == "__main__":
-    from pydataset import data as pydat
     from datasci.core.dataset import DataSet as DS
-    from sklearn.decomposition import PCA
-    import numpy as np
+    import pandas as pd
 
-    df = pydat('iris')
-    data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
-    metadata = df[['Species']]
-    metadata['test'] = np.random.randint(1, 3, (metadata.shape[0],))
-    ds = DS(name='Iris', data=data, metadata=metadata)
-    embedding = PCA(n_components=3)
-    ds.visualize(embedding=embedding,
-                 attr='Species',
-                 cross_attr='test',
-                 x_label='PC 1',
-                 y_label='PC 2',
-                 z_label='PC 3',
-                 backend='plotly',
-                 mrkr_size=10,
-                 mrkr_list=['circle', 'cross', 'x-thin'],
-                 figsize=(900,800),
-                 use_dash=True,
-                 debug=True,
-                 save=True)
+    # load data
+    data = pd.read_csv('/hdd/Zoetis/Data/GSE150706_data.csv', index_col=0)
 
+    # load metadata
+    metadata = pd.read_csv('/hdd/Zoetis/Data/GSE150706_metadata.csv', index_col=0)
+
+    # description
+    description = 'Longitudinal blood transcriptomic analysis to identify molecular regulatory patterns of Bovine Respiratory Disease in beef cattle. We profiled blood transcriptomics of 24 beef steers at three important stages (Entry: on arrival at the feedlot; Pulled: when sickness is identified; and Close-out: recovered, healthy cattle at shipping to slaughter) to reveal the key biological functions and regulatory factors of BRD and identify gene markers of BRD for early diagnosis and potentially use in selection.'
+
+    # name
+    name = 'GSE150706_raw'
+
+    # set dataset
+    ds = DS(data=data, metadata=metadata, name=name, description=description)
+
+    # save dataset
+    ds.save('/hdd/Zoetis/Data/GSE150706_raw.ds')

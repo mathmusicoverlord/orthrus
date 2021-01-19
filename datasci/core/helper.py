@@ -24,20 +24,17 @@ def method_exists(instance: object, method: str):
     return hasattr(instance, method) and ismethod(getattr(instance, method))
 
 
-def scatter_pandas(df: pd.DataFrame,
+def scatter_pyplot(df: pd.DataFrame,
                    dim: int,
                    grp_colors: str,
+                   palette: str = None,
                    grp_mrkrs: str = None,
-                   mrkr_size: int = 100,
                    mrkr_list: list = None,
-                   title: str = '',
-                   x_label: str = '',
-                   y_label: str = '',
-                   z_label: str = '',
-                   sub_title: str = '',
+                   subtitle: str = '',
                    figsize: tuple = (14, 10),
                    no_axes: bool = False,
-                   save_name: str = None):
+                   save_name: str = None,
+                   **kwargs):
     """
     This function uses matplotlib's pyplot to plot the numerical columns of a pandas dataframe against its categorical
     metadata.
@@ -51,23 +48,15 @@ def scatter_pandas(df: pd.DataFrame,
 
         grp_colors (str): The name of the column to color the data by.
 
+        palette (str): String signfying the seaborn palette to use. Default is 'Accent'.
+
         grp_mrkrs (str): The name of the column to mark the data by. Mark means to assign
             markers to such as .,+,x,etc..
-
-        mrkr_size (int): The size to be used for the markers. Default is 100.
 
         mrkr_list (int): List of markers to use for marking the data. The default is a list of
             37 distinct markers.
 
-        title (str): The title of the plot. The default is blank.
-
-        x_label (str): The x-axis label to use. The default is blank.
-
-        y_label (str): The y-axis label to use. The default is blank.
-
-        z_label (str): The z-axis label to use. Only applies if dim = 2. The default is blank.
-
-        sub_title (str): A custom subtitle to the plot. The default is blank.
+        subtitle (str): A custom subtitle to the plot. The default is blank.
 
         figsize (tuple): Tuple whose x-coordinate determines the width of the figure and y-coordinate
             determines the height of the figure. The default is (14, 10).
@@ -76,20 +65,23 @@ def scatter_pandas(df: pd.DataFrame,
 
         save_name (str): The path of where to save the figure. If not given the figure will not be saved.
 
+        kwargs (dict): All keyword arguments are passed to ``matplotlib.axes.Axes.update()`` if :py:attr:`dim` = 2
+            or ``mpl_toolkits.mplot3d.axes3d.Axes3D.update()`` if :py:attr:`dim` = 3.
+
     Returns:
         inplace method.
 
     Examples:
         >>> import pandas as pd
         >>> from pydataset import data as pydat
-        >>> from datasci.core.helper import scatter_pandas
+        >>> from datasci.core.helper import scatter_pyplot
         >>> df = pydat('iris')
-        >>> scatter_pandas(df=df,
+        >>> scatter_pyplot(df=df,
         ...                grp_colors='Species',
         ...                title='Iris Dataset',
         ...                dim=2,
-        ...                x_label='Sepal.Length',
-        ...                y_label='Sepal.Width')
+        ...                xlabel='Sepal Length (cm)',
+        ...                ylabel='Sepal Width (cm)')
     """
 
     from matplotlib import pyplot as plt
@@ -99,20 +91,14 @@ def scatter_pandas(df: pd.DataFrame,
 
     # set pallete
     num_colors = len(df[grp_colors].unique())
-    palette = sns.color_palette("Accent", num_colors)
+    if palette is None:
+        palette = 'Accent'
+    palette = sns.color_palette(palette, num_colors)
 
     # set defaults
     if mrkr_list is None:
         mrkr_list = [".", "+", ",", "o", "v", "^", "<", ">", "1", "2", "3", "4", "8", "s", "p", "P", "*", "h", "H", "x",
                      "X", "D", "d", "|", "_", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    if title is None:
-        title = ''
-
-    if x_label is None:
-        x_label = ''
-
-    if y_label is None:
-        y_label = ''
 
     if grp_mrkrs is None:
         grp_mrkrs = str(np.random.rand())
@@ -136,11 +122,11 @@ def scatter_pandas(df: pd.DataFrame,
                 label = grp_name0 + '/' + grp_name1
                 label = label.rstrip('/')
 
-                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
-                           s=mrkr_size)
+                mrkr_size = kwargs.get('s', 100)
+                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
 
-        ax.text2D(0, 0, sub_title, fontsize=16, transform=ax.transAxes)
-        ax.set_zlabel(z_label, fontsize=16)
+        ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
+        #ax.set_zlabel(zlabel, fontsize=16)
 
 
     elif dim == 2:
@@ -160,10 +146,10 @@ def scatter_pandas(df: pd.DataFrame,
                     label = grp_name0 + '/' + grp_name1
                     label = label.rstrip('/')
 
-                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
-                               s=mrkr_size)
+                    mrkr_size = kwargs.get('s', 100)
+                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
 
-        ax.text(0, -.1, sub_title, fontsize=16, transform=ax.transAxes)
+        ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
     else:
         raise ValueError("Embedding dimension must be 2 or 3!")
@@ -173,9 +159,14 @@ def scatter_pandas(df: pd.DataFrame,
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
-    ax.set_title(title, fontsize=15)
-    ax.set_xlabel(x_label, fontsize=16)
-    ax.set_ylabel(y_label, fontsize=16)
+    try:
+        kwargs.pop('s')
+    except KeyError:
+        pass
+    ax.update(kwargs)
+    #ax.set_title(title, fontsize=15)
+    #ax.set_xlabel(xlabel, fontsize=16)
+    #ax.set_ylabel(ylabel, fontsize=16)
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.show()
@@ -185,13 +176,12 @@ def scatter_plotly(df: pd.DataFrame,
                    dim: int,
                    grp_colors: str,
                    grp_mrkrs: str = None,
-                   mrkr_size: int = 100,
+                   mrkr_size: int = 10,
                    mrkr_list: list = None,
-                   title: str = '',
-                   x_label: str = '',
-                   y_label: str = '',
-                   z_label: str = '',
-                   sub_title: str = '',
+                   xlabel: str = '',
+                   ylabel: str = '',
+                   zlabel: str = '',
+                   subtitle: str = '',
                    figsize: tuple = (900, 800),
                    save_name: str = None,
                    use_dash: bool = False,
@@ -213,20 +203,18 @@ def scatter_plotly(df: pd.DataFrame,
         grp_mrkrs (str): The name of the column to mark the data by. Mark means to assign
             markers to such as .,+,x,etc..
 
-        mrkr_size (int): The size to be used for the markers. Default is 100.
+        mrkr_size (int): The size to be used for the markers. Default is 10.
 
         mrkr_list (int): List of markers to use for marking the data. The default is a list of
             37 distinct markers.
 
-        title (str): The title of the plot. The default is blank.
+        xlabel (str): The x-axis label to use. The default is blank.
 
-        x_label (str): The x-axis label to use. The default is blank.
+        ylabel (str): The y-axis label to use. The default is blank.
 
-        y_label (str): The y-axis label to use. The default is blank.
+        zlabel (str): The z-axis label to use. Only applies if dim = 2. The default is blank.
 
-        z_label (str): The z-axis label to use. Only applies if dim = 2. The default is blank.
-
-        sub_title (str): A custom subtitle to the plot. The default is blank.
+        subtitle (str): A custom subtitle to the plot. The default is blank.
 
         figsize (tuple): Tuple whose x-coordinate determines the width of the figure and y-coordinate
             determines the height of the figure. The default is (900, 800).
@@ -235,8 +223,8 @@ def scatter_plotly(df: pd.DataFrame,
 
         use_dash (bool) = Flag indicating whether to host the figure through dash.
 
-        **kwargs (dict): Passed directly to dash.Dash.app.run_server for configuring host server.
-            See dash documentation for further details.
+        **kwargs (dict): Passed directly to ``plotly.express.scatter`` and then to ``dash.Dash.app.run_server`` for
+            configuring host server. See dash documentation for further details.
 
     Returns:
         inplace method.
@@ -248,11 +236,11 @@ def scatter_plotly(df: pd.DataFrame,
         >>> df = pydat('iris')
         >>> scatter_plotly(df=df,
         ...                grp_colors='Species',
-        ...                title='Iris Dataset',
         ...                dim=2,
-        ...                x_label='Sepal.Length',
-        ...                y_label='Sepal.Width',
-        ...                use_dash=True)
+        ...                xlabel='Sepal Length (cm)',
+        ...                ylabel='Sepal Width (cm)',
+        ...                use_dash=True,
+        ...                title='Iris Dataset')
     """
 
     # imports
@@ -262,29 +250,36 @@ def scatter_plotly(df: pd.DataFrame,
     import plotly.io as pio
 
     # set defaults
-    if title is None:
-        title = ''
+    if xlabel is None:
+        xlabel = ''
 
-    if x_label is None:
-        x_label = ''
-
-    if y_label is None:
-        y_label = ''
+    if ylabel is None:
+        ylabel = ''
 
     # grab column names
     col0 = df.columns[0]
     col1 = df.columns[1]
 
     # scatter
+    if 'labels' in kwargs.keys():
+        raise KeyError("Can not set labels argument for plotly.scatter, must use xlabel, ylabel, etc..")
+
+    if 'symbol' in kwargs.keys():
+        raise KeyError("Can not set symbol argument for plotly.scatter, this is defined by cross_attr argument")
+
+    if 'color' in kwargs.keys():
+        raise KeyError("Can not set color argument for plotly.scatter, this is defined by attr argument")
+
     if dim == 2:
         fig = px.scatter(df,
                          x=col0,
                          y=col1,
                          symbol=grp_mrkrs,
                          color=grp_colors,
-                         title=title,
-                         labels={str(col0): x_label,
-                                 str(col1): y_label})
+                         labels={str(col0): xlabel,
+                                 str(col1): ylabel},
+                         **kwargs)
+
     elif dim == 3:
         col2 = df.columns[2]
         fig = px.scatter_3d(df,
@@ -293,10 +288,10 @@ def scatter_plotly(df: pd.DataFrame,
                             z=col2,
                             symbol=grp_mrkrs,
                             color=grp_colors,
-                            title=title,
-                            labels={str(col0): x_label,
-                                    str(col1): y_label,
-                                    str(col2): z_label})
+                            labels={str(col0): xlabel,
+                                    str(col1): ylabel,
+                                    str(col2): zlabel},
+                            **kwargs)
     else:
         raise ValueError("Embedding dimension must be 2 or 3!")
 
@@ -318,7 +313,7 @@ def scatter_plotly(df: pd.DataFrame,
                        x=0, y=-.1,
                        showarrow=False,
                        font_size=14,
-                       text=sub_title)
+                       text=subtitle)
 
     # resize figure
     fig.update_layout(width=figsize[0], height=figsize[1])
@@ -344,6 +339,11 @@ def scatter_plotly(df: pd.DataFrame,
         for var in scatter_plotly.__code__.co_varnames:
             if var in kwargs.keys():
                 kwargs.pop(var)
+
+        for var in plotly.express.scatter.__code__.co_varnames:
+            if var in kwargs.keys():
+                kwargs.pop(var)
+
         app.run_server(**kwargs)
     else:
         if not (save_name is None):
