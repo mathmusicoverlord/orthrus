@@ -318,7 +318,7 @@ used to <a class="reference internal" href="#dataset.DataSet.normalization_metho
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>normalizer</strong> – Class instance which must contain the method fit_transform. The output of
+<li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
 normalizer.fit_transform(<a class="reference internal" href="#dataset.DataSet.data" title="dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
 as <a class="reference internal" href="#dataset.DataSet.data" title="dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
