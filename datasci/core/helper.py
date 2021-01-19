@@ -407,7 +407,7 @@ def scatter_plotly(df: pd.DataFrame,
 
         save_name (str): The path of where to save the figure. If not given the figure will not be saved.
 
-        use_dash (bool) = Flag indicating whether to host the figure through dash.
+        use_dash (bool): Flag indicating whether to host the figure through dash.
 
         **kwargs (dict): Passed directly to ``plotly.express.scatter`` and then to ``dash.Dash.app.run_server`` for
             configuring host server. See dash documentation for further details.
