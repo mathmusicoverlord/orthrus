@@ -321,7 +321,7 @@ class DataSet:
 
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
-            ds.data.loc[data.index] = data_trans
+            self.data.loc[data.index] = data_trans
             self.normalization_method = norm_name
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")
