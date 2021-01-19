@@ -166,7 +166,7 @@
 <p>This module contains the main DataSet class used for all preprocessing, visualization, and classification.</p>
 <dl class="py class">
 <dt id="dataset.DataSet">
-<em class="property">class </em><code class="sig-prename descclassname">dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">vardata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
 pre-processing, visualization, and classification.</p>
@@ -231,6 +231,19 @@ empty DataFrame.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="dataset.DataSet.vardata">
+<code class="sig-name descname">vardata</code><a class="headerlink" href="#dataset.DataSet.vardata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Categorical data or attributes of the features on the dataset arranged as
+features x attributes. The feature labels in the index column should be the same format as those used for
+the columns in the data DataFrame. Default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="dataset.DataSet.normalization_method">
 <code class="sig-name descname">normalization_method</code><a class="headerlink" href="#dataset.DataSet.normalization_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Label indicating the normalization used on the data. Future normalization will
@@ -265,15 +278,17 @@ used on the data. Default is the empty string.</p>
 </div>
 <dl class="py method">
 <dt id="dataset.DataSet.autosummarize">
-<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method gives a human-readable output of summary statistics for the metadata. It includes basic
-statistics such as mean, median, mode, etc. and gives value counts for discrete data attributes. When
-using dash am interactive dashboard will be created. The user will then be able to view histograms for each
-attribute in the metadata along with basic summary statistics. The user can interact with the dashboard to
-adjust the number of bins and attribute.</p>
+<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="o">=</span><span class="default_value">'metadata'</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gives a human-readable output of summary statistics for the data/metadata/vardata.
+It includes basic statistics such as mean, median, mode, etc. and gives value counts for discrete data
+attributes. When using dash am interactive dashboard will be created. The user will then be able to view
+histograms for each attribute in the metadata along with basic summary statistics. The user can interact
+with the dashboard to adjust the number of bins and attribute.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>which</strong> (<em>str</em>) – String indicating which data to use. Choices are ‘data’, ‘metadata’, or ‘vardata’. Default
+is ‘metadata’.</p></li>
 <li><p><strong>use_dash</strong> (<em>bool</em>) – Flag for indicating whether or not to use dash dashboard. Default is False.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to dash.Dash.app.run_server for configuring host server.
 See dash documentation for further details.</p></li>
@@ -291,6 +306,43 @@ See dash documentation for further details.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">autosummarize</span><span class="p">(</span><span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8787</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dataset.DataSet.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes the data of the dataset according to a normalizer class. Appeneds the normalization method
+used to <a class="reference internal" href="#dataset.DataSet.normalization_method" title="dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normalizer</strong> – Class instance which must contain the method fit_transform. The output of
+normalizer.fit_transform(<a class="reference internal" href="#dataset.DataSet.data" title="dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
+as <a class="reference internal" href="#dataset.DataSet.data" title="dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>norm_name</strong> (<em>str</em>) – Common name for the normalization used. e.g. log, unit, etc… The default is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.__str__().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>  <span class="k">as</span> <span class="n">SS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">SS</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normalizer</span><span class="o">=</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
