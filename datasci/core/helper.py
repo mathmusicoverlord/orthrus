@@ -23,7 +23,6 @@ def method_exists(instance: object, method: str):
     """
     return hasattr(instance, method) and ismethod(getattr(instance, method))
 
-
 def scatter_pyplot(df: pd.DataFrame,
                    dim: int,
                    grp_colors: str,
@@ -37,7 +36,7 @@ def scatter_pyplot(df: pd.DataFrame,
                    **kwargs):
     """
     This function uses matplotlib's pyplot to plot the numerical columns of a pandas dataframe against its categorical
-    metadata.
+    or numerical metadata.
 
     Args:
         df (pandas.DataFrame): DataFrame containing the numerical data and metadata for plotting. The first dim columns
@@ -48,7 +47,8 @@ def scatter_pyplot(df: pd.DataFrame,
 
         grp_colors (str): The name of the column to color the data by.
 
-        palette (str): String signfying the seaborn palette to use. Default is 'Accent'.
+        palette (str): String signfying the seaborn palette to use. Default is 'Accent' for categorical metadata, and
+            'magma' for numerical metadata.
 
         grp_mrkrs (str): The name of the column to mark the data by. Mark means to assign
             markers to such as .,+,x,etc..
@@ -86,6 +86,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
     from matplotlib import pyplot as plt
     from matplotlib.pyplot import Axes
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
     from mpl_toolkits.mplot3d import Axes3D
     import seaborn as sns
 
@@ -95,12 +96,12 @@ def scatter_pyplot(df: pd.DataFrame,
                      "X", "D", "d", "|", "_", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     if grp_mrkrs is None:
-        grp_mrkrs = str(np.random.rand())
+        grp_mrkrs = ''
         df[grp_mrkrs] = ''
 
     # get dtypes of attrs
-    color_type =  pd.api.types.infer_dtype(pd.df[grp_colors])
-    mrkr_type = pd.api.types.infer_dtype(pd.df[grp_mrkrs])
+    color_type = pd.api.types.infer_dtype(df[grp_colors])
+    mrkr_type = pd.api.types.infer_dtype(df[grp_mrkrs])
 
     if color_type != 'floating' and mrkr_type != 'floating':
         # data is discrete
@@ -160,14 +161,20 @@ def scatter_pyplot(df: pd.DataFrame,
         else:
             raise ValueError("Embedding dimension must be 2 or 3!")
 
+        if grp_mrkrs == '':
+            ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
+        else:
+            ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors + '/' + grp_mrkrs)
+
     if color_type == 'floating' and mrkr_type != 'floating':
         # color is continuous
 
         # set pallete
         if palette is None:
-            palette = 'Accent'
+            palette = 'magma'
         palette = sns.color_palette(palette, as_cmap=True)
-        df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+        #df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+        df['c'] = df[grp_colors]
 
         if dim == 3:
             fig = plt.figure(figsize=figsize)
@@ -184,46 +191,63 @@ def scatter_pyplot(df: pd.DataFrame,
                 label = grp_name1
 
                 mrkr_size = kwargs.get('s', 100)
-                ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size)
+                im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size)
+
+            if grp_mrkrs != '':
+                cbar = plt.colorbar(im, ax=ax, location='left', shrink=.6, pad=-0.0001)
+                cbar.set_label(grp_colors, rotation=90)
+            else:
+                cbar = plt.colorbar(im, ax=ax, shrink=.6, pad=-0.1)
+                cbar.set_label(grp_colors, rotation=270, labelpad=10)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
             #ax.set_zlabel(zlabel, fontsize=16)
 
-
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
-            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
-                grp_name0 = grp0[0]
-                grp_idx0 = grp0[1]
 
-                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
-                    grp_name1 = grp1[0]
-                    grp_idx1 = grp1[1]
+            for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
+                grp_name1 = grp1[0]
+                grp_idx1 = grp1[1]
 
-                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
-                    if len(grp_idx) > 0:
-                        x = df.loc[grp_idx, df.columns[0]]
-                        y = df.loc[grp_idx, df.columns[1]]
-                        label = grp_name0 + '/' + grp_name1
-                        label = label.rstrip('/')
+                if len(grp_idx1) > 0:
+                    x = df.loc[grp_idx1, df.columns[0]]
+                    y = df.loc[grp_idx1, df.columns[1]]
+                    c = df.loc[grp_idx1, 'c']
+                    label = grp_name1
 
-                        mrkr_size = kwargs.get('s', 100)
-                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+                    mrkr_size = kwargs.get('s', 100)
+                    im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size)
+
+            if grp_mrkrs != '':
+                cbar = fig.colorbar(im, ax=[ax], location='left', shrink=1, pad=0.1)
+                cbar.set_label(grp_colors, rotation=90)
+            else:
+                cbar = fig.colorbar(im, ax=[ax], shrink=1, pad=-0.15)
+                cbar.set_label(grp_colors, rotation=270, labelpad=10)
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
-
         else:
             raise ValueError("Embedding dimension must be 2 or 3!")
+
+        if grp_mrkrs != '':
+            ax.legend(loc='upper left', bbox_to_anchor=(1.1, 0.5), fontsize=15, title=grp_mrkrs)
+            leg = ax.get_legend()
+            for handle in leg.legendHandles:
+                handle.set_color('black')
+                handle.set_alpha(1)
 
     if color_type == 'floating' and mrkr_type == 'floating':
         # color is continuous
 
         # set pallete
         if palette is None:
-            palette = 'Accent'
+            palette = 'magma'
         palette = sns.color_palette(palette, as_cmap=True)
         df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
-        df['s'] = ((df[grp_mrkrs] - df[grp_mrkrs].min())+df[grp_colors].max())/df[grp_colors].max()
+        ss = (df[grp_mrkrs] - df[grp_mrkrs].min())
+        ss = 24*(ss/ss.max()) + 1
+        ss = ss.values
 
         if dim == 3:
             fig = plt.figure(figsize=figsize)
@@ -233,15 +257,66 @@ def scatter_pyplot(df: pd.DataFrame,
             y = df[df.columns[1]]
             z = df[df.columns[2]]
             c = df['c']
-            s = df['s']
-            label = grp_name1
+            label = ''
 
             mrkr_size = kwargs.get('s', 100)
-            ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=s*mrkr_size)
+            im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss*mrkr_size)
+
+            cbar = plt.colorbar(im, ax=ax, shrink=.6, pad=-0.1)
+            cbar.set_label(grp_colors, rotation=270, labelpad=10)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
             #ax.set_zlabel(zlabel, fontsize=16)
 
+        elif dim == 2:
+            fig, ax = plt.subplots(1, figsize=figsize)
+
+            x = df[df.columns[0]]
+            y = df[df.columns[1]]
+            c = df['c']
+            label = ''
+
+            mrkr_size = kwargs.get('s', 100)
+            im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss*mrkr_size)
+
+            cbar = plt.colorbar(im, ax=[ax], shrink=1, pad=-0.15)
+            cbar.set_label(grp_colors, rotation=270, labelpad=10)
+
+            ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
+
+        else:
+            raise ValueError("Embedding dimension must be 2 or 3!")
+
+    if color_type != 'floating' and mrkr_type == 'floating':
+
+        # set pallete
+        num_colors = len(df[grp_colors].unique())
+        if palette is None:
+            palette = 'Accent'
+        palette = sns.color_palette(palette, num_colors)
+
+        ss = (df[grp_mrkrs] - df[grp_mrkrs].min())
+        ss = 24 * (ss / ss.max()) + 1
+        df['s'] = ss
+
+        if dim == 3:
+            fig = plt.figure(figsize=figsize)
+            ax = Axes3D(fig)
+            for i, grp0 in enumerate(df.groupby(grp_colors).groups.items()):
+                grp_name0 = grp0[0]
+                grp_idx0 = grp0[1]
+
+                x = df.loc[grp_idx0, df.columns[0]]
+                y = df.loc[grp_idx0, df.columns[1]]
+                z = df.loc[grp_idx0, df.columns[2]]
+                ss = df.loc[grp_idx0, 's']
+                label = grp_name0
+
+                mrkr_size = kwargs.get('s', 100)
+                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0], s=ss*mrkr_size)
+
+            ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
+            #ax.set_zlabel(zlabel, fontsize=16)
 
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
@@ -249,31 +324,27 @@ def scatter_pyplot(df: pd.DataFrame,
                 grp_name0 = grp0[0]
                 grp_idx0 = grp0[1]
 
-                for j, grp1 in enumerate(df.groupby(grp_mrkrs).groups.items()):
-                    grp_name1 = grp1[0]
-                    grp_idx1 = grp1[1]
+                if len(grp_idx0) > 0:
+                    x = df.loc[grp_idx0, df.columns[0]]
+                    y = df.loc[grp_idx0, df.columns[1]]
+                    ss = df.loc[grp_idx0, 's']
+                    label = grp_name0
 
-                    grp_idx = list(set(grp_idx0).intersection(set(grp_idx1)))
-                    if len(grp_idx) > 0:
-                        x = df.loc[grp_idx, df.columns[0]]
-                        y = df.loc[grp_idx, df.columns[1]]
-                        label = grp_name0 + '/' + grp_name1
-                        label = label.rstrip('/')
-
-                        mrkr_size = kwargs.get('s', 100)
-                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+                    mrkr_size = kwargs.get('s', 100)
+                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0], s=ss*mrkr_size)
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
         else:
             raise ValueError("Embedding dimension must be 2 or 3!")
 
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
 
     if no_axes:
         ax.axis('off')
+
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
     try:
         kwargs.pop('s')
     except KeyError:
@@ -304,7 +375,7 @@ def scatter_plotly(df: pd.DataFrame,
 
     """
     This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
-    metadata.
+    or numerical metadata.
 
     Args:
         df (pandas.DataFrame): DataFrame containing the numerical data and metadata for plotting. The first dim columns

@@ -274,7 +274,7 @@ class DataSet:
 
     def normalize(self, normalizer, feature_ids=None, sample_ids=None, norm_name: str = None):
         """
-        Normalizes the data of the dataset according to a normalizer class. Appeneds the normalization method
+        Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
         used to :py:attr:`DataSet.normalization_method`.
 
         Args:
@@ -325,6 +325,60 @@ class DataSet:
             self.normalization_method = norm_name
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")
+
+    def impute(self, imputer, feature_ids=None, sample_ids=None,impute_name: str = None):
+        """
+        Imputes the data of the dataset according to an imputer class. Appends the imputation method
+        used to :py:attr:`DataSet.imputation_method`.
+
+        Args:
+            imputer(object): Class instance which must contain the method fit_transform. The output of
+                imputer.fit_transform(:py:attr:`DataSet.data`) must have the same number of columns
+                as :py:attr:`DataSet.data`.
+
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            impute_name (str): Common name for the imputation used. e.g. knn, rf, median, etc .. The default is
+                :py:attr:`imputer`.__str__().
+
+        Returns:
+            inplace method.
+
+        Examples:
+            >>> import pandas as pd
+            >>> from datasci.core.dataset import DataSet as DS
+            >>> from sklearn.impute import KNNImputer
+            >>> data = pd.DataFrame(index=['a', 'b', 'c'],
+            ...                     columns= ['x', 'y', 'z'],
+            ...                     data=[[1,2,3], [0, 0, 1], [8, 5, 4]])
+            >>> ds = DS(name='example', data=data)
+            >>> imputer = KNNImputer(missing_values=0, n_neighbors=2)
+            >>> ds.impute(imputer=imputer, impute_name='knn')
+        """
+        # set defaults
+        if impute_name is None:
+            impute_name = imputer.__str__()
+
+        # slice the data set
+        ds = self.slice_dataset(feature_ids, sample_ids)
+        data = ds.data
+
+        # transform data
+        data_trans = imputer.fit_transform(data.values)
+
+        # create dataframe from transformed data
+        data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
+
+        # set data
+        if self.data.shape[1] == data_trans.shape[1]:
+            self.data.update(data_trans)
+            self.normalization_method = impute_name
+        else:
+            raise ValueError("Argument \"imputer\" should not change the number of features.")
 
     def reformat_metadata(self, convert_dtypes: bool = False):
         """
@@ -696,6 +750,7 @@ class DataSet:
     # TODO: Add varattr
 
     # class methods
+
 
 
 # functions
