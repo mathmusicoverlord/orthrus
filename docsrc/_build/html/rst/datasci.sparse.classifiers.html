@@ -180,7 +180,7 @@ which solves the sparse (l1) support vector problem. The
 primal form of the optimization problem is (?)</p>
 <p>min ||w||_1 + C*sum(xi_j) s.t. y_j*(w’*x_j - b) &lt;= 1-xi_j,</p>
 <p>for points x_j with corresponding labels y_j (assumed +/-1 in this formulation),
-optimizing for vector w (the weight vector) and scalar b (the <a href="#id1"><span class="problematic" id="id2">``</span></a>bias”),
+optimizing for vector w (the weight vector) and scalar b (the bias),
 with a corresponding linear (affine) model function f(x) = w’*x - b which
 approximates the original X, and classifies points using
 sign(f(x)).</p>
