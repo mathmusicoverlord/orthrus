@@ -268,10 +268,7 @@ classifier via <a class="reference internal" href="#datasci.sparse.classifiers.s
 <p>f(x)=w’*x - b</p>
 <p>is found for vector w=len(x) and scalar b which optimally classify the
 training X, in the sense of solving the L1 minimization problem</p>
-<dl class="simple">
-<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’*x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
-</dd>
-</dl>
+<p>min ||w||_1 + C*sum( xi_j ) s.t. y_j*(w’*x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
 <p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
 xi_j are scalar slack variables.</p>
 <p>This code only supports binary classification right now.</p>
