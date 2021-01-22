@@ -38,7 +38,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="datasci.core namespace" href="datasci.core.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,15 +84,19 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">datasci.sparse.classifiers namespace</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-datasci.sparse.classifiers.svm">datasci.sparse.classifiers.svm module</a></li>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">datasci</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">datasci.sparse.classifiers namespace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-datasci.sparse.classifiers.svm">datasci.sparse.classifiers.svm module</a></li>
 </ul>
 </li>
 </ul>
-</div>
+</li>
+</ul>
+
             
           
         </div>
@@ -137,6 +142,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">datasci</a> &raquo;</li>
         
       <li>datasci.sparse.classifiers namespace</li>
     
@@ -206,7 +213,7 @@ text output.</p></li>
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.weights_">
 <code class="sig-name descname">weights_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.weights_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vector of weights, obtained by fitting the SSVM classifier
-via <a href="#id9"><span class="problematic" id="id10">:py:method:`svm.SSVM.fit`</span></a>, defining the normal vector to the separating hyperplane.</p>
+via <a href="#id9"><span class="problematic" id="id10">:py:method:`SSVMClassifier.fit`</span></a>, defining the normal vector to the separating hyperplane.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>ndarray of shape (n_features,)</p>
@@ -218,7 +225,7 @@ via <a href="#id9"><span class="problematic" id="id10">:py:method:`svm.SSVM.fit`
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.bias_">
 <code class="sig-name descname">bias_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.bias_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Affine shift of the hyperplane obtained by fitting the SSVM classifier via
-<a href="#id11"><span class="problematic" id="id12">:py:method:`svm.SSVM.fit`</span></a>.</p>
+<a href="#id11"><span class="problematic" id="id12">:py:method:`SSVMClassifier.fit`</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>float</p>
@@ -230,7 +237,7 @@ via <a href="#id9"><span class="problematic" id="id10">:py:method:`svm.SSVM.fit`
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.pred_labels_">
 <code class="sig-name descname">pred_labels_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.pred_labels_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prediction labels of test data obtained by predicting with the SSVM
-classifier via :py:method:<a href="#id13"><span class="problematic" id="id14">`</span></a>svm.SSVM.predict</p>
+classifier via :py:method:<a href="#id13"><span class="problematic" id="id14">`</span></a>SSVMClassifier.predict</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>list of length n_samples</p>
@@ -268,8 +275,8 @@ training X, in the sense of solving the L1 minimization problem</p>
 <p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
 xi_j are scalar slack variables.</p>
 <p>This code only supports binary classification right now.</p>
-<p>The weight vector w and bias b are stored in <code class="xref py py-attr docutils literal notranslate"><span class="pre">svm.SSVM.weights_</span></code> and
-<a href="#id19"><span class="problematic" id="id20">:py:atrr:`svm.SSVM.bias_`</span></a> respectively.</p>
+<p>The weight vector w and bias b are stored in <a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.weights_" title="datasci.sparse.classifiers.svm.SSVMClassifier.weights_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVMClassifier.weights_</span></code></a> and
+<a href="#id19"><span class="problematic" id="id20">:py:atrr:`SSVMClassifier.bias_`</span></a> respectively.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -292,6 +299,9 @@ in the fit() docstring). New X is classified using</p>
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="datasci.core.html" class="btn btn-neutral float-left" title="datasci.core namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 
