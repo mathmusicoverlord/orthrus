@@ -6,11 +6,3 @@ core
 
    dataset
    helper
-
-sparse
-======
-
-.. toctree::
-   :maxdepth: 4
-
-   svm
