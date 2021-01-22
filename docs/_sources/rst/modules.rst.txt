@@ -1,7 +1,8 @@
-core
-====
+datasci
+=======
 
 .. toctree::
    :maxdepth: 4
 
-   core
+   datasci.core
+   datasci.sparse.classifiers
