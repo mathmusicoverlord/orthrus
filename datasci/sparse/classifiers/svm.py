@@ -6,16 +6,14 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
     '''
 
     A class implementing a sparse support vector machine (SSVM) algorithm,
-    which solves the *sparse* (l1) support vector problem. The
+    which solves the sparse (l1) support vector problem. The
     primal form of the optimization problem is (?)
 
-    min ||w||_1 + C*sum(xi_j)
-
-        s.t. y_j*(w'*x_j - b) <= 1-xi_j,
+    min ||w||_1 + C\*sum(xi_j) s.t. y_j\*(w'\*x_j - b) <= 1-xi_j,
 
     for points x_j with corresponding labels y_j (assumed +/-1 in this formulation),
-    optimizing for vector w (the ``weight" vector) and scalar b (the ``bias"),
-    with a corresponding linear (affine) model function f(x) = w'*x - b which
+    optimizing for vector w (the weight vector) and scalar b (the bias),
+    with a corresponding linear (affine) model function f(x) = w'\*x - b which
     approximates the original X, and classifies points using
     sign(f(x)).
 
@@ -46,12 +44,13 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         
     Attributes:
         weights_ (ndarray of shape (n_features,)): Vector of weights, obtained by fitting the SSVM classifier
-        via :py:func:`SSVM.fit`, defining the normal vector to the separating hyperplane.
+            via :py:meth:`SSVMClassifier.fit`, defining the normal vector to the separating hyperplane.
 
-        bias_ (float): Affine shift of the hyperplane obtained by fitting the SSVM classifier via :py:func:`SSVM.fit`.
+        bias_ (float): Affine shift of the hyperplane obtained by fitting the SSVM classifier via
+            :py:meth:`SSVMClassifier.fit`.
 
         pred_labels_ (list of length n_samples): Prediction labels of test data obtained by predicting with the SSVM
-            classifier via :py:func:`SSVM.predict
+            classifier via :py:meth:`SSVMClassifier.predict`
 
         classes_ (ndarray of shape (n_classes,)): The class labels.
     '''
@@ -84,21 +83,20 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         '''
         Fit/training step for Sparse Support Vector Machines (SSVM). A model function
 
-        f(x)=w'*x - b
+        f(x)=w'\*x - b
 
         is found for vector w=len(x) and scalar b which optimally classify the
         training X, in the sense of solving the L1 minimization problem
 
-        min ||w||_1 + C*sum( xi_j )
-            s.t. y_j*(w'*x_j -b) <= 1-xi_j, j=1,...,n,
+        min ||w||_1 + C\*sum( xi_j ) s.t. y_j\*(w'\*x_j -b) <= 1-xi_j, j=1,...,n,
 
         where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
         xi_j are scalar slack variables.
 
         This code only supports binary classification right now.
 
-        The weight vector w and bias b are stored in self.weights_ and
-        self.bias_ respectively.
+        The weight vector w and bias b are stored in :py:attr:`SSVMClassifier.weights_` and
+        :py:attr:`SSVMClassifier.bias_` respectively.
         '''
 
         import numpy as np
@@ -165,7 +163,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         optimally classify the training X (in the sense described
         in the fit() docstring). New X is classified using
 
-        sign(f(x)) = sign( w'*x - b ).
+        sign(f(x)) = sign( w'\*x - b ).
         '''
         import numpy as np
         try:
