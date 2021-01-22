@@ -38,7 +38,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="helper module" href="helper.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,8 +85,12 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="modules.html">core</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html#sparse">sparse</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">svm module</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -133,6 +138,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">core</a> &raquo;</li>
         
       <li>svm module</li>
     
@@ -196,7 +203,8 @@ text output.</p></li>
 <dl class="py attribute">
 <dt id="svm.SSVMClassifier.weights_">
 <code class="sig-name descname">weights_</code><a class="headerlink" href="#svm.SSVMClassifier.weights_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vector of weights, obtained by fitting the SSVM classifier</p>
+<dd><p>Vector of weights, obtained by fitting the SSVM classifier
+via <a href="#id9"><span class="problematic" id="id10">:py:method:`svm.SSVM.fit`</span></a>, defining the normal vector to the separating hyperplane.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>ndarray of shape (n_features,)</p>
@@ -205,14 +213,10 @@ text output.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname">via :py:method:`SSVM.fit`, defining the normal vector to the separating hyperplane.</code></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="svm.SSVMClassifier.bias_">
 <code class="sig-name descname">bias_</code><a class="headerlink" href="#svm.SSVMClassifier.bias_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Affine shift of the hyperplane obtained by fitting the SSVM classifier via <a href="#id9"><span class="problematic" id="id10">:py:method:`SSVM.fit`</span></a>.</p>
+<dd><p>Affine shift of the hyperplane obtained by fitting the SSVM classifier via
+<a href="#id11"><span class="problematic" id="id12">:py:method:`svm.SSVM.fit`</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>float</p>
@@ -224,7 +228,7 @@ text output.</p></li>
 <dt id="svm.SSVMClassifier.pred_labels_">
 <code class="sig-name descname">pred_labels_</code><a class="headerlink" href="#svm.SSVMClassifier.pred_labels_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prediction labels of test data obtained by predicting with the SSVM
-classifier via :py:method:<a href="#id11"><span class="problematic" id="id12">`</span></a>SSVM.predict</p>
+classifier via :py:method:<a href="#id13"><span class="problematic" id="id14">`</span></a>svm.SSVM.predict</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>list of length n_samples</p>
@@ -252,18 +256,18 @@ classifier via :py:method:<a href="#id11"><span class="problematic" id="id12">`<
 <dt id="svm.SSVMClassifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#svm.SSVMClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit/training step for Sparse Support Vector Machines (SSVM). A model function</p>
-<p>f(x)=w’<a href="#id13"><span class="problematic" id="id14">*</span></a>x - b</p>
+<p>f(x)=w’<a href="#id15"><span class="problematic" id="id16">*</span></a>x - b</p>
 <p>is found for vector w=len(x) and scalar b which optimally classify the
 training X, in the sense of solving the L1 minimization problem</p>
 <dl class="simple">
-<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’<a href="#id15"><span class="problematic" id="id16">*</span></a>x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
+<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’<a href="#id17"><span class="problematic" id="id18">*</span></a>x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
 </dd>
 </dl>
 <p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
 xi_j are scalar slack variables.</p>
 <p>This code only supports binary classification right now.</p>
 <p>The weight vector w and bias b are stored in <code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVM.weights_</span></code> and
-<a href="#id17"><span class="problematic" id="id18">:py:atrr:`SSVM.bias_`</span></a> respectively.</p>
+<a href="#id19"><span class="problematic" id="id20">:py:atrr:`SSVM.bias_`</span></a> respectively.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -273,7 +277,7 @@ xi_j are scalar slack variables.</p>
 After the fit/training step, vectors w and b are found to
 optimally classify the training X (in the sense described
 in the fit() docstring). New X is classified using</p>
-<p>sign(f(x)) = sign( w’<a href="#id19"><span class="problematic" id="id20">*</span></a>x - b ).</p>
+<p>sign(f(x)) = sign( w’<a href="#id21"><span class="problematic" id="id22">*</span></a>x - b ).</p>
 </dd></dl>
 
 </dd></dl>
@@ -285,6 +289,9 @@ in the fit() docstring). New X is classified using</p>
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="helper.html" class="btn btn-neutral float-left" title="helper module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 
