@@ -1,4 +1,4 @@
-core modules
+core
 ====
 
 .. toctree::
