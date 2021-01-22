@@ -1,5 +1,5 @@
-sparse
-======
+classifiers
+===========
 
 .. toctree::
    :maxdepth: 4
