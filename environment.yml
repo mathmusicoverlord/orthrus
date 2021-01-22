@@ -14,6 +14,7 @@ dependencies:
   - sphinx=3.2.1
   - sphinx-rtd-theme=0.5.1
   - pip:
+    - torch==1.7.1
     - dash==1.18.1
     - gpustat==0.6.0
     - imblearn==0.0
