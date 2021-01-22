@@ -1,8 +1,21 @@
-core
-====
+core namespace
+==============
 
-.. toctree::
-   :maxdepth: 4
+Submodules
+----------
 
-   dataset
-   helper
+core.dataset module
+-------------------
+
+.. automodule:: core.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+core.helper module
+------------------
+
+.. automodule:: core.helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
