@@ -213,7 +213,7 @@ text output.</p></li>
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.weights_">
 <code class="sig-name descname">weights_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.weights_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vector of weights, obtained by fitting the SSVM classifier
-via <a href="#id9"><span class="problematic" id="id10">:py:method:`SSVMClassifier.fit`</span></a>, defining the normal vector to the separating hyperplane.</p>
+via <a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.fit" title="datasci.sparse.classifiers.svm.SSVMClassifier.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SSVMClassifier.fit()</span></code></a>, defining the normal vector to the separating hyperplane.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>ndarray of shape (n_features,)</p>
@@ -225,7 +225,7 @@ via <a href="#id9"><span class="problematic" id="id10">:py:method:`SSVMClassifie
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.bias_">
 <code class="sig-name descname">bias_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.bias_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Affine shift of the hyperplane obtained by fitting the SSVM classifier via
-<a href="#id11"><span class="problematic" id="id12">:py:method:`SSVMClassifier.fit`</span></a>.</p>
+<a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.fit" title="datasci.sparse.classifiers.svm.SSVMClassifier.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SSVMClassifier.fit()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>float</p>
@@ -237,7 +237,7 @@ via <a href="#id9"><span class="problematic" id="id10">:py:method:`SSVMClassifie
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.pred_labels_">
 <code class="sig-name descname">pred_labels_</code><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.pred_labels_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prediction labels of test data obtained by predicting with the SSVM
-classifier via <a href="#id13"><span class="problematic" id="id14">:py:method:`SSVMClassifier.predict`</span></a></p>
+classifier via <a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.predict" title="datasci.sparse.classifiers.svm.SSVMClassifier.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SSVMClassifier.predict()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>list of length n_samples</p>
@@ -265,18 +265,18 @@ classifier via <a href="#id13"><span class="problematic" id="id14">:py:method:`S
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit/training step for Sparse Support Vector Machines (SSVM). A model function</p>
-<p>f(x)=w’<a href="#id15"><span class="problematic" id="id16">*</span></a>x - b</p>
+<p>f(x)=w’<a href="#id9"><span class="problematic" id="id10">*</span></a>x - b</p>
 <p>is found for vector w=len(x) and scalar b which optimally classify the
 training X, in the sense of solving the L1 minimization problem</p>
 <dl class="simple">
-<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’<a href="#id17"><span class="problematic" id="id18">*</span></a>x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
+<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’<a href="#id11"><span class="problematic" id="id12">*</span></a>x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
 </dd>
 </dl>
 <p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
 xi_j are scalar slack variables.</p>
 <p>This code only supports binary classification right now.</p>
 <p>The weight vector w and bias b are stored in <a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.weights_" title="datasci.sparse.classifiers.svm.SSVMClassifier.weights_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVMClassifier.weights_</span></code></a> and
-<a href="#id19"><span class="problematic" id="id20">:py:atrr:`SSVMClassifier.bias_`</span></a> respectively.</p>
+<a class="reference internal" href="#datasci.sparse.classifiers.svm.SSVMClassifier.bias_" title="datasci.sparse.classifiers.svm.SSVMClassifier.bias_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVMClassifier.bias_</span></code></a> respectively.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -286,7 +286,7 @@ xi_j are scalar slack variables.</p>
 After the fit/training step, vectors w and b are found to
 optimally classify the training X (in the sense described
 in the fit() docstring). New X is classified using</p>
-<p>sign(f(x)) = sign( w’<a href="#id21"><span class="problematic" id="id22">*</span></a>x - b ).</p>
+<p>sign(f(x)) = sign( w’<a href="#id13"><span class="problematic" id="id14">*</span></a>x - b ).</p>
 </dd></dl>
 
 </dd></dl>
