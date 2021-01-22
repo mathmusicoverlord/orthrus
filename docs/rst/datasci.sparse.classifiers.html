@@ -178,10 +178,7 @@
 <p>A class implementing a sparse support vector machine (SSVM) algorithm,
 which solves the sparse (l1) support vector problem. The
 primal form of the optimization problem is (?)</p>
-<p>min ||w||_1 + C*sum(xi_j)</p>
-<blockquote>
-<div><p>s.t. y_j*(w’*x_j - b) &lt;= 1-xi_j,</p>
-</div></blockquote>
+<p>min ||w||_1 + C*sum(xi_j) s.t. y_j*(w’*x_j - b) &lt;= 1-xi_j,</p>
 <p>for points x_j with corresponding labels y_j (assumed +/-1 in this formulation),
 optimizing for vector w (the <a href="#id1"><span class="problematic" id="id2">``</span></a>weight” vector) and scalar b (the <a href="#id3"><span class="problematic" id="id4">``</span></a>bias”),
 with a corresponding linear (affine) model function f(x) = w’*x - b which
