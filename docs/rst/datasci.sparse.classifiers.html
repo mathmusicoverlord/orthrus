@@ -176,15 +176,15 @@
 <em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.classifiers.svm.</code><code class="sig-name descname">SSVMClassifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">tol</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">solver</span><span class="p">:</span> <span class="n">object</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">errorTrace</span><span class="p">:</span> <span class="n">object</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">debug</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
 <p>A class implementing a sparse support vector machine (SSVM) algorithm,
-which solves the <em>sparse</em> (l1) support vector problem. The
+which solves the sparse (l1) support vector problem. The
 primal form of the optimization problem is (?)</p>
 <p>min ||w||_1 + C*sum(xi_j)</p>
 <blockquote>
-<div><p>s.t. y_j*(w’<a href="#id1"><span class="problematic" id="id2">*</span></a>x_j - b) &lt;= 1-xi_j,</p>
+<div><p>s.t. y_j*(w’*x_j - b) &lt;= 1-xi_j,</p>
 </div></blockquote>
 <p>for points x_j with corresponding labels y_j (assumed +/-1 in this formulation),
-optimizing for vector w (the <a href="#id3"><span class="problematic" id="id4">``</span></a>weight” vector) and scalar b (the <a href="#id5"><span class="problematic" id="id6">``</span></a>bias”),
-with a corresponding linear (affine) model function f(x) = w’<a href="#id7"><span class="problematic" id="id8">*</span></a>x - b which
+optimizing for vector w (the <a href="#id1"><span class="problematic" id="id2">``</span></a>weight” vector) and scalar b (the <a href="#id3"><span class="problematic" id="id4">``</span></a>bias”),
+with a corresponding linear (affine) model function f(x) = w’*x - b which
 approximates the original X, and classifies points using
 sign(f(x)).</p>
 <p>The sklearn adaptation was implemented by Eric Kehoe, CSU 2021.
@@ -265,11 +265,11 @@ classifier via <a class="reference internal" href="#datasci.sparse.classifiers.s
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit/training step for Sparse Support Vector Machines (SSVM). A model function</p>
-<p>f(x)=w’<a href="#id9"><span class="problematic" id="id10">*</span></a>x - b</p>
+<p>f(x)=w’*x - b</p>
 <p>is found for vector w=len(x) and scalar b which optimally classify the
 training X, in the sense of solving the L1 minimization problem</p>
 <dl class="simple">
-<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’<a href="#id11"><span class="problematic" id="id12">*</span></a>x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
+<dt>min ||w||_1 + C*sum( xi_j )</dt><dd><p>s.t. y_j*(w’*x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
 </dd>
 </dl>
 <p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
@@ -286,7 +286,7 @@ xi_j are scalar slack variables.</p>
 After the fit/training step, vectors w and b are found to
 optimally classify the training X (in the sense described
 in the fit() docstring). New X is classified using</p>
-<p>sign(f(x)) = sign( w’<a href="#id13"><span class="problematic" id="id14">*</span></a>x - b ).</p>
+<p>sign(f(x)) = sign( w’*x - b ).</p>
 </dd></dl>
 
 </dd></dl>
