@@ -6,7 +6,7 @@ global() {
   shopt -s globstar
   origdir="../datasci/"
   for i in **/; do
-    sphinx-apidoc -o rst
+    sphinx-apidoc -o rst i
   done
 }
 
