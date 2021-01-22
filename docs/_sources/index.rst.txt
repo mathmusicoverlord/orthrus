@@ -10,7 +10,8 @@ Welcome to DataSci's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   /rst/modules
+   /rst/core
+   /rst/sparse
 
 
 
