@@ -9,6 +9,7 @@ core
 
 sparse
 ======
+
 .. toctree::
    :maxdepth: 4
 
