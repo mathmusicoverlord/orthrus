@@ -124,22 +124,20 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         labelDict = {self.classes_[0]: -1, self.classes_[1]: 1}
         internalLabels = [labelDict[sample] for sample in y]
 
-        nSamples = np.shape(X)[0]
+        nSamples, inputDim = np.shape(X)
 
-        inputDim=np.shape(X)[1]
-        IP=np.diag(np.ones(nSamples)).astype(int)
-        eP=np.ones(nSamples).reshape(-1, 1)
-        eDim=np.ones(inputDim).reshape(-1, 1)
+        IP = np.diag(np.ones(nSamples)).astype(int)
+        eP = np.ones(nSamples).reshape(-1, 1)
+        eDim = np.ones(inputDim).reshape(-1, 1)
 
-        D=np.diag(internalLabels)    #Diagonal matrix of labels
+        D = np.diag(internalLabels)  # Diagonal matrix of labels
 
         if use_cuda:
             D_c = torch.from_numpy(D).double().cuda()
             trData_c = torch.from_numpy(X).double().cuda()
-            DX = torch.mm(D_c,trData_c).cpu().numpy()
-
+            DX = torch.mm(D_c, trData_c).cpu().numpy()
             eP_c = torch.from_numpy(eP).double().cuda()
-            De = torch.mm(D_c,eP_c).cpu().numpy()
+            De = torch.mm(D_c, eP_c).cpu().numpy()
         else:
             DX = np.dot(D, X)
             De = np.dot(D, eP)
@@ -151,6 +149,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         x = self.solver(-c,-A,-eP, output_flag=0, use_cuda=use_cuda, verbosity=self.verbosity, debug=self.debug)
 
         self.weights_ = x[:inputDim] - x[inputDim:2*inputDim]
+        self.weights_ = self.weights_.reshape(-1,)
         self.bias_ = x[2*inputDim]-x[2*inputDim+1]
 
         return self
@@ -184,7 +183,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
                 print('PyTorch could not be imported, or could not access the GPU. Falling back to numpy implementation.')
 
         b = self.bias_
-        w = self.weights_
+        w = self.weights_.reshape(-1,1)
 
         if use_cuda:
             data_c = torch.from_numpy(X).double().cuda()

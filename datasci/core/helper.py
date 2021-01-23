@@ -131,10 +131,11 @@ def scatter_pyplot(df: pd.DataFrame,
                     label = label.rstrip('/')
 
                     mrkr_size = kwargs.get('s', 100)
-                    ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+                    ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
+                               s=mrkr_size)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
-            #ax.set_zlabel(zlabel, fontsize=16)
+            # ax.set_zlabel(zlabel, fontsize=16)
 
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
@@ -154,7 +155,8 @@ def scatter_pyplot(df: pd.DataFrame,
                         label = label.rstrip('/')
 
                         mrkr_size = kwargs.get('s', 100)
-                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j], s=mrkr_size)
+                        ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
+                                   s=mrkr_size)
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
@@ -173,7 +175,7 @@ def scatter_pyplot(df: pd.DataFrame,
         if palette is None:
             palette = 'magma'
         palette = sns.color_palette(palette, as_cmap=True)
-        #df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+        # df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
         df['c'] = df[grp_colors]
 
         if dim == 3:
@@ -201,7 +203,7 @@ def scatter_pyplot(df: pd.DataFrame,
                 cbar.set_label(grp_colors, rotation=270, labelpad=10)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
-            #ax.set_zlabel(zlabel, fontsize=16)
+            # ax.set_zlabel(zlabel, fontsize=16)
 
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
@@ -244,9 +246,9 @@ def scatter_pyplot(df: pd.DataFrame,
         if palette is None:
             palette = 'magma'
         palette = sns.color_palette(palette, as_cmap=True)
-        df['c'] = (df[grp_colors] - df[grp_colors].min())/df[grp_colors].max()
+        df['c'] = (df[grp_colors] - df[grp_colors].min()) / df[grp_colors].max()
         ss = (df[grp_mrkrs] - df[grp_mrkrs].min())
-        ss = 24*(ss/ss.max()) + 1
+        ss = 24 * (ss / ss.max()) + 1
         ss = ss.values
 
         if dim == 3:
@@ -260,13 +262,13 @@ def scatter_pyplot(df: pd.DataFrame,
             label = ''
 
             mrkr_size = kwargs.get('s', 100)
-            im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss*mrkr_size)
+            im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size)
 
             cbar = plt.colorbar(im, ax=ax, shrink=.6, pad=-0.1)
             cbar.set_label(grp_colors, rotation=270, labelpad=10)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
-            #ax.set_zlabel(zlabel, fontsize=16)
+            # ax.set_zlabel(zlabel, fontsize=16)
 
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
@@ -277,7 +279,7 @@ def scatter_pyplot(df: pd.DataFrame,
             label = ''
 
             mrkr_size = kwargs.get('s', 100)
-            im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss*mrkr_size)
+            im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size)
 
             cbar = plt.colorbar(im, ax=[ax], shrink=1, pad=-0.15)
             cbar.set_label(grp_colors, rotation=270, labelpad=10)
@@ -313,10 +315,11 @@ def scatter_pyplot(df: pd.DataFrame,
                 label = grp_name0
 
                 mrkr_size = kwargs.get('s', 100)
-                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0], s=ss*mrkr_size)
+                ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0],
+                           s=ss * mrkr_size)
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
-            #ax.set_zlabel(zlabel, fontsize=16)
+            # ax.set_zlabel(zlabel, fontsize=16)
 
         elif dim == 2:
             fig, ax = plt.subplots(1, figsize=figsize)
@@ -331,7 +334,8 @@ def scatter_pyplot(df: pd.DataFrame,
                     label = grp_name0
 
                     mrkr_size = kwargs.get('s', 100)
-                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0], s=ss*mrkr_size)
+                    ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0],
+                               s=ss * mrkr_size)
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
@@ -350,9 +354,9 @@ def scatter_pyplot(df: pd.DataFrame,
     except KeyError:
         pass
     ax.update(kwargs)
-    #ax.set_title(title, fontsize=15)
-    #ax.set_xlabel(xlabel, fontsize=16)
-    #ax.set_ylabel(ylabel, fontsize=16)
+    # ax.set_title(title, fontsize=15)
+    # ax.set_xlabel(xlabel, fontsize=16)
+    # ax.set_ylabel(ylabel, fontsize=16)
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.show()
@@ -372,7 +376,6 @@ def scatter_plotly(df: pd.DataFrame,
                    save_name: str = None,
                    use_dash: bool = False,
                    **kwargs):
-
     """
     This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
     or numerical metadata.
@@ -537,3 +540,8 @@ def scatter_plotly(df: pd.DataFrame,
             plotly.offline.plot(fig, filename=(save_name + '.html'))
         else:
             pio.show(fig)
+
+if __name__ == "__main__":
+    import numpy as np
+    hello_there = np.sum
+    print(var_name(hello_there))

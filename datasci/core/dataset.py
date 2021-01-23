@@ -77,9 +77,16 @@ class DataSet:
         # private attributes
 
         # restrict metadata to data
-        meta_index = self.metadata.index.intersection(self.data.index)
-        missing_data_index = self.data.index.drop(meta_index)
-        missing_data = pd.DataFrame(index=missing_data_index)
+        try:
+            meta_index = self.metadata.index.intersection(self.data.index)
+            missing_data_index = self.data.index.drop(meta_index)
+            missing_data = pd.DataFrame(index=missing_data_index)
+        except AttributeError:
+            data_index = self.data.index.to_pandas()
+            meta_index = self.metadata.index.to_pandas().intersection(data_index)
+            missing_data_index = data_index.drop(meta_index)
+            missing_data = self.metadata.__class__(index=missing_data_index)
+
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
 
         # sort data and metadata to be in same order
@@ -453,6 +460,7 @@ class DataSet:
 
         # sort data and metadata together to be safe
         self.data.sort_index(inplace=True)
+        self.vardata.sort_index(inplace=True)
         self.metadata.sort_index(inplace=True)
 
         # slice data at features
@@ -475,9 +483,17 @@ class DataSet:
         except KeyError:
             metadata = self.metadata.loc[index[sample_ids]]
 
+        # slice vardata at features
+        index = self.vardata.index
+        try:
+            vardata = self.vardata.loc[feature_ids]
+        except KeyError:
+            vardata = self.vardata.loc[index[feature_ids]]
+
         # generate slice DataSet
         ds = DataSet(data=deepcopy(data),
                 metadata=deepcopy(metadata),
+                vardata=vardata,
                 name=name,
                 normalization_method=self.normalization_method,
                 imputation_method=self.imputation_method)
@@ -743,6 +759,102 @@ class DataSet:
 
         import textwrap
         print(textwrap.fill(self._description, line_width))
+
+    def classify(self, classifier,
+                 attr: str,
+                 feature_ids=None,
+                 sample_ids=None,
+                 partitioner=None,
+                 partitioner_name=None,
+                 split_handle:str = 'split',
+                 fit_handle:str = 'fit',
+                 predict_handle: str = 'predict',
+                 f_weights_handle:str = None,
+                 s_weights_handle:str = None,
+                 append: bool = True,
+                 classifier_name=None):
+
+
+        if classifier_name is None:
+            classifier_name = classifier.__str__()
+
+        if partitioner_name is None:
+            classifier_name = partitioner.__str__()
+
+        method_name = classifier_name + "_" + partitioner_name
+
+        # slice dataframe
+        ds = self.slice_dataset(feature_ids, sample_ids)
+        sample_ids = ds.data.index
+        feature_ids = ds.vardata.index
+        X = ds.data.values
+        y = ds.metadata[attr].values
+
+        if partitioner is None:
+            splits = [[sample_ids, []]]
+        else:
+            split = eval("partitioner" + "." + split_handle)
+            splits = split(X, y)
+            try:
+                _ = (e for e in splits)
+            except TypeError:
+                splits = [splits]
+
+        # set sample index
+        sample_index = self.metadata.loc[sample_ids].index
+
+        # set returns
+        predict_results = pd.DataFrame(index=sample_ids)
+        f_weight_results = pd.DataFrame(index=feature_ids)
+        s_weight_results = pd.DataFrame(index=sample_ids)
+
+        # set methods
+        fit = eval("classifier" + "." + fit_handle)
+        predict = eval("classifier" + "." + predict_handle)
+
+        # loop over splits
+        for i, (train_index, test_index) in enumerate(splits):
+            X_train = X[train_index, :]
+            X_test = X[test_index, :]
+            y_train = y[train_index]
+
+            # fit the classifier (going meta y'all)
+            fit(X_train, y_train)
+
+            # get predict labels
+            y_pred_train = predict(X_train)
+            y_pred_test = predict(X_test)
+
+            # append prediction results
+            predict_results[method_name + " " + attr + " labels_" + str(i)] = ''
+            predict_results.loc[
+                sample_index.take(train_index), method_name + " " + attr + " labels_" + str(i)] = y_pred_train
+            predict_results.loc[
+                sample_index.take(test_index), method_name + " " + attr + " labels_" + str(i)] = y_pred_test
+            predict_results[method_name + " split labels_" + str(i)] = ''
+            predict_results.loc[sample_index.take(train_index), method_name + " split labels_" + str(i)] = 'Train'
+            predict_results.loc[sample_index.take(test_index), method_name + " split labels_" + str(i)] = 'Test'
+
+            # append feature results
+            if not (f_weights_handle is None):
+                f_weights = eval("classifier" + "." + f_weights_handle)
+                f_weight_results[method_name + " feature weights_" + str(i)] = np.NaN
+                f_weight_results.loc[feature_ids, method_name + " feature weights_" + str(i)] = pd.Series(index=feature_ids, data=f_weights)
+
+            # append sample results
+            if not (s_weights_handle is None):
+                s_weights = eval("classifier" + "." + s_weights_handle)
+                s_weight_results[method_name + " sample weights_" + str(i)] = np.nan
+                s_weight_results.loc[
+                    sample_index.take(train_index), method_name + " sample weights_" + str(i)] = s_weights
+
+        if append:
+            self.metadata = pd.concat([self.metadata, predict_results], axis=1)
+            self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
+            self.metadata = pd.concat([self.metadata, s_weight_results], axis=1)
+            return
+        else:
+            return predict_results, f_weight_results, s_weight_results
 
     # TODO: Add conversion to cdd method.
     # TODO: Add basic normalization methods
