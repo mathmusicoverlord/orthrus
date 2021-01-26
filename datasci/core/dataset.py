@@ -90,8 +90,7 @@ class DataSet:
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
 
         # sort data and metadata to be in same order
-        self.data.sort_index(inplace=True)
-        self.metadata.sort_index(inplace=True)
+        self.metadata = self.metadata.loc[self.data.index]
 
         # Assign vardata
         if vardata is None:
@@ -102,6 +101,7 @@ class DataSet:
             missing_data_index = self.data.transpose().index.drop(var_index)
             missing_data = pd.DataFrame(index=missing_data_index)
             self.vardata = vardata.loc[var_index].append(missing_data)
+            self.vardata = self.vardata.loc[self.data.columns]
 
     def visualize(self, embedding,
                   attr: str,
@@ -790,6 +790,7 @@ class DataSet:
         X = ds.data.values
         y = ds.metadata[attr].values
 
+        # TODO: Fix sample_ids for passing to numpy array
         if partitioner is None:
             splits = [[sample_ids, []]]
         else:
