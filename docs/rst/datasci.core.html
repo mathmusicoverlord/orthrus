@@ -323,7 +323,42 @@ See dash documentation for further details.</p></li>
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.classify">
 <code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>classifier</strong> (<em>object</em>) – Classifier to run the classification experiment with; must have the sklearn equivalent
+of a <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code> method.</p></li>
+<li><p><strong>attr</strong> (<em>string</em>) – Name of metadata attribute to classify on.</p></li>
+<li><p><strong>classifier_name</strong> (<em>string</em>) – Common name of classifier to be used for identification. Default is
+<code class="docutils literal notranslate"><span class="pre">classifier.__str__()</span></code>.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>partitioner</strong> (<em>object</em>) – Class-instance which partitions samples in batches of training and test split. This
+instance must have the sklearn equivalent of a split method. The split method returns a list of
+train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
+an example partitioner.</p></li>
+<li><p><strong>partitioner_name</strong> (<em>string</em>) – Common name for the <code class="docutils literal notranslate"><span class="pre">partitioner</span></code> to be used for identification. Default is
+<code class="docutils literal notranslate"><span class="pre">partitioner.__str__()</span></code>.</p></li>
+<li><p><strong>scorer</strong> (<em>object</em>) – Function which scores the prediction labels on training and test partitions. This function
+should accept two arguments: truth labels and prediction labels. This function should output a score
+between 0 and 1 which can be thought of as an accuracy measure. See
+sklearn.metrics.balanced_accuracy_score for an example.</p></li>
+<li><p><strong>scorer_name</strong> (<em>string</em>) – Common name of scorer to used for identification. Default is <code class="docutils literal notranslate"><span class="pre">scorer.__str__()</span></code>.</p></li>
+<li><p><strong>split_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">split</span></code> method used by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code></p></li>
+<li><p><strong>fit_handle</strong> – </p></li>
+<li><p><strong>predict_handle</strong> – </p></li>
+<li><p><strong>f_weights_handle</strong> – </p></li>
+<li><p><strong>s_weights_handle</strong> – </p></li>
+<li><p><strong>append</strong> – </p></li>
+<li><p><strong>f_rnk_func</strong> – </p></li>
+<li><p><strong>s_rnk_func</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.impute">
