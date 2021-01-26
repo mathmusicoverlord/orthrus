@@ -185,7 +185,7 @@ class DataSet:
         """
         # set defaults
         if viz_name is None:
-            viz_name = embedding.__str__()
+            viz_name = embedding.__str__().split('(')[0]
 
         # slice the data set
         ds = self.slice_dataset(feature_ids, sample_ids)
@@ -240,6 +240,13 @@ class DataSet:
 
         if not save:
             save_name = None
+
+        # set default axis labels
+        if dim < 3:
+            kwargs['xlabel'] = kwargs.get('xlabel', viz_name + ' ' + str(1))
+            kwargs['ylabel'] = kwargs.get('ylabel', viz_name + ' ' + str(2))
+            if dim > 2:
+                kwargs['zlabel'] = kwargs.get('zlabel', viz_name + ' ' + str(3))
 
         # plot data
         if backend == "pyplot":
@@ -324,7 +331,7 @@ class DataSet:
         data_trans = normalizer.fit_transform(data.values)
 
         # create dataframe from transformed data
-        data_trans = data.__class__(index=data.index, columns =data.columns, data=data_trans)
+        data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
 
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
@@ -762,26 +769,34 @@ class DataSet:
 
     def classify(self, classifier,
                  attr: str,
+                 classifier_name=None,
                  feature_ids=None,
                  sample_ids=None,
                  partitioner=None,
                  partitioner_name=None,
-                 split_handle:str = 'split',
-                 fit_handle:str = 'fit',
+                 scorer=None,
+                 scorer_name=None,
+                 split_handle: str = 'split',
+                 fit_handle: str = 'fit',
                  predict_handle: str = 'predict',
-                 f_weights_handle:str = None,
-                 s_weights_handle:str = None,
+                 f_weights_handle: str = None,
+                 s_weights_handle: str = None,
                  append: bool = True,
-                 classifier_name=None):
+                 f_rnk_func=None,
+                 s_rnk_func=None,
+                 ):
 
 
         if classifier_name is None:
-            classifier_name = classifier.__str__()
+            classifier_name = classifier.__str__().split('(')[0]
 
         if partitioner_name is None:
-            classifier_name = partitioner.__str__()
+            partitioner_name = partitioner.__str__().split('(')[0]
 
-        method_name = classifier_name + "_" + partitioner_name
+        if scorer_name is None:
+            scorer_name = scorer.__str__().split('(')[0]
+
+        method_name = attr + "_" + partitioner_name + "_" + classifier_name
 
         # slice dataframe
         ds = self.slice_dataset(feature_ids, sample_ids)
@@ -808,6 +823,8 @@ class DataSet:
         predict_results = pd.DataFrame(index=sample_ids)
         f_weight_results = pd.DataFrame(index=feature_ids)
         s_weight_results = pd.DataFrame(index=sample_ids)
+        scores = pd.DataFrame(index=['Train', 'Test'])
+        classifiers = pd.Series()
 
         # set methods
         fit = eval("classifier" + "." + fit_handle)
@@ -818,44 +835,65 @@ class DataSet:
             X_train = X[train_index, :]
             X_test = X[test_index, :]
             y_train = y[train_index]
+            y_true = y[test_index]
 
             # fit the classifier (going meta y'all)
             fit(X_train, y_train)
+            classifiers[method_name + '_classifier_' + str(i)] = classifier
 
             # get predict labels
             y_pred_train = predict(X_train)
             y_pred_test = predict(X_test)
 
+            # get scores
+            score_name = method_name + "_" + scorer_name + "_" + str(i)
+            train_score = scorer(y_train, y_pred_train)
+            test_score = scorer(y_true, y_pred_test)
+            scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
+
             # append prediction results
-            predict_results[method_name + " " + attr + " labels_" + str(i)] = ''
-            predict_results.loc[
-                sample_index.take(train_index), method_name + " " + attr + " labels_" + str(i)] = y_pred_train
-            predict_results.loc[
-                sample_index.take(test_index), method_name + " " + attr + " labels_" + str(i)] = y_pred_test
-            predict_results[method_name + " split labels_" + str(i)] = ''
-            predict_results.loc[sample_index.take(train_index), method_name + " split labels_" + str(i)] = 'Train'
-            predict_results.loc[sample_index.take(test_index), method_name + " split labels_" + str(i)] = 'Test'
+            labels_name = method_name + "_labels_" + str(i)
+            split_labels_name = method_name + "_split_labels_" + str(i)
+            predict_results[labels_name] = ''
+            predict_results.loc[sample_index.take(train_index), labels_name] = y_pred_train
+            predict_results.loc[sample_index.take(test_index), labels_name] = y_pred_test
+            predict_results[split_labels_name] = ''
+            predict_results.loc[sample_index.take(train_index), split_labels_name] = 'Train'
+            predict_results.loc[sample_index.take(test_index), split_labels_name] = 'Test'
 
             # append feature results
             if not (f_weights_handle is None):
+                f_weights_name = method_name + "_f_weights_" + str(i)
                 f_weights = eval("classifier" + "." + f_weights_handle)
-                f_weight_results[method_name + " feature weights_" + str(i)] = np.NaN
-                f_weight_results.loc[feature_ids, method_name + " feature weights_" + str(i)] = pd.Series(index=feature_ids, data=f_weights)
+                f_weight_results[f_weights_name] = np.nan
+                f_weight_results.loc[feature_ids, f_weights_name] = pd.Series(index=feature_ids, data=f_weights)
+                if not (f_rnk_func is None):
+                    f_rnk_name = method_name + "_f_rank_" + str(i)
+                    weights = f_weight_results.loc[feature_ids, f_weights_name]
+                    f_weight_results[f_rnk_name] = np.nan
+                    f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
+                    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
 
             # append sample results
             if not (s_weights_handle is None):
+                s_weights_name = method_name + "_s_weights_" + str(i)
                 s_weights = eval("classifier" + "." + s_weights_handle)
-                s_weight_results[method_name + " sample weights_" + str(i)] = np.nan
-                s_weight_results.loc[
-                    sample_index.take(train_index), method_name + " sample weights_" + str(i)] = s_weights
+                s_weight_results[s_weights_name] = np.nan
+                s_weight_results.loc[sample_index.take(train_index), s_weights_name] = s_weights
+                if not (f_rnk_func is None):
+                    s_rnk_name = method_name + "_s_rank_" + str(i)
+                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    s_weight_results[s_rnk_name] = np.nan
+                    s_weight_results.loc[feature_ids, s_rnk_name] = (-s_rnk_func(weights)).argsort()
+                    s_weight_results[s_rnk_name] = s_weight_results[s_rnk_name].astype('Int64')
 
         if append:
             self.metadata = pd.concat([self.metadata, predict_results], axis=1)
             self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
             self.metadata = pd.concat([self.metadata, s_weight_results], axis=1)
-            return
+            return classifiers, scores
         else:
-            return predict_results, f_weight_results, s_weight_results
+            return classifiers, scores, predict_results, f_weight_results, s_weight_results
 
     # TODO: Add conversion to cdd method.
     # TODO: Add basic normalization methods
