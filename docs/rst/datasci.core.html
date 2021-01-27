@@ -180,99 +180,36 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
 pre-processing, visualization, and classification.</p>
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.name">
-<code class="sig-name descname">name</code><a class="headerlink" href="#datasci.core.dataset.DataSet.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reference name for the dataset. Default is the empty string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.description">
-<code class="sig-name descname">description</code><a class="headerlink" href="#datasci.core.dataset.DataSet.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Short description of data set.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.path">
-<code class="sig-name descname">path</code><a class="headerlink" href="#datasci.core.dataset.DataSet.path" title="Permalink to this definition">¶</a></dt>
-<dd><p>File path for saving DataSet instance and related outputs. Default is the empty string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.data">
-<code class="sig-name descname">data</code><a class="headerlink" href="#datasci.core.dataset.DataSet.data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Numerical data or features of the data set arranged as samples x features.
-Default is the empty DataFrame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.metadata">
-<code class="sig-name descname">metadata</code><a class="headerlink" href="#datasci.core.dataset.DataSet.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Categorical data or attributes of the dataset arranged as samples x attributes.
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for the dataset. Default is the empty string.</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – Short description of data set.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – File path for saving DataSet instance and related outputs. Default is the empty string.</p></li>
+<li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – Numerical data or features of the data set arranged as samples x features.
+Default is the empty DataFrame.</p></li>
+<li><p><strong>metadata</strong> (<em>pandas.DataFrame</em>) – Categorical data or attributes of the dataset arranged as samples x attributes.
 The sample labels in the index column should be the same format as those used for the data DataFrame.
 If labels are missing or there are more labels than in the data, the class will automatically restrict
 to just those samples used in the data and fill in NaN where there are missing samples. Default is the
-empty DataFrame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.vardata">
-<code class="sig-name descname">vardata</code><a class="headerlink" href="#datasci.core.dataset.DataSet.vardata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Categorical data or attributes of the features on the dataset arranged as
+empty DataFrame.</p></li>
+<li><p><strong>vardata</strong> (<em>pandas.DataFrame</em>) – Categorical data or attributes of the features on the dataset arranged as
 features x attributes. The feature labels in the index column should be the same format as those used for
-the columns in the data DataFrame. Default is None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.normalization_method">
-<code class="sig-name descname">normalization_method</code><a class="headerlink" href="#datasci.core.dataset.DataSet.normalization_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>Label indicating the normalization used on the data. Future normalization will
+the columns in the data DataFrame. Default is None.</p></li>
+<li><p><strong>normalization_method</strong> (<em>str</em>) – Label indicating the normalization used on the data. Future normalization will
 append as normalization_1/normalization_2/…/normalization_n indicating the sequence of normalizations
-used on the data. Default is the empty string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+used on the data. Default is the empty string.</p></li>
+<li><p><strong>imputation_method</strong> (<em>str</em>) – Label indicating the imputation used on the data. Default is the empty string.</p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.imputation_method">
-<code class="sig-name descname">imputation_method</code><a class="headerlink" href="#datasci.core.dataset.DataSet.imputation_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>Label indicating the imputation used on the data. Default is the empty string.</p>
+<dt id="datasci.core.dataset.DataSet.experiments">
+<code class="sig-name descname">experiments</code><a class="headerlink" href="#datasci.core.dataset.DataSet.experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -322,8 +259,13 @@ See dash documentation for further details.</p></li>
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.classify">
-<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method runs a classification experiment. The user provides a classifier, a class to partition the data
+into train/test partitions, and a scoring method. The experiment returns the fit classifiers across the
+train/test partitions, the train/test scores. Additionally, the experiment will either return, or append
+depending on the <code class="docutils literal notranslate"><span class="pre">append</span></code> flag, the prediction labels, the training and testing labels, feature/sample
+weights associated to the fit classifiers, and their associated rankings.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>classifier</strong> (<em>object</em>) – Classifier to run the classification experiment with; must have the sklearn equivalent
@@ -338,7 +280,8 @@ of a <code class="docutils literal notranslate"><span class="pre">fit</span></co
 <li><p><strong>partitioner</strong> (<em>object</em>) – Class-instance which partitions samples in batches of training and test split. This
 instance must have the sklearn equivalent of a split method. The split method returns a list of
 train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
-an example partitioner.</p></li>
+an example partitioner. The default is None; resulting in using all of the samples to train
+the classifier with no test samples.</p></li>
 <li><p><strong>partitioner_name</strong> (<em>string</em>) – Common name for the <code class="docutils literal notranslate"><span class="pre">partitioner</span></code> to be used for identification. Default is
 <code class="docutils literal notranslate"><span class="pre">partitioner.__str__()</span></code>.</p></li>
 <li><p><strong>scorer</strong> (<em>object</em>) – Function which scores the prediction labels on training and test partitions. This function
@@ -346,31 +289,94 @@ should accept two arguments: truth labels and prediction labels. This function s
 between 0 and 1 which can be thought of as an accuracy measure. See
 sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 <li><p><strong>scorer_name</strong> (<em>string</em>) – Common name of scorer to used for identification. Default is <code class="docutils literal notranslate"><span class="pre">scorer.__str__()</span></code>.</p></li>
-<li><p><strong>split_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">split</span></code> method used by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. Default is “split”</p></li>
-<li><p><strong>fit_handle</strong> – </p></li>
-<li><p><strong>predict_handle</strong> – </p></li>
-<li><p><strong>f_weights_handle</strong> – </p></li>
-<li><p><strong>s_weights_handle</strong> – </p></li>
-<li><p><strong>append</strong> – </p></li>
-<li><p><strong>f_rnk_func</strong> – </p></li>
-<li><p><strong>s_rnk_func</strong> – </p></li>
+<li><p><strong>split_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">split</span></code> method used by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. Default is “split”.</p></li>
+<li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">classifier</span></code>. Default is “fit”.</p></li>
+<li><p><strong>predict_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">predict</span></code> method used by <code class="docutils literal notranslate"><span class="pre">classifier</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p></li>
+<li><p><strong>f_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing feature weights. Default is None.</p></li>
+<li><p><strong>s_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing sample weights. Default is None.</p></li>
+<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the classification results will be appended to</p></li>
 </ul>
 </dd>
 </dl>
-<p>Returns:</p>
+<p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<blockquote>
+<div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
+features will be ranked in from least to greatest.</p></li>
+<li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
+samples will be ranked in from least to greatest.</p></li>
+<li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
+<a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(classifiers) - Contains the fit classifiers. (scores) - Contains the training and test scores</dt><dd><p>provided by <code class="docutils literal notranslate"><span class="pre">scorer</span></code> across partitions given by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. (prediction_results) - Contains the
+prediction labels and train/test labels across each fold generated by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. (f_weights) -
+Contains the feature weights and rankings in the classification experiment for each fold generated by
+<code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. (s_weights) - Contains the sample weights and rankings in the classification experiment
+for each fold generated by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;/test_data/GSE161731_tmm_log2.ds&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># setup classification experiment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">SSVM</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covid_healthy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;COVID-19&#39;</span><span class="p">,</span> <span class="s1">&#39;healthy&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run classification</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">ssvm</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;SSVM&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;cohort&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">sample_ids</span><span class="o">=</span><span class="n">covid_healthy</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">partitioner</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;5-fold&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;bsr&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;weights_&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">append_to_meta</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;covid_vs_healthy_SSVM_5-fold&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">f_rnk_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># share the results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;F:/DataSci/test_data/GSE161731_ssvm_results.ds&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.impute">
 <code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imputes the data of the dataset according to an imputer class. Appends the imputation method
-used to <a class="reference internal" href="#datasci.core.dataset.DataSet.imputation_method" title="datasci.core.dataset.DataSet.imputation_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code></a>.</p>
+used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imputer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-imputer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+imputer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
@@ -401,13 +407,13 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 <dt id="datasci.core.dataset.DataSet.normalize">
 <code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
-used to <a class="reference internal" href="#datasci.core.dataset.DataSet.normalization_method" title="datasci.core.dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
+used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-normalizer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+normalizer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
@@ -478,7 +484,7 @@ pandas infer_dtypes function to automatically infer the datatypes for each attri
 <dt id="datasci.core.dataset.DataSet.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code>/<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code>.ds where the spaces in <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> are replaced
 with underscores.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -511,7 +517,7 @@ with underscores.</p>
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _slice</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -545,7 +551,7 @@ restricting the features and samples.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-embedding.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
+embedding.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have at most 3 columns.</p></li>
 <li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
 <li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
@@ -556,8 +562,8 @@ embedding.fit_transform(<a class="reference internal" href="#datasci.core.datase
 <li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>.__str__().</p></li>
 <li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
-<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
-<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code> when using the
 backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
 indicating plot properties.</p></li>
