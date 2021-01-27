@@ -14,7 +14,7 @@ To install the DataSci package first activate the DataSci environment and then n
 conda activate DataSci
 cd /path/to/DataSci/
 ```
-Fianlly install the package with ```pip```
+Finally install the package with ```pip```
 ```bash
 pip install -e .
 
