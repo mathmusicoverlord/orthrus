@@ -20,7 +20,7 @@ class DataSet:
     Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
     pre-processing, visualization, and classification.
 
-    Attributes:
+    Parameters:
         name (str): Reference name for the dataset. Default is the empty string.
 
         description (str): Short description of data set.
@@ -45,6 +45,10 @@ class DataSet:
             used on the data. Default is the empty string.
 
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
+
+    Attributes:
+        experiments (dict): Holds experimental results. e.g. from :py:meth:`DataSet.classify`.
+
 
     Examples:
             >>> from pydataset import data as pydat
@@ -74,7 +78,8 @@ class DataSet:
         self.normalization_method = normalization_method
         self.imputation_method = imputation_method
 
-        # private attributes
+        # unset attributes
+        self.experiments = dict()
 
         # restrict metadata to data
         try:
@@ -466,16 +471,18 @@ class DataSet:
             name = self.name + '_slice'
 
         # sort data and metadata together to be safe
-        self.data.sort_index(inplace=True)
-        self.vardata.sort_index(inplace=True)
-        self.metadata.sort_index(inplace=True)
+        self.vardata = self.vardata.loc[self.data.columns]
+        self.metadata = self.metadata.loc[self.data.index]
 
         # slice data at features
         columns = self.data.columns
         try:
-            data = self.data[feature_ids]
-        except KeyError:
-            data = self.data[columns[feature_ids]]
+            data = self.data[self.vardata.index[feature_ids]]
+        except IndexError:
+            try:
+                data = self.data[feature_ids]
+            except KeyError:
+                data = self.data[columns[feature_ids]]
 
         # slice data at samples
         index = self.data.index
@@ -781,11 +788,116 @@ class DataSet:
                  predict_handle: str = 'predict',
                  f_weights_handle: str = None,
                  s_weights_handle: str = None,
-                 append: bool = True,
+                 append_to_meta: bool = True,
+                 inplace: bool = False,
                  f_rnk_func=None,
                  s_rnk_func=None,
+                 experiment_name=None,
                  ):
+        """
+        This method runs a classification experiment. The user provides a classifier, a class to partition the data
+        into train/test partitions, and a scoring method. The experiment returns the fit classifiers across the
+        train/test partitions, the train/test scores. Additionally, the experiment will either return, or append
+        depending on the ``append`` flag, the prediction labels, the training and testing labels, feature/sample
+        weights associated to the fit classifiers, and their associated rankings.
 
+        Args:
+            classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
+                of a ``fit`` and ``predict`` method.
+
+            attr (string): Name of metadata attribute to classify on.
+
+            classifier_name (string): Common name of classifier to be used for identification. Default is
+                ``classifier.__str__()``.
+
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            partitioner (object): Class-instance which partitions samples in batches of training and test split. This
+                instance must have the sklearn equivalent of a split method. The split method returns a list of
+                train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
+                an example partitioner. The default is None; resulting in using all of the samples to train
+                the classifier with no test samples.
+
+            partitioner_name (string): Common name for the ``partitioner`` to be used for identification. Default is
+                ``partitioner.__str__()``.
+
+            scorer (object): Function which scores the prediction labels on training and test partitions. This function
+                should accept two arguments: truth labels and prediction labels. This function should output a score
+                between 0 and 1 which can be thought of as an accuracy measure. See
+                sklearn.metrics.balanced_accuracy_score for an example.
+
+            scorer_name (string): Common name of scorer to used for identification. Default is ``scorer.__str__()``.
+
+            split_handle (string): Name of ``split`` method used by ``partitioner``. Default is "split".
+
+            fit_handle (string): Name of ``fit`` method used by ``classifier``. Default is "fit".
+
+            predict_handle (string): Name of ``predict`` method used by ``classifier``. Default is ``predict``.
+
+            f_weights_handle (string): Name of ``classifier`` attribute containing feature weights. Default is None.
+
+            s_weights_handle (string): Name of ``classifier`` attribute containing sample weights. Default is None.
+
+            append_to_meta (bool): If ``True``, the classification results will be appended to
+            :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
+
+            inplace (bool): If True the classification results will be stored to :py:attr:`DataSet.experiments`.
+                If ``False`` the classification results will be returned to the user. Default is ``False``
+
+            f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
+                features will be ranked in from least to greatest.
+
+            s_rnk_func (object): Function to be applied to sample weights for sample ranking. Default is None, and the
+                samples will be ranked in from least to greatest.
+
+            experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
+                :py:attr:`DataSet.experiments`. Default is ``classifier_name`` + ``partitioner_name`` + ``scorer_name``.
+        Returns:
+            dict : (classifiers) - Contains the fit classifiers. (scores) - Contains the training and test scores
+                provided by ``scorer`` across partitions given by ``partitioner``. (prediction_results) - Contains the
+                prediction labels and train/test labels across each fold generated by ``partitioner``. (f_weights) -
+                Contains the feature weights and rankings in the classification experiment for each fold generated by
+                ``partitioner``. (s_weights) - Contains the sample weights and rankings in the classification experiment
+                for each fold generated by ``partitioner``.
+
+        Examples:
+            >>> # imports
+            >>> import datasci.core.dataset as dataset
+            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> from calcom.solvers import LPPrimalDualPy
+            >>> from sklearn.model_selection import KFold
+            >>> from sklearn.metrics import balanced_accuracy_score as bsr
+            ...
+            >>> # load dataset
+            >>> ds = dataset.load_dataset('/test_data/GSE161731_tmm_log2.ds')
+            ...
+            >>> # setup classification experiment
+            >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
+            >>> kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+            >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
+            ...
+            >>> # run classification
+            >>> ds.classify(classifier=ssvm,
+            ...             classifier_name='SSVM',
+            ...             attr='cohort',
+            ...             sample_ids=covid_healthy,
+            ...             partitioner=kfold,
+            ...             partitioner_name='5-fold',
+            ...             scorer=bsr,
+            ...             scorer_name='bsr',
+            ...             f_weights_handle='weights_',
+            ...             append_to_meta=True,
+            ...             inplace=True,
+            ...             experiment_name='covid_vs_healthy_SSVM_5-fold',
+            ...             f_rnk_func=np.abs)
+            ...
+            >>> # share the results
+            >>> ds.save('F:/DataSci/test_data/GSE161731_ssvm_results.ds')
+        """
 
         if classifier_name is None:
             classifier_name = classifier.__str__().split('(')[0]
@@ -873,6 +985,12 @@ class DataSet:
                     f_weight_results[f_rnk_name] = np.nan
                     f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
                     f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+                else:
+                    f_rnk_name = method_name + "_f_rank_" + str(i)
+                    weights = f_weight_results.loc[feature_ids, f_weights_name]
+                    f_weight_results[f_rnk_name] = np.nan
+                    f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
+                    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
 
             # append sample results
             if not (s_weights_handle is None):
@@ -886,19 +1004,33 @@ class DataSet:
                     s_weight_results[s_rnk_name] = np.nan
                     s_weight_results.loc[feature_ids, s_rnk_name] = (-s_rnk_func(weights)).argsort()
                     s_weight_results[s_rnk_name] = s_weight_results[s_rnk_name].astype('Int64')
+                else:
+                    s_rnk_name = method_name + "_s_rank_" + str(i)
+                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    s_weight_results[s_rnk_name] = np.nan
+                    s_weight_results.loc[feature_ids, s_rnk_name] = (-np.array(weights)).argsort()
 
-        if append:
+        if append_to_meta:
             self.metadata = pd.concat([self.metadata, predict_results], axis=1)
             self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
             self.metadata = pd.concat([self.metadata, s_weight_results], axis=1)
-            return classifiers, scores
+
+        results = {'classifiers': classifiers,
+                   'scores': scores,
+                   'prediction_results': predict_results,
+                   'f_weights': f_weight_results,
+                   's_weights': s_weight_results}
+
+        if inplace:
+            if experiment_name is None:
+                experiment_name = classifier_name + '_' + partitioner_name + '_' + scorer_name
+            self.experiments[experiment_name] = results
         else:
-            return classifiers, scores, predict_results, f_weight_results, s_weight_results
+            return results
 
     # TODO: Add conversion to cdd method.
     # TODO: Add basic normalization methods
     # TODO: Add imputation method
-    # TODO: Add varattr
 
     # class methods
 
@@ -939,8 +1071,6 @@ def load_dataset(file_path: str):
 
     # get name
     #name = gse.name
-
-
 
 # TODO: Add
 

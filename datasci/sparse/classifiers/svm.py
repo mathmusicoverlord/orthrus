@@ -154,7 +154,6 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
 
         return self
     #
-
     def predict(self, X):
         '''
         Classification step for Sparse Support Vector Machine (SSVM).
@@ -189,7 +188,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             data_c = torch.from_numpy(X).double().cuda()
             w_c = torch.from_numpy(w).double().cuda()
             b_c = torch.from_numpy(b).double().cuda()
-            d = torch.addmm(-1,b_c,data_c,w_c).cpu().numpy()
+            d = torch.addmm(-1, b_c, data_c, w_c).cpu().numpy()
         else:
             d = np.dot(X, w) - b
 
