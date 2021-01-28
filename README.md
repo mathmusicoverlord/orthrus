@@ -1,5 +1,5 @@
 # DataSci
-A collection of python classes and functions for automating pre-processing, visualization, and classification of generic data sets. Read the [docs](https://ekehoe32.github.io/DataSci/)!
+A collection of python classes and functions for automating pre-processing, visualization, classification, and features selection for generic data sets. Read the [docs](https://ekehoe32.github.io/DataSci/)!
 
 ## Installing the conda environment
 In order to ensure proper behavior of python classes and functions between platforms we recommend installing an isolated ```conda``` environment with the depedencies listed in [environment.yml](environment.yml). To create a new enviroment with these dependencies, from the shell run:
@@ -14,13 +14,13 @@ To install the DataSci package first activate the DataSci environment and then n
 conda activate DataSci
 cd /path/to/DataSci/
 ```
-Fianlly install the package with ```pip```
+Finally install the package with ```pip```
 ```bash
 pip install -e .
 
 ```
 ## Basic Usage
-The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/dataset.html#dataset.DataSet) class to create an instance from within the DataSci directory:
+The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/datasci.core.html#datasci.core.dataset.DataSet) class to create an instance from within the DataSci directory:
 
 ```python
 # imports
