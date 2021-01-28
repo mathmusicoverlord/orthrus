@@ -873,7 +873,7 @@ class DataSet:
             >>> from sklearn.metrics import balanced_accuracy_score as bsr
             ...
             >>> # load dataset
-            >>> ds = dataset.load_dataset('/test_data/GSE161731_tmm_log2.ds')
+            >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
             ...
             >>> # setup classification experiment
             >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
@@ -896,7 +896,7 @@ class DataSet:
             ...             f_rnk_func=np.abs)
             ...
             >>> # share the results
-            >>> ds.save('F:/DataSci/test_data/GSE161731_ssvm_results.ds')
+            >>> ds.save('./test_data/GSE161731_ssvm_results.ds')
         """
 
         if classifier_name is None:
@@ -1029,8 +1029,6 @@ class DataSet:
             return results
 
     # TODO: Add conversion to cdd method.
-    # TODO: Add basic normalization methods
-    # TODO: Add imputation method
 
     # class methods
 

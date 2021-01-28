@@ -541,7 +541,137 @@ def scatter_plotly(df: pd.DataFrame,
         else:
             pio.show(fig)
 
-if __name__ == "__main__":
-    import numpy as np
-    hello_there = np.sum
-    print(var_name(hello_there))
+def plot_scores(results_list, param_list=None, average='mean', variation='std', figsize=(20, 10), **kwargs):
+    """
+    This function plots the training and test scores from the results of classification experiments over a
+    continuous range of hyper-parameters. It is helpful for these accuracy scores as one varies a continuous parameter
+    for the classifier, or experiment.
+
+    Args:
+        results_list (list): Each item in the list must be a dictionary which has a "scores" key pointing to a dataframe
+            containing "Test" and "Train" rows of accuracy scores. See the output of :py:meth:`DataSet.classify`.
+
+        param_list (list or ndarray): List of hyper-parameters used to generate each result in the ``results_list``.
+            If ``None`` each result will be indexed as 1,2,3,...
+
+        average (string): Method of averaging to use. So far there are only two options: "mean" and "median". The
+            deafult is "mean".
+
+        variation (string): Method of variation to use; provides error bars in the plot to see the variation of the
+            scores across experiments. So far there are only two options: "std" and "minmax", where "minmax" indicates
+            using the minimum score and maximum score respectively. The default is "std".
+
+        figsize (tuple): Size of the figure, e.g. (width, height). The default is (20, 10).
+
+        **kwargs (dict): All keyword arguments are passed to ``matplotlib.axes.Axes.update()`` for plot customizations.
+            See `here <https://matplotlib.org/3.3.3/api/axes_api.html>`_ for all possible inputs.
+    Returns:
+        inplace method.
+
+    Examples:
+            >>> # imports
+            >>> import datasci.core.dataset as dataset
+            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> from calcom.solvers import LPPrimalDualPy
+            >>> from sklearn.model_selection import KFold
+            >>> from sklearn.metrics import balanced_accuracy_score as bsr
+            >>> from datasci.core.helper import plot_scores
+            ...
+            >>> # load dataset
+            >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
+            ...
+            >>> # setup classification experiment
+            >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
+            >>> kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+            >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
+            ...
+            >>> # Run classification while varying C in SSVM
+            >>> C_range = np.arange(1e-2, .5, 1e-2)
+            >>> results_list = []
+            >>> for C in C_range:
+            >>>     ssvm.C = C
+            >>>     # run classification
+            >>>     results = ds.classify(classifier=ssvm,
+            ...                           attr='cohort',
+            ...                           sample_ids=covid_healthy,
+            ...                           partitioner=kfold,
+            ...                           scorer=bsr,
+            ...                           experiment_name='covid_vs_healthy_SSVM_5-fold',
+            ...                           )
+            >>>     results_list.append(results)
+            ...
+            >>> # plot scores across C_range
+            >>> plot_scores(results_list,
+            ...             param_list=C_range,
+            ...             title='Mean BSR of 5-fold SSVM /w Std. Dev. Err Bars',
+            ...             ylim=[0, 1],
+            ...             yticks=np.arange(0, 1.1, .1),
+            ...             xlabel='C',
+            ...             ylabel='balanced success rate')
+
+    """
+    # imports
+    import matplotlib.pyplot as plt
+
+    # intitialize outputs
+    test_averages = []
+    test_variations_l = []
+    test_variations_h = []
+    train_averages = []
+    train_variations_l= []
+    train_variations_h = []
+
+    for results in results_list:
+
+        if average == 'mean':
+            train_average = results['scores'].mean(axis=1)['Train']
+            test_average = results['scores'].mean(axis=1)['Test']
+        elif average == 'median':
+            train_average = results['scores'].median(axis=1)['Train']
+            test_average = results['scores'].median(axis=1)['Test']
+
+        train_averages.append(train_average)
+        test_averages.append(test_average)
+
+        if variation == 'std':
+            train_variation_l = train_average - results['scores'].std(axis=1)['Train']
+            train_variation_h = train_average + results['scores'].std(axis=1)['Train']
+            test_variation_l = test_average - results['scores'].std(axis=1)['Test']
+            test_variation_h = test_average + results['scores'].std(axis=1)['Test']
+
+        elif variation == 'minmax':
+            train_variation_l = results['scores'].min(axis=1)['Train']
+            train_variation_h = results['scores'].max(axis=1)['Train']
+            test_variation_l = results['scores'].min(axis=1)['Test']
+            test_variation_h = results['scores'].max(axis=1)['Test']
+
+        train_variations_l.append(train_variation_l)
+        train_variations_h.append(train_variation_h)
+        test_variations_l.append(test_variation_l)
+        test_variations_h.append(test_variation_h)
+
+
+    # convert lists to ndarrays
+    train_averages = np.array(train_averages)
+    test_averages = np.array(test_averages)
+    train_variations_l = np.array(train_variations_l)
+    train_variations_h = np.array(train_variations_h)
+    test_variations_l = np.array(test_variations_l)
+    test_variations_h = np.array(test_variations_h)
+
+    # check for missing parameters list
+    if param_list is None:
+        param_list = np.arange(1, len(train_averages)+1)
+    elif type(param_list) == list:
+        param_list = np.array(param_list)
+
+    fig, ax = plt.subplots(1, figsize=figsize)
+    ax.plot(param_list, train_averages, "b", label='Train')
+    ax.fill_between(param_list, train_variations_l, train_variations_h, color="b", alpha=0.2)
+    ax.plot(param_list, test_averages, "r", label='Test')
+    ax.fill_between(param_list, test_variations_l, test_variations_h, color="r", alpha=0.2)
+    ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15)
+    ax.update(kwargs)
+    plt.show()
+
+
