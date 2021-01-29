@@ -3,8 +3,12 @@ channels:
   - rapidsai
   - nvidia
   - conda-forge
+  - pytorch
   - defaults
 dependencies:
+  - pytorch
+  - torchvision
+  - torchaudio
   - rapids-blazing=0.17 
   - python=3.8 
   - cudatoolkit=11.0
