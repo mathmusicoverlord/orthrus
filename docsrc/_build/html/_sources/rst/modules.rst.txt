@@ -6,3 +6,4 @@ datasci
 
    datasci.core
    datasci.sparse.classifiers
+   datasci.sparse.feature_selection
