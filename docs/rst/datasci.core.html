@@ -95,6 +95,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="datasci.sparse.classifiers.html">datasci.sparse.classifiers namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasci.sparse.feature_selection.html">datasci.sparse.feature_selection namespace</a></li>
 </ul>
 </li>
 </ul>
@@ -294,10 +295,18 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 <li><p><strong>predict_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">predict</span></code> method used by <code class="docutils literal notranslate"><span class="pre">classifier</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p></li>
 <li><p><strong>f_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing feature weights. Default is None.</p></li>
 <li><p><strong>s_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing sample weights. Default is None.</p></li>
-<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the classification results will be appended to
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>inplace</strong> (<em>bool</em>) – If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the classification results will be appended to</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<blockquote>
+<div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
 features will be ranked in from least to greatest.</p></li>
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
@@ -378,10 +387,18 @@ sklearn equivalent of a <code class="docutils literal notranslate"><span class="
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature weights. Default is None.</p></li>
-<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>inplace</strong> (<em>bool</em>) – If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<blockquote>
+<div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
 features will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
@@ -401,15 +418,14 @@ rankings in the feature selection experiment.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.feature_selection.kffs</span> <span class="kn">import</span> <span class="n">KFFS</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;./test_data/GSE161731_tmm_log2.ds&#39;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># setup classification experiment</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">SSVM</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kffs</span> <span class="o">=</span> <span class="n">KFFS</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covid_healthy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;COVID-19&#39;</span><span class="p">,</span> <span class="s1">&#39;healthy&#39;</span><span class="p">])</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run classification</span>
