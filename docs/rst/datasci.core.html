@@ -294,18 +294,10 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 <li><p><strong>predict_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">predict</span></code> method used by <code class="docutils literal notranslate"><span class="pre">classifier</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p></li>
 <li><p><strong>f_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing feature weights. Default is None.</p></li>
 <li><p><strong>s_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">classifier</span></code> attribute containing sample weights. Default is None.</p></li>
-<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the classification results will be appended to</p></li>
-</ul>
-</dd>
-</dl>
-<p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
-<blockquote>
-<div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
+<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the classification results will be appended to
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
 features will be ranked in from least to greatest.</p></li>
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
@@ -386,18 +378,10 @@ sklearn equivalent of a <code class="docutils literal notranslate"><span class="
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_weights_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature weights. Default is None.</p></li>
-<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to</p></li>
-</ul>
-</dd>
-</dl>
-<p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
-<blockquote>
-<div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
+<li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
 features will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
