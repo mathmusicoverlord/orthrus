@@ -247,7 +247,7 @@ class DataSet:
             save_name = None
 
         # set default axis labels
-        if dim < 3:
+        if dim < 4:
             kwargs['xlabel'] = kwargs.get('xlabel', viz_name + ' ' + str(1))
             kwargs['ylabel'] = kwargs.get('ylabel', viz_name + ' ' + str(2))
             if dim > 2:
@@ -855,7 +855,7 @@ class DataSet:
                 samples will be ranked in from least to greatest.
 
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
-                :py:attr:`DataSet.experiments`. Default is ``classifier_name`` + ``partitioner_name`` + ``scorer_name``.
+                :py:attr:`DataSet.experiments`. Default is ``attr`` + ``classifier_name`` + ``partitioner_name`` + ``scorer_name``.
         Returns:
             dict : (classifiers) - Contains the fit classifiers. (scores) - Contains the training and test scores
                 provided by ``scorer`` across partitions given by ``partitioner``. (prediction_results) - Contains the
@@ -1023,11 +1023,149 @@ class DataSet:
 
         if inplace:
             if experiment_name is None:
-                experiment_name = classifier_name + '_' + partitioner_name + '_' + scorer_name
+                experiment_name = attr + '_' + classifier_name + '_' + partitioner_name + '_' + scorer_name
             self.experiments[experiment_name] = results
         else:
             return results
 
+    def feature_select(self, selector,
+                 attr: str,
+                 selector_name=None,
+                 feature_ids=None,
+                 sample_ids=None,
+                 fit_handle: str = 'fit',
+                 f_weights_handle: str = None,
+                 append_to_meta: bool = True,
+                 inplace: bool = False,
+                 f_rnk_func=None,
+                 experiment_name=None,
+                 ):
+        """
+        This method runs a feature selection experiment. The user provides a feature selector and a ranking function.
+        The experiment returns, or appends depending on the ``append`` flag, the feature weights, and their
+        associated rankings.
+
+        Args:
+            selector (object): Feature selector to run the feature selection experiment with; must have the
+                sklearn equivalent of a ``fit`` method.
+
+            attr (string): Name of metadata attribute to feature select on.
+
+            selector_name (string): Common name of feature selector to be used for identification. Default is
+                ``selector.__str__()``.
+
+            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
+                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            fit_handle (string): Name of ``fit`` method used by ``selector``. Default is "fit".
+
+            f_weights_handle (string): Name of ``selector`` attribute containing feature weights. Default is None.
+
+            append_to_meta (bool): If ``True``, the feature selection results will be appended to
+            :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
+
+            inplace (bool): If True the feature selection results will be stored to :py:attr:`DataSet.experiments`.
+                If ``False`` the feature selection results will be returned to the user. Default is ``False``
+
+            f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
+                features will be ranked in from least to greatest.
+
+            experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
+                :py:attr:`DataSet.experiments`. Default is ``attr``+ ``selector_name``.
+        Returns:
+            dict : (selector) - Contains the fit feature selector. (f_weights) - Contains the feature weights and
+            rankings in the feature selection experiment.
+
+        Examples:
+            >>> # imports
+            >>> import datasci.core.dataset as dataset
+            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> from calcom.solvers import LPPrimalDualPy
+            >>> from sklearn.model_selection import KFold
+            >>> from sklearn.metrics import balanced_accuracy_score as bsr
+            ...
+            >>> # load dataset
+            >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
+            ...
+            >>> # setup classification experiment
+            >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
+            >>> kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+            >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
+            ...
+            >>> # run classification
+            >>> ds.classify(classifier=ssvm,
+            ...             classifier_name='SSVM',
+            ...             attr='cohort',
+            ...             sample_ids=covid_healthy,
+            ...             partitioner=kfold,
+            ...             partitioner_name='5-fold',
+            ...             scorer=bsr,
+            ...             scorer_name='bsr',
+            ...             f_weights_handle='weights_',
+            ...             append_to_meta=True,
+            ...             inplace=True,
+            ...             experiment_name='covid_vs_healthy_SSVM_5-fold',
+            ...             f_rnk_func=np.abs)
+            ...
+            >>> # share the results
+            >>> ds.save('./test_data/GSE161731_ssvm_results.ds')
+        """
+
+        if selector_name is None:
+            selector_name = selector.__str__().split('(')[0]
+
+        method_name = attr + "_" + selector_name
+
+        # slice dataframe
+        ds = self.slice_dataset(feature_ids, sample_ids)
+        sample_ids = ds.data.index
+        feature_ids = ds.vardata.index
+        X = ds.data.values
+        y = ds.metadata[attr].values
+
+        # set sample index
+        sample_index = self.metadata.loc[sample_ids].index
+
+        # set returns
+        f_weight_results = pd.DataFrame(index=feature_ids)
+
+        # set methods
+        fit = eval("selector" + "." + fit_handle)
+
+        # fit the feature selector (going meta y'all)
+        fit(X, y)
+
+        # append feature results
+        if not (f_weights_handle is None):
+            f_weights_name = method_name + "_f_weights"
+            f_weights = eval("classifier" + "." + f_weights_handle)
+            f_weight_results[f_weights_name] = np.nan
+            f_weight_results.loc[feature_ids, f_weights_name] = pd.Series(index=feature_ids, data=f_weights)
+            if not (f_rnk_func is None):
+                f_rnk_name = method_name + "_f_rank"
+                weights = f_weight_results.loc[feature_ids, f_weights_name]
+                f_weight_results[f_rnk_name] = np.nan
+                f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
+                f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+            else:
+                f_rnk_name = method_name + "_f_rank"
+                weights = f_weight_results.loc[feature_ids, f_weights_name]
+                f_weight_results[f_rnk_name] = np.nan
+                f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
+                f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+
+        results = {'selector': selector,
+                   'f_weights': f_weight_results}
+
+        if inplace:
+            if experiment_name is None:
+                experiment_name = attr + '_' + selector_name
+            self.experiments[experiment_name] = results
+        else:
+            return results
     # TODO: Add conversion to cdd method.
 
     # class methods
