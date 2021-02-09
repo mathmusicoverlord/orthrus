@@ -26,12 +26,9 @@ class KFFS(BaseEstimator):
         random_state (int): Random state to generate k-fold partitions. Default is 0.
 
     Attributes:
-        _classifiers (series): Contains each classifier trained on each fold.
-        _ranks (ndarray): Contains the final rankings of all the features.
-        _weights (ndarray): Contains the feature weights and ranks for each fold, and the final rankings.
-
-    Examples:
-
+        classifiers_ (series): Contains each classifier trained on each fold.
+        ranks_ (ndarray): Contains the final rankings of all the features.
+        weights_ (ndarray): Contains the feature weights and ranks for each fold, and the final rankings.
     """
 
     def __init__(self, k=5, n=10, classifier=None, f_weights_handle=None, f_rnk_func=None, random_state=0):
@@ -45,11 +42,20 @@ class KFFS(BaseEstimator):
         self.f_rnk_func = f_rnk_func
 
         # set attributes
-        self._classifiers = pd.Series()
-        self._ranks = None
-        self._weights = None
+        self.classifiers_ = pd.Series()
+        self.ranks_ = None
+        self.weights_ = None
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y):
+        '''
+        Fits the kFFS model to the training data.
+
+        Args:
+            X (array-like, (n_samples, n_features)): Training samples to be used for feature selection.
+            y (array-like, (n_features,)): Training labels to be used for feature selection.
+        Returns:
+            inplace method. Results are stored in :py:attr:`KFFS.classifiers_`, :py:attr:`KFFS.weights_`, and :py:attr:`KFFS.ranks_`.
+        '''
 
         # generate splits
         kfold = KFold(n_splits=self.k, shuffle=True, random_state=self.random_state)
@@ -67,7 +73,7 @@ class KFFS(BaseEstimator):
 
             # fit classifier
             self.classifier.fit(X_train, y_train)
-            self._classifiers['classifier_' + str(i)] = self.classifier
+            self.classifiers_['classifier_' + str(i)] = self.classifier
 
             if not (self.f_weights_handle is None):
                 f_weights_name = "weights_" + str(i)
@@ -96,7 +102,7 @@ class KFFS(BaseEstimator):
             occurences = top_features.astype(int).sum(axis=1)
             self._results['top_' + str(threshold) + '_occurences'] = occurences.replace(0, pd.NA)
             self._results['top_' + str(threshold) + '_rank'] = occurences.argsort()
-            self._ranks = occurences.argsort().values
+            self.ranks_ = occurences.argsort().values
 
 
 

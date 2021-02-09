@@ -849,7 +849,7 @@ class DataSet:
                 If ``False`` the classification results will be returned to the user. Default is ``False``
 
             f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
-                features will be ranked in from least to greatest.
+                features will be ranked from greatest to least importance. e.g. rank = 1 most important.
 
             s_rnk_func (object): Function to be applied to sample weights for sample ranking. Default is None, and the
                 samples will be ranked in from least to greatest.
@@ -1071,7 +1071,7 @@ class DataSet:
                 If ``False`` the feature selection results will be returned to the user. Default is ``False``
 
             f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
-                features will be ranked in from least to greatest.
+                features will be ranked from greatest to least importance. e.g. rank = 1 most important.
 
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
                 :py:attr:`DataSet.experiments`. Default is ``attr``+ ``selector_name``.
@@ -1081,37 +1081,35 @@ class DataSet:
 
         Examples:
             >>> # imports
+            >>> import numpy as np
             >>> import datasci.core.dataset as dataset
             >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
             >>> from calcom.solvers import LPPrimalDualPy
-            >>> from sklearn.model_selection import KFold
-            >>> from sklearn.metrics import balanced_accuracy_score as bsr
+            >>> from datasci.sparse.feature_selection.kffs import KFFS
             ...
             >>> # load dataset
             >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
             ...
             >>> # setup classification experiment
             >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
-            >>> kfold = KFold(n_splits=5, shuffle=True, random_state=0)
+            >>> kffs = KFFS(k=5,
+            ...             n=5,
+            ...             classifier=ssvm,
+            ...             f_weights_handle = 'weights_',
+            ...             f_rnk_func=np.abs,
+            ...             random_state=0)
+            ...
             >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
             ...
             >>> # run classification
-            >>> ds.classify(classifier=ssvm,
-            ...             classifier_name='SSVM',
+            >>> ds.feature_select(selector=kffs,
+            ...             selector_name='kFFS',
             ...             attr='cohort',
             ...             sample_ids=covid_healthy,
-            ...             partitioner=kfold,
-            ...             partitioner_name='5-fold',
-            ...             scorer=bsr,
-            ...             scorer_name='bsr',
-            ...             f_weights_handle='weights_',
+            ...             f_weights_handle='ranks_',
             ...             append_to_meta=True,
             ...             inplace=True,
-            ...             experiment_name='covid_vs_healthy_SSVM_5-fold',
-            ...             f_rnk_func=np.abs)
-            ...
-            >>> # share the results
-            >>> ds.save('./test_data/GSE161731_ssvm_results.ds')
+            ...             experiment_name='covid_vs_healthy_SSVM_kFFS')
         """
 
         if selector_name is None:
@@ -1125,9 +1123,6 @@ class DataSet:
         feature_ids = ds.vardata.index
         X = ds.data.values
         y = ds.metadata[attr].values
-
-        # set sample index
-        sample_index = self.metadata.loc[sample_ids].index
 
         # set returns
         f_weight_results = pd.DataFrame(index=feature_ids)
@@ -1159,6 +1154,9 @@ class DataSet:
 
         results = {'selector': selector,
                    'f_weights': f_weight_results}
+
+        if append_to_meta:
+            self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
 
         if inplace:
             if experiment_name is None:
