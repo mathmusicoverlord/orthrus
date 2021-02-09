@@ -308,7 +308,7 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
-features will be ranked in from least to greatest.</p></li>
+features will be ranked from greatest to least importance. e.g. rank = 1 most important.</p></li>
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
 samples will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
@@ -400,7 +400,7 @@ sklearn equivalent of a <code class="docutils literal notranslate"><span class="
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
-features will be ranked in from least to greatest.</p></li>
+features will be ranked from greatest to least importance. e.g. rank = 1 most important.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
 <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p></li>
 </ul>
@@ -415,6 +415,7 @@ rankings in the feature selection experiment.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
@@ -425,26 +426,24 @@ rankings in the feature selection experiment.</p>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># setup classification experiment</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">SSVM</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kffs</span> <span class="o">=</span> <span class="n">KFFS</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kffs</span> <span class="o">=</span> <span class="n">KFFS</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">classifier</span><span class="o">=</span><span class="n">ssvm</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">f_weights_handle</span> <span class="o">=</span> <span class="s1">&#39;weights_&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">f_rnk_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covid_healthy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;COVID-19&#39;</span><span class="p">,</span> <span class="s1">&#39;healthy&#39;</span><span class="p">])</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run classification</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">ssvm</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;SSVM&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">feature_select</span><span class="p">(</span><span class="n">selector</span><span class="o">=</span><span class="n">kffs</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">selector_name</span><span class="o">=</span><span class="s1">&#39;kFFS&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;cohort&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">sample_ids</span><span class="o">=</span><span class="n">covid_healthy</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">partitioner</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;5-fold&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;bsr&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;weights_&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;ranks_&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">append_to_meta</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;covid_vs_healthy_SSVM_5-fold&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">f_rnk_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># share the results</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;./test_data/GSE161731_ssvm_results.ds&#39;</span><span class="p">)</span>
+<span class="gp">... </span>            <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;covid_vs_healthy_SSVM_kFFS&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
