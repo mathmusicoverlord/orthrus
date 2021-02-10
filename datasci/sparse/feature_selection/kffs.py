@@ -1,6 +1,7 @@
 # imports
 import torch as tc
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
 
@@ -28,7 +29,7 @@ class KFFS(BaseEstimator):
     Attributes:
         classifiers_ (series): Contains each classifier trained on each fold.
         ranks_ (ndarray): Contains the final rankings of all the features.
-        weights_ (ndarray): Contains the feature weights and ranks for each fold, and the final rankings.
+        results_ (ndarray): Contains the feature weights and ranks for each fold, and the final rankings.
     """
 
     def __init__(self, k=5, n=10, classifier=None, f_weights_handle=None, f_rnk_func=None, random_state=0):
@@ -44,7 +45,7 @@ class KFFS(BaseEstimator):
         # set attributes
         self.classifiers_ = pd.Series()
         self.ranks_ = None
-        self.weights_ = None
+        self.results_ = None
 
     def fit(self, X, y):
         '''
@@ -79,29 +80,29 @@ class KFFS(BaseEstimator):
                 f_weights_name = "weights_" + str(i)
                 f_weights = eval("self.classifier" + "." + self.f_weights_handle)
                 f_weight_results[f_weights_name] = np.nan
-                f_weight_results.loc[feature_index , f_weights_name] = pd.Series(index=feature_index , data=f_weights)
+                f_weight_results.loc[feature_index, f_weights_name] = pd.Series(index=feature_index , data=f_weights)
                 if not (self.f_rnk_func is None):
                     f_rnk_name = "ranks_" + str(i)
                     weights = f_weight_results.loc[feature_index, f_weights_name]
                     f_weight_results[f_rnk_name] = np.nan
-                    f_weight_results.loc[feature_ids, f_rnk_name] = (-self.f_rnk_func(weights)).argsort()
+                    f_weight_results.loc[feature_index, f_rnk_name] = (-self.f_rnk_func(weights)).argsort()
                     f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
                 else:
-                    f_rnk_name = method_name + "ranks_" + str(i)
+                    f_rnk_name = "ranks_" + str(i)
                     weights = f_weight_results.loc[feature_index, f_weights_name]
                     f_weight_results[f_rnk_name] = np.nan
                     f_weight_results.loc[feature_index, f_rnk_name] = (-np.array(weights)).argsort()
                     f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
 
             # set weights
-            self._results = f_weight_results
+            self.results_ = f_weight_results
 
             # perform kffs
             threshold = self.n
-            top_features = self._results.filter(regex='ranks', axis=1) < threshold
+            top_features = self.results_.filter(regex='ranks', axis=1) < threshold
             occurences = top_features.astype(int).sum(axis=1)
-            self._results['top_' + str(threshold) + '_occurences'] = occurences.replace(0, pd.NA)
-            self._results['top_' + str(threshold) + '_rank'] = occurences.argsort()
+            self.results_['top_' + str(threshold) + '_occurences'] = occurences.replace(0, pd.NA)
+            self.results_['top_' + str(threshold) + '_rank'] = occurences.argsort()
             self.ranks_ = occurences.argsort().values
 
 

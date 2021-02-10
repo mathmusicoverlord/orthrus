@@ -878,7 +878,7 @@ class DataSet:
             >>> # setup classification experiment
             >>> ssvm = SSVM(solver=LPPrimalDualPy, use_cuda=True)
             >>> kfold = KFold(n_splits=5, shuffle=True, random_state=0)
-            >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
+            >>> covid_healthy = ds.metadata['cohort'].isin(['COVID-19', 'healthy'])
             ...
             >>> # run classification
             >>> ds.classify(classifier=ssvm,
@@ -1099,7 +1099,7 @@ class DataSet:
             ...             f_rnk_func=np.abs,
             ...             random_state=0)
             ...
-            >>> covid_healthy = ds.metadata[attr].isin(['COVID-19', 'healthy'])
+            >>> covid_healthy = ds.metadata['cohort'].isin(['COVID-19', 'healthy'])
             ...
             >>> # run classification
             >>> ds.feature_select(selector=kffs,
