@@ -1107,6 +1107,7 @@ class DataSet:
             ...             attr='cohort',
             ...             sample_ids=covid_healthy,
             ...             f_weights_handle='ranks_',
+            ...             f_rnk_func= lambda x:  -np.abs(x),
             ...             append_to_meta=True,
             ...             inplace=True,
             ...             experiment_name='covid_vs_healthy_SSVM_kFFS')
@@ -1136,7 +1137,7 @@ class DataSet:
         # append feature results
         if not (f_weights_handle is None):
             f_weights_name = method_name + "_f_weights"
-            f_weights = eval("classifier" + "." + f_weights_handle)
+            f_weights = eval("selector" + "." + f_weights_handle)
             f_weight_results[f_weights_name] = np.nan
             f_weight_results.loc[feature_ids, f_weights_name] = pd.Series(index=feature_ids, data=f_weights)
             if not (f_rnk_func is None):

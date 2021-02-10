@@ -101,9 +101,9 @@ class KFFS(BaseEstimator):
             threshold = self.n
             top_features = self.results_.filter(regex='ranks', axis=1) < threshold
             occurences = top_features.astype(int).sum(axis=1)
-            self.results_['top_' + str(threshold) + '_occurences'] = occurences.replace(0, pd.NA)
-            self.results_['top_' + str(threshold) + '_rank'] = occurences.argsort()
-            self.ranks_ = occurences.argsort().values
+            self.results_['top_' + str(threshold) + '_occurences'] = occurences
+            self.results_['top_' + str(threshold) + '_rank'] = (-occurences).argsort()
+            self.ranks_ = ((-occurences).argsort()).values
 
 
 
