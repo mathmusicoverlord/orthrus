@@ -345,7 +345,7 @@ class DataSet:
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")
 
-    def impute(self, imputer, feature_ids=None, sample_ids=None,impute_name: str = None):
+    def impute(self, imputer, feature_ids=None, sample_ids=None, impute_name: str = None):
         """
         Imputes the data of the dataset according to an imputer class. Appends the imputation method
         used to :py:attr:`DataSet.imputation_method`.
@@ -406,7 +406,8 @@ class DataSet:
         pandas infer_dtypes function to automatically infer the datatypes for each attribute.
 
         Args:
-            convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata. Default is false.
+            convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata and vardata.
+                Default is false.
 
 
         Returns:
@@ -432,9 +433,19 @@ class DataSet:
                 data_series = data_series.str.capitalize()
                 self.metadata[column] = data_series
 
+        self.vardata.replace("  ", " ", inplace=True)  # replace double whitespace
+        for column in self.vardata.columns:
+            data_series = self.vardata[column]
+            if pd.api.types.infer_dtype(data_series) in ["string", "empty", "bytes", "mixed", "mixed-integer"]:
+                data_series = data_series.str.lstrip()
+                data_series = data_series.str.rstrip()
+                data_series = data_series.str.capitalize()
+                self.vardata[column] = data_series
+
         # convert dtypes
         if convert_dtypes:
             self.metadata = self.metadata.convert_dtypes()
+            self.vardata = self.vardata.convert_dtypes()
 
     def slice_dataset(self, feature_ids=None, sample_ids=None, name=None):
         """
@@ -1168,8 +1179,6 @@ class DataSet:
     # TODO: Add conversion to cdd method.
 
     # class methods
-
-
 
 # functions
 def load_dataset(file_path: str):

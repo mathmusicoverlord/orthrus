@@ -127,7 +127,7 @@ def scatter_pyplot(df: pd.DataFrame,
                     x = df.loc[grp_idx, df.columns[0]]
                     y = df.loc[grp_idx, df.columns[1]]
                     z = df.loc[grp_idx, df.columns[2]]
-                    label = grp_name0 + '/' + grp_name1
+                    label = str(grp_name0) + '/' + str(grp_name1)
                     label = label.rstrip('/')
 
                     mrkr_size = kwargs.get('s', 100)
@@ -151,7 +151,7 @@ def scatter_pyplot(df: pd.DataFrame,
                     if len(grp_idx) > 0:
                         x = df.loc[grp_idx, df.columns[0]]
                         y = df.loc[grp_idx, df.columns[1]]
-                        label = grp_name0 + '/' + grp_name1
+                        label = str(grp_name0) + '/' + str(grp_name1)
                         label = label.rstrip('/')
 
                         mrkr_size = kwargs.get('s', 100)
