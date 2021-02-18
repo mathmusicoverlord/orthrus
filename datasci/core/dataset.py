@@ -1072,16 +1072,14 @@ class DataSet:
 
             fit_handle (string): Name of ``fit`` method used by ``selector``. Default is "fit".
 
-            f_weights_handle (string): Name of ``selector`` attribute containing feature weights. Default is None.
+            f_results_handle (string): Name of ``selector`` attribute containing feature results e.g. weights, ranks,
+                etc.The attribute should be array-like with rows corresponding to the features.
 
             append_to_meta (bool): If ``True``, the feature selection results will be appended to
             :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
 
             inplace (bool): If True the feature selection results will be stored to :py:attr:`DataSet.experiments`.
                 If ``False`` the feature selection results will be returned to the user. Default is ``False``
-
-            f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
-                features will be ranked from greatest to least importance. e.g. rank = 1 most important.
 
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
                 :py:attr:`DataSet.experiments`. Default is ``attr``+ ``selector_name``.
