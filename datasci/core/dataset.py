@@ -1142,11 +1142,11 @@ class DataSet:
         fit(X, y)
 
         # append feature results
-        if not (f_weights_handle is None):
-            f_results_name = method_name + "_f_results"
-            f_results = pd.DataFrame(eval("selector" + "." + f_weights_handle))
+        if not (f_results_handle is None):
+            #f_results_name = method_name + "_f_results"
+            f_results = pd.DataFrame(eval("selector" + "." + f_results_handle))
             f_weight_results[f_results.columns] = np.nan
-            f_weight_results.loc[feature_ids] = f_results
+            f_weight_results.loc[feature_ids] = pd.DataFrame(data=f_results.values, index=feature_ids, columns=f_results.columns)
             #if not (f_rnk_func is None):
             #    f_rnk_name = method_name + "_f_rank"
             #    weights = f_weight_results.loc[feature_ids, f_weights_name]
