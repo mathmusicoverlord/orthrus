@@ -1045,10 +1045,9 @@ class DataSet:
                  feature_ids=None,
                  sample_ids=None,
                  fit_handle: str = 'fit',
-                 f_weights_handle: str = None,
+                 f_results_handle: str = None,
                  append_to_meta: bool = True,
                  inplace: bool = False,
-                 f_rnk_func=None,
                  experiment_name=None,
                  ):
         """
@@ -1117,8 +1116,7 @@ class DataSet:
             ...             selector_name='kFFS',
             ...             attr='cohort',
             ...             sample_ids=covid_healthy,
-            ...             f_weights_handle='ranks_',
-            ...             f_rnk_func= lambda x:  -np.abs(x),
+            ...             f_results_handle='results_',
             ...             append_to_meta=True,
             ...             inplace=True,
             ...             experiment_name='covid_vs_healthy_SSVM_kFFS')
@@ -1137,7 +1135,7 @@ class DataSet:
         y = ds.metadata[attr].values
 
         # set returns
-        f_weight_results = pd.DataFrame(index=feature_ids)
+        f_weight_results = pd.DataFrame(index=self.vardata.index)
 
         # set methods
         fit = eval("selector" + "." + fit_handle)
@@ -1147,25 +1145,27 @@ class DataSet:
 
         # append feature results
         if not (f_weights_handle is None):
-            f_weights_name = method_name + "_f_weights"
-            f_weights = eval("selector" + "." + f_weights_handle)
-            f_weight_results[f_weights_name] = np.nan
-            f_weight_results.loc[feature_ids, f_weights_name] = pd.Series(index=feature_ids, data=f_weights)
-            if not (f_rnk_func is None):
-                f_rnk_name = method_name + "_f_rank"
-                weights = f_weight_results.loc[feature_ids, f_weights_name]
-                f_weight_results[f_rnk_name] = np.nan
-                f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
-                f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
-            else:
-                f_rnk_name = method_name + "_f_rank"
-                weights = f_weight_results.loc[feature_ids, f_weights_name]
-                f_weight_results[f_rnk_name] = np.nan
-                f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
-                f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+            f_results_name = method_name + "_f_results"
+            f_results = pd.DataFrame(eval("selector" + "." + f_weights_handle))
+            f_weight_results[f_results.columns] = np.nan
+            f_weight_results.loc[feature_ids] = f_results
+            #if not (f_rnk_func is None):
+            #    f_rnk_name = method_name + "_f_rank"
+            #    weights = f_weight_results.loc[feature_ids, f_weights_name]
+            #    f_weight_results[f_rnk_name] = np.nan
+            #    f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
+            #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+            #else:
+            #    f_rnk_name = method_name + "_f_rank"
+            #    weights = f_weight_results.loc[feature_ids, f_weights_name]
+            #    f_weight_results[f_rnk_name] = np.nan
+            #    f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
+            #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+        else:
+            raise ValueError("Must input a results handle for the selector.")
 
         results = {'selector': selector,
-                   'f_weights': f_weight_results}
+                   'f_results': f_weight_results}
 
         if append_to_meta:
             self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
@@ -1217,7 +1217,6 @@ def load_dataset(file_path: str):
     #name = gse.name
 
 # TODO: Add
-
 
 if __name__ == "__main__":
     from datasci.core.dataset import DataSet as DS

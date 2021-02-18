@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import KFold
+from copy import deepcopy
 
 class KFFS(BaseEstimator):
     """
@@ -85,25 +86,28 @@ class KFFS(BaseEstimator):
                     f_rnk_name = "ranks_" + str(i)
                     weights = f_weight_results.loc[feature_index, f_weights_name]
                     f_weight_results[f_rnk_name] = np.nan
-                    f_weight_results.loc[feature_index, f_rnk_name] = (-self.f_rnk_func(weights)).argsort()
+                    ordering = (-self.f_rnk_func(weights)).argsort().values
+                    f_weight_results.loc[feature_index[ordering], f_rnk_name] = np.arange(0, len(feature_index))
                     f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
                 else:
                     f_rnk_name = "ranks_" + str(i)
                     weights = f_weight_results.loc[feature_index, f_weights_name]
                     f_weight_results[f_rnk_name] = np.nan
-                    f_weight_results.loc[feature_index, f_rnk_name] = (-np.array(weights)).argsort()
+                    ordering = (-weights).argsort().values
+                    f_weight_results.loc[feature_index[ordering], f_rnk_name] = np.arange(0, len(feature_index))
                     f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
 
-            # set weights
-            self.results_ = f_weight_results
+        # set weights
+        self.results_ = f_weight_results
 
-            # perform kffs
-            threshold = self.n
-            top_features = self.results_.filter(regex='ranks', axis=1) < threshold
-            occurences = top_features.astype(int).sum(axis=1)
-            self.results_['top_' + str(threshold) + '_occurences'] = occurences
-            self.results_['top_' + str(threshold) + '_rank'] = (-occurences).argsort()
-            self.ranks_ = ((-occurences).argsort()).values
+        # perform kffs
+        threshold = self.n
+        top_features = self.results_.filter(regex='ranks', axis=1) < threshold
+        occurences = top_features.astype(int).sum(axis=1)
+        self.results_['top_' + str(threshold) + '_occurences'] = occurences
+        index = self.results_.index[(-occurences).argsort().values]
+        self.results_.loc[index, 'top_' + str(threshold) + '_rank'] = np.arange(0, len(occurences))
+        self.ranks_ = self.results_['top_' + str(threshold) + '_rank'].values
 
 
 
