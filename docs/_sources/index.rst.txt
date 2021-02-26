@@ -11,6 +11,10 @@ Welcome to DataSci's documentation!
    :caption: Contents:
 
    /rst/modules
+   /rst/datasci.core
+   /rst/datasci.manifold
+   /rst/datasci.sparse
+
 
 
 

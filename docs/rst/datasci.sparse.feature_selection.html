@@ -32,7 +32,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -87,12 +86,13 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">datasci</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasci.sparse.classifiers.html">datasci.sparse.classifiers namespace</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">datasci.sparse.feature_selection namespace</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-datasci.sparse.feature_selection.kffs">datasci.sparse.feature_selection.kffs module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-datasci.sparse.feature_selection.sabs">datasci.sparse.feature_selection.sabs module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="datasci.html">datasci namespace</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="datasci.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="datasci.manifold.html">datasci.manifold namespace</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="datasci.sparse.html">datasci.sparse namespace</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -147,6 +147,10 @@
         
           <li><a href="modules.html">datasci</a> &raquo;</li>
         
+          <li><a href="datasci.html">datasci namespace</a> &raquo;</li>
+        
+          <li><a href="datasci.sparse.html">datasci.sparse namespace</a> &raquo;</li>
+        
       <li>datasci.sparse.feature_selection namespace</li>
     
     
@@ -175,7 +179,7 @@
 <span id="datasci-sparse-feature-selection-kffs-module"></span><h2>datasci.sparse.feature_selection.kffs module<a class="headerlink" href="#module-datasci.sparse.feature_selection.kffs" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.kffs.</code><code class="sig-name descname">KFFS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">classifier</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.kffs.</span></code><code class="sig-name descname"><span class="pre">KFFS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_weights_handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_rnk_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>K-fold Feature Selection (kFFS) selects features using a classifier in a k-fold cross-validation experiment.
 Specifically, the given classifier is trained on each fold, the features in each fold are ranked and sorted,
@@ -196,7 +200,7 @@ features will be ranked in from least to greatest.</p></li>
 </dl>
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.classifiers_">
-<code class="sig-name descname">classifiers_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">classifiers_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains each classifier trained on each fold.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -207,7 +211,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.ranks_">
-<code class="sig-name descname">ranks_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">ranks_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains the final rankings of all the features.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -218,7 +222,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.results_">
-<code class="sig-name descname">results_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.results_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">results_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.results_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains the feature weights and ranks for each fold, and the final rankings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -229,7 +233,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits the kFFS model to the training data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -251,11 +255,11 @@ features will be ranked in from least to greatest.</p></li>
 <span id="datasci-sparse-feature-selection-sabs-module"></span><h2>datasci.sparse.feature_selection.sabs module<a class="headerlink" href="#module-datasci.sparse.feature_selection.sabs" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.sabs.SABS">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.sabs.</code><code class="sig-name descname">SABS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">iterations</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">store_updates</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.sabs.</span></code><code class="sig-name descname"><span class="pre">SABS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_updates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.sabs.SABS.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
