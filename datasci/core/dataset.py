@@ -40,6 +40,9 @@ class DataSet:
             features x attributes. The feature labels in the index column should be the same format as those used for
             the columns in the data DataFrame. Default is None.
 
+        dissimilarity_matrix (pandas.DataFrame): Symmetric matrix whose columns and index are given by the samples.
+            Its contents give the pairwise dissimilarities between the samples. Default is None.
+
         normalization_method (str): Label indicating the normalization used on the data. Future normalization will
             append as normalization_1/normalization_2/.../normalization_n indicating the sequence of normalizations
             used on the data. Default is the empty string.
@@ -65,7 +68,8 @@ class DataSet:
                  path: str = os.curdir,
                  data: DataFrame = pd.DataFrame(),
                  metadata: DataFrame = pd.DataFrame(),
-                 vardata: DataFrame = pd.DataFrame(),
+                 vardata: DataFrame = None,
+                 dissimilarity_matrix: DataFrame = None,
                  normalization_method: str = '',
                  imputation_method: str = ''):
 
@@ -101,18 +105,46 @@ class DataSet:
         if vardata is None:
             self.vardata = pd.DataFrame(index=self.data.columns)
         else:
-            # restrict metadata to data
-            var_index = vardata.index.intersection(self.data.transpose().index)
-            missing_data_index = self.data.transpose().index.drop(var_index)
-            missing_data = pd.DataFrame(index=missing_data_index)
+            try:
+                # restrict vardata to data
+                var_index = vardata.index.intersection(self.data.transpose().index)
+                missing_data_index = self.data.transpose().index.drop(var_index)
+                missing_data = pd.DataFrame(index=missing_data_index)
+            except AttributeError:
+                # restrict vardata to data
+                data_index = self.data.transpose().index.to_pandas()
+                var_index = vardata.index.to_pandas().intersection(data_index)
+                missing_data_index = data_index.drop(var_index)
+                missing_data = self.data.__class__(index=missing_data_index)
+
             self.vardata = vardata.loc[var_index].append(missing_data)
             self.vardata = self.vardata.loc[self.data.columns]
+
+        # Assign dissimilarity matrix
+        if dissimilarity_matrix is None:
+            pass
+        else:
+            try:
+                dissimilarity_index = dissimilarity_matrix.intersection(self.data.index)
+                missing_data_index = self.data.index.drop(dissimilarity_index)
+                missing_data = pd.DataFrame(index=missing_data_index)
+            except AttributeError:
+                data_index = self.data.index.to_pandas()
+                dissimilarity_index = dissimilarity_matrix.to_pandas().intersection(data_index)
+                missing_data_index = data_index.drop(meta_index)
+                missing_data = self.data.__class__(index=missing_data_index)
+
+            self.dissimilarity_matrix = dissimilarity_matrix.loc[dissimilarity_index].append(missing_data)
+
+            # sort data and dissimilarity matrix to be in same order
+            self.dissimilarity_matrix = self.dissimilarity_matrix.loc[self.data.index, self.data.index.to_list()]
 
     def visualize(self, embedding,
                   attr: str,
                   cross_attr: str = None,
                   feature_ids=None,
                   sample_ids=None,
+                  use_dissimilarity=False,
                   backend: str = 'pyplot',
                   viz_name: str = None,
                   save: bool = False,
@@ -136,6 +168,9 @@ class DataSet:
 
             sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
                 ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            use_dissimilarity (bool): If True the embedding will fit to the dissimilarity matrix stored in
+                :py:attr:`DataSet.dissimilarity_matrix`. The default is false.
 
             backend (str): Plotting backend to use. Can be either ``pyplot`` or ``plotly``. The default is ``pyplot``.
 

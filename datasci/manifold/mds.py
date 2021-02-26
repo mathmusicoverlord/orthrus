@@ -11,7 +11,7 @@ class MDS(BaseEstimator):
     """
     This class compute the Multidimensional Scaling (MDS) embedding of a distance matrix X for ``n_components``. So that
     the data is embedding into Euclidean space with dimension n_components. The algorithm is as follows:
-    1. Compute :math:`D = X\odot X` (Distances squared).
+    1. Compute :math:`D = X\odot X` (Distances squared) where :math:`\odot` indicates the point-wise product.
     2. Compute :math:`B = CDC` where :math:`C` is the double-centering matrix :math:`C=I - \frac{1}{\text{n\_components}}ee^T`
         and :math:`e` is the ones vector of dimension ``n_components``
     3. Compute :math:`E`, the matrix whose columns are the eigenvectors of :math:`B`,  :math:`\lambda` the vector of
@@ -20,6 +20,7 @@ class MDS(BaseEstimator):
         descending order, and let :math:`\tilde{E}` be the matrix whose columns are the eigenvectors, columns
         of :math:`E`, that correspond to the diagonal entries in :math:`\tilde{\Lambda}`.
     5. The embedding is given by :math:`Y = \tilde{E}\tilde{\Lambda}^{\frac{1}{2}}`.
+
     Parameters:
         n_components (int): The number of components (dimensions) to use for the embedding.
         use_cuda (bool): Flag indicating whether or not to use cuda tensors on the gpu.
