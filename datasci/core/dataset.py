@@ -144,7 +144,7 @@ class DataSet:
                   cross_attr: str = None,
                   feature_ids=None,
                   sample_ids=None,
-                  use_dissimilarity=False,
+                  use_dissimilarity: bool = False,
                   backend: str = 'pyplot',
                   viz_name: str = None,
                   save: bool = False,
@@ -229,7 +229,10 @@ class DataSet:
 
         # slice the data set
         ds = self.slice_dataset(feature_ids, sample_ids)
-        data = ds.data
+        if use_dissimilarity:
+            data = ds.dissimilarity_matrix
+        else:
+            data = ds.data
         metadata = ds.metadata
 
         # transform data
@@ -516,9 +519,11 @@ class DataSet:
         if name is None:
             name = self.name + '_slice'
 
-        # sort data and metadata together to be safe
+        # sort data, metadata, vardata, and dissimilarity matrix together to be safe
         self.vardata = self.vardata.loc[self.data.columns]
         self.metadata = self.metadata.loc[self.data.index]
+        if not(self.dissimilarity_matrix is None):
+            self.dissimilarity_matrix = self.dissimilarity_matrix.loc[self.data.index, self.data.index.to_list()]
 
         # slice data at features
         columns = self.data.columns
@@ -543,6 +548,15 @@ class DataSet:
         except KeyError:
             metadata = self.metadata.loc[index[sample_ids]]
 
+        # slice dissimilarity matrix at samples
+        if self.dissimilarity_matrix is None:
+            dissimilarity_matrix = None
+        else:
+            try:
+                dissimilarity_matrix = self.dissimilarity_matrix.loc[sample_ids, sample_ids.to_list()]
+            except KeyError:
+                dissimilarity_matrix = self.dissimilarity_matrix.loc[index[sample_ids], index[sample_ids].to_list()]
+
         # slice vardata at features
         index = self.vardata.index
         try:
@@ -554,6 +568,7 @@ class DataSet:
         ds = DataSet(data=deepcopy(data),
                 metadata=deepcopy(metadata),
                 vardata=vardata,
+                dissimilarity_matrix=dissimilarity_matrix,
                 name=name,
                 normalization_method=self.normalization_method,
                 imputation_method=self.imputation_method)
