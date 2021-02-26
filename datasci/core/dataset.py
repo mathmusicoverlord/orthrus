@@ -139,6 +139,7 @@ class DataSet:
             # sort data and dissimilarity matrix to be in same order
             self.dissimilarity_matrix = self.dissimilarity_matrix.loc[self.data.index, self.data.index.to_list()]
 
+
     def visualize(self, embedding,
                   attr: str,
                   cross_attr: str = None,
