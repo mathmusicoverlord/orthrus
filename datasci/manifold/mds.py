@@ -26,6 +26,9 @@ class MDS(BaseEstimator):
     Parameters:
         n_components (int): The number of components (dimensions) to use for the embedding.
         use_cuda (bool): Flag indicating whether or not to use cuda tensors on the gpu.
+        prev_embedding (ndarray of shape (n_samples, n_components)): Optional embedding used to orient the new
+            embedding from. This is useful if you are generating sequential embeddings where you want continuity
+            between frames.
 
     Attributes:
         eigenvalues_ (ndarray of shape (n_samples,)): The eigenvalues corresponding to the MDS embedding.
@@ -35,12 +38,13 @@ class MDS(BaseEstimator):
 
     def __init__(self,
                  n_components=2,
-                 use_cuda=False):
-
+                 use_cuda=False,
+                 prev_embedding=None):
 
         # set parameters
         self.n_components = n_components
         self.use_cuda = use_cuda
+        self.prev_embedding = prev_embedding
 
         # set attributes
         self.eigenvalues_ = np.array([])
@@ -60,6 +64,10 @@ class MDS(BaseEstimator):
 
         Returns: Inplace method.
         """
+        # setup rng
+        from numpy.random import default_rng
+        rg = default_rng(0)
+        rg.random()
 
         # check if using cuda
         if self.use_cuda:
@@ -94,6 +102,21 @@ class MDS(BaseEstimator):
         n_components = self.n_components
         idx = ((-eigenvalues).argsort())[:n_components]
         embedding = eigenvectors[:, idx] * np.sqrt(eigenvalues[idx]).reshape(1, -1)
+
+        # reorient samples to a previous embedding frame
+        if not (self.prev_embedding is None):
+            prev_embedding = self.prev_embedding
+            embedding_norm = np.linalg.norm(embedding, axis=0).reshape((1, n_components))
+            prev_embedding_norm = np.linalg.norm(prev_embedding, axis=0).reshape((1, n_components))
+            cosines = np.matmul((embedding/embedding_norm).transpose(), prev_embedding/prev_embedding_norm)
+            ids = np.abs(cosines).argmax(axis=1)
+            signs = np.sign(np.array([cosines[i, ids[i]] for i in range(n_components)]))
+            if np.unique(ids).size == ids.size:
+                embedding[:, ids] = embedding*signs.reshape((1, n_components))
+            else:
+                print("Could not orient to previous embedding!")
+
+            # adjust for sign
 
         # store embedding
         self.embedding_ = embedding

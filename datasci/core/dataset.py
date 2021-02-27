@@ -125,7 +125,7 @@ class DataSet:
             pass
         else:
             try:
-                dissimilarity_index = dissimilarity_matrix.intersection(self.data.index)
+                dissimilarity_index = dissimilarity_matrix.index.intersection(self.data.index)
                 missing_data_index = self.data.index.drop(dissimilarity_index)
                 missing_data = pd.DataFrame(index=missing_data_index)
             except AttributeError:
@@ -149,6 +149,7 @@ class DataSet:
                   backend: str = 'pyplot',
                   viz_name: str = None,
                   save: bool = False,
+                  save_name: str = None,
                   **kwargs):
         """
         This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
@@ -182,12 +183,15 @@ class DataSet:
                 :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.png for ``pyplot`` and
                 :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.html for ``plotly``
 
+            save_name (str): Optional file name to save figure to when :py:attr:`save` is ``True``. This save name will
+            be prepended by :py:attr:`DataSet.path`. Default is None.
+
             **kwargs (dict): Keyword arguments passed directly to :py:func:`helper.scatter_pyplot` when using the
                 backend ``pyplot`` and :py:func:`helper.scatter_plotly` when using the backend ``plotly``, for
                 indicating plot properties.
 
         Returns:
-            inplace method.
+             class instance: Returns the fit embedding used to visualize.
 
         Examples:
             >>> from pydataset import data as pydat
@@ -274,13 +278,19 @@ class DataSet:
         if cross_attr is None:
             title = 'Visualization of data set ' + self.name + ' using\n' \
                     + viz_name + ' with labels given by ' + attr
-            save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
-                normalization_method) + '_' + str(attr) + '_' + str(dim)
+            if save_name is None:
+                save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
+                    normalization_method) + '_' + str(attr) + '_' + str(dim)
+            else:
+                save_name = self.path + save_name
         else:
             title = 'Visualization of data set ' + self.name + ' using\n' \
                     + viz_name + ' with labels given by ' + attr + ' and ' + cross_attr
-            save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
-                normalization_method) + '_' + str(attr) + '_' + str(cross_attr) + '_' + str(dim)
+            if save_name is None:
+                save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
+                    normalization_method) + '_' + str(attr) + '_' + str(cross_attr) + '_' + str(dim)
+            else:
+                save_name = self.path + save_name
 
         if not save:
             save_name = None
@@ -329,6 +339,8 @@ class DataSet:
                         dim=dim,
                         save_name=save_name,
                         **kwargs)
+
+        return embedding
 
     def normalize(self, normalizer, feature_ids=None, sample_ids=None, norm_name: str = None):
         """
