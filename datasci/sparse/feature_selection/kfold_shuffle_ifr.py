@@ -21,7 +21,8 @@ class KFSIFR(BaseEstimator):
                  test_size_shuffle: float = .25,
                  random_state_kfold=None,
                  random_state_shuffle=None,
-                 n_top_features: int = None):
+                 n_top_features: int = None,
+                 kfold_labels=None):
 
         # set parameters
         self.threshold = threshold
@@ -31,6 +32,7 @@ class KFSIFR(BaseEstimator):
         self.shuffle = StratifiedShuffleSplit(n_splits=n_splits_shuffle, test_size=test_size_shuffle, random_state=random_state_shuffle)
         self.weights_handle = weights_handle
         self.n_top_features = n_top_features
+        self.kfold_labels = kfold_labels
 
         # set attributes
         self.results_ = pd.DataFrame()
@@ -44,7 +46,11 @@ class KFSIFR(BaseEstimator):
         self.results_ = pd.DataFrame(index=St, columns=np.arange(self.kfold.n_splits))
 
         # loop through cv folds
-        for i, (kf_train_index, kf_test_index) in enumerate(self.kfold.split(X, y)):
+        if self.kfold_labels is None:
+            splits = self.kfold.split(X, y)
+        else:
+            splits = self.kfold_labels
+        for i, (kf_train_index, kf_test_index) in enumerate(splits):
             print("Starting fold " + str(i) + "...")
             Xi_train = X[kf_train_index, :]; yi_train = y[kf_train_index]
             Xi_test = X[kf_test_index, :]; yi_test = y[kf_test_index]
@@ -55,7 +61,7 @@ class KFSIFR(BaseEstimator):
             for j, (shuffle_train_index, shuffle_test_index) in enumerate(self.shuffle.split(Xi_train, yi_train)):
                 print("Starting shuffle split " + str(j) + "...")
                 Xij_train = Xi_train[shuffle_train_index, :]; yij_train = yi_train[shuffle_train_index]
-                Xij_valid = Xi_train[shuffle_test_index, :]; yij_valid= yi_train[shuffle_test_index]
+                Xij_valid = Xi_train[shuffle_test_index, :]; yij_valid = yi_train[shuffle_test_index]
                 Sij = [] # intial feature set
                 while True:
                     print("Starting IFR pass...")
