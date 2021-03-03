@@ -993,7 +993,7 @@ class DataSet:
 
         # TODO: Fix sample_ids for passing to numpy array
         if partitioner is None:
-            splits = [[sample_ids, []]]
+            splits = [(np.arange(0, len(sample_ids)), np.arange(0, len(sample_ids)))]
         else:
             split = eval("partitioner" + "." + split_handle)
             splits = split(X, y)
