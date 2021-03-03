@@ -79,9 +79,9 @@ class KFLIFR(BaseEstimator):
                     S = np.argsort(-f_weights)
                     if self.n_top_features is None:
                         f_weights_sorted = f_weights[S]
-                        f_ratios = f_weights_sorted[:-1]/f_weights_sorted[1:]
-                        f_ratios[np.isinf(f_ratios)] = 0
-                        f_ratios[np.isnan(f_ratios)] = 0
+                        a = f_weights_sorted[:-1]
+                        b = f_weights_sorted[1:]
+                        f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b!=0)
                         try:
                             id = np.where(f_ratios > self.jump_value)[0][0]
                             S = S[:id]
