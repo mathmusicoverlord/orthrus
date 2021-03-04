@@ -6,6 +6,7 @@ subject out (LOSO) partitions.
 # imports
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import LeaveOneGroupOut
 from sklearn.model_selection import LeaveOneOut
 import numpy as np
 import pandas as pd
@@ -36,10 +37,9 @@ class KFLIFR(BaseEstimator):
         self.kfold_labels = kfold_labels
 
         # set attributes
-        self.loso = LeaveOneOut()
         self.results_ = pd.DataFrame()
 
-    def fit(self, X, y):
+    def fit(self, X, y, groups=None):
 
         # set total feature set
         St = np.arange(X.shape[1])
@@ -60,10 +60,16 @@ class KFLIFR(BaseEstimator):
             # intialize feature set
             Si = pd.DataFrame(index=St, columns=np.arange(Xi_train.shape[0])).fillna(False).astype(bool)
 
-            for j, (loso_train_index, loso_test_index) in enumerate(self.loso.split(Xi_train, yi_train)):
+            if groups is None:
+                logo_splits = LeaveOneOut().split(Xi_train, yi_train)
+            else:
+                groups_train = np.array(groups)[kf_train_index]
+                logo_splits = LeaveOneGroupOut().split(Xi_train, yi_train, groups_train)
+
+            for j, (logo_train_index, logo_test_index) in enumerate(logo_splits):
                 print("Starting LOSO split " + str(j) + "...")
-                Xij_train = Xi_train[loso_train_index, :]; yij_train = yi_train[loso_train_index]
-                Xij_valid = Xi_train[loso_test_index, :]; yij_valid = yi_train[loso_test_index]
+                Xij_train = Xi_train[logo_train_index, :]; yij_train = yi_train[logo_train_index]
+                Xij_valid = Xi_train[logo_test_index, :]; yij_valid = yi_train[logo_test_index]
                 Sij = [] # intial feature set
                 while True:
                     print("Starting IFR pass...")

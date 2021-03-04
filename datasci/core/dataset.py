@@ -867,7 +867,7 @@ class DataSet:
                  f_rnk_func=None,
                  s_rnk_func=None,
                  experiment_name=None,
-                 ):
+                 **kwargs):
         """
         This method runs a classification experiment. The user provides a classifier, a class to partition the data
         into train/test partitions, and a scoring method. The experiment returns the fit classifiers across the
@@ -996,7 +996,15 @@ class DataSet:
             splits = [(np.arange(0, len(sample_ids)), np.arange(0, len(sample_ids)))]
         else:
             split = eval("partitioner" + "." + split_handle)
-            splits = split(X, y)
+            group = kwargs.get('group', None)
+            if group is None:
+                splits = split(X, y)
+            else:
+                try:
+                    groups = ds.metadata[group].values
+                    splits = split(X, y, groups=groups)
+                except TypeError:
+                    splits = split(X, y)
             try:
                 _ = (e for e in splits)
             except TypeError:
@@ -1104,6 +1112,7 @@ class DataSet:
 
     def feature_select(self, selector,
                  attr: str,
+                 cross_attr: str = None,
                  selector_name=None,
                  feature_ids=None,
                  sample_ids=None,
@@ -1123,6 +1132,9 @@ class DataSet:
                 sklearn equivalent of a ``fit`` method.
 
             attr (string): Name of metadata attribute to feature select on.
+
+            cross_attr (string): (Optional) Name of metadata cross attribute to feature select on. The ``fit`` method
+                of the ``selector`` must accept these cross labels.
 
             selector_name (string): Common name of feature selector to be used for identification. Default is
                 ``selector.__str__()``.
@@ -1202,7 +1214,11 @@ class DataSet:
         fit = eval("selector" + "." + fit_handle)
 
         # fit the feature selector (going meta y'all)
-        fit(X, y)
+        if cross_attr is None:
+            fit(X, y)
+        else:
+            groups = ds.metadata[cross_attr].values
+            fit(X, y, groups)
 
         # append feature results
         if not (f_results_handle is None):
