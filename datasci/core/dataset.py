@@ -122,7 +122,7 @@ class DataSet:
 
         # Assign dissimilarity matrix
         if dissimilarity_matrix is None:
-            pass
+            self.dissimilarity_matrix = None
         else:
             try:
                 dissimilarity_index = dissimilarity_matrix.index.intersection(self.data.index)
@@ -392,7 +392,7 @@ class DataSet:
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
             self.data.update(data_trans)
-            self.normalization_method = norm_name
+            self.normalization_method = self.normalization_method + '/' + norm_name
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")
 
@@ -446,7 +446,7 @@ class DataSet:
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
             self.data.update(data_trans)
-            self.normalization_method = impute_name
+            self.normalization_method = self.normalization_method + '/' + impute_name
         else:
             raise ValueError("Argument \"imputer\" should not change the number of features.")
 
