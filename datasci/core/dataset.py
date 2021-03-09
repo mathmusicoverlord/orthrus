@@ -391,7 +391,8 @@ class DataSet:
 
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
-            self.data.update(data_trans)
+            data.update(data_trans)
+            self.data.loc[data.index, data.columns] = data
             self.normalization_method = (self.normalization_method + '/' + norm_name).lstrip('/')
         else:
             raise ValueError("Argument \"normalizer\" should not change the number of features.")
@@ -445,7 +446,8 @@ class DataSet:
 
         # set data
         if self.data.shape[1] == data_trans.shape[1]:
-            self.data.update(data_trans)
+            data.update(data_trans)
+            self.data.loc[data.index, data.columns] = data
             self.imputation_method = (self.imputation_method + '/' + impute_name).lstrip('/')
         else:
             raise ValueError("Argument \"imputer\" should not change the number of features.")
