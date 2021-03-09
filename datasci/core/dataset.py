@@ -390,7 +390,7 @@ class DataSet:
         data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
 
         # set data
-        if self.data.shape[1] == data_trans.shape[1]:
+        if data.shape[1] == data_trans.shape[1]:
             data.update(data_trans)
             self.data.loc[data.index, data.columns] = data
             self.normalization_method = (self.normalization_method + '/' + norm_name).lstrip('/')
@@ -445,7 +445,7 @@ class DataSet:
         data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
 
         # set data
-        if self.data.shape[1] == data_trans.shape[1]:
+        if data.shape[1] == data_trans.shape[1]:
             data.update(data_trans)
             self.data.loc[data.index, data.columns] = data
             self.imputation_method = (self.imputation_method + '/' + impute_name).lstrip('/')
