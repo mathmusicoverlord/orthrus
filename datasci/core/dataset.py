@@ -241,7 +241,7 @@ class DataSet:
         metadata = ds.metadata
 
         # transform data
-        data_trans = embedding.fit_transform(data.values)
+        data_trans = embedding.fit_transform(data.values, metadata[attr].values)
         dim = data_trans.shape[1]
 
         # create dataframe from transformed data
