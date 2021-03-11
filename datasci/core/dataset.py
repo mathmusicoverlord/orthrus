@@ -1072,6 +1072,7 @@ class DataSet:
             if not (test_index is None):
                 y_true = y[test_index]
 
+
             # fit the classifier (going meta y'all)
             fit(X_train, y_train, **fit_args)
             classifiers[method_name + '_classifier_' + str(i)] = classifier
@@ -1338,7 +1339,85 @@ class DataSet:
             self.experiments[experiment_name] = results
         else:
             return results
+    
+    def generate_attr_from_queries(self, 
+                                attrname:str, 
+                                queries: dict, 
+                                attr_exist_mode: str = 'err',
+                                which: str='metdata'):
+
+        """
+        This function creates or updates an attribute in the metadata or vardata. New values for the attribute
+        are provided by the queries, which is a dictionary. For each value in the queries dictionary, indices are 
+        extracted using the query method on the dataframe and the key is used as new value at these indices. Any index 
+        which is not covered by any of the query is set to pandas.NA
+
+        Args:
+            attrname (str): Name of the new attribute
+            queries (dict): key: label for the new attribute at the filtered indices, value: query string to filter the indices
+            attr_exist_mode (str) : 'err' : raises an Exception if the attribute already exists in the dataframe
+                                    'overwrite' : overwrites the previous values with new values
+                                    'append' : updates and appends "_x"  the attribute name, where x is an integer based on existing attributes names.
+                                    Ex. if 'response', 'response_new', 'response_1' is already present, the new name for the attribute will be 'response_2'
+
+            which (str): String indicating which data to use. Choices are 'metadata' or 'vardata'. Default
+                is 'metadata'.
+
+        Returns:
+            inplace method
+
+        Examples:
+                >>> q_res = "Tissue=='Liver' and response_new=='resistant' and partition in ['training', 'validation']"
+                >>> q_tol = "Tissue=='Liver' and response_new=='tolerant' and partition in ['training', 'validation']
+                >>> attribute_name = 'Response'
+                >>> qs = {'Resistant' : q_res, 'Tolerant': q_tol}
+                >>> ds.generate_attr_from_queries(attribute_name, qs, attr_exist_mode='append')
+        """
+        if which == 'metadata':
+            df = self.metadata
+        elif which == 'vardata':
+            df = self.vardata
+
+        attr_exists = False
+        # check if attr exists
+        if attrname in df.columns:
+            attr_exists = True
+
+        if attr_exists:
+            if attr_exist_mode == 'err':
+                raise Exception("Attribute '%s' already exists. Please provide a different attribute name or change attr_exist_mode to 'append' or 'overwrite'." % attrname)
+
+            elif attr_exist_mode == 'append':
+                existing_column_names = df.filter(regex=attrname).columns
+                splits = existing_column_names.str.split('_')
+                reps = []
+
+                #find the largest rep number
+                for split in splits:
+                    try:
+                        #convert the last entry to int
+                        #may throw an exception when converting to int
+                        #if any column name has an underscore, 
+                        #ex. if column name is response_new, it's split will be ['response' 'new'] 
+                        rep = int(split[-1])
+                        print(rep)
+                    except:
+                        continue
+                    reps.append(rep)
+                reps = np.sort(np.array(reps))
+                
+                attrname = attrname + '_%d'%(reps[-1]+1)
+        
+            elif attr_exist_mode != 'overwrite':
+                raise Exception("Incorrect value passed for attr_exist_mode. Allowed values are 'err', 'append' and 'overwrite'")
+
+        df[attrname] = pd.NA
+        for key, values in queries.items():
+            index = df.query(values).index
+            df.loc[index, attrname] = key
+
     # TODO: Add conversion to cdd method.
+
 
     # class methods
 
@@ -1359,6 +1438,63 @@ def load_dataset(file_path: str):
     # open file and unpickle
     with open(file_path, 'rb') as f:
         return pickle.load(f)
+
+def from_ccd(file_path: str, name: str = None, index_col: str='_id'):
+    """
+    This function loads a Calcom Dataset object and returns an instance of a DataSet class.
+
+    Args:
+        file_path (str): Path of the CCDataSet file to load.
+
+        name (str): Reference name for the dataset. Default is the name of the ccd file (without extension).
+
+        index_col (str): attribute name from the ccd file to use as index for data and metadata dataframes (must contain unique values).
+
+    Returns:
+        DataSet : Class instance of Dataset.
+
+    Examples:
+            >>> ds = from_ccd(file_path='./ccd_file.h5')
+    """
+    import calcom
+    #load ccdataset
+    ccd = calcom.io.CCDataSet(file_path)
+
+    #get index column values
+    try:
+        index_vals = ccd.get_attrs(index_col)
+    except:
+        print('Attribute %s not found, using _id as index'%index_col)
+        index_vals = ccd.get_attrs('_id')
+    
+    #check index column values are unique
+    assert np.unique(index_vals).shape[0] == index_vals.shape[0], '%s cannot be used as index, it contains duplicate values for samples.'%index_col
+    
+    #if filename not provided
+    if name is None:
+        #use ccd file name without extensions
+        name = os.path.splitext(os.path.basename(file_path))[0]
+    
+    description = ccd._about_str
+    
+    path = os.path.dirname(ccd.fname)
+    
+    data = ccd.generate_data_matrix()
+    data_df = df = pd.DataFrame(data, columns = ccd.variable_names)
+    data_df.index = index_vals
+    
+    metadata = None
+    for attr in ccd.attrs:
+        if metadata is None:
+            metadata = ccd.get_attrs(attr).reshape(-1, 1)
+        else:
+            metadata = np.hstack((metadata, ccd.get_attrs(attr).reshape(-1, 1)))
+    metadata_df = pd.DataFrame(metadata, columns = ccd.attrs)
+    metadata_df.index = index_vals
+
+    #create and return DS object
+    ds = DataSet(name=name,description=description, path=path, data=data_df, metadata= metadata_df)
+    return ds
 
 #def load_geo(**kwargs):
     # imports
