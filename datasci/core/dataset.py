@@ -241,7 +241,16 @@ class DataSet:
         metadata = ds.metadata
 
         # transform data
-        data_trans = embedding.fit_transform(data.values, metadata[attr].values)
+        try:
+            data_trans = embedding.fit_transform(data.values, y=metadata[attr].values)
+        except ValueError:
+            data_trans = embedding.fit_transform(data.values)
+        if data_trans.shape[1] == 1:
+            is_1d = True
+            data_trans = np.hstack((data_trans, (2*np.random.rand(data_trans.shape[0], 1) - 1)))
+        else:
+            is_1d = False
+
         dim = data_trans.shape[1]
 
         # create dataframe from transformed data
@@ -298,9 +307,13 @@ class DataSet:
         # set default axis labels
         if dim < 4:
             kwargs['xlabel'] = kwargs.get('xlabel', viz_name + ' ' + str(1))
-            kwargs['ylabel'] = kwargs.get('ylabel', viz_name + ' ' + str(2))
+            if is_1d:
+                kwargs['ylabel'] = kwargs.get('ylabel', 'Jitter')
+            else:
+                kwargs['ylabel'] = kwargs.get('ylabel', viz_name + ' ' + str(2))
             if dim > 2:
                 kwargs['zlabel'] = kwargs.get('zlabel', viz_name + ' ' + str(3))
+
 
         # plot data
         if backend == "pyplot":
