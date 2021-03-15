@@ -132,7 +132,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
                     mrkr_size = kwargs.get('s', 100)
                     ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
-                               s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                               s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
             # ax.set_zlabel(zlabel, fontsize=16)
@@ -156,7 +156,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
                         mrkr_size = kwargs.get('s', 100)
                         ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[j],
-                                   s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                                   s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
@@ -193,7 +193,7 @@ def scatter_pyplot(df: pd.DataFrame,
                 label = grp_name1
 
                 mrkr_size = kwargs.get('s', 100)
-                im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             if grp_mrkrs != '':
                 cbar = plt.colorbar(im, ax=ax, location='left', shrink=.6, pad=-0.0001)
@@ -219,7 +219,7 @@ def scatter_pyplot(df: pd.DataFrame,
                     label = grp_name1
 
                     mrkr_size = kwargs.get('s', 100)
-                    im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                    im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[j], s=mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             if grp_mrkrs != '':
                 cbar = fig.colorbar(im, ax=[ax], location='left', shrink=1, pad=0.1)
@@ -262,7 +262,7 @@ def scatter_pyplot(df: pd.DataFrame,
             label = ''
 
             mrkr_size = kwargs.get('s', 100)
-            im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+            im = ax.scatter(x, y, z, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             cbar = plt.colorbar(im, ax=ax, shrink=.6, pad=-0.1)
             cbar.set_label(grp_colors, rotation=270, labelpad=10)
@@ -279,7 +279,7 @@ def scatter_pyplot(df: pd.DataFrame,
             label = ''
 
             mrkr_size = kwargs.get('s', 100)
-            im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+            im = ax.scatter(x, y, label=label, c=c, cmap=palette, marker=mrkr_list[0], s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             cbar = plt.colorbar(im, ax=[ax], shrink=1, pad=-0.15)
             cbar.set_label(grp_colors, rotation=270, labelpad=10)
@@ -316,7 +316,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
                 mrkr_size = kwargs.get('s', 100)
                 ax.scatter(x, y, z, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0],
-                           s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                           s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             ax.text2D(0, 0, subtitle, fontsize=16, transform=ax.transAxes)
             # ax.set_zlabel(zlabel, fontsize=16)
@@ -335,7 +335,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
                     mrkr_size = kwargs.get('s', 100)
                     ax.scatter(x, y, label=label, c=np.array(palette[i]).reshape(1, -1), marker=mrkr_list[0],
-                               s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'k'), linewidths=kwargs.get('linewidths', 1))
+                               s=ss * mrkr_size, edgecolors=kwargs.get('edgecolors', 'face'), linewidths=kwargs.get('linewidths', 1))
 
             ax.text(0, -.1, subtitle, fontsize=16, transform=ax.transAxes)
 
