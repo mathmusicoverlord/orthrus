@@ -866,7 +866,7 @@ class DataSet:
         """
 
         import textwrap
-        print(textwrap.fill(self._description, line_width))
+        print(textwrap.fill(self._description, line_width, break_long_words=False, replace_whitespace=False))
 
     def classify(self, classifier,
                  attr: str,
@@ -1161,7 +1161,7 @@ class DataSet:
                  feature_ids=None,
                  sample_ids=None,
                  fit_handle: str = 'fit',
-                 f_results_handle: str = None,
+                 f_results_handle: str = 'results',
                  append_to_meta: bool = True,
                  inplace: bool = False,
                  experiment_name=None,
@@ -1192,7 +1192,7 @@ class DataSet:
             fit_handle (string): Name of ``fit`` method used by ``selector``. Default is "fit".
 
             f_results_handle (string): Name of ``selector`` attribute containing feature results e.g. weights, ranks,
-                etc.The attribute should be array-like with rows corresponding to the features.
+                etc.The attribute should be array-like with rows corresponding to the features. Default is "results".
 
             append_to_meta (bool): If ``True``, the feature selection results will be appended to
             :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
@@ -1251,8 +1251,6 @@ class DataSet:
         X = ds.data.values
         y = ds.metadata[attr].values
 
-        # set returns
-        f_weight_results = pd.DataFrame(index=self.vardata.index)
 
         # set methods
         fit = eval("selector" + "." + fit_handle)
@@ -1265,25 +1263,25 @@ class DataSet:
             fit(X, y, groups)
 
         # append feature results
-        if not (f_results_handle is None):
-            #f_results_name = method_name + "_f_results"
-            f_results = pd.DataFrame(eval("selector" + "." + f_results_handle))
-            f_weight_results[f_results.columns] = np.nan
-            f_weight_results.loc[feature_ids] = pd.DataFrame(data=f_results.values, index=feature_ids, columns=f_results.columns)
-            #if not (f_rnk_func is None):
-            #    f_rnk_name = method_name + "_f_rank"
-            #    weights = f_weight_results.loc[feature_ids, f_weights_name]
-            #    f_weight_results[f_rnk_name] = np.nan
-            #    f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
-            #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
-            #else:
-            #    f_rnk_name = method_name + "_f_rank"
-            #    weights = f_weight_results.loc[feature_ids, f_weights_name]
-            #    f_weight_results[f_rnk_name] = np.nan
-            #    f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
-            #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
-        else:
-            raise ValueError("Must input a results handle for the selector.")
+        f_results = pd.DataFrame(eval("selector" + "." + f_results_handle))
+
+        # set returns
+        f_weight_results = pd.DataFrame(index=self.vardata.index, columns=f_results.columns)
+        
+        f_weight_results.loc[feature_ids] = pd.DataFrame(data=f_results.values, index=feature_ids, columns=f_results.columns)
+        #if not (f_rnk_func is None):
+        #    f_rnk_name = method_name + "_f_rank"
+        #    weights = f_weight_results.loc[feature_ids, f_weights_name]
+        #    f_weight_results[f_rnk_name] = np.nan
+        #    f_weight_results.loc[feature_ids, f_rnk_name] = (-f_rnk_func(weights)).argsort()
+        #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+        #else:
+        #    f_rnk_name = method_name + "_f_rank"
+        #    weights = f_weight_results.loc[feature_ids, f_weights_name]
+        #    f_weight_results[f_rnk_name] = np.nan
+        #    f_weight_results.loc[feature_ids, f_rnk_name] = (-np.array(weights)).argsort()
+        #    f_weight_results[f_rnk_name] = f_weight_results[f_rnk_name].astype('Int64')
+
 
         results = {'selector': selector,
                    'f_results': f_weight_results}
@@ -1302,7 +1300,7 @@ class DataSet:
                                 attrname:str, 
                                 queries: dict, 
                                 attr_exist_mode: str = 'err',
-                                which: str='metdata'):
+                                which: str='metadata'):
 
         """
         This function creates or updates an attribute in the metadata or vardata. New values for the attribute
