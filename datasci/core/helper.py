@@ -424,7 +424,7 @@ def scatter_plotly(df: pd.DataFrame,
             configuring host server. See dash documentation for further details.
 
     Returns:
-        inplace method.
+        fig: The figure object for more advanced plots
 
     Examples:
         >>> import pandas as pd
@@ -446,6 +446,9 @@ def scatter_plotly(df: pd.DataFrame,
     import plotly.graph_objects as go
     import plotly.io as pio
 
+    # sort dataframe by color
+    df = df.iloc[df[grp_colors].argsort().values]
+
     # set defaults
     if xlabel is None:
         xlabel = ''
@@ -456,6 +459,10 @@ def scatter_plotly(df: pd.DataFrame,
     # grab column names
     col0 = df.columns[0]
     col1 = df.columns[1]
+
+    # convert int to str for discrete labels
+    if df[grp_colors].dtype == 'int64':
+        df = df.astype({grp_colors: str})
 
     # scatter
     if 'labels' in kwargs.keys():
@@ -499,10 +506,11 @@ def scatter_plotly(df: pd.DataFrame,
     if not (mrkr_list is None):
         for i, label in enumerate(df[grp_mrkrs].unique()):
             fig.for_each_trace(
-                lambda trace: trace.update(marker_symbol=mrkr_list[i]) if str(label) in trace.name else ())
+                lambda trace: trace.update(marker_symbol=mrkr_list[i]) if str(label) == trace.name else ())
 
     # set title height
-    fig.update_layout(title={'y': .92, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'})
+    fig.update_layout(title={'y': .92, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'}, coloraxis_colorbar=dict(yanchor="top", y=1, x=-.2,
+                                          ticks="outside"))
 
     # set subtitle
     fig.add_annotation(xref='paper',
