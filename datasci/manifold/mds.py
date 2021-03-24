@@ -62,7 +62,8 @@ class MDS(BaseEstimator):
                 Should be a symmetric non-negative matrix.
             y (Ignored):
 
-        Returns: Inplace method.
+        Returns:
+            MDS: The fit MDS instance.
         """
         # setup rng
         from numpy.random import default_rng
@@ -120,6 +121,8 @@ class MDS(BaseEstimator):
 
         # store embedding
         self.embedding_ = embedding
+
+        return self
 
     def fit_transform(self, X, y=None):
         """
