@@ -24,7 +24,8 @@ class KFLIFR(BaseEstimator):
                  gamma: float = .01,
                  n_top_features: int = None,
                  jump_value: float = None,
-                 kfold_labels=None):
+                 kfold_labels=None,
+                 sort_occurence_classes=False):
 
         # set parameters
         self.scorer = scorer
@@ -35,6 +36,7 @@ class KFLIFR(BaseEstimator):
         self.n_top_features = n_top_features
         self.jump_value = jump_value
         self.kfold_labels = kfold_labels
+        self.sort_occurence_classes=sort_occurence_classes
 
         # set attributes
         self.results_ = pd.DataFrame()
@@ -67,7 +69,7 @@ class KFLIFR(BaseEstimator):
                 logo_splits = LeaveOneGroupOut().split(Xi_train, yi_train, groups_train)
 
             for j, (logo_train_index, logo_test_index) in enumerate(logo_splits):
-                print("Starting LOSO split " + str(j) + "...")
+                print("Starting LOGO split " + str(j) + "...")
                 Xij_train = Xi_train[logo_train_index, :]; yij_train = yi_train[logo_train_index]
                 Xij_valid = Xi_train[logo_test_index, :]; yij_valid = yi_train[logo_test_index]
                 Sij = [] # intial feature set
@@ -112,6 +114,39 @@ class KFLIFR(BaseEstimator):
                 # set selected features
                 Si.loc[Sij, j] = True
 
-            # compute frequencies and store into results
+            # compute frequencies and sort
             Si = Si.sum(axis=1)
+            if self.sort_occurence_classes:
+                print("Sorting each occurrence class.")
+                freqs = np.sort(Si.unique())[::-1]
+                index_list = []
+                for k in freqs:
+                    print("Sorting occurrence class " + str(k) + "...")
+                    S_freq = np.array(Si[Si == k].index)
+                    A = np.zeros((len(S_freq), np.unique(groups_train).size))
+                    logo_splits = LeaveOneGroupOut().split(Xi_train, yi_train, groups_train)
+                    for j, (logo_train_index, logo_test_index) in enumerate(logo_splits):
+                        print("Starting LOGO split " + str(j) + "...")
+                        Xij_train = Xi_train[logo_train_index, :]; yij_train = yi_train[logo_train_index]
+
+                        # fit the classifier
+                        self.classifier.fit(Xij_train[:, S_freq], yij_train)
+
+                        # store weights
+                        f_weights = np.abs(eval("self.classifier" + "." + self.weights_handle))
+                        A[:, j] = f_weights.reshape(-1,)
+
+                    # normalize weights and then compute means
+                    A = A / A.sum(axis=0)
+                    means = A.mean(axis=1)
+                    order = (-means).argsort()
+
+                    # sort S_freq and append to list
+                    S_freq = S_freq[order]
+                    index_list = index_list + S_freq.tolist()
+
+                # sort features
+                Si = Si.loc[index_list]
+
+            # store results
             self.results_[i] = Si
