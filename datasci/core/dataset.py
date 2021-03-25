@@ -1006,7 +1006,13 @@ class DataSet:
 
         # TODO: Fix sample_ids for passing to numpy array
         if partitioner is None:
-            splits = [(np.arange(0, len(sample_ids)), np.arange(0, len(sample_ids)))]
+            splits = [(np.arange(0, len(sample_ids)), None)]
+        elif type(partitioner) == tuple:
+            train_ids = self.slice_dataset(sample_ids=partitioner[0]).data.index
+            test_ids = self.slice_dataset(sample_ids=partitioner[1]).data.index
+            train_ids = np.where(ds.data.index.isin(train_ids))[0]
+            test_ids = np.where(ds.data.index.isin(test_ids))[0]
+            splits = [(train_ids, test_ids)]
         else:
             split = eval("partitioner" + "." + split_handle)
             group = kwargs.get('group', None)
@@ -1040,9 +1046,11 @@ class DataSet:
         # loop over splits
         for i, (train_index, test_index) in enumerate(splits):
             X_train = X[train_index, :]
-            X_test = X[test_index, :]
+            if not (test_index is None):
+                X_test = X[test_index, :]
             y_train = y[train_index]
-            y_true = y[test_index]
+            if not (test_index is None):
+                y_true = y[test_index]
 
             # fit the classifier (going meta y'all)
             fit(X_train, y_train)
@@ -1050,23 +1058,29 @@ class DataSet:
 
             # get predict labels
             y_pred_train = predict(X_train)
-            y_pred_test = predict(X_test)
+            if not (test_index is None):
+                y_pred_test = predict(X_test)
 
             # get scores
             score_name = method_name + "_" + scorer_name + "_" + str(i)
             train_score = scorer(y_train, y_pred_train)
-            test_score = scorer(y_true, y_pred_test)
-            scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
+            if not (test_index is None):
+                test_score = scorer(y_true, y_pred_test)
+                scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
+            else:
+                scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, pd.NA])
 
             # append prediction results
             labels_name = method_name + "_labels_" + str(i)
             split_labels_name = method_name + "_split_labels_" + str(i)
             predict_results[labels_name] = ''
             predict_results.loc[sample_index.take(train_index), labels_name] = y_pred_train
-            predict_results.loc[sample_index.take(test_index), labels_name] = y_pred_test
+            if not (test_index is None):
+                predict_results.loc[sample_index.take(test_index), labels_name] = y_pred_test
             predict_results[split_labels_name] = ''
             predict_results.loc[sample_index.take(train_index), split_labels_name] = 'Train'
-            predict_results.loc[sample_index.take(test_index), split_labels_name] = 'Test'
+            if not (test_index is None):
+                predict_results.loc[sample_index.take(test_index), split_labels_name] = 'Test'
 
             # append feature results
             if not (f_weights_handle is None):
