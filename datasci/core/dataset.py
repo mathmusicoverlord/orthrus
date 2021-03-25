@@ -903,11 +903,11 @@ class DataSet:
             sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
                 ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
 
-            partitioner (object): Class-instance which partitions samples in batches of training and test split. This
-                instance must have the sklearn equivalent of a split method. The split method returns a list of
-                train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
-                an example partitioner. The default is None; resulting in using all of the samples to train
-                the classifier with no test samples.
+            partitioner (object): Option 1.) Class-instance which partitions samples in batches of training and test
+                split. This instance must have the sklearn equivalent of a split method. The split method returns a
+                list of train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold
+                for an example partitioner. Option 2.) Tuple of training and test ids. The default is None; resulting
+                in using all of the samples to train the classifier with no test samples.
 
             partitioner_name (string): Common name for the ``partitioner`` to be used for identification. Default is
                 ``partitioner.__str__()``.
