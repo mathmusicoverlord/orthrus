@@ -145,8 +145,10 @@ class KFLIFR(BaseEstimator):
                     S_freq = S_freq[order]
                     index_list = index_list + S_freq.tolist()
 
-                # sort features
-                Si = Si.loc[index_list]
+                # rank features
+                Si = Si.to_frame().rename({0: 'Frequency'}, axis='columns')
+                Si['Rank'] = pd.NA
+                Si.loc[index_list] = np.arange(len(index_list))
 
             # store results
             self.results_[i] = Si
