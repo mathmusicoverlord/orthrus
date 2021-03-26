@@ -47,7 +47,7 @@ class KFLIFR(BaseEstimator):
         St = np.arange(X.shape[1])
 
         # intialize results
-        self.results_ = pd.DataFrame(index=St, columns=np.arange(self.kfold.n_splits))
+        self.results_ = pd.DataFrame(index=St)
 
         # loop through cv folds
         if self.kfold_labels is None:
@@ -146,9 +146,9 @@ class KFLIFR(BaseEstimator):
                     index_list = index_list + S_freq.tolist()
 
                 # rank features
-                Si = Si.to_frame().rename({0: 'Frequency'}, axis='columns')
-                Si['Rank'] = pd.NA
-                Si.loc[index_list, 'Rank'] = np.arange(len(index_list))
+                Si = Si.to_frame().rename({0: 'Frequency_' + str(i)}, axis='columns')
+                Si['Rank_' + str(i)] = pd.NA
+                Si.loc[index_list, 'Rank_' + str(i)] = np.arange(len(index_list))
 
             # store results
-            self.results_[i] = Si
+            self.results_ = pd.concat([self.results_, Si], axis=1)
