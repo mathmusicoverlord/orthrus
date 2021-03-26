@@ -148,7 +148,7 @@ class KFLIFR(BaseEstimator):
                 # rank features
                 Si = Si.to_frame().rename({0: 'Frequency'}, axis='columns')
                 Si['Rank'] = pd.NA
-                Si.loc[index_list] = pd.Series(index=index_list, data=np.arange(len(index_list)))
+                Si.loc[index_list, 'Rank'] = np.arange(len(index_list))
 
             # store results
             self.results_[i] = Si
