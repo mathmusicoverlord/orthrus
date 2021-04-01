@@ -38,7 +38,7 @@ def get_close_matches_icase(word, possibilities, *args, **kwargs):
     lmatches = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
     ret = [lpos[m] for m in lmatches]
     ret = itertools.chain.from_iterable(ret)
-    return set(ret)
+    return list(ret)
 
 def scatter_pyplot(df: pd.DataFrame,
                    dim: int,
