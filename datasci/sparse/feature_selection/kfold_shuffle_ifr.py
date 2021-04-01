@@ -43,7 +43,6 @@ class KFSIFR(BaseEstimator):
         self.results_ = pd.DataFrame()
 
     def fit(self, X, y):
-
         # set total feature set
         St = np.arange(X.shape[1])
 

@@ -23,6 +23,23 @@ def method_exists(instance: object, method: str):
     """
     return hasattr(instance, method) and ismethod(getattr(instance, method))
 
+def get_close_matches_icase(word, possibilities, *args, **kwargs):
+    """ Case-insensitive version of difflib.get_close_matches """
+    import difflib
+    import itertools
+
+    lword = word.lower()
+    lpos = {}
+    for p in possibilities:
+        if p.lower() not in lpos:
+            lpos[p.lower()] = [p]
+        else:
+            lpos[p.lower()].append(p)
+    lmatches = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
+    ret = [lpos[m] for m in lmatches]
+    ret = itertools.chain.from_iterable(ret)
+    return set(ret)
+
 def scatter_pyplot(df: pd.DataFrame,
                    dim: int,
                    grp_colors: str,
