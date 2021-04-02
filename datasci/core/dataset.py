@@ -148,6 +148,7 @@ class DataSet:
                   use_dissimilarity: bool = False,
                   backend: str = 'pyplot',
                   viz_name: str = None,
+                  supervised: bool = False,
                   save: bool = False,
                   save_name: str = None,
                   **kwargs):
@@ -178,6 +179,8 @@ class DataSet:
 
             viz_name (str): Common name for the embedding used. e.g. MDS, PCA, UMAP, etc... The default is
                 :py:attr:`embedding`.__str__().
+
+            supervised (bool): If True the attr labels are based to the embedding fit method, rather than None.
 
             save (bool): Flag indicating to save the file. The file will save to self.path with the file name
                 :py:attr:`DataSet.name` _ :py:attr:`viz_name` _ :py:attr:`attrname`.png for ``pyplot`` and
@@ -241,10 +244,14 @@ class DataSet:
         metadata = ds.metadata
 
         # transform data
-        try:
+        if supervised:
             data_trans = embedding.fit_transform(data.values, y=metadata[attr].values)
-        except ValueError:
-            data_trans = embedding.fit_transform(data.values)
+        else:
+            try:
+                data_trans = embedding.fit_transform(data.values, y=None)
+            except ValueError:
+                data_trans = embedding.fit_transform(data.values)
+
         if data_trans.shape[1] == 1:
             is_1d = True
             data_trans = np.hstack((data_trans, (2*np.random.rand(data_trans.shape[0], 1) - 1)))

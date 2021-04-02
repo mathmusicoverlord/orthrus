@@ -31,6 +31,7 @@ class OrthTransform(BaseEstimator):
     def __init__(self, subspace, shift, transformer, transformer_args=dict()):
         # parameters
         self.subspace = subspace
+        self.normalize_1d_subspace = False
         self.shift = shift
         self.transformer = transformer
         self.transformer_args = transformer_args
@@ -55,7 +56,13 @@ class OrthTransform(BaseEstimator):
         X = np.array(X) - np.array(self.shift).reshape(1, -1)
 
         # project data onto subspace
-        P = np.linalg.qr(self.subspace)[0]
+        if self.subspace.shape[1] == 1:
+            if self.normalize_1d_subspace:
+                P = np.linalg.qr(self.subspace)[0]
+            else:
+                P = self.subspace
+        else:
+            P = np.linalg.qr(self.subspace)[0]
         PX = np.matmul(X, P)
 
         # subtract off projected component
