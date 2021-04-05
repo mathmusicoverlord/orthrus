@@ -154,7 +154,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
 
         return self
     #
-    def predict(self, X):
+    def predict(self, X, prob=False, pos=None):
         '''
         Classification step for Sparse Support Vector Machine (SSVM).
         After the fit/training step, vectors w and b are found to
@@ -192,15 +192,36 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         else:
             d = np.dot(X, w) - b
 
-        predicted = np.sign(d)
-        predicted = np.array(predicted, dtype=int).flatten()  # can't be too sure
+        # use probability or not
+        if prob:
+            if pos is None:
+                pos = self.classes_[0]
+            # hard classification past margins
+            d[d<-1] = -1
+            d[d>1] = 1
+            # shift-scale [-1, 1] to [0, 1]
+            d = (d + 1)/2
+            if pos == self.classes_[0]:
+                d = 1 - d
+            elif pos == self.classes_[1]:
+                pass
+            else:
+                raise ValueError("Positive label provided is not in class labels.")
+            pred_labels = d.reshape(-1,).tolist()
+            return pred_labels
 
-        # map -1, 1 labels to original labels
-        invLabelDict = {-1: self.classes_[0], 1: self.classes_[1]}
-        pred_labels = [invLabelDict[sample] for sample in predicted]
-        self.pred_labels_ = pred_labels
+        else:
+            predicted = np.sign(d)
+            predicted = np.array(predicted, dtype=int).flatten()  # can't be too sure
 
-        return pred_labels
+            # map -1, 1 labels to original labels
+            invLabelDict = {-1: self.classes_[0], 1: self.classes_[1]}
+            pred_labels = [invLabelDict[sample] for sample in predicted]
+            self.pred_labels_ = pred_labels
+            return pred_labels
+
+
+
 
     def decision_function(self, X):
         import numpy as np
