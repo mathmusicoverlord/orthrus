@@ -871,11 +871,14 @@ class DataSet:
     def classify(self, classifier,
                  attr: str,
                  classifier_name=None,
+                 fit_args: dict = {},
+                 predict_args: dict = {},
                  feature_ids=None,
                  sample_ids=None,
                  partitioner=None,
                  partitioner_name=None,
                  scorer=None,
+                 scorer_args: dict = {},
                  scorer_name=None,
                  split_handle: str = 'split',
                  fit_handle: str = 'fit',
@@ -898,6 +901,10 @@ class DataSet:
         Args:
             classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
                 of a ``fit`` and ``predict`` method.
+
+            fit_args (dict): Keyword arguments passed to the classifiers fit method.
+
+            predict_args (dict): Keyword arguments passed to the classifers predict method
 
             attr (string): Name of metadata attribute to classify on.
 
@@ -923,6 +930,8 @@ class DataSet:
                 should accept two arguments: truth labels and prediction labels. This function should output a score
                 between 0 and 1 which can be thought of as an accuracy measure. See
                 sklearn.metrics.balanced_accuracy_score for an example.
+
+            scorer_args (dict): Keyword argumunts passed to the scoring function used.
 
             scorer_name (string): Common name of scorer to used for identification. Default is ``scorer.__str__()``.
 
@@ -1060,17 +1069,17 @@ class DataSet:
                 y_true = y[test_index]
 
             # fit the classifier (going meta y'all)
-            fit(X_train, y_train)
+            fit(X_train, y_train, fit_args)
             classifiers[method_name + '_classifier_' + str(i)] = classifier
 
             # get predict labels
             y_pred_train = predict(X_train)
             if not (test_index is None):
-                y_pred_test = predict(X_test)
+                y_pred_test = predict(X_test, predict_args)
 
             # get scores
             score_name = method_name + "_" + scorer_name + "_" + str(i)
-            train_score = scorer(y_train, y_pred_train)
+            train_score = scorer(y_train, y_pred_train, scorer_args)
             if not (test_index is None):
                 test_score = scorer(y_true, y_pred_test)
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
