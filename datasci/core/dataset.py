@@ -1069,19 +1069,19 @@ class DataSet:
                 y_true = y[test_index]
 
             # fit the classifier (going meta y'all)
-            fit(X_train, y_train, fit_args)
+            fit(X_train, y_train, **fit_args)
             classifiers[method_name + '_classifier_' + str(i)] = classifier
 
             # get predict labels
-            y_pred_train = predict(X_train)
+            y_pred_train = predict(X_train, **predict_args)
             if not (test_index is None):
-                y_pred_test = predict(X_test, predict_args)
+                y_pred_test = predict(X_test, **predict_args)
 
             # get scores
             score_name = method_name + "_" + scorer_name + "_" + str(i)
-            train_score = scorer(y_train, y_pred_train, scorer_args)
+            train_score = scorer(y_train, y_pred_train, **scorer_args)
             if not (test_index is None):
-                test_score = scorer(y_true, y_pred_test)
+                test_score = scorer(y_true, y_pred_test, **scorer_args)
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
             else:
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, pd.NA])

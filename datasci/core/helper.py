@@ -380,8 +380,12 @@ def scatter_pyplot(df: pd.DataFrame,
         pass
     ax.update(kwargs)
     # ax.set_title(title, fontsize=15)
-    # ax.set_xlabel(xlabel, fontsize=16)
-    # ax.set_ylabel(ylabel, fontsize=16)
+    ax.set_xlabel(ax.get_xlabel(), fontsize=18)
+    ax.set_ylabel(ax.get_ylabel(), fontsize=18)
+    try:
+        ax.set_zlabel(ax.get_zlabel(), fontsize=18)
+    except AttributeError:
+        pass
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.show()
