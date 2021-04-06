@@ -390,7 +390,6 @@ def scatter_pyplot(df: pd.DataFrame,
         plt.savefig(fname=save_name + '.png', format='png')
     plt.show()
 
-
 def scatter_plotly(df: pd.DataFrame,
                    dim: int,
                    grp_colors: str,
