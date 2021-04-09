@@ -1060,6 +1060,10 @@ class DataSet:
         predict = eval("classifier" + "." + predict_handle)
 
         # loop over splits
+        try:
+            n_splits = partitioner.n_splits
+        except AttributeError:
+            n_splits = len(splits)
         for i, (train_index, test_index) in enumerate(splits):
             X_train = X[train_index, :]
             if not (test_index is None):
@@ -1078,13 +1082,28 @@ class DataSet:
                 y_pred_test = predict(X_test, **predict_args)
 
             # get scores
+            title = r"%s, Split %d of %d, Scores: " % (classifier_name, i+1, n_splits)
+            print(title)
+            print("="*len(title))
             score_name = method_name + "_" + scorer_name + "_" + str(i)
             train_score = scorer(y_train, y_pred_train, **scorer_args)
+            if pd.api.types.infer_dtype(train_score) == 'floating':
+                print(r"Training %s: %.2f%%" % (scorer_name, train_score*100))
+            else:
+                print(r"Training %s:" % (scorer_name,))
+                print(train_score)
             if not (test_index is None):
+                print("-"*len(title))
                 test_score = scorer(y_true, y_pred_test, **scorer_args)
+                if pd.api.types.infer_dtype(test_score) == 'floating':
+                    print(r"Test %s: %.2f%%" % (scorer_name, test_score * 100))
+                else:
+                    print(r"Test %s:" % (scorer_name,))
+                    print(test_score)
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
             else:
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, pd.NA])
+            print("\n")
 
             # append prediction results
             labels_name = method_name + "_labels_" + str(i)
@@ -1134,6 +1153,29 @@ class DataSet:
                     weights = s_weight_results.loc[feature_ids, s_weights_name]
                     s_weight_results[s_rnk_name] = np.nan
                     s_weight_results.loc[feature_ids, s_rnk_name] = (-np.array(weights)).argsort()
+
+        # print means and standard deviations
+        if pd.api.types.infer_dtype(train_score) == 'floating':
+            title = r"%s, Summary, Scores: " % (classifier_name,)
+            print(title)
+            print("=" * len(title))
+            mean_train_score = scores.loc['Train'].mean()
+            std_train_score = scores.loc['Train'].std()
+            min_train_score = scores.loc['Train'].min()
+            max_train_score = scores.loc['Train'].max()
+            print(r"Training %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_train_score * 100, std_train_score * 100))
+            print(r"Max. Training %s: %.2f%%" % (scorer_name, max_train_score * 100))
+            print(r"Min. Training %s: %.2f%%" % (scorer_name, min_train_score * 100))
+        if not (test_index is None):
+            if pd.api.types.infer_dtype(test_score) == 'floating':
+                print("-"*len(title))
+                mean_test_score = scores.loc['Test'].mean()
+                std_test_score = scores.loc['Test'].std()
+                min_test_score = scores.loc['Test'].min()
+                max_test_score = scores.loc['Test'].max()
+                print(r"Test %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_test_score * 100, std_test_score * 100))
+                print(r"Max. Test %s: %.2f%%" % (scorer_name, max_test_score * 100))
+                print(r"Min. Test %s: %.2f%%" % (scorer_name, min_test_score * 100))
 
         if append_to_meta:
             self.metadata = pd.concat([self.metadata, predict_results], axis=1)

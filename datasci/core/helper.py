@@ -182,9 +182,9 @@ def scatter_pyplot(df: pd.DataFrame,
             raise ValueError("Embedding dimension must be 2 or 3!")
 
         if grp_mrkrs == '':
-            ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
+            lg = ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
         else:
-            ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors + '/' + grp_mrkrs)
+            lg = ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors + '/' + grp_mrkrs)
 
     if color_type == 'floating' and mrkr_type != 'floating':
         # color is continuous
@@ -251,7 +251,7 @@ def scatter_pyplot(df: pd.DataFrame,
             raise ValueError("Embedding dimension must be 2 or 3!")
 
         if grp_mrkrs != '':
-            ax.legend(loc='upper left', bbox_to_anchor=(1.1, 0.5), fontsize=15, title=grp_mrkrs)
+            lg = ax.legend(loc='upper left', bbox_to_anchor=(1.1, 0.5), fontsize=15, title=grp_mrkrs)
             leg = ax.get_legend()
             for handle in leg.legendHandles:
                 handle.set_color('black')
@@ -360,7 +360,8 @@ def scatter_pyplot(df: pd.DataFrame,
         else:
             raise ValueError("Embedding dimension must be 2 or 3!")
 
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
+        lg = ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), fontsize=15, title=grp_colors)
+
 
     if no_axes:
         ax.axis('off')
@@ -387,6 +388,7 @@ def scatter_pyplot(df: pd.DataFrame,
         ax.set_zlabel(ax.get_zlabel(), fontsize=18)
     except AttributeError:
         pass
+    lg.get_title().set_fontsize(18)
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.rc('legend', **{'fontsize': 16})
@@ -806,10 +808,10 @@ def generate_experiment(name: str, proj_dir: str):
                   "# set experiment name\n" \
                   "EXP_NAME = \'" + name + "\'\n\n" \
                   "# set working directories\n" \
-                  "PROJ_DIR = \'" + proj_dir + "\'\n" \
+                  "PROJ_DIR = \'" + proj_dir + "\' # <---- put your absolute path\n" \
                   "DATA_DIR = PROJ_DIR + \'Data/\'\n" \
                   "EXP_DIR = PROJ_DIR + \'Experiments/\' + EXP_NAME + \'/\'\n" \
-                  "RESULTS_DIR = EXP_DIR + \'Results\'\n\n" \
+                  "RESULTS_DIR = EXP_DIR + \'Results/\'\n\n" \
                   "# generate figures directory by date\n" \
                   "dt = datetime.datetime.now()\n" \
                   "dt = datetime.date(dt.year, dt.month, dt.day)\n" \
@@ -822,9 +824,9 @@ def generate_experiment(name: str, proj_dir: str):
                   "DATASET = load_dataset(\'/path/to/dataset.ds\')\n" \
                   "DATASET.path = FIG_DIR\n\n" \
                   "# restrict samples\n" \
-                  "SAMPLE_IDS = DATASET.metadata.query(\'query here\')\n\n" \
+                  "SAMPLE_IDS = DATASET.metadata.query(\'query here\').index\n\n" \
                   "# restrict features\n" \
-                  "FEATURE_IDS = DATASET.vardata.query(\'query here\')\n\n" \
+                  "FEATURE_IDS = DATASET.vardata.query(\'query here\').index\n\n" \
                   "# other parameters"
 
     with open(params_file, "w") as f:
