@@ -34,5 +34,32 @@ metadata = pd.read_csv("./test_data/iris_metadata.csv", index_col=0)
 # create DataSet instance
 ds = DS(name='iris', path='./test_data', data=data, metadata=metadata)
 
+# save dataset
+ds.save()
+
 ```
 here ```path``` indicates where ```ds``` will save figures and results output by the class methods.
+
+## Creating a Project Environment
+To increase organization and reproducibility of results the DataSci package includes helper functions for generating a project directory and experiment subdirectories. Here is an example where we create a project directory called *Iris* and then generate an experiment directory called *setosa_versicolor_classify_species_svm* where we intend to classify setosa and versicolor species with an SVM classifier.
+
+```python
+# imports
+from datasci.core.helper import generate_project
+from datasci.core.helper import generate_experiment
+from datasci.core.dataset import load_dataset
+import shutil
+
+# Create a project directory structure in the test path
+file_path = './test_data/'
+generate_project('Iris', file_path)
+
+# move data into Data directory of Iris project directory
+shutil.move('./test_data/iris.ds', './test_data/Iris/Data/iris.ds')
+
+# create experiment directory in the Experiments directory of the Iris directory
+proj_dir = './test_data/Iris/'
+generate_experiment('setosa_versicolor_classify_species_svm', proj_dir)
+```
+Once the *setosa_versicolor_classify_species_svm* directory is created there will be a file *setosa_versicolor_classify_species_svm_params.py* containing a template for experimental parameters that the user can change or add on to. The Scripts directory in the Iris directory should contain general purpose scripts that can take in specific experimental parameters from your different experiments—allowing you to easily change your experiment on the fly with minimal code change. Take a look at the Iris directory for an example of this workflow.
+
