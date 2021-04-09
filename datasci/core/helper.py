@@ -5,6 +5,7 @@ This module contains user-defined and general purpose helper functions use by th
 from inspect import ismethod
 import numpy as np
 import pandas as pd
+import pickle
 from flask import request
 
 
@@ -711,4 +712,154 @@ def plot_scores(results_list, param_list=None, average='mean', variation='std', 
     ax.update(kwargs)
     plt.show()
 
+def generate_project(name: str, file_path: str):
+    """
+    This function creates the directory structure for a project— this includes a Data, Experiments, and Scripts directory.
+
+    Args:
+        name (str): The name of the project.
+        file_path (str): The file path to the location where the project directory will be created.
+
+    Returns:
+        inplace
+    """
+    import os
+
+    # define the project directory
+    proj_dir = file_path + name + '/'
+    try:
+        os.mkdir(proj_dir.rstrip('/'))
+    except Exception:
+        pass
+
+    # define data directory
+    data_dir = proj_dir + 'Data/'
+    try:
+        os.mkdir(data_dir.rstrip('/'))
+    except Exception:
+        pass
+
+    # define experiments directory
+    exps_dir = proj_dir + 'Experiments/'
+    try:
+        os.mkdir(exps_dir.rstrip('/'))
+    except Exception:
+        pass
+
+    # define data directory
+    scripts_dir = proj_dir + 'Scripts/'
+    try:
+        os.mkdir(scripts_dir.rstrip('/'))
+    except Exception:
+        pass
+
+def generate_experiment(name: str, proj_dir: str):
+    """
+    This function creates the directory structure for an experiment and generates a parameters python file containing
+    a template for experimental parameters to be exported for the experiment in mind. The experiment will automatically
+    be placed in the Experiments directory of the project directory.
+
+    Args:
+        name (str): The name of the experiment.
+        proj_dir (str): The file path of the project directory where the data is held. See :py:func:`generate_project`
+            for auto-generation of a project directory.
+
+    Returns:
+        inplace
+    """
+    import os
+
+    # create experiment directory
+    proj_dir = proj_dir.replace('Experiment/', '/')
+    exps_dir = proj_dir + 'Experiments/'
+    exp_dir = exps_dir + name + '/'
+    try:
+        os.mkdir(exps_dir.rstrip('/'))
+    except Exception:
+        pass
+    try:
+        os.mkdir(exp_dir.rstrip('/'))
+    except Exception:
+        pass
+
+    # create figures and results directories
+    fig_dir = exp_dir + 'Figures/'
+    results_dir = exp_dir + 'Results/'
+    try:
+        os.mkdir(fig_dir.rstrip('/'))
+    except Exception:
+        pass
+    try:
+        os.mkdir(results_dir.rstrip('/'))
+    except Exception:
+        pass
+
+    # generate python file
+    params_file = exp_dir + name + '_params.py'
+    params_text = "\"\"\"\nThis file contains the experimental constants for the experiment " + name + ".\n" \
+                  "All experimental parameters to be exported are denoted by UPPERCASE names as a convention.\n" \
+                  "\"\"\"\n\n" \
+                  "# imports\n" \
+                  "import datetime\n" \
+                  "import os\n" \
+                  "from datasci.core.dataset import load_dataset\n\n" \
+                  "# set experiment name\n" \
+                  "EXP_NAME = \'" + name + "\'\n\n" \
+                  "# set working directories\n" \
+                  "PROJ_DIR = \'" + proj_dir + "\'\n" \
+                  "DATA_DIR = PROJ_DIR + \'Data/\'\n" \
+                  "EXP_DIR = PROJ_DIR + \'Experiments/\' + EXP_NAME + \'/\'\n" \
+                  "RESULTS_DIR = EXP_DIR + \'Results\'\n\n" \
+                  "# generate figures directory by date\n" \
+                  "dt = datetime.datetime.now()\n" \
+                  "dt = datetime.date(dt.year, dt.month, dt.day)\n" \
+                  "FIG_DIR = EXP_DIR + \'Figures/\' + dt.__str__() + \'/\'\n" \
+                  "try:\n" \
+                  "\tos.mkdir(FIG_DIR.rstrip(\'/\'))\n" \
+                  "except Exception:\n" \
+                  "\tpass\n\n" \
+                  "# load dataset\n" \
+                  "DATASET = load_dataset(\'/path/to/dataset.ds\')\n" \
+                  "DATASET.path = FIG_DIR\n\n" \
+                  "# restrict samples\n" \
+                  "SAMPLE_IDS = DATASET.metadata.query(\'query here\')\n\n" \
+                  "# restrict features\n" \
+                  "FEATURE_IDS = DATASET.vardata.query(\'query here\')\n\n" \
+                  "# other parameters"
+
+    with open(params_file, "w") as f:
+        f.write(params_text)
+    return
+
+def load_object(file_path: str):
+    """
+    This function loads and returns any object stored in pickle format at the file_path.
+
+    Args:
+        file_path (str): Path of the file to load the instance from.
+
+    Returns:
+        Pickle object stored at the file_path.
+
+    Examples:
+            >>> ifr = load_object(file_path='./tol_vs_res_liver_ifr.pickle')
+    """
+    # open file and unpickle
+    with open(file_path, 'rb') as f:
+        return pickle.load(f)
+
+def save_object(object, file_path):
+    """
+    This method saves an an object in pickle format at the specified path.
+
+    Args:
+        file_path (str): Path of the file to save the instance to.
+
+    Returns:
+        inplace method.
+
+    """
+    # pickle class instance
+    with open(file_path, 'wb') as f:
+        pickle.dump(object, file=f)
 

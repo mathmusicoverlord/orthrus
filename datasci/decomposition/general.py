@@ -16,6 +16,11 @@ class OrthTransform(BaseEstimator):
     Parameters:
         subspace (ndarray of shape (n_features, subspace_dimension)): The matrix whose columns span the subspace in
             consideration.
+        normalize_1d_subspace (bool): If ``False`` and the subspace is one-dimensional, the projection of the data onto the
+            subspace will be scaled by the length of the vector respresenting the subspace. This is useful for prediction
+            models such as SVM where the magnitude of the normal vector is included in the model. If ``True`` then the
+            the vector representing the subspace will be made into a unit vector before multiplying the data. The default
+            is ``False``.
         shift (1-d array with n_features components): The point in space to affinely shift the data by— we subtract the
             point.
         transformer (class instance): The transformation object to transform the orthogonal complement to the subspace—
