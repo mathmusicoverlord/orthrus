@@ -8,5 +8,5 @@ Subpackages
    :maxdepth: 4
 
    datasci.core
+   datasci.decomposition
    datasci.manifold
-   datasci.sparse
