@@ -98,6 +98,20 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasci.manifold.html">datasci.manifold namespace</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="datasci.sparse.html">datasci.sparse namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="datasci.sparse.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">datasci.sparse.classifiers namespace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-datasci.sparse.classifiers.svm">datasci.sparse.classifiers.svm module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="datasci.sparse.feature_selection.html">datasci.sparse.feature_selection namespace</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -282,7 +296,7 @@ xi_j are scalar slack variables.</p>
 
 <dl class="py method">
 <dt id="datasci.sparse.classifiers.svm.SSVMClassifier.predict">
-<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.classifiers.svm.SSVMClassifier.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Classification step for Sparse Support Vector Machine (SSVM).
 After the fit/training step, vectors w and b are found to
 optimally classify the training X (in the sense described
