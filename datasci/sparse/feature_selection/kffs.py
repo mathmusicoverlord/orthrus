@@ -56,7 +56,7 @@ class KFFS(BaseEstimator):
             X (array-like, (n_samples, n_features)): Training samples to be used for feature selection.
             y (array-like, (n_features,)): Training labels to be used for feature selection.
         Returns:
-            inplace method. Results are stored in :py:attr:`KFFS.classifiers_`, :py:attr:`KFFS.weights_`, and :py:attr:`KFFS.ranks_`.
+            inplace method. Results are stored in :py:attr:`KFFS.classifiers_`, :py:attr:`KFFS.ranks_`, and :py:attr:`KFFS.results_`.
         '''
 
         # generate splits
