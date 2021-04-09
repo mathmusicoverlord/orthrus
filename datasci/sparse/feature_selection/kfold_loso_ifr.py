@@ -40,9 +40,9 @@ class KFLIFR(BaseEstimator):
             given then :py:attr:`KFLIFR.jump_ratio` will be used instead. The default is None.
 
         jump_ratio (float): The weight ratio used to determine the number of top features to remove for each iteration
-            of IFR. For example let :py:math:`r_i = w_{i}/w_{i+1}` denote the ratio of the
-            :py:math:`i` th largest weight and :py:math:`i+1` largest weight, then :py:attr:`KFLIFR.jump_ratio` = 2 means
-            that top features will be chosen until :py:math:`r_i \geq 2`. If this parameter is not given then the user
+            of IFR. For example let :math:`r_i = w_{i}/w_{i+1}` denote the ratio of the
+            :math:`i` th largest weight and :math:`i+1` largest weight, then :py:attr:`KFLIFR.jump_ratio` = 2 means
+            that top features will be chosen until :math:`r_i \geq 2`. If this parameter is not given then the user
             must provide a constant number of features to prune at each step via the parameter :py:attr:`KFLIFR.n_top_features`.
 
         sort_freq_classes (bool): If ``True`` the algorithm will sort frequency classes of feature by the mean of
