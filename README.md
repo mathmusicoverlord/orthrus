@@ -61,5 +61,5 @@ shutil.move('./test_data/iris.ds', './test_data/Iris/Data/iris.ds')
 proj_dir = './test_data/Iris/'
 generate_experiment('setosa_versicolor_classify_species_svm', proj_dir)
 ```
-Once the *setosa_versicolor_classify_species_svm* directory is created there will be a file *setosa_versicolor_classify_species_svm_params.py* containing a template for experimental parameters that the user can change or add on to. The Scripts directory in the Iris directory should contain general purpose scripts that can take in specific experimental parameters from your different experiments—allowing you to easily change your experiment on the fly with minimal code change. Take a look at the Iris directory for an example of this workflow.
+Once the *setosa_versicolor_classify_species_svm* directory is created there will be a file *setosa_versicolor_classify_species_svm_params.py* containing a template for experimental parameters that the user can change or add on to. The Scripts directory in the Iris directory should contain general purpose scripts that can take in specific experimental parameters from your different experiments—allowing you to easily change your experiment on the fly with minimal code change. Take a look at the [Iris](test_data/Iris) directory for an example of this workflow.
 
