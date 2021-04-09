@@ -32,6 +32,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -281,9 +282,9 @@ features extracted reaches this proportion of the total features.</p></li>
 <li><p><strong>n_top_features</strong> (<em>int</em>) – The number of top features to remove at each iteration of IFR. If this parameter is not
 given then <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.jump_ratio</span></code> will be used instead. The default is None.</p></li>
 <li><p><strong>jump_ratio</strong> (<em>float</em>) – The weight ratio used to determine the number of top features to remove for each iteration
-of IFR. For example let <a href="#id1"><span class="problematic" id="id2">:py:math:`r_i = w_{i}/w_{i+1}`</span></a> denote the ratio of the
-<a href="#id3"><span class="problematic" id="id4">:py:math:`i`</span></a> th largest weight and <a href="#id5"><span class="problematic" id="id6">:py:math:`i+1`</span></a> largest weight, then <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.jump_ratio</span></code> = 2 means
-that top features will be chosen until <a href="#id7"><span class="problematic" id="id8">:py:math:`r_i \geq 2`</span></a>. If this parameter is not given then the user
+of IFR. For example let <span class="math notranslate nohighlight">\(r_i = w_{i}/w_{i+1}\)</span> denote the ratio of the
+<span class="math notranslate nohighlight">\(i\)</span> th largest weight and <span class="math notranslate nohighlight">\(i+1\)</span> largest weight, then <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.jump_ratio</span></code> = 2 means
+that top features will be chosen until <span class="math notranslate nohighlight">\(r_i \geq 2\)</span>. If this parameter is not given then the user
 must provide a constant number of features to prune at each step via the parameter <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.n_top_features</span></code>.</p></li>
 <li><p><strong>sort_freq_classes</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the algorithm will sort frequency classes of feature by the mean of
 normalized weight across a LOSO experiment— providing a unique ranking. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
