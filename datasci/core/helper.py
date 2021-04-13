@@ -382,6 +382,7 @@ def scatter_pyplot(df: pd.DataFrame,
         pass
     ax.update(kwargs)
     # ax.set_title(title, fontsize=15)
+    ax.set_title(ax.get_title(), fontsize=16)
     ax.set_xlabel(ax.get_xlabel(), fontsize=18)
     ax.set_ylabel(ax.get_ylabel(), fontsize=18)
     try:
@@ -716,7 +717,7 @@ def plot_scores(results_list, param_list=None, average='mean', variation='std', 
 
 def generate_project(name: str, file_path: str):
     """
-    This function creates the directory structure for a project— this includes a Data, Experiments, and Scripts directory.
+    This function creates the directory structure for a project— this includes a Data, Experiments, and scripts directory.
 
     Args:
         name (str): The name of the project.
@@ -728,32 +729,20 @@ def generate_project(name: str, file_path: str):
     import os
 
     # define the project directory
-    proj_dir = file_path + name + '/'
-    try:
-        os.mkdir(proj_dir.rstrip('/'))
-    except Exception:
-        pass
+    proj_dir = os.path.join(file_path, name)
+    os.makedirs(proj_dir, exist_ok=True)
 
     # define data directory
-    data_dir = proj_dir + 'Data/'
-    try:
-        os.mkdir(data_dir.rstrip('/'))
-    except Exception:
-        pass
+    data_dir = os.path.join(proj_dir, 'Data')
+    os.makedirs(data_dir, exist_ok=True)
 
     # define experiments directory
-    exps_dir = proj_dir + 'Experiments/'
-    try:
-        os.mkdir(exps_dir.rstrip('/'))
-    except Exception:
-        pass
+    exps_dir = os.path.join(proj_dir, 'Experiments')
+    os.makedirs(exps_dir, exist_ok=True)
 
     # define data directory
-    scripts_dir = proj_dir + 'Scripts/'
-    try:
-        os.mkdir(scripts_dir.rstrip('/'))
-    except Exception:
-        pass
+    scripts_dir = os.path.join(proj_dir, 'scripts')
+    os.makedirs(scripts_dir)
 
 def generate_experiment(name: str, proj_dir: str):
     """
@@ -772,32 +761,23 @@ def generate_experiment(name: str, proj_dir: str):
     import os
 
     # create experiment directory
-    proj_dir = proj_dir.replace('Experiment/', '/')
-    exps_dir = proj_dir + 'Experiments/'
-    exp_dir = exps_dir + name + '/'
-    try:
-        os.mkdir(exps_dir.rstrip('/'))
-    except Exception:
-        pass
-    try:
-        os.mkdir(exp_dir.rstrip('/'))
-    except Exception:
-        pass
+    if 'Experiments' not in os.path.basename(os.path.abspath(proj_dir)):
+        exps_dir = os.path.join(proj_dir, 'Experiments')
+    else:
+        exps_dir = os.path.abspath(proj_dir)
+        proj_dir = os.path.dirname(exps_dir)
+    exp_dir = os.path.join(exps_dir, name)
+    os.makedirs(exps_dir, exist_ok=True)
+    os.makedirs(exp_dir, exist_ok=True)
 
     # create figures and results directories
-    fig_dir = exp_dir + 'Figures/'
-    results_dir = exp_dir + 'Results/'
-    try:
-        os.mkdir(fig_dir.rstrip('/'))
-    except Exception:
-        pass
-    try:
-        os.mkdir(results_dir.rstrip('/'))
-    except Exception:
-        pass
+    fig_dir = os.path.join(exp_dir, 'Figures')
+    results_dir = os.path.join(exp_dir, 'Results')
+    os.makedirs(fig_dir)
+    os.makedirs(results_dir)
 
     # generate python file
-    params_file = exp_dir + name + '_params.py'
+    params_file = os.path.join(exp_dir, '_'.join([name, 'params.py']))
     params_text = "\"\"\"\nThis file contains the experimental constants for the experiment " + name + ".\n" \
                   "All experimental parameters to be exported are denoted by UPPERCASE names as a convention.\n" \
                   "\"\"\"\n\n" \
@@ -809,17 +789,14 @@ def generate_experiment(name: str, proj_dir: str):
                   "EXP_NAME = \'" + name + "\'\n\n" \
                   "# set working directories\n" \
                   "PROJ_DIR = \'" + proj_dir + "\' # <---- put your absolute path\n" \
-                  "DATA_DIR = PROJ_DIR + \'Data/\'\n" \
-                  "EXP_DIR = PROJ_DIR + \'Experiments/\' + EXP_NAME + \'/\'\n" \
-                  "RESULTS_DIR = EXP_DIR + \'Results/\'\n\n" \
+                  "DATA_DIR = os.path.join(PROJ_DIR, \'Data\')\n" \
+                  "EXP_DIR = os.path.join(PROJ_DIR, \'Experiments\', EXP_NAME)\n" \
+                  "RESULTS_DIR = os.path.join(EXP_DIR, \'Results\')\n\n" \
                   "# generate figures directory by date\n" \
                   "dt = datetime.datetime.now()\n" \
                   "dt = datetime.date(dt.year, dt.month, dt.day)\n" \
-                  "FIG_DIR = EXP_DIR + \'Figures/\' + dt.__str__() + \'/\'\n" \
-                  "try:\n" \
-                  "\tos.mkdir(FIG_DIR.rstrip(\'/\'))\n" \
-                  "except Exception:\n" \
-                  "\tpass\n\n" \
+                  "FIG_DIR = os.path.join(EXP_DIR, \'Figures\', dt.__str__())\n" \
+                  "os.makedirs(FIG_DIR, exist_ok=True)\n\n" \
                   "# load dataset\n" \
                   "DATASET = load_dataset(\'/path/to/dataset.ds\')\n" \
                   "DATASET.path = FIG_DIR\n\n" \
@@ -832,6 +809,28 @@ def generate_experiment(name: str, proj_dir: str):
     with open(params_file, "w") as f:
         f.write(params_text)
     return
+
+def module_from_path(module_name:str, module_path: str):
+    """
+    This function imports a module from a file path and returns the module object.
+
+    Args:
+        module_name (string): Name of the module.
+        module_path (string): Path of the module
+
+    Returns:
+        object : The module pointed to by the file path.
+    """
+    # imports
+    import importlib
+    import sys
+
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+
+    return module
 
 def load_object(file_path: str):
     """

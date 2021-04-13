@@ -1,6 +1,6 @@
-'''
+"""
 This script visualizes the Iris data set.
-'''
+"""
 
 if __name__ == '__main__':
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     umap = UMAP(n_components=2, n_neighbors=25)
     pca = PCA(n_components=2, whiten=True, random_state=0)
     mds = MDS(n_components=2)
-    embedding = umap # <---- Choose one
+    embedding = pca # <---- Choose one
     backend = 'pyplot'
     figsize_plotly = (1500, 1000)
     palette_pyplot = 'bright'
@@ -30,6 +30,7 @@ if __name__ == '__main__':
                  attr=class_attr,
                  backend=backend,
                  palette='bright',
+                 alpha=.7,
                  subtitle='', # <--- default show normalization and imputation methods used
                  s=200,
                  save=True,
