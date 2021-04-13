@@ -25,13 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--dim',
                         type=int,
                         default=2,
-                        choices=[1, 2, 3],
-                        help='Dimension of embedding.')
-
-    parser.add_argument('--backend',
-                        type=str,
-                        default='pyplot',
-                        choices=['plotly', 'pyplot'],
+                        choices=[2, 3],
                         help='Dimension of embedding.')
 
     args = parser.parse_args()
@@ -48,11 +42,8 @@ if __name__ == '__main__':
     class_attr = exp_params.CLASS_ATTR
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
-    feature_ids = exp_params.FEATURE_IDS
 
     # grab dimension
-    if args.dim == 1:
-        dim = 1
     if args.dim == 2:
         dim = 2
     elif args.dim == 3:
@@ -66,21 +57,18 @@ if __name__ == '__main__':
     elif args.embedding == 'mds':
         embedding = MDS(n_components=dim)
 
-    # get backend info
-    if args.backend == 'pyplot':
-        backend = 'pyplot'
-        backend_args = dict(palette='bright', alpha=.7, mrkr_list=['o'], s=200)
-    elif args.backend == 'plotly':
-        backend = 'plotly'
-        backend_args = dict(figsize=(1500, 1000))
-
     # visualize data
+    backend = 'pyplot'
+    figsize_plotly = (1500, 1000)
+    palette_pyplot = 'bright'
     ds.visualize(embedding=embedding,
                  sample_ids=sample_ids,
-                 feature_ids=feature_ids,
                  attr=class_attr,
                  backend=backend,
+                 palette='bright',
+                 alpha=.7,
+                 mrkr_list=['o'],
                  subtitle='', # <--- default show normalization and imputation methods used
+                 s=200,
                  save=True,
-                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr]),
-                 **backend_args)
+                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr]))
