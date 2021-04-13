@@ -1,17 +1,31 @@
 """
-This script classifies the Iris data set.
+Generic script for visualizing a dataset.
 """
 
 if __name__ == '__main__':
+    # imports for arguments
+    import argparse
+    import os
+
+    # command line arguments
+    parser = argparse.ArgumentParser("generic-classification")
+
+    parser.add_argument('--exp_params',
+                        type=str,
+                        default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                                             'setosa_versicolor_classify_species_svm',
+                                             'setosa_versicolor_classify_species_svm_params.py'),
+                        help='File path of containing the experimental parameters. Default is the Iris experiment.')
+
+    args = parser.parse_args()
 
     # imports
-    import sys
     from sklearn.metrics import balanced_accuracy_score as bsr
     from datasci.core.helper import save_object
+    from datasci.core.helper import module_from_path
 
     # set experiment parameters
-    sys.path.append()
-    from Experiments.setosa_versicolor_classify_species_svm import setosa_versicolor_classify_species_svm_params as exp_params
+    exp_params = module_from_path('exp_params', args.exp_params)
     results_dir = exp_params.RESULTS_DIR
     exp_name = exp_params.EXP_NAME
     class_attr = exp_params.CLASS_ATTR
@@ -35,4 +49,4 @@ if __name__ == '__main__':
                                          f_weights_handle=classifier_weights_handle)
 
     # save classification results
-    save_object(classification_results, results_dir + '_'.join([ds.name, exp_name, 'classification_results.pickle']))
+    save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, 'classification_results.pickle'])))

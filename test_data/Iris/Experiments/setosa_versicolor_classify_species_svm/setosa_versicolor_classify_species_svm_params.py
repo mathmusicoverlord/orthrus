@@ -16,22 +16,19 @@ from sklearn.model_selection import KFold
 EXP_NAME = 'setosa_versicolor_classify_species_svm'
 
 # set working directories
-PROJ_DIR = os.getcwd().replace('\\','/').replace('Scripts', '').rstrip('/') + '/' # <--- put your absolute path
-DATA_DIR = PROJ_DIR + 'Data/'
-EXP_DIR = PROJ_DIR + 'Experiments/' + EXP_NAME + '/'
-RESULTS_DIR = EXP_DIR + 'Results/'
+PROJ_DIR = os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris') # <--- put your absolute path
+DATA_DIR = os.path.join(PROJ_DIR, 'Data')
+EXP_DIR = os.path.join(PROJ_DIR, 'Experiments', EXP_NAME)
+RESULTS_DIR = os.path.join(EXP_DIR, 'Results')
 
 # generate figures directory by date
 dt = datetime.datetime.now()
 dt = datetime.date(dt.year, dt.month, dt.day)
-FIG_DIR = EXP_DIR + 'Figures/' + dt.__str__() + '/'
-try:
-	os.mkdir(FIG_DIR.rstrip('/'))
-except Exception:
-	pass
+FIG_DIR = os.path.join(EXP_DIR, 'Figures', dt.__str__())
+os.makedirs(FIG_DIR, exist_ok=True)
 
 # load dataset
-DATASET = load_dataset(DATA_DIR + 'iris.ds')
+DATASET = load_dataset(os.path.join(DATA_DIR, 'iris.ds'))
 DATASET.path = FIG_DIR
 
 # restrict samples

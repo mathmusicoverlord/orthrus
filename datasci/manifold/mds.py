@@ -58,8 +58,9 @@ class MDS(BaseEstimator):
         :py:attr:`MDS.embedding_`
 
         Args:
-            X (array-like of shape (n_samples, n_samples)): An array representing the distances between samples.
-                Should be a symmetric non-negative matrix.
+            X (array-like of shape (n_samples, n_samples) or (n_samples, n_features)): An array representing the
+                distances between samples. Should be a symmetric non-negative matrix, but if not euclidean l2
+                will be used between samples.
             y (Ignored):
 
         Returns:
@@ -82,7 +83,10 @@ class MDS(BaseEstimator):
         # check dimensions
         m, n = X.shape
         if m != n:
-            raise ValueError("Input must be a square symmetric matrix representing distances")
+            print("Input must be a square symmetric matrix representing distances, using Euclidean distance instead.")
+            D = X[None, :, :] - X[:, None, :]
+            D = tc.square(D)
+            X = tc.sqrt(tc.sum(D, dim=2)).reshape((m, m))
 
         # compute square distances
         X = tc.pow(X, 2)
