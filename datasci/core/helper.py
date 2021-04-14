@@ -765,7 +765,7 @@ def generate_experiment(name: str, proj_dir: str):
         exps_dir = os.path.join(proj_dir, 'Experiments')
     else:
         exps_dir = os.path.abspath(proj_dir)
-        proj_dir = os.path.dirname(exps_dir)
+        proj_dir = os.path.abspath(os.path.dirname(exps_dir))
     exp_dir = os.path.join(exps_dir, name)
     os.makedirs(exps_dir, exist_ok=True)
     os.makedirs(exp_dir, exist_ok=True)
