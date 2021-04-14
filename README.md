@@ -18,7 +18,7 @@ Install the package with ```pip```
 ```bash
 pip install -e .
 ```
-Finally add ```DATASCI_PATH=/path/to/your/DataSci/repo``` to your environment variables (different for each OS).
+Finally add ```DATASCI_PATH=/path/to/DataSci/``` to your environment variables (different for each OS).
 
 ## Basic Usage
 The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/datasci.core.html#datasci.core.dataset.DataSet) class to create an instance from within the DataSci directory:
