@@ -1031,6 +1031,7 @@ class DataSet:
             split = eval("partitioner" + "." + split_handle)
             group = kwargs.get('group', None)
             if group is None:
+                groups = y
                 splits = split(X, y)
             else:
                 try:
@@ -1059,7 +1060,7 @@ class DataSet:
 
         # loop over splits
         try:
-            n_splits = partitioner.get_n_splits()
+            n_splits = partitioner.get_n_splits(groups=groups)
         except AttributeError:
             n_splits = len(splits)
         for i, (train_index, test_index) in enumerate(splits):
