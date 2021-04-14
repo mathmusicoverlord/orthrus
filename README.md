@@ -14,11 +14,12 @@ To install the DataSci package first activate the DataSci environment and then n
 conda activate DataSci
 cd /path/to/DataSci/
 ```
-Finally install the package with ```pip```
+Install the package with ```pip```
 ```bash
 pip install -e .
-
 ```
+Finally add ```DATASCI_PATH=/path/to/DataSci/``` to your environment variables (different for each OS).
+
 ## Basic Usage
 The fundamental object in the DataSci package is the DataSet class. Here is an example of loading the iris dataset into the [DataSet](https://ekehoe32.github.io/DataSci/rst/datasci.core.html#datasci.core.dataset.DataSet) class to create an instance from within the DataSci directory:
 
