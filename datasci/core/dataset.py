@@ -1059,7 +1059,7 @@ class DataSet:
 
         # loop over splits
         try:
-            n_splits = partitioner.get_n_splits
+            n_splits = partitioner.get_n_splits()
         except AttributeError:
             n_splits = len(splits)
         for i, (train_index, test_index) in enumerate(splits):
