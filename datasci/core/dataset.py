@@ -295,18 +295,16 @@ class DataSet:
             title = 'Visualization of data set ' + self.name + ' using\n' \
                     + viz_name + ' with labels given by ' + attr
             if save_name is None:
-                save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
-                    normalization_method) + '_' + str(attr) + '_' + str(dim)
+                save_name = os.path.join(self.path, '_'.join([self.name, viz_name, str(imputation_method), str(normalization_method), str(attr), str(dim)]))
             else:
-                save_name = self.path + save_name
+                save_name = os.path.join(self.path, save_name)
         else:
             title = 'Visualization of data set ' + self.name + ' using\n' \
                     + viz_name + ' with labels given by ' + attr + ' and ' + cross_attr
             if save_name is None:
-                save_name = self.path + self.name + '_' + viz_name + '_' + str(imputation_method) + '_' + str(
-                    normalization_method) + '_' + str(attr) + '_' + str(cross_attr) + '_' + str(dim)
+                save_name = os.path.join(self.path, '_'.join([self.name, viz_name, str(imputation_method), str(normalization_method), str(attr),  str(cross_attr), str(dim)]))
             else:
-                save_name = self.path + save_name
+                save_name = os.path.join(self.path, save_name)
 
         if not save:
             save_name = None
@@ -1061,7 +1059,7 @@ class DataSet:
 
         # loop over splits
         try:
-            n_splits = partitioner.n_splits
+            n_splits = partitioner.get_n_splits
         except AttributeError:
             n_splits = len(splits)
         for i, (train_index, test_index) in enumerate(splits):

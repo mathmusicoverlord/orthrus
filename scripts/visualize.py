@@ -28,6 +28,12 @@ if __name__ == '__main__':
                         choices=[2, 3],
                         help='Dimension of embedding.')
 
+    parser.add_argument('--backend',
+                        type=str,
+                        default='pyplot',
+                        choices=['plotly', 'pyplot'],
+                        help='Dimension of embedding.')
+
     args = parser.parse_args()
 
     # imports for script
@@ -57,18 +63,20 @@ if __name__ == '__main__':
     elif args.embedding == 'mds':
         embedding = MDS(n_components=dim)
 
+    # get backend info
+    if args.backend == 'pyplot':
+        backend = 'pyplot'
+        backend_args = dict(palette='bright', alpha=.7, mrkr_list=['o'], s=200)
+    elif args.backend == 'plotly':
+        backend = 'plotly'
+        backend_args = dict(figsize=(1500, 1000))
+
     # visualize data
-    backend = 'pyplot'
-    figsize_plotly = (1500, 1000)
-    palette_pyplot = 'bright'
     ds.visualize(embedding=embedding,
                  sample_ids=sample_ids,
                  attr=class_attr,
                  backend=backend,
-                 palette='bright',
-                 alpha=.7,
-                 mrkr_list=['o'],
                  subtitle='', # <--- default show normalization and imputation methods used
-                 s=200,
                  save=True,
-                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr]))
+                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr]),
+                 **backend_args)
