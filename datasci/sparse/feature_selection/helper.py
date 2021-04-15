@@ -97,20 +97,20 @@ def reduce_feature_set_size(ds,
                         append_to_meta=False,
                         )
             >>> features_df = results['f_results']
-            >>> ranking_method_args = {'attr': 'frequency'}
-            >>> ranked_order =  rank_features_by_attribute(features_df, ranking_method_args)
-                    def model_factory():
-            >>> return svm.LinearSVC(dual=False)
+
+            >>> def model_factory():
+                    return svm.LinearSVC(dual=False)
 
             >>> bsr = sklearn.metrics.balanced_accuracy_score
 
-            >>> features = result['f_results']
-
             >>> ranking_method_args = {'attr': 'frequency'}
+
             >>> partitioner = KFold(n_splits=5, shuffle=True, random_state=0)
+
             >>> import datasci.sparse.feature_selection.helper as fhelper
+
             >>> reduced_feature_results = fhelper.reduce_feature_set_size(x, 
-                                    features, 
+                                    features_df, 
                                     sample_ids_training,
                                     attrname,
                                     model_factory, 
@@ -118,7 +118,6 @@ def reduce_feature_set_size(ds,
                                     fhelper.rank_features_by_attribute,
                                     ranking_method_args,
                                     test_sample_ids=sample_ids_validation,
-                                    #partitioner=partitioner,
                                     start = 5, 
                                     end = 100, 
                                     jump = 1)
