@@ -118,7 +118,7 @@ def scatter_pyplot(df: pd.DataFrame,
         df[grp_mrkrs] = ''
 
     # get dtypes of attrs
-    color_type = pd.api.types.infer_dtype(df[grp_colors])
+    color_type = pd.api.types.infer_dtype(df.loc[~df[grp_colors].isna(), grp_colors])
     mrkr_type = pd.api.types.infer_dtype(df[grp_mrkrs])
 
     if color_type != 'floating' and mrkr_type != 'floating':
@@ -389,7 +389,10 @@ def scatter_pyplot(df: pd.DataFrame,
         ax.set_zlabel(ax.get_zlabel(), fontsize=18)
     except AttributeError:
         pass
-    lg.get_title().set_fontsize(18)
+    try:
+        lg.get_title().set_fontsize(18)
+    except UnboundLocalError:
+        pass
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.rc('legend', **{'fontsize': 16})
