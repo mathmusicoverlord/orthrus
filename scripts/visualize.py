@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--dim',
                         type=int,
                         default=2,
-                        choices=[2, 3],
+                        choices=[1, 2, 3],
                         help='Dimension of embedding.')
 
     parser.add_argument('--backend',
@@ -48,8 +48,11 @@ if __name__ == '__main__':
     class_attr = exp_params.CLASS_ATTR
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
+    feature_ids = exp_params.FEATURE_IDS
 
     # grab dimension
+    if args.dim == 1:
+        dim = 1
     if args.dim == 2:
         dim = 2
     elif args.dim == 3:
@@ -74,6 +77,7 @@ if __name__ == '__main__':
     # visualize data
     ds.visualize(embedding=embedding,
                  sample_ids=sample_ids,
+                 feature_ids=feature_ids,
                  attr=class_attr,
                  backend=backend,
                  subtitle='', # <--- default show normalization and imputation methods used
