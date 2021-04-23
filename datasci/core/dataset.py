@@ -1031,15 +1031,17 @@ class DataSet:
         else:
             split = eval("partitioner" + "." + split_handle)
             group = kwargs.get('group', None)
+
             if group is None:
-                groups = y
-                splits = split(X, y)
+                groups = ds.data.index
             else:
-                try:
-                    groups = ds.metadata[group].values
-                    splits = split(X, y, groups=groups)
-                except TypeError:
-                    splits = split(X, y)
+                groups = ds.metadata[group].values
+                
+            try:
+                splits = split(X, y, groups=groups)
+            except AttributeError:
+                splits = split(X, y)
+
             try:
                 _ = (e for e in splits)
             except TypeError:
@@ -1121,7 +1123,7 @@ class DataSet:
             # append feature results
             if not (f_weights_handle is None):
                 f_weights_name = method_name + "_f_weights_" + str(i)
-                f_weights = eval("classifier" + "." + f_weights_handle)
+                f_weights = eval("classifier" + "." + f_weights_handle).reshape(-1)
                 f_weight_results[f_weights_name] = np.nan
                 f_weight_results.loc[feature_ids, f_weights_name] = pd.Series(index=feature_ids, data=f_weights)
                 if not (f_rnk_func is None):
