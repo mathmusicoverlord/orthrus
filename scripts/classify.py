@@ -1,5 +1,5 @@
 """
-Generic script for visualizing a dataset.
+Generic script for classifying a dataset.
 """
 
 if __name__ == '__main__':
