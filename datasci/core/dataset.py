@@ -105,6 +105,7 @@ class DataSet:
         if vardata is None:
             self.vardata = pd.DataFrame(index=self.data.columns)
         else:
+            self.vardata = vardata
             try:
                 # restrict vardata to data
                 var_index = vardata.index.intersection(self.data.transpose().index)
@@ -1046,7 +1047,7 @@ class DataSet:
         sample_ids = ds.data.index
         feature_ids = ds.vardata.index
         X = ds.data.values
-        y = ds.metadata[attr].values
+        y = ds.metadata[attr].infer_objects().values
 
         # TODO: Fix sample_ids for passing to numpy array
         if partitioner is None:
@@ -1325,7 +1326,7 @@ class DataSet:
         sample_ids = ds.data.index
         feature_ids = ds.vardata.index
         X = ds.data.values
-        y = ds.metadata[attr].values
+        y = ds.metadata[attr].infer_objects().values
 
         # set returns
         f_weight_results = pd.DataFrame(index=self.vardata.index)
