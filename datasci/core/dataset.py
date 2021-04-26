@@ -89,12 +89,12 @@ class DataSet:
         try:
             meta_index = self.metadata.index.intersection(self.data.index)
             missing_data_index = self.data.index.drop(meta_index)
-            missing_data = pd.DataFrame(index=missing_data_index)
+            missing_data = pd.DataFrame(index=missing_data_index, columns=self.metadata.columns)
         except AttributeError:
             data_index = self.data.index.to_pandas()
             meta_index = self.metadata.index.to_pandas().intersection(data_index)
             missing_data_index = data_index.drop(meta_index)
-            missing_data = self.metadata.__class__(index=missing_data_index)
+            missing_data = self.metadata.__class__(index=missing_data_index, columns=self.metadata.columns)
 
         self.metadata = self.metadata.loc[meta_index].append(missing_data)
 
@@ -109,13 +109,13 @@ class DataSet:
                 # restrict vardata to data
                 var_index = vardata.index.intersection(self.data.transpose().index)
                 missing_data_index = self.data.transpose().index.drop(var_index)
-                missing_data = pd.DataFrame(index=missing_data_index)
+                missing_data = pd.DataFrame(index=missing_data_index, columns=self.vardata.columns)
             except AttributeError:
                 # restrict vardata to data
                 data_index = self.data.transpose().index.to_pandas()
                 var_index = vardata.index.to_pandas().intersection(data_index)
                 missing_data_index = data_index.drop(var_index)
-                missing_data = self.data.__class__(index=missing_data_index)
+                missing_data = self.data.__class__(index=missing_data_index, columns=self.vardata.columns)
 
             self.vardata = vardata.loc[var_index].append(missing_data)
             self.vardata = self.vardata.loc[self.data.columns]
@@ -139,6 +139,17 @@ class DataSet:
             # sort data and dissimilarity matrix to be in same order
             self.dissimilarity_matrix = self.dissimilarity_matrix.loc[self.data.index, self.data.index.to_list()]
 
+            # convert index and column names to string
+            self.dissimilarity_matrix.index = self.dissimilarity_matrix.index.astype(str)
+            self.dissimilarity_matrix.columns = self.dissimilarity_matrix.columns.astype(str)
+
+        # convert all indices and column names to string to avoid integer slicing issues
+        self.data.index = self.data.index.astype(str)
+        self.metadata.index = self.metadata.index.astype(str)
+        self.vardata.index = self.vardata.index.astype(str)
+        self.data.columns = self.data.columns.astype(str)
+        self.metadata.columns = self.metadata.columns.astype(str)
+        self.vardata.columns = self.vardata.columns.astype(str)
 
     def visualize(self, embedding,
                   attr: str,
