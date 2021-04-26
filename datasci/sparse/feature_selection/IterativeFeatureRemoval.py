@@ -514,7 +514,7 @@ class IFR:
         #second row of plots
 
         #first plot shows the histogram of number of iterations
-        num_iterations = [len(x)-1 for x in self.diagnostic_information_['true_feature_count']]
+        num_iterations = np.array([len(x) for x in self.diagnostic_information_['true_feature_count']])
         axs[1][0].hist(num_iterations)
         axs[1][0].set_ylabel('Frequency')
         axs[1][0].set_xlabel('# Iterations per fold')

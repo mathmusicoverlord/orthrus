@@ -1,5 +1,6 @@
 import numpy as np
-
+import sys
+import pandas as pd
 def reduce_feature_set_size(ds, 
                             features_dataframe, 
                             sample_ids,
@@ -206,6 +207,9 @@ def rank_features_by_attribute(features_df, args):
                     'attr' (Mandatory): Attribute/ Column name in the features_df to rank the features on
                     'order': Whether to rank in ascending or descending order. 'asc' for ascending and 'desc' for descending.
                              (defaul: 'desc') 
+                    'feature_ids' (list-like): To limit the ranking within certain features. List of indicators for the features to use. 
+                            e.g. [True, False, True], ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. 
+                            Default: None which corresponds to using all features.
           
     Return:
         array of sorted features (index of features_df) 
@@ -236,8 +240,9 @@ def rank_features_by_attribute(features_df, args):
     """
     #create an array whose first column is feature indices and 
     #second column is values of the "attr" 
-    indices = features_df.index.values.reshape(-1, 1)
-    f = features_df[args['attr']].values.reshape(-1,1)
+    indices = args.get('feature_ids', features_df.index.values)
+    f = features_df[args['attr']].loc[indices].values.reshape(-1,1)
+    indices = np.array(indices).reshape(-1, 1)
     feature_array = np.hstack((indices, f))
 
     order=args.get('order', 'desc')
@@ -249,3 +254,144 @@ def rank_features_by_attribute(features_df, args):
         raise ValueError('%s is an incorrect value for rank "order" in args. It should "asc" for ascending or "desc" for descending.'%order)
     
     return feature_array[:, 0]
+
+
+def rank_features_by_mean_attribute_value(features_df, args):
+    """
+    CHECK THIS BEFORE COMMITING
+    This method takes a features dataframe as input and ranks them based on a column/attribute which contains numerical data.  
+
+    Parameters:
+        features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
+                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+
+        args (dict): This dictionary contains variables to determine which attribute to rank feature on and the
+                    order of ranking. Check details for various key and values below:
+                    'attr' (Mandatory): Attribute/ Column name in the features_df to rank the features on
+                    'order': Whether to rank in ascending or descending order. 'asc' for ascending and 'desc' for descending.
+                             (defaul: 'desc')
+                    'feature_ids' (list-like): To limit the ranking within certain features. List of indicators for the features to use. 
+                            e.g. [True, False, True], ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. 
+                            Default: None which corresponds to using all features.
+                    'method': which operation to perform. Can be "mean" or "median". (Default: "mean")
+          
+    Return:
+        array of sorted features (index of features_df) 
+
+    Examples:
+            >>> import datasci.core.dataset as DS
+            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            
+            >>> x = DS.load_dataset(file_path)
+            >>> ifr = IFR.IFR(
+                verbosity = 2,
+                nfolds = 4,
+                repetition = 500,
+                cutoff = .6,
+                jumpratio = 5,
+                max_iters = 100,
+                max_features_per_iter_ratio = 2
+                )
+            >>> result = x.feature_select(ifr,
+                        attrname,
+                        selector_name='IFR',
+                        f_results_handle='results',
+                        append_to_meta=False,
+                        )
+            >>> features_df = results['f_results']
+            >>> ranking_method_args = {'attr': 'frequency'}
+            >>> ranked_order =  rank_features_by_attribute(features_df, ranking_method_args)
+    """
+    #create an array whose first column is feature indices and 
+    #second column is values of the "attr" 
+    indices = args.get('feature_ids', features_df.index.values)
+    
+    #get values
+    values = features_df[args['attr']].loc[indices].values
+    method = args.get('method', 'mean')
+
+    if method == 'mean':
+        #get means
+        processed_values = np.array([np.mean(np.array(x)) for x in values ]).reshape(-1, 1)
+    else:
+        processed_values = np.array([np.median(np.array(x)) for x in values ]).reshape(-1, 1)
+    
+    #get indices where values is not nan
+    idx = np.where(np.isnan(processed_values) == False)[0]
+    
+    indices = np.array(indices).reshape(-1, 1)
+    feature_array = np.hstack((indices, processed_values))
+    feature_array = feature_array[idx, :]
+
+    order=args.get('order', 'desc')
+    if order=='desc':
+        feature_array = feature_array[feature_array[:,1].argsort()[::-1]]
+    elif order=='asc':
+        feature_array = feature_array[feature_array[:,1].argsort()]
+    else:
+        raise ValueError('%s is an incorrect value for rank "order" in args. It should "asc" for ascending or "desc" for descending.'%order)
+    
+    return feature_array[:, 0]
+
+
+def rank_features_within_attribute_class(features_df, 
+                                    feature_class_attribute, 
+                                    new_feature_attribute_name,
+                                    x, 
+                                    partitioner, 
+                                    sample_ids,
+                                    scorer,
+                                    classification_attr,
+                                    classifier_factory_method,
+                                    f_weights_handle,
+                                    feature_ids = None,
+                                    **kwargs):
+    features_df[new_feature_attribute_name] = 0
+
+    #get ranked features
+    # args = {'attr': feature_class_attribute}
+    # if feature_ids is not None:
+    #     args['feature_ids'] = feature_ids
+    # ranked_features = rank_features_by_attribute(features_df, args)
+
+    if feature_ids is None:
+        feature_ids = features_df.index
+    #get unique values (classes) for the attributes
+    unique_attr_values = np.unique(features_df[feature_class_attribute].loc[feature_ids].values)
+    unique_attr_values = np.sort(unique_attr_values)[::-1]
+    for val in unique_attr_values:
+        features = features_df[feature_class_attribute] == val
+        if features.sum() != 1:    
+
+            #train model on the features for the current class
+            classififer = classifier_factory_method()
+            results = x.classify(classififer,
+                        classification_attr,
+                        feature_ids=features,
+                        sample_ids=sample_ids,
+                        partitioner=partitioner,
+                        scorer=scorer,
+                        f_weights_handle = f_weights_handle)
+
+            #extract mean of absolute weights for features
+            weights_keys = results['f_weights'].keys()
+            filtered_keys = [k for k in weights_keys if 'weights' in k]            
+            weights = results['f_weights'][filtered_keys].values
+            mean_of_abs_weights = np.mean(np.abs(weights), axis=1)
+
+            #normalize features between 0 and 1
+            
+            b = .999
+            a = .001
+            r_max = np.max(mean_of_abs_weights)
+            r_min = np.min(mean_of_abs_weights)
+            mean_of_abs_weights = (b-a) * (mean_of_abs_weights - r_min) / (r_max - r_min) + a
+            mean_of_abs_weights = val + mean_of_abs_weights
+        else:
+            mean_of_abs_weights = val
+            
+        features_df.loc[features, new_feature_attribute_name] = mean_of_abs_weights
+
+
+        
+
