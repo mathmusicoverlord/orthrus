@@ -282,7 +282,8 @@ class DataSet:
             metadata = metadata[[attr, cross_attr]]
 
         # replace nan values
-        metadata = deepcopy(metadata.fillna('nan'))
+        metadata = deepcopy(metadata)
+        #metadata = deepcopy(metadata.fillna('nan'))
 
         # create common dataframe
         df = data_trans
