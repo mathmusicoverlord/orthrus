@@ -48,6 +48,8 @@ class KFLIFR(BaseEstimator):
         sort_freq_classes (bool): If ``True`` the algorithm will sort frequency classes of feature by the mean of
             normalized weight across a LOSO experiment— providing a unique ranking. The default is ``False``.
 
+        imputer (object): Optional imputer to impute training set values with.
+
     Attributes:
         results_ (DataFrame): Outputs the feature frequencies and rankings for each fold provided by the
             k-fold partition defined by :py:attr:`KFLIFR.n_splits_kfold` and :py:attr:`KFLIFR.random_state_kfold`, or
@@ -63,7 +65,8 @@ class KFLIFR(BaseEstimator):
                  gamma: float = .01,
                  n_top_features: int = None,
                  jump_ratio: float = None,
-                 sort_freq_classes=False):
+                 sort_freq_classes=False,
+                 imputer = None):
 
         # set parameters
         self.classifier = classifier
@@ -109,8 +112,12 @@ class KFLIFR(BaseEstimator):
             splits = self.train_test_splits
         for i, (kf_train_index, kf_test_index) in enumerate(splits):
             print("Starting fold " + str(i) + "...")
-            Xi_train = X[kf_train_index, :]; yi_train = y[kf_train_index]
-            Xi_test = X[kf_test_index, :]; yi_test = y[kf_test_index]
+            if self.imputer is None:
+                Xi_train = X[kf_train_index, :]
+            else:
+                Xi_train = self.imputer.fit_transform(X[kf_train_index, :])
+
+            yi_train = y[kf_train_index]
 
             # intialize feature set
             Si = pd.DataFrame(index=St, columns=np.arange(Xi_train.shape[0])).fillna(False).astype(bool)
