@@ -115,6 +115,7 @@ class KFLIFR(BaseEstimator):
             if self.imputer is None:
                 Xi_train = X[kf_train_index, :]
             else:
+                print("Imputing...")
                 Xi_train = self.imputer.fit_transform(X[kf_train_index, :])
 
             yi_train = y[kf_train_index]
