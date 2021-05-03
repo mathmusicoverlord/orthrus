@@ -189,7 +189,7 @@ class KFSIFR(BaseEstimator):
                     print("Feature set size = " + str(Sij.size))
 
                     # check threshold condition
-                    if score < self.gamma:
+                    if bsr < self.gamma:
                         break
 
                 # set selected features
