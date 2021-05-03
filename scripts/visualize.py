@@ -41,6 +41,7 @@ if __name__ == '__main__':
     from umap import UMAP
     from datasci.manifold.mds import MDS
     from datasci.core.helper import module_from_path
+    import pandas as pd
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
@@ -69,7 +70,11 @@ if __name__ == '__main__':
     # get backend info
     if args.backend == 'pyplot':
         backend = 'pyplot'
-        backend_args = dict(palette='bright', alpha=.7, mrkr_list=['o'], s=200)
+        if pd.api.types.infer_dtype(ds.metadata[class_attr]) == 'floating':
+            palette = 'viridis'
+        else:
+            palette = 'bright'
+        backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
     elif args.backend == 'plotly':
         backend = 'plotly'
         backend_args = dict(figsize=(1500, 1000))
@@ -82,5 +87,5 @@ if __name__ == '__main__':
                  backend=backend,
                  subtitle='', # <--- default show normalization and imputation methods used
                  save=True,
-                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr]),
+                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()]),
                  **backend_args)
