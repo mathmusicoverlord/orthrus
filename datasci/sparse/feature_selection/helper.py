@@ -240,7 +240,10 @@ def rank_features_by_attribute(features_df, args):
     """
     #create an array whose first column is feature indices and 
     #second column is values of the "attr" 
-    indices = args.get('feature_ids', features_df.index.values)
+    if args.get('feature_ids', None) is not None:
+        indices = features_df.loc[args['feature_ids']].index.values
+    else:
+        indices = features_df.index.values
     f = features_df[args['attr']].loc[indices].values.reshape(-1,1)
     indices = np.array(indices).reshape(-1, 1)
     feature_array = np.hstack((indices, f))
@@ -304,7 +307,10 @@ def rank_features_by_mean_attribute_value(features_df, args):
     """
     #create an array whose first column is feature indices and 
     #second column is values of the "attr" 
-    indices = args.get('feature_ids', features_df.index.values)
+    if args.get('feature_ids', None) is not None:
+        indices = features_df.loc[args['feature_ids']].index.values
+    else:
+        indices = features_df.index.values
     
     #get values
     values = features_df[args['attr']].loc[indices].values

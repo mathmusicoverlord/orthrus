@@ -7,5 +7,5 @@ class TrainTestPartitioner():
         self.train_idx = train_idx
         self.test_idx = test_idx
 
-    def split(self, X, y):
+    def split(self, X=None, y=None):
         return [[self.train_idx, self.test_idx]]
