@@ -108,7 +108,7 @@ if __name__ == '__main__':
                                           **backend_args)
 
             prev_embedding = prev_embedding.embedding_
-            mds = MDS(n_components=2, prev_embedding=prev_embedding)
+            embedding = MDS(n_components=2, prev_embedding=prev_embedding)
             plt.close()
 
     # grab images and sort them
@@ -119,7 +119,8 @@ if __name__ == '__main__':
     frame = cv2.imread(os.path.join(video_dir, images[0]))
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
+    video = cv2.VideoWriter(os.path.join(video_dir, 'movie.mp4'),
+                            cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
 
     for image in images:
         video.write(cv2.imread(os.path.join(video_dir, image)))
