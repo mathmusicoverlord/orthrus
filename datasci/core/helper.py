@@ -51,6 +51,7 @@ def scatter_pyplot(df: pd.DataFrame,
                    figsize: tuple = (14, 10),
                    no_axes: bool = False,
                    save_name: str = None,
+                   block=True,
                    **kwargs):
     """
     This function uses matplotlib's pyplot to plot the numerical columns of a pandas dataframe against its categorical
@@ -82,6 +83,9 @@ def scatter_pyplot(df: pd.DataFrame,
         no_axes (bool): Flag indicating whether or not to show the axes in the plot.
 
         save_name (str): The path of where to save the figure. If not given the figure will not be saved.
+
+        block (bool): Passed to pyplot's show function. If True the user must close the pervious plot before
+            another plot will appear.
 
         kwargs (dict): All keyword arguments are passed to ``matplotlib.axes.Axes.update()`` if :py:attr:`dim` = 2
             or ``mpl_toolkits.mplot3d.axes3d.Axes3D.update()`` if :py:attr:`dim` = 3.
@@ -396,7 +400,7 @@ def scatter_pyplot(df: pd.DataFrame,
     if not (save_name is None):
         plt.savefig(fname=save_name + '.png', format='png')
     plt.rc('legend', **{'fontsize': 16})
-    plt.show()
+    plt.show(block=block)
 
 def scatter_plotly(df: pd.DataFrame,
                    dim: int,
