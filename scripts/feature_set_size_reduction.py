@@ -44,10 +44,10 @@ if __name__ == '__main__':
         feature_selection_result = load_object(file_path=os.path.join(results_dir, feauture_selection_results_file_name))
         features = feature_selection_result['f_results']
         try:
-                sample_ids_validation = exp_params.SAMPLE_IDS_VALIDATION
+            sample_ids_validation = exp_params.SAMPLE_IDS_VALIDATION
         except AttributeError as e:
-                print('sample_ids_validation not defined in the params file. Using sample_ids_validation = sample_ids instead.')
-                sample_ids_validation = sample_ids
+            print('sample_ids_validation not defined in the params file. Using sample_ids_validation = sample_ids instead.')
+            sample_ids_validation = sample_ids
 
         reduced_feature_results = fhelper.reduce_feature_set_size(ds, 
                                 features, 
