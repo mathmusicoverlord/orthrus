@@ -3,6 +3,7 @@ This module contains methods related to general data decompositions outside of t
 """
 import torch as tc
 import numpy as np
+from numpy import ndarray
 from sklearn.base import BaseEstimator
 
 class OrthTransform(BaseEstimator):
@@ -104,3 +105,44 @@ class OrthTransform(BaseEstimator):
         self.fit(X, y)
 
         return deepcopy(self.coordinates_)
+
+def align_embedding(prev_embedding: ndarray):
+    """
+    This class decorator with parameters attempts to align embedding coordinates to a previous embeddings coordinates by
+    editing the fit_transform method of the class responsible for the embedding. This is useful for continuity in
+    visualizations over time.
+
+    Args:
+        prev_embedding: Previous embedding to align to.
+
+    Returns:
+        method: Method which transforms classes fit_transform method to align to the previous embedding.
+    """
+
+    def adjust_class(cls):
+
+        def fit_transform(X, y=None):
+            embedding = cls.fit_transform(X, y)
+
+            # check for the same shape
+            if embedding.shape != prev_embedding.shape:
+                raise ValueError("Embeddings must have the same shape!")
+
+            n_components = embedding.shape[1]
+            embedding_norm = np.linalg.norm(embedding, axis=0).reshape((1, n_components))
+            prev_embedding_norm = np.linalg.norm(prev_embedding, axis=0).reshape((1, n_components))
+            cosines = np.matmul((embedding / embedding_norm).transpose(), prev_embedding / prev_embedding_norm)
+            ids = np.abs(cosines).argmax(axis=1)
+            signs = np.sign(np.array([cosines[i, ids[i]] for i in range(n_components)]))
+            if np.unique(ids).size == ids.size:
+                embedding[:, ids] = embedding * signs.reshape((1, n_components))
+            else:
+                print("Could not orient to previous embedding!")
+
+            return embedding
+
+        cls.fit_transform = fit_transform
+
+        return cls
+
+    return adjust_class
