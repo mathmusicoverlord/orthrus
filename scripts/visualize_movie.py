@@ -20,8 +20,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--embedding',
                         type=str,
-                        default='pca',
-                        choices=['pca', 'mds'],
+                        default='mds',
+                        choices=['mds'],
                         help='Method used to embed the data.')
 
     parser.add_argument('--dim',
@@ -48,8 +48,6 @@ if __name__ == '__main__':
     from umap import UMAP
     from datasci.manifold.mds import MDS
     from datasci.core.helper import module_from_path
-    from datasci.decomposition.general import align_embedding
-    from copy import deepcopy
     import pandas as pd
 
     # set experiment parameters
@@ -57,7 +55,6 @@ if __name__ == '__main__':
     fig_dir = exp_params.FIG_DIR
     exp_name = exp_params.EXP_NAME
     class_attr = exp_params.CLASS_ATTR
-    cross_attr = exp_params.CROSS_ATTR
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
     feature_ids = exp_params.FEATURE_IDS # should be a list of ranked features (most important -> least important)
@@ -83,10 +80,7 @@ if __name__ == '__main__':
         palette = 'viridis'
     else:
         palette = 'bright'
-    if cross_attr is None:
-        backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
-    else:
-        backend_args = dict(palette=palette, alpha=.7, s=200)
+    backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
 
     # generate video directory
     video_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
@@ -96,27 +90,25 @@ if __name__ == '__main__':
 
     # generate frames
     frame_number = 0
-    adjusted_embedding = deepcopy(embedding)
     for num_features in range(0, len(feature_ids), args.increment):
 
         # check the number of features is above the dimension
         if num_features > args.dim:
             frame_number = frame_number + 1
             print(r"Generating frame number %d..." % (frame_number,))
-
             # visualize data
-            _, embedding_vals = ds.visualize(embedding=adjusted_embedding,
-                                             sample_ids=sample_ids,
-                                             feature_ids=feature_ids[:num_features],
-                                             attr=class_attr,
-                                             cross_attr=cross_attr,
-                                             subtitle=r'# Features = %d' % (num_features,),
-                                             save=True,
-                                             save_name=str(frame_number),
-                                             block=False,
-                                             **backend_args)
+            prev_embedding = ds.visualize(embedding=embedding,
+                                          sample_ids=sample_ids,
+                                          feature_ids=feature_ids[:num_features],
+                                          attr=class_attr,
+                                          subtitle=r'# Features = %d' % (num_features,), # <--- default show normalization and imputation methods used
+                                          save=True,
+                                          save_name=str(frame_number),
+                                          block=False,
+                                          **backend_args)
 
-            adjusted_embedding = (align_embedding(embedding_vals))(deepcopy(embedding))
+            prev_embedding = prev_embedding.embedding_
+            mds = MDS(n_components=2, prev_embedding=prev_embedding)
             plt.close()
 
     # grab images and sort them
@@ -127,8 +119,7 @@ if __name__ == '__main__':
     frame = cv2.imread(os.path.join(video_dir, images[0]))
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(os.path.join(video_dir, 'movie.mp4'),
-                            cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
+    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
 
     for image in images:
         video.write(cv2.imread(os.path.join(video_dir, image)))
