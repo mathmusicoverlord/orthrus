@@ -5,6 +5,7 @@ import torch as tc
 import numpy as np
 from numpy import ndarray
 from sklearn.base import BaseEstimator
+from copy import copy, deepcopy
 
 class OrthTransform(BaseEstimator):
     """
@@ -121,8 +122,11 @@ def align_embedding(prev_embedding: ndarray):
 
     def adjust_class(cls):
 
+        # copy the original method
+        cls._fit_transform = copy(cls.fit_transform)
+
         def fit_transform(X, y=None):
-            embedding = cls.fit_transform(X, y)
+            embedding = cls._fit_transform(X, y)
 
             # check for the same shape
             if embedding.shape != prev_embedding.shape:
