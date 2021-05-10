@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # grab embedding
     if args.embedding == 'umap':
-        embedding = UMAP(n_components=dim)
+        embedding = UMAP(n_components=dim, n_neighbors=30)
     elif args.embedding == 'pca':
         embedding = PCA(n_components=dim, whiten=True, random_state=0)
     elif args.embedding == 'mds':
