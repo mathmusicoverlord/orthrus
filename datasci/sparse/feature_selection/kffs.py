@@ -25,6 +25,8 @@ class KFFS(BaseEstimator):
         f_rnk_func (object): Function to be applied to feature weights for feature ranking. Default is None, and the
             features will be ranked in from least to greatest.
 
+        training_ids (list): Optional list of training ids, to restrict feature selection further.
+
         random_state (int): Random state to generate k-fold partitions. Default is 0.
 
     Attributes:
@@ -33,7 +35,7 @@ class KFFS(BaseEstimator):
         results_ (ndarray): Contains the feature weights and ranks for each fold, and the final rankings.
     """
 
-    def __init__(self, k=5, n=10, classifier=None, f_weights_handle=None, f_rnk_func=None, random_state=0):
+    def __init__(self, k=5, n=10, classifier=None, f_weights_handle=None, f_rnk_func=None, training_ids=None, random_state=0):
 
         # set parameters
         self.k = k
@@ -42,6 +44,7 @@ class KFFS(BaseEstimator):
         self.random_state = random_state
         self.f_weights_handle = f_weights_handle
         self.f_rnk_func = f_rnk_func
+        self.training_ids = training_ids
 
         # set attributes
         self.classifiers_ = pd.Series()
@@ -59,9 +62,17 @@ class KFFS(BaseEstimator):
             inplace method. Results are stored in :py:attr:`KFFS.classifiers_`, :py:attr:`KFFS.ranks_`, and :py:attr:`KFFS.results_`.
         '''
 
+        # restrict to training samples
+        if self.training_ids is not None:
+            X_r = X[self.training_ids, :]
+            y_r = y[self.training_ids]
+        else:
+            X_r = X
+            y_r = y
+
         # generate splits
         kfold = KFold(n_splits=self.k, shuffle=True, random_state=self.random_state)
-        splits = kfold.split(X, y)
+        splits = kfold.split(X_r, y_r)
 
         # set returns
         feature_index = np.arange(0, np.shape(X)[1])
@@ -70,8 +81,8 @@ class KFFS(BaseEstimator):
 
         # loop over splits
         for i, (train_index, test_index) in enumerate(splits):
-            X_train = X[train_index, :]
-            y_train = y[train_index]
+            X_train = X_r[train_index, :]
+            y_train = y_r[train_index]
 
             # fit classifier
             self.classifier.fit(X_train, y_train)
