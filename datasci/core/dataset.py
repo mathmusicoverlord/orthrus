@@ -206,7 +206,9 @@ class DataSet:
                 indicating plot properties.
 
         Returns:
-             class instance: Returns the fit embedding used to visualize.
+             class instance: The fit embedding used to visualize.
+
+             ndarray of shape (n_samples, n_components): The values of the embedding.
 
         Examples:
             >>> from pydataset import data as pydat
@@ -263,6 +265,9 @@ class DataSet:
                 data_trans = embedding.fit_transform(data.values, y=None)
             except ValueError:
                 data_trans = embedding.fit_transform(data.values)
+
+        # store embedding values
+        embedding_vals = deepcopy(data_trans)
 
         if data_trans.shape[1] == 1:
             is_1d = True
@@ -371,7 +376,7 @@ class DataSet:
                         save_name=save_name,
                         **kwargs)
 
-        return embedding
+        return embedding, embedding_vals
 
     def normalize(self, 
                 normalizer, 
