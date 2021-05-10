@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--embedding',
                         type=str,
                         default='mds',
-                        choices=['mds'],
+                        choices=['pca', 'mds'],
                         help='Method used to embed the data.')
 
     parser.add_argument('--dim',
@@ -48,6 +48,8 @@ if __name__ == '__main__':
     from umap import UMAP
     from datasci.manifold.mds import MDS
     from datasci.core.helper import module_from_path
+    from datasci.decomposition.general import align_embedding
+    from copy import deepcopy
     import pandas as pd
 
     # set experiment parameters
@@ -90,25 +92,26 @@ if __name__ == '__main__':
 
     # generate frames
     frame_number = 0
+    adjusted_embedding = deepcopy(embedding)
     for num_features in range(0, len(feature_ids), args.increment):
 
         # check the number of features is above the dimension
         if num_features > args.dim:
             frame_number = frame_number + 1
             print(r"Generating frame number %d..." % (frame_number,))
-            # visualize data
-            prev_embedding = ds.visualize(embedding=embedding,
-                                          sample_ids=sample_ids,
-                                          feature_ids=feature_ids[:num_features],
-                                          attr=class_attr,
-                                          subtitle=r'# Features = %d' % (num_features,), # <--- default show normalization and imputation methods used
-                                          save=True,
-                                          save_name=str(frame_number),
-                                          block=False,
-                                          **backend_args)
 
-            prev_embedding = prev_embedding.embedding_
-            embedding = MDS(n_components=2, prev_embedding=prev_embedding)
+            # visualize data
+            _, embedding_vals = ds.visualize(embedding=adjusted_embedding,
+                                             sample_ids=sample_ids,
+                                             feature_ids=feature_ids[:num_features],
+                                             attr=class_attr,
+                                             subtitle=r'# Features = %d' % (num_features,),
+                                             save=True,
+                                             save_name=str(frame_number),
+                                             block=False,
+                                             **backend_args)
+
+            adjusted_embedding = (align_embedding(embedding_vals))(deepcopy(embedding))
             plt.close()
 
     # grab images and sort them
