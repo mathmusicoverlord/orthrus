@@ -17,10 +17,15 @@ if __name__ == '__main__':
                                              'setosa_versicolor_classify_species_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
 
+    parser.add_argument('--score',
+                        type=str,
+                        default='bsr',
+                        choices=['bsr', 'accuracy', 'confusion'],
+                        help='File path of containing the experimental parameters. Default is the Iris experiment.')
+
     args = parser.parse_args()
 
     # imports
-    from sklearn.metrics import balanced_accuracy_score as bsr
     from datasci.core.helper import save_object
     from datasci.core.helper import module_from_path
 
@@ -37,6 +42,17 @@ if __name__ == '__main__':
     partitioner = exp_params.PARTITIONER
     partitioner_name = exp_params.PARTITIONER_NAME
 
+    # set scorer
+    if args.score == 'bsr':
+        from sklearn.metrics import balanced_accuracy_score
+        scorer = balanced_accuracy_score
+    elif args.score == 'confusion':
+        from sklearn.metrics import confusion_matrix
+        scorer = confusion_matrix
+    elif args.score == 'accuracy':
+        from sklearn.metrics import accuracy_score
+        scorer = accuracy_score
+
     # classify data
     classification_results = ds.classify(classifier=classifier,
                                          classifier_name=classifier_name,
@@ -44,9 +60,9 @@ if __name__ == '__main__':
                                          sample_ids=sample_ids,
                                          partitioner=partitioner,
                                          partitioner_name=partitioner_name,
-                                         scorer=bsr,
-                                         scorer_name='bsr',
+                                         scorer=scorer,
+                                         scorer_name=args.score,
                                          f_weights_handle=classifier_weights_handle)
 
     # save classification results
-    save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, 'classification_results.pickle'])))
+    save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, args.score, 'classification_results.pickle'])))
