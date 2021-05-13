@@ -904,24 +904,24 @@ def save_object(object, file_path):
 def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_frequency=10):
 
     """
-    This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle, 
+    This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
     which defines the worker, and a list of arguments for the jobs.
-    
+
     Args:
         function_handle: Handle of the function or job
 
         list of arguments (list of list): It is a list of argument list (see example below).
 
-        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used 
+        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used
             in resource constrained situation; lower the number of process if you are getting errors/exceptions
 
-        verbose_frequency (int) : This parameter controls the frequency of progress outputs to console; an output is 
+        verbose_frequency (int) : This parameter controls the frequency of progress outputs to console; an output is
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
 
     Return:
         a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
-        Note: 
-        1. The order of elements in return does not match the order of elements in arguments. 
+        Note:
+        1. The order of elements in return does not match the order of elements in arguments.
         2. This method calls ray.init() but doesn't call ray.shutdown() to preseve object references. It must be done
            after the object references have been used
 
@@ -972,5 +972,5 @@ def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_fr
 
     assert num_finished == total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
                                         % (total_processes - num_finished)
-    assert num_running == 0, '%d processes still running' % num_running    
+    assert num_running == 0, '%d processes still running' % num_running
     return all_finished_processes
