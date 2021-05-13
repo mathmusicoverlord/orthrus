@@ -538,7 +538,7 @@ def scatter_plotly(df: pd.DataFrame,
     if not (mrkr_list is None):
         for i, label in enumerate(df[grp_mrkrs].unique()):
             fig.for_each_trace(
-                lambda trace: trace.update(marker_symbol=mrkr_list[i]) if str(label) == trace.name else ())
+                lambda trace: trace.update(marker=dict(symbol=mrkr_list[i])) if str(label) in trace.name else ())
 
     # set title height
     fig.update_layout(title={'y': .92, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'}, coloraxis_colorbar=dict(yanchor="top", y=1, x=-.2,
@@ -839,12 +839,15 @@ def module_from_path(module_name:str, module_path: str):
 
     return module
 
-def load_object(file_path: str):
+def load_object(file_path: str, block=True):
     """
     This function loads and returns any object stored in pickle format at the file_path.
 
     Args:
         file_path (str): Path of the file to load the instance from.
+
+        block (bool): If False and the file is not found, the function will return None. The default is True, so
+            the function will error when the file is not found.
 
     Returns:
         Pickle object stored at the file_path.
@@ -852,9 +855,18 @@ def load_object(file_path: str):
     Examples:
             >>> ifr = load_object(file_path='./tol_vs_res_liver_ifr.pickle')
     """
-    # open file and unpickle
-    with open(file_path, 'rb') as f:
-        return pickle.load(f)
+
+    if block:
+        # open file and unpickle
+        with open(file_path, 'rb') as f:
+            return pickle.load(f)
+    else:
+        try:
+            # open file and unpickle
+            with open(file_path, 'rb') as f:
+                return pickle.load(f)
+        except FileNotFoundError:
+            return None
 
 def save_object(object, file_path):
     """
