@@ -244,9 +244,15 @@ def rank_features_by_attribute(features_df, args):
         indices = features_df.loc[args['feature_ids']].index.values
     else:
         indices = features_df.index.values
-    f = features_df[args['attr']].loc[indices].values.reshape(-1,1)
+    attr_values = features_df[args['attr']].loc[indices].values.reshape(-1,1)
+    #remove features with nan values
+    np.isnan(attr_values.astype(float))
+    non_nan_idxs = np.invert(np.isnan(attr_values.astype(float))).reshape(-1)
+
     indices = np.array(indices).reshape(-1, 1)
-    feature_array = np.hstack((indices, f))
+    feature_array = np.hstack((indices, attr_values))
+
+    feature_array = feature_array[non_nan_idxs, :]
 
     order=args.get('order', 'desc')
     if order=='desc':
