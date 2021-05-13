@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--embedding',
                         type=str,
-                        default='mds',
+                        default='pca',
                         choices=['pca', 'mds'],
                         help='Method used to embed the data.')
 
@@ -57,6 +57,7 @@ if __name__ == '__main__':
     fig_dir = exp_params.FIG_DIR
     exp_name = exp_params.EXP_NAME
     class_attr = exp_params.CLASS_ATTR
+    cross_attr = exp_params.CROSS_ATTR
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
     feature_ids = exp_params.FEATURE_IDS # should be a list of ranked features (most important -> least important)
@@ -82,7 +83,10 @@ if __name__ == '__main__':
         palette = 'viridis'
     else:
         palette = 'bright'
-    backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
+    if cross_attr is None:
+        backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
+    else:
+        backend_args = dict(palette=palette, alpha=.7, s=200)
 
     # generate video directory
     video_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
@@ -105,6 +109,7 @@ if __name__ == '__main__':
                                              sample_ids=sample_ids,
                                              feature_ids=feature_ids[:num_features],
                                              attr=class_attr,
+                                             cross_attr=cross_attr,
                                              subtitle=r'# Features = %d' % (num_features,),
                                              save=True,
                                              save_name=str(frame_number),
