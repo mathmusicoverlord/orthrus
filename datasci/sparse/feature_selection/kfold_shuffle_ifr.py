@@ -183,7 +183,7 @@ class KFSIFR(BaseEstimator):
                         try:
                             id = np.where(f_ratios > self.jump_ratio)[0][0]
                             if (id + 1) < max_feature_threshold:
-                                S = S[:id]
+                                S = S[:(id+1)]
                                 S = Sc[S]
                             else:
                                 print("Maximum feature threshold exceeded, no features selected...")
