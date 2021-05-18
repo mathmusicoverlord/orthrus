@@ -149,6 +149,7 @@ class KFSIFR(BaseEstimator):
             Si = pd.DataFrame(index=St, columns=np.arange(Xi_train.shape[0])).fillna(False).astype(bool)
 
             if groups is None:
+                groups_train = np.array(y)[kf_train_index]
                 shuffle_splits = ShuffleSplit(n_splits=self.n_splits_shuffle,
                                               random_state=self.random_state_shuffle,
                                               train_size=self.train_prop_shuffle).split(Xi_train, yi_train)
