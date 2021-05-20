@@ -47,6 +47,10 @@ if __name__ == '__main__':
     exp_params = module_from_path('exp_params', args.exp_params)
     exp_name = exp_params.EXP_NAME
     class_attr = exp_params.CLASS_ATTR
+    try:
+        cross_attr = exp_params.CROSS_ATTR
+    except AttributeError:
+        cross_attr = None
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
     feature_ids = exp_params.FEATURE_IDS
@@ -74,18 +78,28 @@ if __name__ == '__main__':
             palette = 'viridis'
         else:
             palette = 'bright'
-        backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
+        if cross_attr is None:
+            backend_args = dict(palette=palette, alpha=.7, mrkr_list=['o'], s=200)
+        else:
+            backend_args = dict(palette=palette, alpha=.7, s=200)
     elif args.backend == 'plotly':
         backend = 'plotly'
         backend_args = dict(figsize=(1500, 1000))
+
+    # set save name
+    if cross_attr is None:
+        save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
+    else:
+        save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower(), cross_attr.lower()])
 
     # visualize data
     ds.visualize(embedding=embedding,
                  sample_ids=sample_ids,
                  feature_ids=feature_ids,
                  attr=class_attr,
+                 cross_attr=cross_attr,
                  backend=backend,
                  subtitle='', # <--- default show normalization and imputation methods used
                  save=True,
-                 save_name='_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()]),
+                 save_name=save_name,
                  **backend_args)
