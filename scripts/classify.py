@@ -36,6 +36,7 @@ if __name__ == '__main__':
     class_attr = exp_params.CLASS_ATTR
     ds = exp_params.DATASET
     sample_ids = exp_params.SAMPLE_IDS
+    feature_ids = exp_params.FEATURE_IDS
     classifier = exp_params.CLASSIFIER
     classifier_name = exp_params.CLASSIFIER_NAME
     classifier_weights_handle = exp_params.CLASSIFIER_WEIGHTS_HANDLE
@@ -58,6 +59,7 @@ if __name__ == '__main__':
                                          classifier_name=classifier_name,
                                          attr=class_attr,
                                          sample_ids=sample_ids,
+                                         feature_ids=feature_ids,
                                          partitioner=partitioner,
                                          partitioner_name=partitioner_name,
                                          scorer=scorer,
