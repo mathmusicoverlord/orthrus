@@ -11,6 +11,7 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import balanced_accuracy_score as bsr
+from datasci.model_selection.partitioning import TrainPartitioner
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
@@ -84,7 +85,10 @@ class KFSIFR(BaseEstimator):
 
         # set parameters
         self.classifier = classifier
-        self.kfold = StratifiedKFold(n_splits=n_splits_kfold, shuffle=True, random_state=random_state_kfold)
+        if n_splits_kfold != 1:
+            self.kfold = StratifiedKFold(n_splits=n_splits_kfold, shuffle=True, random_state=random_state_kfold)
+        else:
+            self.kfold = TrainPartitioner()
         self.weights_handle = weights_handle
         self.gamma = gamma
         self.max_feature_threshold = max_feature_threshold
@@ -149,7 +153,7 @@ class KFSIFR(BaseEstimator):
             Si = pd.DataFrame(index=St, columns=np.arange(Xi_train.shape[0])).fillna(False).astype(bool)
 
             if groups is None:
-                groups_train = kf_train_index
+                groups_train = np.array(kf_train_index)
                 shuffle_splits = ShuffleSplit(n_splits=self.n_splits_shuffle,
                                               random_state=self.random_state_shuffle,
                                               train_size=self.train_prop_shuffle).split(Xi_train, yi_train)
