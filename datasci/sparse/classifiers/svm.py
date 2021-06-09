@@ -254,13 +254,15 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
 
 class L1SVM(BaseEstimator, ClassifierMixin):
     def __init__(self,
-                nu: float = 1,
-                eps: float = 1e-5,
-                tp: float = .1,
-                kernel_args: dict = None,
-                solver_args: dict = None,
-                device: int = -1,
-                verbosity: int = 1):
+                 nu: float = 1,
+                 eps: float = 1e-5,
+                 tp: float = .1,
+                 delta: float = .001,
+                 imax: int = 50,
+                 tol: float = 1e-3,
+                 kernel_args: dict = None,
+                 device: int = -1,
+                 verbosity: int = 1):
 
         # set params
         self.nu = nu
@@ -268,12 +270,14 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         self.kernel_args = kernel_args
         self.device = device
         self.tp = tp
+        self.delta = delta
+        self.imax = imax,
+        self.tol = tol,
         self.verbosity = verbosity
-
-        if solver_args is None:
-            self.solver_ = LPNewton(verbosity=verbosity)
-        else:
-            self.solver_ = LPNewton(verbosity=verbosity, **solver_args)
+        self.solver_ = LPNewton(verbosity=verbosity,
+                                delta=delta,
+                                imax=imax,
+                                tol=tol)
 
         # set attributes
         self.classes_ = None
