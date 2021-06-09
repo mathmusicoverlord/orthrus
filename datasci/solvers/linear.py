@@ -85,7 +85,13 @@ class LPNewton():
     def convert_type(self, x):
 
         if self.device == -1:
-            return tc.tensor(data=x, dtype=tc.float64)
+            if isinstance(x, tc.Tensor):
+                return x.detach().cpu().type(tc.float64)
+            else:
+                return tc.tensor(data=x, dtype=tc.float64)
         else:
             cuda = tc.device('cuda:' + str(self.device))
-            return tc.tensor(data=x, device=cuda, dtype=tc.float64)
+            if isinstance(x, tc.Tensor):
+                return x.detach().type(tc.float64).to(cuda)
+            else:
+                return tc.tensor(data=x, device=cuda, dtype=tc.float64)

@@ -37,38 +37,35 @@ DATASET.path = FIG_DIR
 # restrict samples
 SAMPLE_IDS = DATASET.metadata['species'].isin(['setosa', 'versicolor'])
 
-# restrict features
-FEATURE_IDS = None
-
 # classification attribute
 CLASS_ATTR = 'species'
 
-# set partitioner
-PARTITIONER = KFold(n_splits=5, shuffle=True, random_state=0)
-PARTITIONER_NAME = '5-fold'
+# set classifier attributes
+#CLASSIFIER = SSVM(solver=LPPrimalDualPy)
+#CLASSIFIER_NAME = 'SSVM'
+#CLASSIFIER_FWEIGHTS_HANDLE = 'weights_'
+#kernel_args = dict(metric='linear')
+kernel_args = None
+CLASSIFIER = L1SVM(nu=1, delta=.001, imax=100, verbosity=0, kernel_args=kernel_args)
+CLASSIFIER_NAME = 'l1SVM'
+CLASSIFIER_FWEIGHTS_HANDLE = 'w_'
+CLASSIFIER_SWEIGHTS_HANDLE = None
+CLASSIFIER_TUNING_PARAMS = dict(nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
+                                delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()))
 
-# set classifier
-CLASSIFIER = L1SVM(device='any', kernel_args=dict(metric='rbf', gamma=.0625))
-CLASSIFIER_NAME = 'L1SVM_RBF'
-CLASSIFIER_FWEIGHTS_HANDLE=None,
-CLASSIFIER_SWEIGHTS_HANDLE='w_',
+# set 80/20 train/test split for simple experiment
+#y = DATASET.metadata.loc[SAMPLE_IDS, CLASS_ATTR]
+#split = train_test_split(y, test_size=.2)
+#train_ids = split[0].index
+#test_ids = split[1].index
+#PARTITIONER = (train_ids, test_ids)
+#PARTITIONER_NAME = 'split'
 
+# maybe k-fold instead
+PARTITIONER = KFold(n_splits=10, shuffle=True, random_state=0)
+PARTITIONER_NAME = '10-fold'
 
-## specific script args
+# restrict features
+FEATURE_IDS = None
 
-# tune_classifier.py args
-TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
-                            CLASSIFIER_NAME='l1SVM_RBF',
-                            CLASSIFIER_FWEIGHTS_HANDLE=None,
-                            CLASSIFIER_SWEIGHTS_HANDLE='w_',
-                            TUNING_PARAMS=dict(imax=100,
-                                               verbosity=0,
-                                               nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                               delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()),
-                                               kernel_args=dict(metric='rbf',
-                                                                gamma=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                                                )
-                                               )                       
-                            )
-
-# other parametersVISUALIZE_ARGS = dict()
+# other parameters
