@@ -42,7 +42,7 @@ class LPNewton():
 
             # check for convergence
             err = tc.norm(ui - uii).item()
-            if self.verbosity > 1:
+            if self.verbosity > 0:
                 print("\t||u_i - u_{i+1}|| = %0.2f" % (err,))
             if err < self.tol:
                 ui = uii
@@ -79,27 +79,13 @@ class LPNewton():
         while (f(ui) - f(ui + l * di)) < -(l / 4)*tc.matmul(df_ui.t(), di):
             l = (1 / 2)*l
 
-        if self.verbosity > 1:
-            print("\tObjective = %0.2f" % (f(ui),))
-
         # return the updated ui
         return ui + (l * di)
 
     def convert_type(self, x):
 
         if self.device == -1:
-            if isinstance(x, tc.Tensor):
-                return x.detach().cpu().type(tc.float64)
-            else:
-                return tc.tensor(data=x, dtype=tc.float64)
-        elif self.device == 'any':
-            if isinstance(x, tc.Tensor):
-                return x.detach().type(tc.float64).cuda()
-            else:
-                return tc.tensor(data=x, dtype=tc.float64).cuda()
+            return tc.tensor(data=x, dtype=tc.float64)
         else:
             cuda = tc.device('cuda:' + str(self.device))
-            if isinstance(x, tc.Tensor):
-                return x.detach().type(tc.float64).to(cuda)
-            else:
-                return tc.tensor(data=x, device=cuda, dtype=tc.float64)
+            return tc.tensor(data=x, device=cuda, dtype=tc.float64)

@@ -254,15 +254,13 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
 
 class L1SVM(BaseEstimator, ClassifierMixin):
     def __init__(self,
-                 nu: float = 1,
-                 eps: float = 1e-5,
-                 tp: float = .1,
-                 delta: float = .001,
-                 imax: int = 50,
-                 tol: float = 1e-3,
-                 kernel_args: dict = None,
-                 device: int = -1,
-                 verbosity: int = 1):
+                nu: float = 1,
+                eps: float = 1e-5,
+                tp: float = .1,
+                kernel_args: dict = None,
+                solver_args: dict = None,
+                device: int = -1,
+                verbosity: int = 1):
 
         # set params
         self.nu = nu
@@ -270,14 +268,12 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         self.kernel_args = kernel_args
         self.device = device
         self.tp = tp
-        self.delta = delta
-        self.imax = imax,
-        self.tol = tol,
         self.verbosity = verbosity
-        self.solver_ = LPNewton(verbosity=verbosity,
-                                delta=delta,
-                                imax=imax,
-                                tol=tol)
+
+        if solver_args is None:
+            self.solver_ = LPNewton(verbosity=verbosity)
+        else:
+            self.solver_ = LPNewton(verbosity=verbosity, **solver_args)
 
         # set attributes
         self.classes_ = None
@@ -287,27 +283,16 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         self.xi_ = None
         self.X_ = None
         self.y_ = None
-        self.sigma_ = None
-        self.mu_ = None
 
 
     def fit(self, X, y):
-
-        # set randomness
-        rng = np.random.default_rng(12345)
 
         # check that X and y have correct shape
         X, y = check_X_y(X, y)
 
         # store data as attributes
-        self.X_ = X = np.array(X)
-        self.y_ = y = np.array(y)
-
-        # mean center and scale each feature to var = 1
-        self.mu_ = np.nanmean(X, axis=0).reshape(1, -1)
-        self.sigma_ = np.nanstd(X, axis=0).reshape(1, -1)
-        X_tr = (X - self.mu_) / self.sigma_
-
+        self.X_ = np.array(X)
+        self.y_ = np.array(y)
 
         # Store the classes seen during fit
         self.classes_ = unique_labels(y)
@@ -321,13 +306,13 @@ class L1SVM(BaseEstimator, ClassifierMixin):
 
         # apply kernel
         if self.kernel_args is not None:
-            X_tr = pairwise_kernels(X_tr, **self.kernel_args) * D
+            X = pairwise_kernels(X, **self.kernel_args) * D
 
         # grab shapes
-        m, n = X_tr.shape
+        m, n = X.shape
 
         # convert dtypes
-        X_tr = self.convert_type(X_tr)
+        X = self.convert_type(X)
         D = self.convert_type(D.reshape(-1, 1))
 
         # set params
@@ -341,23 +326,35 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # Define variables
         en = self.convert_type(np.ones((n, 1)))
         em = self.convert_type(np.ones((m, 1)))
-        z = D * X_tr
+        z = D * X
         w = nu * em
         g = (em * D).t()
         zero = self.convert_type(0)
 
         # define f, df, hf (func, deriv, hessian resp.)
-        f = lambda u: -eps * tc.dot(em.view(-1, ), u.view(-1, )) + (1 / 2) * (tc.pow(tc.norm(tc.relu((tc.matmul(z.t(), u) - en))), 2) + tc.pow(tc.norm(tc.relu((tc.matmul(-z.t(), u) - en))), 2) + tc.pow(-tc.dot(g.view(-1, ), u.view(-1, )), 2) + tc.pow(tc.norm(tc.relu(u - w)), 2) + tc.pow(tc.norm(tc.relu(-u)), 2) )
+        f = lambda u: -eps * tc.dot(em.view(-1, ), u.view(-1, )) + (1 / 2) * (
+                tc.pow(tc.norm(tc.relu((tc.matmul(z.t(), u) - en))), 2) +
+                tc.pow(tc.norm(tc.relu((tc.matmul(-z.t(), u) - en))), 2) +
+                tc.pow(tc.dot(g.view(-1, ), u.view(-1, )), 2) +
+                tc.pow(tc.norm(tc.relu(u - w)), 2) +
+                tc.pow(tc.norm(tc.relu(-u)), 2)
+                )
 
-        df = lambda u: -eps * em + tc.matmul(z, tc.relu(tc.matmul(z.t(), u) - en)) - tc.matmul(z, tc.relu(tc.matmul(-z.t(), u) - en)) + tc.dot(g.view(-1,), u.view(-1,)) * g.t() + tc.relu(u - w) - tc.relu(-u)
+        df = lambda u: -eps * em + \
+                tc.matmul(z, tc.relu(tc.matmul(z.t(), u) - en)) - \
+                tc.matmul(z, tc.relu(tc.matmul(-z.t(), u) - en)) + \
+                tc.dot(g.view(-1,), u.view(-1,)) * g.t() + \
+                tc.relu(u - w) - \
+                tc.relu(-u)
 
-        hf = lambda u: tc.matmul(z * (tc.heaviside(tc.abs(tc.matmul(z.t(), u)) - en, zero)).t(), z.t()) + g.t() * g + tc.diag((tc.heaviside(u - w, zero) + tc.heaviside(-u, zero)).view(-1,))
+        hf = lambda u: tc.matmul(z * (tc.heaviside(tc.abs(tc.matmul(z.t(), u)) - en, zero)).t(), z.t()) + \
+                       g.t() * g + \
+                       tc.diag(tc.relu(u - w) + tc.relu(-u))
 
         # solve LP with LPNewton
         if self.verbosity > 0:
             print("Solving with LPNewton:")
-        u0 = self.convert_type(rng.normal(size=em.shape))
-        u, _ = self.solver_.solve(u0, f, df, hf)
+        u, _ = self.solver_.solve(em, f, df, hf)
 
         # update model attributes
         self.w_ = ((1 / eps) * (tc.relu(tc.matmul(z.t(), u) - en) - tc.relu(tc.matmul(-z.t(), u) - en))).detach().cpu().numpy().reshape(-1,)
@@ -372,17 +369,11 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # compute D vector
         D = np.array([self.label_dict_[sample] for sample in self.y_]).reshape(-1, 1)
 
-        # center and scale data
-        X_tr = (self.X_ - self.mu_) / self.sigma_
-        X_tst = (X - self.mu_) / self.sigma_
-
         # compute decision function
         if self.kernel_args is None:
-            p = np.matmul(X_tst, self.w_.reshape(-1, 1)) - self.gamma_
-
-
+            p = np.matmul(X, self.w_.reshape(-1, 1)) - self.gamma_
         else:
-            p = self.nu * np.matmul(pairwise_kernels(X_tst, X_tr, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
+            p = self.nu * np.matmul(pairwise_kernels(X, self.X_, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
 
 
         # compute inverse label dictionary
@@ -398,18 +389,7 @@ class L1SVM(BaseEstimator, ClassifierMixin):
     def convert_type(self, x):
 
         if self.device == -1:
-            if isinstance(x, tc.Tensor):
-                return x.detach().cpu().type(tc.float64)
-            else:
-                return tc.tensor(data=x, dtype=tc.float64)
-        elif self.device == 'any':
-            if isinstance(x, tc.Tensor):
-                return x.detach().type(tc.float64).cuda()
-            else:
-                return tc.tensor(data=x, dtype=tc.float64).cuda()
+            return tc.tensor(data=x, dtype=tc.float64)
         else:
             cuda = tc.device('cuda:' + str(self.device))
-            if isinstance(x, tc.Tensor):
-                return x.detach().type(tc.float64).to(cuda)
-            else:
-                return tc.tensor(data=x, device=cuda, dtype=tc.float64)
+            return tc.tensor(data=x, device=cuda, dtype=tc.float64)

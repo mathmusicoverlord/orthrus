@@ -39,7 +39,8 @@ if __name__ == '__main__':
     feature_ids = exp_params.FEATURE_IDS
     classifier = exp_params.CLASSIFIER
     classifier_name = exp_params.CLASSIFIER_NAME
-    classifier_weights_handle = exp_params.CLASSIFIER_WEIGHTS_HANDLE
+    classifier_fweights_handle = exp_params.CLASSIFIER_FWEIGHTS_HANDLE
+    classifier_sweights_handle = exp_params.CLASSIFIER_SWEIGHTS_HANDLE
     partitioner = exp_params.PARTITIONER
     partitioner_name = exp_params.PARTITIONER_NAME
 
@@ -64,7 +65,8 @@ if __name__ == '__main__':
                                          partitioner_name=partitioner_name,
                                          scorer=scorer,
                                          scorer_name=args.score,
-                                         f_weights_handle=classifier_weights_handle)
+                                         f_weights_handle=classifier_fweights_handle,
+                                         s_weights_handle=classifier_sweights_handle)
 
     # save classification results
     save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, args.score, 'classification_results.pickle'])))
