@@ -1,6 +1,12 @@
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import unique_labels
+from sklearn.metrics.pairwise import pairwise_kernels
+import torch as tc
+import numpy as np
+from datasci.solvers.linear import LPNewton
+from copy import copy
+import ray
 
 class SSVMClassifier(BaseEstimator, ClassifierMixin):
     '''
@@ -59,18 +65,18 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
                  C: float = 1.0,
                  tol: float = 0.001,
                  solver: object = None,
-                 errorTrace: object =None,
+                 errorTrace: object = None,
                  use_cuda: bool = False,
                  verbosity: int = 0,
                  debug: bool = False):
 
         # Solver parameters
-        self.C = C                              # the margin weight
-        self.tol = tol                          # error tolerance for interior point solver
-        self.solver = solver                    # solver for solving the LP
+        self.C = C  # the margin weight
+        self.tol = tol  # error tolerance for interior point solver
+        self.solver = solver  # solver for solving the LP
         self.errorTrace = errorTrace
-        self.use_cuda = use_cuda                # Flag to attempt to use CUDA.
-        self.verbosity = verbosity              # Level of verbosity
+        self.use_cuda = use_cuda  # Flag to attempt to use CUDA.
+        self.verbosity = verbosity  # Level of verbosity
         self.debug = debug
 
         # Solver attributes
@@ -107,9 +113,10 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
 
         # Check that the stars have aligned so that we can use CUDA.
         use_cuda = self.use_cuda and torch and torch.cuda.is_available()
-        if self.verbosity>0:
+        if self.verbosity > 0:
             if self.use_cuda and not use_cuda:
-                print('PyTorch could not be imported, or could not access the GPU. Falling back to numpy implementation.')
+                print(
+                    'PyTorch could not be imported, or could not access the GPU. Falling back to numpy implementation.')
         #
 
         # Check that X and y have correct shape
@@ -118,7 +125,8 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         # Store the classes seen during fit
         self.classes_ = unique_labels(y)
         if len(self.classes_) != 2:
-            raise ValueError("The supplied training X has fewer or greater than two labels.\nOnly binary classification is supported.")
+            raise ValueError(
+                "The supplied training X has fewer or greater than two labels.\nOnly binary classification is supported.")
 
         # Need an extra step here - SSVM wants labels -1 and 1.
         labelDict = {self.classes_[0]: -1, self.classes_[1]: 1}
@@ -144,15 +152,16 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         #
 
         A = np.hstack((DX, -DX, -De, De, IP))
-        c = np.vstack((eDim, eDim, np.array([0]).reshape(-1, 1), np.array([0]).reshape(-1, 1), self.C*eP))
+        c = np.vstack((eDim, eDim, np.array([0]).reshape(-1, 1), np.array([0]).reshape(-1, 1), self.C * eP))
 
-        x = self.solver(-c,-A,-eP, output_flag=0, use_cuda=use_cuda, verbosity=self.verbosity, debug=self.debug)
+        x = self.solver(-c, -A, -eP, output_flag=0, use_cuda=use_cuda, verbosity=self.verbosity, debug=self.debug)
 
-        self.weights_ = x[:inputDim] - x[inputDim:2*inputDim]
-        self.weights_ = self.weights_.reshape(-1,)
-        self.bias_ = x[2*inputDim]-x[2*inputDim+1]
+        self.weights_ = x[:inputDim] - x[inputDim:2 * inputDim]
+        self.weights_ = self.weights_.reshape(-1, )
+        self.bias_ = x[2 * inputDim] - x[2 * inputDim + 1]
 
         return self
+
     #
     def predict(self, X, prob=False, pos=None):
         '''
@@ -179,10 +188,11 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         use_cuda = self.use_cuda and torch and torch.cuda.is_available()
         if self.verbosity > 0:
             if self.use_cuda and not use_cuda:
-                print('PyTorch could not be imported, or could not access the GPU. Falling back to numpy implementation.')
+                print(
+                    'PyTorch could not be imported, or could not access the GPU. Falling back to numpy implementation.')
 
         b = self.bias_
-        w = self.weights_.reshape(-1,1)
+        w = self.weights_.reshape(-1, 1)
 
         if use_cuda:
             data_c = torch.from_numpy(X).double().cuda()
@@ -197,17 +207,17 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             if pos is None:
                 pos = self.classes_[0]
             # hard classification past margins
-            d[d<-1] = -1
-            d[d>1] = 1
+            d[d < -1] = -1
+            d[d > 1] = 1
             # shift-scale [-1, 1] to [0, 1]
-            d = (d + 1)/2
+            d = (d + 1) / 2
             if pos == self.classes_[0]:
                 d = 1 - d
             elif pos == self.classes_[1]:
                 pass
             else:
                 raise ValueError("Positive label provided is not in class labels.")
-            pred_labels = d.reshape(-1,).tolist()
+            pred_labels = d.reshape(-1, ).tolist()
             return pred_labels
 
         else:
@@ -219,9 +229,6 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             pred_labels = [invLabelDict[sample] for sample in predicted]
             self.pred_labels_ = pred_labels
             return pred_labels
-
-
-
 
     def decision_function(self, X):
         import numpy as np
@@ -243,3 +250,146 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             d = np.dot(X, w) - b
         #
         return d
+
+
+class L1SVM(BaseEstimator, ClassifierMixin):
+    def __init__(self,
+                nu: float = 1,
+                eps: float = 1e-5,
+                tp: float = .1,
+                kernel_args: dict = None,
+                solver_args: dict = None,
+                device: int = -1,
+                verbosity: int = 1):
+
+        # set params
+        self.nu = nu
+        self.eps = eps
+        self.kernel_args = kernel_args
+        self.device = device
+        self.tp = tp
+        self.verbosity = verbosity
+
+        if solver_args is None:
+            self.solver_ = LPNewton(verbosity=verbosity)
+        else:
+            self.solver_ = LPNewton(verbosity=verbosity, **solver_args)
+
+        # set attributes
+        self.classes_ = None
+        self.label_dict_ = None
+        self.w_ = None
+        self.gamma_ = None
+        self.xi_ = None
+        self.X_ = None
+        self.y_ = None
+
+
+    def fit(self, X, y):
+
+        # check that X and y have correct shape
+        X, y = check_X_y(X, y)
+
+        # store data as attributes
+        self.X_ = np.array(X)
+        self.y_ = np.array(y)
+
+        # Store the classes seen during fit
+        self.classes_ = unique_labels(y)
+        if len(self.classes_) != 2:
+            raise ValueError(
+                "The supplied training X has fewer or greater than two labels.\nOnly binary classification is supported.")
+
+        # Need an extra step here - SSVM wants labels -1 and 1.
+        self.label_dict_ = {self.classes_[0]: -1, self.classes_[1]: 1}
+        D = np.array([self.label_dict_[sample] for sample in y]).reshape(1, -1)
+
+        # apply kernel
+        if self.kernel_args is not None:
+            X = pairwise_kernels(X, **self.kernel_args) * D
+
+        # grab shapes
+        m, n = X.shape
+
+        # convert dtypes
+        X = self.convert_type(X)
+        D = self.convert_type(D.reshape(-1, 1))
+
+        # set params
+        nu = self.nu
+        eps = self.eps
+
+        # print to console
+        if self.verbosity > 0:
+            print("Computing the unconstrained objective function f and its derivatives df and d^2f...")
+
+        # Define variables
+        en = self.convert_type(np.ones((n, 1)))
+        em = self.convert_type(np.ones((m, 1)))
+        z = D * X
+        w = nu * em
+        g = (em * D).t()
+        zero = self.convert_type(0)
+
+        # define f, df, hf (func, deriv, hessian resp.)
+        f = lambda u: -eps * tc.dot(em.view(-1, ), u.view(-1, )) + (1 / 2) * (
+                tc.pow(tc.norm(tc.relu((tc.matmul(z.t(), u) - en))), 2) +
+                tc.pow(tc.norm(tc.relu((tc.matmul(-z.t(), u) - en))), 2) +
+                tc.pow(tc.dot(g.view(-1, ), u.view(-1, )), 2) +
+                tc.pow(tc.norm(tc.relu(u - w)), 2) +
+                tc.pow(tc.norm(tc.relu(-u)), 2)
+                )
+
+        df = lambda u: -eps * em + \
+                tc.matmul(z, tc.relu(tc.matmul(z.t(), u) - en)) - \
+                tc.matmul(z, tc.relu(tc.matmul(-z.t(), u) - en)) + \
+                tc.dot(g.view(-1,), u.view(-1,)) * g.t() + \
+                tc.relu(u - w) - \
+                tc.relu(-u)
+
+        hf = lambda u: tc.matmul(z * (tc.heaviside(tc.abs(tc.matmul(z.t(), u)) - en, zero)).t(), z.t()) + \
+                       g.t() * g + \
+                       tc.diag(tc.relu(u - w) + tc.relu(-u))
+
+        # solve LP with LPNewton
+        if self.verbosity > 0:
+            print("Solving with LPNewton:")
+        u, _ = self.solver_.solve(em, f, df, hf)
+
+        # update model attributes
+        self.w_ = ((1 / eps) * (tc.relu(tc.matmul(z.t(), u) - en) - tc.relu(tc.matmul(-z.t(), u) - en))).detach().cpu().numpy().reshape(-1,)
+        self.gamma_ = (- (1 / eps) * tc.dot(g.view(-1,), u.view(-1,))).detach().cpu().numpy()
+        self.xi_ = ((1 / eps) * tc.relu(u - w)).detach().cpu().numpy().reshape(-1,)
+
+    def predict(self, X):
+
+        # convert to numpy array
+        X = np.array(X)
+
+        # compute D vector
+        D = np.array([self.label_dict_[sample] for sample in self.y_]).reshape(-1, 1)
+
+        # compute decision function
+        if self.kernel_args is None:
+            p = np.matmul(X, self.w_.reshape(-1, 1)) - self.gamma_
+        else:
+            p = self.nu * np.matmul(pairwise_kernels(X, self.X_, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
+
+
+        # compute inverse label dictionary
+        inv_label_dict_ = {v: k for k, v in self.label_dict_.items()}
+
+        # predict labels
+        y_pred = np.ones_like(p)
+        y_pred[p < 0] = -1
+        y_pred = np.array([inv_label_dict_[val.item()] for val in y_pred])
+
+        return y_pred
+
+    def convert_type(self, x):
+
+        if self.device == -1:
+            return tc.tensor(data=x, dtype=tc.float64)
+        else:
+            cuda = tc.device('cuda:' + str(self.device))
+            return tc.tensor(data=x, device=cuda, dtype=tc.float64)

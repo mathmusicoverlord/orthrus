@@ -1161,17 +1161,17 @@ class DataSet:
                 s_weights = eval("classifier" + "." + s_weights_handle)
                 s_weight_results[s_weights_name] = np.nan
                 s_weight_results.loc[sample_index.take(train_index), s_weights_name] = s_weights
-                if not (f_rnk_func is None):
+                if not (s_rnk_func is None):
                     s_rnk_name = method_name + "_s_rank_" + str(i)
-                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    weights = s_weight_results.loc[sample_index.take(train_index), s_weights_name]
                     s_weight_results[s_rnk_name] = np.nan
-                    s_weight_results.loc[feature_ids, s_rnk_name] = (-s_rnk_func(weights)).argsort()
+                    s_weight_results.loc[sample_index.take(train_index), s_rnk_name] = (-s_rnk_func(weights)).argsort()
                     s_weight_results[s_rnk_name] = s_weight_results[s_rnk_name].astype('Int64')
                 else:
                     s_rnk_name = method_name + "_s_rank_" + str(i)
-                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    weights = s_weight_results.loc[sample_index.take(train_index), s_weights_name]
                     s_weight_results[s_rnk_name] = np.nan
-                    s_weight_results.loc[feature_ids, s_rnk_name] = (-np.array(weights)).argsort()
+                    s_weight_results.loc[sample_index.take(train_index), s_rnk_name] = (-np.array(weights)).argsort()
 
         # print means and standard deviations
         if pd.api.types.infer_dtype(train_score) == 'floating':
