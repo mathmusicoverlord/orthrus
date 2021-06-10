@@ -379,6 +379,8 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # compute decision function
         if self.kernel_args is None:
             p = np.matmul(X_tst, self.w_.reshape(-1, 1)) - self.gamma_
+
+
         else:
             p = self.nu * np.matmul(pairwise_kernels(X_tst, X_tr, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
 

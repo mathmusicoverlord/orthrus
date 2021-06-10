@@ -12,10 +12,16 @@ if __name__ == '__main__':
 
     parser.add_argument('--exp_params',
                         type=str,
-                        # default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
-                        #                     'setosa_versicolor_classify_species_svm',
-                        #                     'setosa_versicolor_classify_species_svm_params.py'),
+                        default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                                             'setosa_versicolor_classify_species_svm',
+                                             'setosa_versicolor_classify_species_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
+
+
+    parser.add_argument('--logdir',
+                        type=str,
+                        default='~/logs/tune_classifier',
+                        help='Directory of where to store the log of the tuning procedure.')
 
     parser.add_argument('--score',
                         type=str,
@@ -26,44 +32,44 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # imports
-    from datasci.core.helper import save_object
+    import shutil
     from datasci.core.helper import module_from_path
+    from datasci.core.helper import default_val
     from ray import tune
-    import ray
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    results_dir = exp_params.RESULTS_DIR
-    exp_name = exp_params.EXP_NAME
-    class_attr = exp_params.CLASS_ATTR
-    ds = exp_params.DATASET
-    sample_ids = exp_params.SAMPLE_IDS
-    feature_ids = exp_params.FEATURE_IDS
-    classifier = exp_params.CLASSIFIER
-    classifier_name = exp_params.CLASSIFIER_NAME
-    classifier_fweights_handle = exp_params.CLASSIFIER_FWEIGHTS_HANDLE
-    classifier_sweights_handle = exp_params.CLASSIFIER_SWEIGHTS_HANDLE
-    partitioner = exp_params.PARTITIONER
-    partitioner_name = exp_params.PARTITIONER_NAME
-    classifier_tuning_params = exp_params.CLASSIFIER_TUNING_PARAMS
+    script_args = exp_params.TUNE_CLASSIFIER_ARGS
+    results_dir = script_args.get('RESULTS_DIR', exp_params.RESULTS_DIR)
+    exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
+    class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
+    ds = script_args.get('DATASET', exp_params.DATASET)
+    sample_ids = script_args.get('SAMPLE_IDS', exp_params.SAMPLE_IDS)
+    feature_ids = script_args.get('FEATURE_IDS', exp_params.FEATURE_IDS)
+    partitioner = script_args.get('PARTITIONER', exp_params.PARTITIONER)
+    partitioner_name = script_args.get('PARTITIONER_NAME', default_val(exp_params, 'PARTITIONER_NAME'))
+    classifier = script_args.get('CLASSIFIER', exp_params.CLASSIFIER)
+    classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
+    classifier_fweights_handle = script_args.get('CLASSIFIER_FWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
+    classifier_sweights_handle = script_args.get('CLASSIFIER_SWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_SWEIGHTS_HANDLE'))
+    classifier_tuning_params = script_args.get('CLASSIFIER_TUNING_PARAMS')
 
     # set scorer
     if args.score == 'bsr':
         from sklearn.metrics import balanced_accuracy_score
-
         scorer = balanced_accuracy_score
     elif args.score == 'accuracy':
         from sklearn.metrics import accuracy_score
-
         scorer = accuracy_score
 
-
-    # ray.init(local_mode=True)
+    # set log directory
+    log_dir, log_name = os.path.split(os.path.abspath(args.logdir))
 
     def objective_function(**kwargs):
 
         # generate new classifier with args
         new_classifier = classifier.__class__(**kwargs)
+
 
         classification_results = ds.classify(classifier=new_classifier,
                                              classifier_name=classifier_name,
@@ -77,16 +83,19 @@ if __name__ == '__main__':
                                              f_weights_handle=classifier_fweights_handle,
                                              s_weights_handle=classifier_sweights_handle)
 
-        # grab training score
-        return classification_results['scores'].loc['Train'].to_dict()
+        return {**classification_results['scores'].loc['Train'].to_dict(),
+                **classification_results['scores'].loc['Test'].to_dict()}
+
 
 
     def trainable(config):
         scores = objective_function(**config)
         [tune.report(**scores)]
 
+    # remove contents of original log directory
+    shutil.rmtree(os.path.join(log_dir, log_name))
 
-    tune.run(trainable, config=classifier_tuning_params, local_dir="/s/a/home/ekehoe/ray/logs/", name="tuning_test")
-
-    # save classification results
-    # save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, args.score, 'classification_results.pickle'])))
+    tune.run(trainable,
+             config=classifier_tuning_params,
+             local_dir=os.path.abspath(log_dir),
+             name=log_name)
