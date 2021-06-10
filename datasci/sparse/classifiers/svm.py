@@ -336,24 +336,11 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         zero = self.convert_type(0)
 
         # define f, df, hf (func, deriv, hessian resp.)
-        f = lambda u: -eps * tc.dot(em.view(-1, ), u.view(-1, )) + (1 / 2) * (
-                tc.pow(tc.norm(tc.relu((tc.matmul(z.t(), u) - en))), 2) +
-                tc.pow(tc.norm(tc.relu((tc.matmul(-z.t(), u) - en))), 2) +
-                tc.pow(tc.dot(g.view(-1, ), u.view(-1, )), 2) +
-                tc.pow(tc.norm(tc.relu(u - w)), 2) +
-                tc.pow(tc.norm(tc.relu(-u)), 2)
-                )
+        f = lambda u: -eps * tc.dot(em.view(-1, ), u.view(-1, )) + (1 / 2) * (tc.pow(tc.norm(tc.relu((tc.matmul(z.t(), u) - en))), 2) + tc.pow(tc.norm(tc.relu((tc.matmul(-z.t(), u) - en))), 2) + tc.pow(-tc.dot(g.view(-1, ), u.view(-1, )), 2) + tc.pow(tc.norm(tc.relu(u - w)), 2) + tc.pow(tc.norm(tc.relu(-u)), 2) )
 
-        df = lambda u: -eps * em + \
-                tc.matmul(z, tc.relu(tc.matmul(z.t(), u) - en)) - \
-                tc.matmul(z, tc.relu(tc.matmul(-z.t(), u) - en)) + \
-                tc.dot(g.view(-1,), u.view(-1,)) * g.t() + \
-                tc.relu(u - w) - \
-                tc.relu(-u)
+        df = lambda u: -eps * em + tc.matmul(z, tc.relu(tc.matmul(z.t(), u) - en)) - tc.matmul(z, tc.relu(tc.matmul(-z.t(), u) - en)) + tc.dot(g.view(-1,), u.view(-1,)) * g.t() + tc.relu(u - w) - tc.relu(-u)
 
-        hf = lambda u: tc.matmul(z * (tc.heaviside(tc.abs(tc.matmul(z.t(), u)) - en, zero)).t(), z.t()) + \
-                       g.t() * g + \
-                       tc.diag(tc.relu(u - w) + tc.relu(-u))
+        hf = lambda u: tc.matmul(z * (tc.heaviside(tc.abs(tc.matmul(z.t(), u)) - en, zero)).t(), z.t()) + g.t() * g + tc.diag((tc.heaviside(u - w, zero) + tc.heaviside(-u, zero)).view(-1,))
 
         # solve LP with LPNewton
         if self.verbosity > 0:
