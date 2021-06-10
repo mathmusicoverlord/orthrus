@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--exp_params',
                         type=str,
-                        default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
-                                             'setosa_versicolor_classify_species_svm',
-                                             'setosa_versicolor_classify_species_svm_params.py'),
+                        # default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                        #                     'setosa_versicolor_classify_species_svm',
+                        #                     'setosa_versicolor_classify_species_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
 
     parser.add_argument('--score',
@@ -50,20 +50,22 @@ if __name__ == '__main__':
     # set scorer
     if args.score == 'bsr':
         from sklearn.metrics import balanced_accuracy_score
+
         scorer = balanced_accuracy_score
     elif args.score == 'accuracy':
         from sklearn.metrics import accuracy_score
+
         scorer = accuracy_score
 
-    ray.init(local_mode=True)
+
+    # ray.init(local_mode=True)
 
     def objective_function(**kwargs):
 
-        # update classifier args
-        for key in kwargs:
-            classifier.__setattr__(key, kwargs[key])
+        # generate new classifier with args
+        new_classifier = classifier.__class__(**kwargs)
 
-        classification_results = ds.classify(classifier=classifier,
+        classification_results = ds.classify(classifier=new_classifier,
                                              classifier_name=classifier_name,
                                              attr=class_attr,
                                              sample_ids=sample_ids,
@@ -76,13 +78,15 @@ if __name__ == '__main__':
                                              s_weights_handle=classifier_sweights_handle)
 
         # grab training score
-        return classification_results['scores'].loc['Train'].to_list()
+        return classification_results['scores'].loc['Train'].to_dict()
+
 
     def trainable(config):
         scores = objective_function(**config)
-        [tune.report(score=score) for score in scores]
+        [tune.report(**scores)]
 
-    tune.run(trainable, config=classifier_tuning_params)
+
+    tune.run(trainable, config=classifier_tuning_params, local_dir="/s/a/home/ekehoe/ray/logs/", name="tuning_test")
 
     # save classification results
-    #save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, args.score, 'classification_results.pickle'])))
+    # save_object(classification_results, os.path.join(results_dir, '_'.join([ds.name, exp_name, args.score, 'classification_results.pickle'])))
