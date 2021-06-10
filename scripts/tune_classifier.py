@@ -33,6 +33,7 @@ if __name__ == '__main__':
 
     # imports
     import shutil
+    import numpy as np
     from datasci.core.helper import module_from_path
     from datasci.core.helper import default_val
     from ray import tune
@@ -53,6 +54,8 @@ if __name__ == '__main__':
     classifier_fweights_handle = script_args.get('CLASSIFIER_FWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
     classifier_sweights_handle = script_args.get('CLASSIFIER_SWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_SWEIGHTS_HANDLE'))
     classifier_tuning_params = script_args.get('CLASSIFIER_TUNING_PARAMS')
+    classifier_fweights_threshold = script_args.get('CLASSIFIER_FWEIGHTS_THRESHOLD', 0)
+    classifier_sweights_threshold = script_args.get('CLASSIFIER_SWEIGHTS_THRESHOLD', 0)
 
     # set scorer
     if args.score == 'bsr':
@@ -82,15 +85,31 @@ if __name__ == '__main__':
                                              scorer_name=args.score,
                                              f_weights_handle=classifier_fweights_handle,
                                              s_weights_handle=classifier_sweights_handle)
+        
+        # init output
+        out_dict = {}
 
+        # gather train scores
         train_score_dict = classification_results['scores'].loc['Train'].to_dict()
-        test_score_dict = classification_results['scores'].loc['Test'].to_dict()
         train_score_dict = {k+'_Train': v for k, v in train_score_dict.items()}
+        out_dict.update(train_score_dict)
+
+        # gather test scores
+        test_score_dict = classification_results['scores'].loc['Test'].to_dict()
         test_score_dict = {k+'_Test': v for k, v in test_score_dict.items()}
+        out_dict.update(test_score_dict)
 
-        return {**train_score_dict, **test_score_dict}
+        # gather # important features in model
+        if classifier_fweights_handle is not None:
+            fweights_dict = (classification_results['f_weights'].filter(regex='weights').apply(np.abs) > classifier_fweights_threshold).sum().to_dict()
+            out_dict.update(f_weights_dict)
+        
+        # gather # important samples in model
+        if classifier_fweights_handle is not None:
+            sweights_dict = (classification_results['s_weights'].filter(regex='weights').apply(np.abs) > classifier_sweights_threshold).sum().to_dict()
+            out_dict.update(s_weights_dict)
 
-
+        return out_dict
 
     def trainable(config):
         scores = objective_function(**config)
