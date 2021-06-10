@@ -287,16 +287,27 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         self.xi_ = None
         self.X_ = None
         self.y_ = None
+        self.sigma_ = None
+        self.mu_ = None
 
 
     def fit(self, X, y):
+
+        # set randomness
+        rng = np.random.default_rng(12345)
 
         # check that X and y have correct shape
         X, y = check_X_y(X, y)
 
         # store data as attributes
-        self.X_ = np.array(X)
-        self.y_ = np.array(y)
+        self.X_ = X = np.array(X)
+        self.y_ = y = np.array(y)
+
+        # mean center and scale each feature to var = 1
+        self.mu_ = np.nanmean(X, axis=0).reshape(1, -1)
+        self.sigma_ = np.nanstd(X, axis=0).reshape(1, -1)
+        X_tr = (X - self.mu_) / self.sigma_
+
 
         # Store the classes seen during fit
         self.classes_ = unique_labels(y)
@@ -310,13 +321,13 @@ class L1SVM(BaseEstimator, ClassifierMixin):
 
         # apply kernel
         if self.kernel_args is not None:
-            X = pairwise_kernels(X, **self.kernel_args) * D
+            X_tr = pairwise_kernels(X_tr, **self.kernel_args) * D
 
         # grab shapes
-        m, n = X.shape
+        m, n = X_tr.shape
 
         # convert dtypes
-        X = self.convert_type(X)
+        X_tr = self.convert_type(X_tr)
         D = self.convert_type(D.reshape(-1, 1))
 
         # set params
@@ -330,7 +341,7 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # Define variables
         en = self.convert_type(np.ones((n, 1)))
         em = self.convert_type(np.ones((m, 1)))
-        z = D * X
+        z = D * X_tr
         w = nu * em
         g = (em * D).t()
         zero = self.convert_type(0)
@@ -345,7 +356,8 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # solve LP with LPNewton
         if self.verbosity > 0:
             print("Solving with LPNewton:")
-        u, _ = self.solver_.solve(em, f, df, hf)
+        u0 = self.convert_type(rng.normal(size=em.shape))
+        u, _ = self.solver_.solve(u0, f, df, hf)
 
         # update model attributes
         self.w_ = ((1 / eps) * (tc.relu(tc.matmul(z.t(), u) - en) - tc.relu(tc.matmul(-z.t(), u) - en))).detach().cpu().numpy().reshape(-1,)
@@ -360,11 +372,15 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         # compute D vector
         D = np.array([self.label_dict_[sample] for sample in self.y_]).reshape(-1, 1)
 
+        # center and scale data
+        X_tr = (self.X_ - self.mu_) / self.sigma_
+        X_tst = (X - self.mu_) / self.sigma_
+
         # compute decision function
         if self.kernel_args is None:
-            p = np.matmul(X, self.w_.reshape(-1, 1)) - self.gamma_
+            p = np.matmul(X_tst, self.w_.reshape(-1, 1)) - self.gamma_
         else:
-            p = self.nu * np.matmul(pairwise_kernels(X, self.X_, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
+            p = self.nu * np.matmul(pairwise_kernels(X_tst, X_tr, **self.kernel_args), D * self.w_.reshape(-1, 1)) - self.gamma_
 
 
         # compute inverse label dictionary
