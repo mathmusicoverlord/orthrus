@@ -83,8 +83,12 @@ if __name__ == '__main__':
                                              f_weights_handle=classifier_fweights_handle,
                                              s_weights_handle=classifier_sweights_handle)
 
-        return {**classification_results['scores'].loc['Train'].to_dict(),
-                **classification_results['scores'].loc['Test'].to_dict()}
+        train_score_dict = classification_results['scores'].loc['Train'].to_dict()
+        test_score_dict = classification_results['scores'].loc['Test'].to_dict()
+        train_score_dict = {k+'_Train': v for k, v in train_score_dict.items()}
+        test_score_dict = {k+'_Test': v for k, v in test_score_dict.items()}
+
+        return {**train_score_dict, **test_score_dict}
 
 
 
