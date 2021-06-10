@@ -42,7 +42,7 @@ class LPNewton():
 
             # check for convergence
             err = tc.norm(ui - uii).item()
-            if self.verbosity > 0:
+            if self.verbosity > 1:
                 print("\t||u_i - u_{i+1}|| = %0.2f" % (err,))
             if err < self.tol:
                 ui = uii
@@ -79,7 +79,8 @@ class LPNewton():
         while (f(ui) - f(ui + l * di)) < -(l / 4)*tc.matmul(df_ui.t(), di):
             l = (1 / 2)*l
 
-        print("\tObjective = %0.2f" % (f(ui),))
+        if self.verbosity > 1:
+            print("\tObjective = %0.2f" % (f(ui),))
 
         # return the updated ui
         return ui + (l * di)
