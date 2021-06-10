@@ -839,6 +839,23 @@ def module_from_path(module_name:str, module_path: str):
 
     return module
 
+def default_val(module, attr: str, val=None):
+    """
+    Returns a default value when a module doesn't contain an attribute.
+    Args:
+        module: Module in consideration
+        attr (str): The name of the attribute whose existence is in question.
+        val: The value to be used in the case this attribute doesn't exist. The default is None.
+
+    Returns:
+        The value of the attribute or the default value.
+    """
+
+    if hasattr(module, attr):
+        return eval("module." + attr)
+    else:
+        return val
+
 def load_object(file_path: str, block=True):
     """
     This function loads and returns any object stored in pickle format at the file_path.
