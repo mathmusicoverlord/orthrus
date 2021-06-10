@@ -79,6 +79,8 @@ class LPNewton():
         while (f(ui) - f(ui + l * di)) < -(l / 4)*tc.matmul(df_ui.t(), di):
             l = (1 / 2)*l
 
+        print("\tObjective = %0.2f" % (f(ui),))
+
         # return the updated ui
         return ui + (l * di)
 
