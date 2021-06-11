@@ -30,7 +30,6 @@ if __name__ == '__main__':
                         help='Score reported by the classifier.')
 
     parser.add_argument('--gpus-per-trial',
-                        type=int,
                         default=0,
                         help='The fraction of gpu resources to assign for each trial. e.g. .5 means each trial uses half of a gpu.')
 
