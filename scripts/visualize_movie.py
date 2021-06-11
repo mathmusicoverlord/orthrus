@@ -49,18 +49,25 @@ if __name__ == '__main__':
     from datasci.manifold.mds import MDS
     from datasci.core.helper import module_from_path
     from datasci.decomposition.general import align_embedding
+    from datasci.core.helper import default_val
     from copy import deepcopy
     import pandas as pd
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    fig_dir = exp_params.FIG_DIR
-    exp_name = exp_params.EXP_NAME
-    class_attr = exp_params.CLASS_ATTR
-    cross_attr = exp_params.CROSS_ATTR
-    ds = exp_params.DATASET
-    sample_ids = exp_params.SAMPLE_IDS
-    feature_ids = exp_params.FEATURE_IDS # should be a list of ranked features (most important -> least important)
+    script_args = exp_params.VISUALIZE_MOVIE_ARGS
+
+    ## required script params
+    fig_dir = script_args.get('FIG_DIR', exp_params.FIG_DIR)
+    exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
+    class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
+    ds = script_args.get('DATASET', exp_params.DATASET)
+
+    ## optional script params
+    sample_ids = script_args.get('SAMPLE_IDS', default_val(exp_params, 'SAMPLE_IDS')),
+    feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
+    cross_attr = script_args.get('CROSS_ATTR', default_val(exp_params, 'CROSS_ATTR'))
+    save_name = script_args.get('SAVE_NAME', default_val(exp_params, 'VISUALIZE_MOVIE_SAVE_NAME'))
 
     # grab dimension
     if args.dim == 1:
@@ -127,8 +134,12 @@ if __name__ == '__main__':
     frame = cv2.imread(os.path.join(video_dir, images[0]))
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(os.path.join(video_dir, 'movie.mp4'),
-                            cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
+    if save_name is None:
+        video = cv2.VideoWriter(os.path.join(video_dir, 'movie.mp4'),
+                                cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
+    else:
+        video = cv2.VideoWriter(os.path.join(video_dir, save_name + '.mp4'),
+                                cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
 
     for image in images:
         video.write(cv2.imread(os.path.join(video_dir, image)))
