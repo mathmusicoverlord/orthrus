@@ -27,9 +27,10 @@ if __name__ == '__main__':
                         type=str,
                         default='bsr',
                         choices=['bsr', 'accuracy'],
-                        help='Score reported by the classifier.')
+                        help='Score reported on the prediction results.')
 
     parser.add_argument('--gpus-per-trial',
+                        type=float,
                         default=0,
                         help='The fraction of gpu resources to assign for each trial. e.g. .5 means each trial uses half of a gpu.')
 
@@ -45,19 +46,25 @@ if __name__ == '__main__':
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
     script_args = exp_params.TUNE_CLASSIFIER_ARGS
+
+    ## required script parameters
     results_dir = script_args.get('RESULTS_DIR', exp_params.RESULTS_DIR)
     exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
     class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
     ds = script_args.get('DATASET', exp_params.DATASET)
-    sample_ids = script_args.get('SAMPLE_IDS', exp_params.SAMPLE_IDS)
-    feature_ids = script_args.get('FEATURE_IDS', exp_params.FEATURE_IDS)
-    partitioner = script_args.get('PARTITIONER', exp_params.PARTITIONER)
-    partitioner_name = script_args.get('PARTITIONER_NAME', default_val(exp_params, 'PARTITIONER_NAME'))
     classifier = script_args.get('CLASSIFIER', exp_params.CLASSIFIER)
+    tuning_params = script_args.get('TUNING_PARAMS')
+
+    ## optional script parameters
+    sample_ids = script_args.get('SAMPLE_IDS',  default_val(exp_params, 'SAMPLE_IDS')),
+    feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
     classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
-    classifier_fweights_handle = script_args.get('CLASSIFIER_FWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
-    classifier_sweights_handle = script_args.get('CLASSIFIER_SWEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_SWEIGHTS_HANDLE'))
-    classifier_tuning_params = script_args.get('CLASSIFIER_TUNING_PARAMS')
+    partitioner = script_args.get('PARTITIONER', default_val(exp_params, 'PARTITIONER'))
+    partitioner_name = script_args.get('PARTITIONER_NAME', default_val(exp_params, 'PARTITIONER_NAME'))
+    classifier_fweights_handle = script_args.get('CLASSIFIER_FWEIGHTS_HANDLE',
+                                                 default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
+    classifier_sweights_handle = script_args.get('CLASSIFIER_SWEIGHTS_HANDLE',
+                                                 default_val(exp_params, 'CLASSIFIER_SWEIGHTS_HANDLE'))
     classifier_fweights_threshold = script_args.get('CLASSIFIER_FWEIGHTS_THRESHOLD', 0)
     classifier_sweights_threshold = script_args.get('CLASSIFIER_SWEIGHTS_THRESHOLD', 0)
 
@@ -75,7 +82,7 @@ if __name__ == '__main__':
     # remove contents of original log directory
     shutil.rmtree(os.path.join(log_dir, log_name), ignore_errors=True)
 
-
+    # define objective function
     def objective_function(**kwargs):
 
         # generate new classifier with args
@@ -119,21 +126,22 @@ if __name__ == '__main__':
 
         return out_dict
 
+    # define trainable object for ray tune
     def trainable(config):
         scores = objective_function(**config)
         [tune.report(**scores)]
 
-    
+    # determine if gpus are used and then start the trials
     if args.gpus_per_trial == 0:
                 tune.run(trainable,
-                config=classifier_tuning_params,
+                config=tuning_params,
                 local_dir=os.path.abspath(log_dir),
                 name=log_name,
                 resources_per_trial={"gpu": args.args.gpus_per_trial},
                 )
     else:
         tune.run(trainable,
-                config=classifier_tuning_params,
+                config=tuning_params,
                 local_dir=os.path.abspath(log_dir),
                 name=log_name,
                 )
