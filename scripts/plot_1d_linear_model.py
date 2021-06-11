@@ -1,10 +1,15 @@
+"""
+Generic script for visualizing a data set with respect to a 1d linear model. The model must have a weights vector for
+the linear transformation and an optional bias for an affine shift component.
+"""
+
 if __name__ == '__main__':
     # imports for arguments
     import argparse
     import os
 
     # command line arguments
-    parser = argparse.ArgumentParser("plot-1d-ML-model")
+    parser = argparse.ArgumentParser("plot-1d-linear-model")
 
     parser.add_argument('--exp_params',
                         type=str,
@@ -29,29 +34,30 @@ if __name__ == '__main__':
 
     # imports
     from sklearn.decomposition import PCA
-    from sklearn.metrics import balanced_accuracy_score as bsr
     from datasci.decomposition.general import OrthTransform
-    from sklearn.model_selection import LeaveOneGroupOut
-    import torch as tc
     import numpy as np
-    import sys
     import os
-    from copy import deepcopy
     from datasci.core.helper import module_from_path
+    from datasci.core.helper import default_val
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    results_dir = exp_params.RESULTS_DIR
-    exp_name = exp_params.EXP_NAME
-    class_attr = exp_params.CLASS_ATTR
-    train_test_attr = exp_params.TRAIN_TEST_ATTR
-    ds = exp_params.DATASET
-    sample_ids = exp_params.SAMPLE_IDS
-    feature_ids = exp_params.FEATURE_IDS
-    classifier_results = exp_params.CLASSIFIER_RESULTS
-    classifier_name = exp_params.CLASSIFIER_NAME
-    classifier_weights_handle = exp_params.CLASSIFIER_WEIGHTS_HANDLE
-    classifier_bias_handle = exp_params.CLASSIFIER_BIAS_HANDLE
+    script_args = exp_params.PLOT_1D_MODEL_ARGS
+
+    ## required script params
+    results_dir = script_args.get('RESULTS_DIR', exp_params.RESULTS_DIR)
+    exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
+    class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
+    ds = script_args.get('DATASET', exp_params.DATASET)
+    classifier_results = script_args.get('CLASSIFIER_RESULTS', exp_params.CLASSIFIER_RESULTS)
+
+    ## optional script params
+    sample_ids = script_args.get('SAMPLE_IDS',  default_val(exp_params, 'SAMPLE_IDS')),
+    feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
+    train_test_attr = script_args.get('TRAIN_TEST_ATTR', default_val(exp_params, 'TRAIN_TEST_ATTR'))
+    classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
+    weights_handle = script_args.get('WEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
+    bias_handle = script_args.get('BIAS_HANDLE', default_val(exp_params, 'CLASSIFIER_BIAS_HANDLE'))
 
     # get number of features
     n_features = len(feature_ids)
@@ -66,11 +72,11 @@ if __name__ == '__main__':
         test_score = classifier_results['scores'].loc['Test'].values[i]
 
         # extract weights vector
-        w = eval("classifier." + classifier_weights_handle).reshape(-1, 1)
+        w = eval("classifier." + weights_handle).reshape(-1, 1)
 
         # extract bias/shift
         try:
-            b = np.array(eval("classifier." + classifier_bias_handle)).item()
+            b = np.array(eval("classifier." + bias_handle)).item()
         except AttributeError:
             b = 0
 
