@@ -29,6 +29,11 @@ if __name__ == '__main__':
                         choices=['bsr', 'accuracy'],
                         help='Score reported by the classifier.')
 
+    parser.add_argument('--gpus-per-trial',
+                        type=int,
+                        default=0,
+                        help='The fraction of gpu resources to assign for each trial. e.g. .5 means each trial uses half of a gpu.')
+
     args = parser.parse_args()
 
     # imports
@@ -68,6 +73,10 @@ if __name__ == '__main__':
     # set log directory
     log_dir, log_name = os.path.split(os.path.abspath(args.logdir))
 
+    # remove contents of original log directory
+    shutil.rmtree(os.path.join(log_dir, log_name), ignore_errors=True)
+
+
     def objective_function(**kwargs):
 
         # generate new classifier with args
@@ -102,12 +111,12 @@ if __name__ == '__main__':
         # gather # important features in model
         if classifier_fweights_handle is not None:
             fweights_dict = (classification_results['f_weights'].filter(regex='weights').apply(np.abs) > classifier_fweights_threshold).sum().to_dict()
-            out_dict.update(f_weights_dict)
+            out_dict.update(fweights_dict)
         
         # gather # important samples in model
-        if classifier_fweights_handle is not None:
+        if classifier_sweights_handle is not None:
             sweights_dict = (classification_results['s_weights'].filter(regex='weights').apply(np.abs) > classifier_sweights_threshold).sum().to_dict()
-            out_dict.update(s_weights_dict)
+            out_dict.update(sweights_dict)
 
         return out_dict
 
@@ -115,10 +124,17 @@ if __name__ == '__main__':
         scores = objective_function(**config)
         [tune.report(**scores)]
 
-    # remove contents of original log directory
-    shutil.rmtree(os.path.join(log_dir, log_name))
-
-    tune.run(trainable,
-             config=classifier_tuning_params,
-             local_dir=os.path.abspath(log_dir),
-             name=log_name)
+    
+    if args.gpus_per_trial == 0:
+                tune.run(trainable,
+                config=classifier_tuning_params,
+                local_dir=os.path.abspath(log_dir),
+                name=log_name,
+                resources_per_trial={"gpu": args.args.gpus_per_trial},
+                )
+    else:
+        tune.run(trainable,
+                config=classifier_tuning_params,
+                local_dir=os.path.abspath(log_dir),
+                name=log_name,
+                )
