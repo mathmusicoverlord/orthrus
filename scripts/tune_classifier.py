@@ -129,11 +129,11 @@ if __name__ == '__main__':
                 config=classifier_tuning_params,
                 local_dir=os.path.abspath(log_dir),
                 name=log_name,
-                resources_per_trial={"gpu": args.args.gpus_per_trial},
                 )
     else:
         tune.run(trainable,
                 config=classifier_tuning_params,
                 local_dir=os.path.abspath(log_dir),
                 name=log_name,
+                resources_per_trial={"gpu": args.gpus_per_trial}
                 )
