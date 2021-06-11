@@ -48,9 +48,11 @@ PARTITIONER = KFold(n_splits=5, shuffle=True, random_state=0)
 PARTITIONER_NAME = '5-fold'
 
 # set classifier
-CLASSIFIER = SSVM(solver=LPPrimalDualPy)
-CLASSIFIER_NAME = 'SSVM'
-CLASSIFIER_FWEIGHTS_HANDLE = 'weights_'
+CLASSIFIER = L1SVM(device='any', kernel_args=dict(metric='rbf', gamma=.0625))
+CLASSIFIER_NAME = 'L1SVM_RBF'
+CLASSIFIER_FWEIGHTS_HANDLE=None,
+CLASSIFIER_SWEIGHTS_HANDLE='w_',
+
 
 ## specific script args
 
@@ -63,7 +65,6 @@ TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
                                                           verbosity=0,
                                                           nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
                                                           delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()),
-                                                          device='any',
                                                           kernel_args=dict(metric='rbf',
                                                                            gamma=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
                                                                            )
