@@ -92,6 +92,11 @@ class LPNewton():
                 return x.detach().cpu().type(tc.float64)
             else:
                 return tc.tensor(data=x, dtype=tc.float64)
+        elif self.device == 'any':
+            if isinstance(x, tc.Tensor):
+                return x.detach().type(tc.float64).cuda()
+            else:
+                return tc.tensor(data=x, dtype=tc.float64).cuda()
         else:
             cuda = tc.device('cuda:' + str(self.device))
             if isinstance(x, tc.Tensor):
