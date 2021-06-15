@@ -378,12 +378,13 @@ class DataSet:
 
         return embedding, embedding_vals
 
-    def normalize(self, 
-                normalizer, 
+    def normalize(self,
+                normalizer,
                 feature_ids=None,
-                sample_ids=None, 
+                sample_ids=None,
                 norm_name: str = None,
-                supervised_attr: str = None):
+                supervised_attr: str = None,
+                normalize_args=None):
         """
         Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
         used to :py:attr:`DataSet.normalization_method`.
@@ -404,6 +405,8 @@ class DataSet:
 
             supervised_attr (string): If not None, the supervised_attr labels are based to the normalizer fit method, rather than None.
 
+            normalize_args (dict)L Dictionary of keyword arguments to be passed to fit_transform method of the
+                :py:attr:`normalizer`.
         Returns:
             inplace method.
 
@@ -422,6 +425,9 @@ class DataSet:
         if norm_name is None:
             norm_name = normalizer.__str__()
 
+        if normalize_args is None:
+            normalize_args = {}
+
         # slice the data set
         ds = self.slice_dataset(feature_ids, sample_ids)
         data = ds.data
@@ -429,12 +435,17 @@ class DataSet:
 
         # transform data
         if supervised_attr != None:
-            data_trans = normalizer.fit_transform(data.values, y=metadata[supervised_attr].values)
+            data_trans = normalizer.fit_transform(data.values,
+                                                  y=metadata[supervised_attr].values,
+                                                  **normalize_args)
         else:
             try:
-                data_trans = normalizer.fit_transform(data.values, y=None)
+                data_trans = normalizer.fit_transform(data.values,
+                                                      y=None,
+                                                      **normalize_args)
             except TypeError:
-                data_trans = normalizer.fit_transform(data.values)
+                data_trans = normalizer.fit_transform(data.values,
+                                                      **normalize_args)
 
 
         # create dataframe from transformed data
