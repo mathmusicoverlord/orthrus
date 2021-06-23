@@ -103,11 +103,14 @@ if __name__ == '__main__':
     ax.plot(values,
             num_features,
             #label='Number of features',
-
+            linewidth=2,
             )
     ax.update(dict(xlabel=key,
                    ylabel='Proportion of Features'))
     ax.update(plot_args)
+    ax.set_title(ax.get_title(), fontsize=16)
+    ax.set_xlabel(ax.get_xlabel(), fontsize=18)
+    ax.set_ylabel(ax.get_ylabel(), fontsize=18)
     if save_name is None:
         save_name = '_'.join([ds.name, exp_name, classifier_name, class_attr.lower(), key, 'feature_counts'])
     plt.savefig(fname=os.path.join(fig_dir, save_name + '.png'), format='png')
