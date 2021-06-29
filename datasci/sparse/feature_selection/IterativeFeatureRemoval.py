@@ -4,7 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import random
 from calcom.solvers import LPPrimalDualPy
-
+import copy 
+import sklearn
+import calcom
+import ray
 class IFR:
 
 
@@ -98,6 +101,13 @@ class IFR:
                                             'features', 'true_feature_count', 'cap_breached']
         self._initialize_diagnostic_dictionary(self.diagnostic_information_)
         self.diagnostic_information_['exit_reasons'] = []
+        self.scorer = sklearn.metrics.balanced_accuracy_score
+        model = calcom.classifiers.SSVMClassifier()
+        model.params['C'] = 1.
+        model.params['method'] = LPPrimalDualPy
+        model.params['use_cuda'] = True
+        self.model = model
+        self.num_processes = 20
         super(IFR, self).__init__()
     #
 
@@ -150,13 +160,14 @@ class IFR:
         self.results.loc[features, 'frequency'] =  self.results.loc[features, 'frequency'] + 1
 
 
-    def _update_selection_iteration_in_results(self, features, iteration):
+    def _update_selection_iteration_in_results(self, list_of_features):
         '''
         Appends the iteration number, for passed features, in selection_iteration column of self.results
         '''
-        for feature in features:
-            iter_list = self.results.loc[feature, 'selection_iteration']
-            iter_list.append(iteration)
+        for iteration, features in enumerate(list_of_features):
+            for feature in features:
+                iter_list = self.results.loc[feature, 'selection_iteration']
+                iter_list.append(iteration)
 
     def _update_weights_in_results(self, features, weights):
         '''
@@ -168,8 +179,6 @@ class IFR:
             weights = self.results.loc[feature, 'weights']
             weights.append(weight)
             
-
-
     def fit(self, data, labels):
         '''
         data        : m-by-n array of data, with m the number of observations.
@@ -179,7 +188,6 @@ class IFR:
         '''
         import calcom
         import numpy as np
-        import time
 
         m,n = np.shape(data)
 
@@ -196,52 +204,21 @@ class IFR:
             print('\n')
         #
 
-
         if self.nfolds < 2:
             raise ValueError("Number of folds have to be greater than 1")
 
-
         self._initialize_results(n)
 
-        bsr = calcom.metrics.ConfusionMatrix('bsr')
-
-        # start processing
-
-        #total time is the time taken by this method divided by total Number
-        #of iterations it will run for.
-        total_start_time = time.time()
-
-        #method time is similar to total time, but calculates just the
-        #time taken by ssvm to fit the data
-        total_method_time = 0
-
-        total_iterations = 0
         n_data_partition = 0
+        processes = []
+        # start processing
         for n_rep in range(self.repetition):
-
-            if self.verbosity>0:
-                print("=====================================================")
-                print("beginning of repetition ", n_rep+1, " of ", self.repetition)
-                print("=====================================================")
-
 
             partitions = calcom.utils.generate_partitions(labels, method=self.partition_method, nfolds=self.nfolds)
 
             for i, partition in enumerate(partitions):
 
                 n_data_partition +=1
-
-                if self.verbosity>0:
-                    print("=====================================================")
-                    print("beginning of execution for fold ", i+1, " of ", len(partitions))
-                    print("=====================================================")
-                #
-
-                list_of_features_for_curr_fold = np.array([], dtype=np.int64)
-                list_of_weights_for_curr_fold = np.array([], dtype=np.int64)            
-                selected = np.array([], dtype=np.int64)
-                # Mask array which tracks features which haven't been removed.
-                active_mask = np.ones(n, dtype=bool)
 
                 train_idx, validation_idx = partition
                 train_data = data[train_idx, :]
@@ -250,228 +227,259 @@ class IFR:
                 validation_data = data[validation_idx, :]
                 validation_labels = labels[validation_idx]
 
-                #create an empty dictionary to store diagnostic info for the
-                #current data partition, this dictionary has info about each iteration
-                #on the current data partition
+                processes.append(self.select_features_for_data_partition.remote(self, train_data, validation_data, train_labels, validation_labels))
 
-                diagnostic_info_dictionary = {}
-                self._initialize_diagnostic_dictionary(diagnostic_info_dictionary)
-                exit_reason = "max_iters"
-                for i in range(self.max_iters):
-                    total_iterations += 1
-                    if self.verbosity > 1:
-                        print("=====================================================")
-                        print("beginning of inner loop iteration ", i+1)
-                        print("Number of features selected for this fold: %i of %i"%(len(list_of_features_for_curr_fold),n))
-                        print("Checking BSR of complementary problem... ",end="")
-                    #
-
-                    #redefine SSVM classifier with new random parameters
-                    ssvm = calcom.classifiers.SSVMClassifier()
-                    ssvm.params['C'] = 1.
-                    ssvm.params['use_cuda'] = True
-                    ssvm.params['method'] = LPPrimalDualPy
-
-                    tr_d = np.array( train_data[:,active_mask] )
-                    te_d = np.array( validation_data[:,active_mask] )
-                    #import pdb; pdb.set_trace()
-                    try:
-                        method_start_time = time.time()
-                        ssvm.fit(tr_d, train_labels)
-                        total_method_time += time.time() - method_start_time
-                    except Exception as e:
-                        if self.verbosity>0:
-                            print("Warning: during the training process the following exception occurred:\n")
-                            print(str(e))
-                            print("\nBreaking the execution for the current data fold")
-                            #save the diagnostic information
-                            
-                        self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None)
-                        exit_reason = "exception_in_ssvm_fitting"
-                        break
-                    
-                    weight = ssvm.results['weight']
-
-                    #calculate BSR for training data
-                    pred_train = ssvm.predict(tr_d)
-                    bsrval_train = bsr.evaluate(train_labels, pred_train)
-                    if self.verbosity>1:
-                        print('')
-                        print("Training BSR %.3f. "%bsrval_train)
-                        print("")
-
-                    #calculate BSR for validation data
-                    pred_validation = ssvm.predict(te_d)
-                    bsrval_validation = bsr.evaluate(validation_labels, pred_validation)
-
-                    if self.verbosity>1:
-                        print("Validation BSR %.3f. "%bsrval_validation)
-                        print("")
-
-                    #Check if BSR is above cutoff
-                    if (bsrval_validation < self.cutoff):
-                        if self.verbosity>1:
-                            print("BSR below cutoff, exiting inner loop.")
-
-                        #save the diagnostic information for this iteration
-                        #in this case we only have train and validation bsr
-                        self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                            bsrval_train,
-                            bsrval_validation,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None)
-
-                        #break out of current loop if bsr is below cutoff
-                        exit_reason = "validation_bsr_cutoff"
-                        break
-
-                    ##########
-                    #
-                    # Detect where the coefficients in the weight vector are
-                    # numerically zero, based on the (absolute value) ratio of
-                    # successive coefficients.
-                    #
-
-                    # Look at absolute values and sort largest to smallest.
-                    abs_weights = (np.abs(weight)).flatten()
-                    order = np.argsort(-abs_weights)
-                    sorted_abs_weights = abs_weights[order]
-
-                    # Detect jumps in the coefficient values using a ratio parameter.
-                    weight_ratios = sorted_abs_weights[:-1] / (sorted_abs_weights[1:] + np.finfo(float).eps)
-                    jumpidxs = np.where(weight_ratios > self.jumpratio)[0]
-
-
-                    #check if sufficient jump was found
-                    if len(jumpidxs)==0:
-                        #jump never happened.
-                        #save the diagnostic information for this iteration
-                        #we still do not have the selected feature count and features
-
-                        self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                            bsrval_train,
-                            bsrval_validation,
-                            sorted_abs_weights,
-                            weight_ratios,
-                            None,
-                            None,
-                            None)
-                        exit_reason = "jump_failed"
-                   
-                   
-                        #break out of the loop
-                        if self.verbosity>1:
-                            print('There was no jump of sufficient size between ratios of successive coefficients in the weight vector.')
-                            print("Discarding iteration..")
-                        break
-
-                    else:
-                        count = jumpidxs[0]
-
-                    #check if the weight at the jump is greater than cutoff
-                    if sorted_abs_weights[count] < 1e-6:
-
-                        self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                            bsrval_train,
-                            bsrval_validation,
-                            sorted_abs_weights,
-                            weight_ratios,
-                            None,
-                            None,
-                            None)
-                        exit_reason = "small_weight_at_jump"
-                        if self.verbosity>1:
-                            print('Weight at the jump(', sorted_abs_weights[count] ,')  smaller than weight cutoff(1e-6).')
-                            print("Discarding iteration..")
-                        break
-
-                    count += 1
-                    cap_breached = False
-                    #check if the number of selected features is greater than the cap
-                    if count > int(self.max_features_per_iter_ratio * train_data.shape[0]):
-
-                        self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                            bsrval_train,
-                            bsrval_validation,
-                            sorted_abs_weights,
-                            weight_ratios,
-                            None,
-                            None,
-                            None)
-                        exit_reason = "max_features_per_iter_breached"
-                        if self.verbosity>1:
-                            print('More features selected than the ', self.max_features_per_iter_ratio, ' ratio of training data samples(', train_data.shape[0], ')')
-                            print("Discarding iteration..")
-                        
-                        break
-
-                    
-                    #select features: order is list of sorted features
-                    selected = order[:count]
-
-                    if self.verbosity>1:
-                        print("\nSelected features on this iteration:")
-                        print(selected)
-                        print("\n")
-                    #
-
-                    # Selected indices are relative to the current active set.
-                    # Get the mapping back to the original indices.
-                    active_idxs = np.where(active_mask)[0]
-
-                    active_mask[active_idxs[selected]] = 0
-
-                    #append the selected features to the list_of_features_for_curr_fold
-                    list_of_features_for_curr_fold = np.concatenate([list_of_features_for_curr_fold ,  active_idxs[selected]])
-                    list_of_weights_for_curr_fold = np.concatenate([list_of_weights_for_curr_fold ,  weight.flatten()[order][:count]])
-                    #save the diagnostic information for this iteration
-                    #here we have all the information we need
-                    self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                        bsrval_train,
-                        bsrval_validation,
-                        sorted_abs_weights,
-                        weight_ratios,
-                        active_idxs[selected],
-                        count,
-                        cap_breached)
-
-                    if self.verbosity>1:
-                        print('Removing %i features from training and validation matrices.'%len(selected))
-                        print("\n")
-
-                    #update the selection_iteration for the features selected in the current iteration
-                    self._update_selection_iteration_in_results(active_idxs[selected], i+1)    
-
+        num_done = 0
+        total = len(processes)
+        while(len(processes) > 0):
+            if len(processes) < self.num_processes:
+                num_returns = len(processes)
+            else:
+                num_returns = self.num_processes
+            finished_processes, processes = ray.wait(processes, num_returns=num_returns)
+            num_done += len(finished_processes)
+            for process in finished_processes:
+                results = ray.get(process)
                 # update the feature set dictionary based on the features collected for current fold
+                list_of_features_for_curr_fold = results['list_of_features']
                 self._update_frequency_in_results(list_of_features_for_curr_fold)
+                
+                list_of_weights_for_curr_fold = results['list_of_weights']
                 self._update_weights_in_results(list_of_features_for_curr_fold, list_of_weights_for_curr_fold) 
+                list_of_selection_iterations_for_current_fold = results['list_of_selection_iteration']
+                self._update_selection_iteration_in_results(list_of_selection_iterations_for_current_fold)   
+                
+                n_iters = results['n_iters']
+                diagnostic_info_dictionary = results['diagnostic_info_dictionary']
+                exit_reason = results['exit_reason']
+                                
+                self._sanity_check_diagnostics(diagnostic_info_dictionary, n_iters)
                 #save the diagnostic information for this data partition
-                self._sanity_check_diagnostics(diagnostic_info_dictionary, i+1)
                 self._add_diagnostic_info_for_data_partition(diagnostic_info_dictionary, n_data_partition, exit_reason)
-
             #
-        total_time_per_iteration = (time.time() - total_start_time) / total_iterations
-        method_time_per_iteration = total_method_time / total_iterations
-        self.total_time = total_time_per_iteration
-        self.method_time = method_time_per_iteration
 
+        assert num_done == total, 'All processes were not processed.'
         if self.verbosity>0:
             print("=====================================================")
             print("Finishing Execution. %d features out of a total of %d features were selected."% ((self.results['frequency'] > 0).sum(), data.shape[1]))
             print("=====================================================")
 
         return self.results
-    #
+
+    @ray.remote(num_gpus=0.1)
+    def select_features_for_data_partition(self, train_data, validation_data, train_labels, validation_labels):
+        _, n = train_data.shape
+        list_of_features_for_curr_fold = np.array([], dtype=np.int64)
+        list_of_weights_for_curr_fold = np.array([], dtype=np.int64)  
+        list_of_selection_iterations_for_current_fold = []
+
+        selected = np.array([], dtype=np.int64)
+        # Mask array which tracks features which haven't been removed.
+        active_mask = np.ones(n, dtype=bool)
+
+        #create an empty dictionary to store diagnostic info for the
+        #current data partition, this dictionary has info about each iteration
+        #on the current data partition
+        diagnostic_info_dictionary = {}
+        self._initialize_diagnostic_dictionary(diagnostic_info_dictionary)
+        exit_reason = "max_iters"
+        for i in range(self.max_iters):
+            if self.verbosity > 1:
+                print("=====================================================")
+                print("beginning of inner loop iteration ", i+1)
+                print("Number of features selected for this fold: %i of %i"%(len(list_of_features_for_curr_fold), n))
+                print("Checking BSR of complementary problem... ",end="")
+            #
+
+            #redefine SSVM classifier with new random parameters
+            model = copy.deepcopy(self.model)
+
+            tr_d = np.array( train_data[:,active_mask] )
+            te_d = np.array( validation_data[:,active_mask] )
+            #import pdb; pdb.set_trace()
+            try:
+                model.fit(tr_d, train_labels)
+            except Exception as e:
+                if self.verbosity>0:
+                    print("Warning: during the training process the following exception occurred:\n")
+                    print(str(e))
+                    print("\nBreaking the execution for the current data fold")
+                    #save the diagnostic information
+                    
+                self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None)
+                exit_reason = "exception_in_ssvm_fitting"
+                break
+            
+            weight = model.results['weight']
+
+            #calculate BSR for training data
+            pred_train = model.predict(tr_d)
+            bsrval_train = self.scorer(train_labels, pred_train)
+            if self.verbosity>1:
+                print('')
+                print("Training BSR %.3f. "%bsrval_train)
+                print("")
+
+            #calculate BSR for validation data
+            pred_validation = model.predict(te_d)
+            bsrval_validation = self.scorer(validation_labels, pred_validation)
+
+            if self.verbosity>1:
+                print("Validation BSR %.3f. "%bsrval_validation)
+                print("")
+
+            #Check if BSR is above cutoff
+            if (bsrval_validation < self.cutoff):
+                if self.verbosity>1:
+                    print("BSR below cutoff, exiting inner loop.")
+
+                #save the diagnostic information for this iteration
+                #in this case we only have train and validation bsr
+                self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                    bsrval_train,
+                    bsrval_validation,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None)
+
+                #break out of current loop if bsr is below cutoff
+                exit_reason = "validation_bsr_cutoff"
+                break
+
+            ##########
+            #
+            # Detect where the coefficients in the weight vector are
+            # numerically zero, based on the (absolute value) ratio of
+            # successive coefficients.
+            #
+
+            # Look at absolute values and sort largest to smallest.
+            abs_weights = (np.abs(weight)).flatten()
+            order = np.argsort(-abs_weights)
+            sorted_abs_weights = abs_weights[order]
+
+            # Detect jumps in the coefficient values using a ratio parameter.
+            weight_ratios = sorted_abs_weights[:-1] / (sorted_abs_weights[1:] + np.finfo(float).eps)
+            jumpidxs = np.where(weight_ratios > self.jumpratio)[0]
+
+
+            #check if sufficient jump was found
+            if len(jumpidxs)==0:
+                #jump never happened.
+                #save the diagnostic information for this iteration
+                #we still do not have the selected feature count and features
+
+                self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                    bsrval_train,
+                    bsrval_validation,
+                    sorted_abs_weights,
+                    weight_ratios,
+                    None,
+                    None,
+                    None)
+                exit_reason = "jump_failed"
+            
+            
+                #break out of the loop
+                if self.verbosity>1:
+                    print('There was no jump of sufficient size between ratios of successive coefficients in the weight vector.')
+                    print("Discarding iteration..")
+                break
+
+            else:
+                count = jumpidxs[0]
+
+            #check if the weight at the jump is greater than cutoff
+            if sorted_abs_weights[count] < 1e-6:
+
+                self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                    bsrval_train,
+                    bsrval_validation,
+                    sorted_abs_weights,
+                    weight_ratios,
+                    None,
+                    None,
+                    None)
+                exit_reason = "small_weight_at_jump"
+                if self.verbosity>1:
+                    print('Weight at the jump(', sorted_abs_weights[count] ,')  smaller than weight cutoff(1e-6).')
+                    print("Discarding iteration..")
+                break
+
+            count += 1
+            cap_breached = False
+            #check if the number of selected features is greater than the cap
+            if count > int(self.max_features_per_iter_ratio * train_data.shape[0]):
+
+                self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                    bsrval_train,
+                    bsrval_validation,
+                    sorted_abs_weights,
+                    weight_ratios,
+                    None,
+                    None,
+                    None)
+                exit_reason = "max_features_per_iter_breached"
+                if self.verbosity>1:
+                    print('More features selected than the ', self.max_features_per_iter_ratio, ' ratio of training data samples(', train_data.shape[0], ')')
+                    print("Discarding iteration..")
+                
+                break
+
+            
+            #select features: order is list of sorted features
+            selected = order[:count]
+
+            if self.verbosity>1:
+                print("\nSelected features on this iteration:")
+                print(selected)
+                print("\n")
+            #
+
+            # Selected indices are relative to the current active set.
+            # Get the mapping back to the original indices.
+            active_idxs = np.where(active_mask)[0]
+
+            active_mask[active_idxs[selected]] = 0
+
+            #append the selected features to the list_of_features_for_curr_fold
+            list_of_features_for_curr_fold = np.concatenate([list_of_features_for_curr_fold ,  active_idxs[selected]])
+            list_of_weights_for_curr_fold = np.concatenate([list_of_weights_for_curr_fold ,  weight.flatten()[order][:count]])
+            #save the diagnostic information for this iteration
+            #here we have all the information we need
+            self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
+                bsrval_train,
+                bsrval_validation,
+                sorted_abs_weights,
+                weight_ratios,
+                active_idxs[selected],
+                count,
+                cap_breached)
+
+            if self.verbosity>1:
+                print('Removing %i features from training and validation matrices.'%len(selected))
+                print("\n")
+
+            #append the selection iterations for the features selected in the current iteration
+            list_of_selection_iterations_for_current_fold.append(active_idxs[selected])
+        
+        results = {}
+        results['list_of_features'] = list_of_features_for_curr_fold
+        results['list_of_weights'] = list_of_weights_for_curr_fold
+        results['list_of_selection_iteration'] = list_of_selection_iterations_for_current_fold
+        results['diagnostic_info_dictionary'] = diagnostic_info_dictionary
+        results['exit_reason'] = exit_reason
+        results['n_iters'] = i+1
+        return results 
 
 
     def plot_basic_diagnostic_stats(self, validation_bsr_iteration_idx = None, n_random_exp = -1):
@@ -537,5 +545,3 @@ class IFR:
         plt.show()
 
 #
-
-
