@@ -59,6 +59,8 @@ if __name__ == '__main__':
     feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
     cross_attr = script_args.get('CROSS_ATTR', default_val(exp_params, 'CROSS_ATTR'))
     save_name = script_args.get('SAVE_NAME', default_val(exp_params, 'VISUALIZE_SAVE_NAME'))
+    title = script_args.get('TITLE', default_val(exp_params, 'VISUALIZE_TITLE', val=''))
+    subtitle = script_args.get('SUBTITLE', default_val(exp_params, 'VISUALIZE_SUBTITLE', val=''))
 
     # grab dimension
     if args.dim == 1:
@@ -108,7 +110,8 @@ if __name__ == '__main__':
                  attr=class_attr,
                  cross_attr=cross_attr,
                  backend=backend,
-                 subtitle='', # <--- default show normalization and imputation methods used
+                 subtitle=subtitle, # <--- default show normalization and imputation methods used
+                 title=title,
                  save=True,
                  save_name=save_name,
                  **backend_args)
