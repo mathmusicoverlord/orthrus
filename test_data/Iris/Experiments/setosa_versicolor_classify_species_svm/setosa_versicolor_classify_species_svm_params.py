@@ -61,14 +61,14 @@ TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
                             CLASSIFIER_NAME='l1SVM_RBF',
                             CLASSIFIER_FWEIGHTS_HANDLE=None,
                             CLASSIFIER_SWEIGHTS_HANDLE='w_',
-                            CLASSIFIER_TUNING_PARAMS=dict(imax=100,
-                                                          verbosity=0,
-                                                          nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                                          delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()),
-                                                          kernel_args=dict(metric='rbf',
-                                                                           gamma=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                                                           )
-                                                          )                       
+                            TUNING_PARAMS=dict(imax=100,
+                                               verbosity=0,
+                                               nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
+                                               delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()),
+                                               kernel_args=dict(metric='rbf',
+                                                                gamma=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
+                                                                )
+                                               )                       
                             )
 
 # other parameters
