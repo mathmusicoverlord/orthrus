@@ -1444,64 +1444,66 @@ def load_dataset(file_path: str):
         DataSet : Class instance encoded by pickle binary file_path.
 
     Examples:
-            >>> ds = load_dataset(file_path='./iris.ds')
+            >>> ds = load_dataset(file_path=os.path.join(os.environ["DATASCI_PATH"], "test_data/Iris/Data/iris.ds"))
     """
     # open file and unpickle
     with open(file_path, 'rb') as f:
         return pickle.load(f)
 
-def from_ccd(file_path: str, name: str = None, index_col: str='_id'):	
-	    """	
-	    This function loads a Calcom Dataset object and returns an instance of a DataSet class.	
-	    Args:	
-	        file_path (str): Path of the CCDataSet file to load.	
-	        name (str): Reference name for the dataset. Default is the name of the ccd file (without extension).	
-	        index_col (str): attribute name from the ccd file to use as index for data and metadata dataframes (must contain unique values).	
-	    Returns:	
-	        DataSet : Class instance of Dataset.	
-	    Examples:	
-	            >>> ds = from_ccd(file_path='./ccd_file.h5')	
-	    """	
-	    import calcom	
-	    #load ccdataset	
-	    ccd = calcom.io.CCDataSet(file_path)	
-		
-	    #get index column values	
-	    try:	
-	        index_vals = ccd.get_attrs(index_col)	
-	    except:	
-	        print('Attribute %s not found, using _id as index'%index_col)	
-	        index_vals = ccd.get_attrs('_id')	
-	    	
-	    #check index column values are unique	
-	    assert np.unique(index_vals).shape[0] == index_vals.shape[0], '%s cannot be used as index, it contains duplicate values for samples.'%index_col	
-	    	
-	    #if filename not provided	
-	    if name is None:	
-	        #use ccd file name without extensions	
-	        name = os.path.splitext(os.path.basename(file_path))[0]	
-	    	
-	    description = ccd._about_str	
-	    	
-	    path = os.path.dirname(ccd.fname)	
-	    	
-	    data = ccd.generate_data_matrix()	
-	    data_df = df = pd.DataFrame(data, columns = ccd.variable_names)	
-	    data_df.index = index_vals	
-	    	
-	    metadata = None	
-	    for attr in ccd.attrs:	
-	        if metadata is None:	
-	            metadata = ccd.get_attrs(attr).reshape(-1, 1)	
-	        else:	
-	            metadata = np.hstack((metadata, ccd.get_attrs(attr).reshape(-1, 1)))	
-	    metadata_df = pd.DataFrame(metadata, columns = ccd.attrs)	
-	    metadata_df.index = index_vals	
-		
-	    #create and return DS object	
-	    ds = DataSet(name=name,description=description, path=path, data=data_df, metadata= metadata_df)	
-	    return ds	
-	
+
+def from_ccd(file_path: str, name: str = None, index_col: str = '_id'):
+    """
+    This function loads a Calcom Dataset object and returns an instance of a DataSet class.
+    Args:
+        file_path (str): Path of the CCDataSet file to load.
+        name (str): Reference name for the dataset. Default is the name of the ccd file (without extension).
+        index_col (str): attribute name from the ccd file to use as index for data and metadata dataframes (must contain unique values).
+    Returns:
+        DataSet : Class instance of Dataset.
+    Examples:
+            >>> ds = from_ccd(file_path='/path/to/ccd_file.h5')
+    """
+    import calcom
+    # load ccdataset
+    ccd = calcom.io.CCDataSet(file_path)
+
+    # get index column values
+    try:
+        index_vals = ccd.get_attrs(index_col)
+    except:
+        print('Attribute %s not found, using _id as index' % index_col)
+        index_vals = ccd.get_attrs('_id')
+
+    # check index column values are unique
+    assert np.unique(index_vals).shape[0] == index_vals.shape[
+        0], '%s cannot be used as index, it contains duplicate values for samples.' % index_col
+
+    # if filename not provided
+    if name is None:
+        # use ccd file name without extensions
+        name = os.path.splitext(os.path.basename(file_path))[0]
+
+    description = ccd._about_str
+
+    path = os.path.dirname(ccd.fname)
+
+    data = ccd.generate_data_matrix()
+    data_df = df = pd.DataFrame(data, columns=ccd.variable_names)
+    data_df.index = index_vals
+
+    metadata = None
+    for attr in ccd.attrs:
+        if metadata is None:
+            metadata = ccd.get_attrs(attr).reshape(-1, 1)
+        else:
+            metadata = np.hstack((metadata, ccd.get_attrs(attr).reshape(-1, 1)))
+    metadata_df = pd.DataFrame(metadata, columns=ccd.attrs)
+    metadata_df.index = index_vals
+
+    # create and return DS object
+    ds = DataSet(name=name, description=description, path=path, data=data_df, metadata=metadata_df)
+    return ds
+
 
 #def load_geo(**kwargs):
     # imports
