@@ -522,7 +522,6 @@ class DataSet:
             convert_dtypes (bool): Flag for whether or not to infer the datatypes for the metadata and vardata.
                 Default is false.
 
-
         Returns:
             inplace method.
 
