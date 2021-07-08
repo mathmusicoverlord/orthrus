@@ -867,3 +867,77 @@ def save_object(object, file_path):
     with open(file_path, 'wb') as f:
         pickle.dump(object, file=f)
 
+
+def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_frequency=10):
+
+    """
+    This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle, 
+    which defines the worker, and a list of arguments for the jobs.
+    
+    Args:
+        function_handle: Handle of the function or job
+
+        list of arguments (list of list): It is a list of argument list (see example below).
+
+        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used 
+            in resource constrained situation; lower the number of process if you are getting errors/exceptions
+
+        verbose_frequency (int) : This parameter controls the frequency of progress outputs to console; an output is 
+            printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+
+    Return:
+        a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
+        Note: 
+        1. The order of elements in return does not match the order of elements in arguments. 
+        2. This method calls ray.init() but doesn't call ray.shutdown() to preseve object references. It must be done
+           after the object references have been used
+
+    Example:
+        >>> import ray
+        >>> from datasci.core.helper import batch_jobs_
+        >>> import numpy as np
+        >>> @ray.remote
+        ... def job_handle(a: int, b: int):
+        ...     return a + b
+        >>> list_of_args = []
+        >>> for i in range(100):
+        ...     a = np.random.randint(200)
+        ...     b = np.random.randint(200)
+        ...     args = [a, b]
+        ...     list_of_args.append(args)
+        >>> process_refs = batch_jobs_(job_handle, list_of_args, max_processes=50, verbose_frequency=10)
+        >>> for process in process_refs:
+        ...     print(ray.get(process))
+    """
+    import ray
+    ray.init(ignore_reinit_error=True)
+    total_processes = len(list_of_arguments)
+    num_running=0
+    num_finished=0
+    processes = []
+    all_finished_processes = []
+    i = 1
+    for arguments in list_of_arguments:
+        if num_finished >= i * verbose_frequency:
+            print('%d of %d processes finished'%(num_finished, total_processes))
+            i = i+1
+        if num_running == max_processes:
+            finished_processes, processes = ray.wait(processes)
+            num_running -=len(finished_processes)
+            num_finished +=len(finished_processes)
+            all_finished_processes.extend(finished_processes)
+
+        processes.append(function_handle.remote(*arguments))
+        num_running+=1
+
+    #wait for all remaining processes to finish
+    finished_processes, processes = ray.wait(processes, num_returns=len(processes))
+    num_running -=len(finished_processes)
+    num_finished +=len(finished_processes)
+    print('%d of %d processes finished'%(num_finished, total_processes))
+    all_finished_processes.extend(finished_processes)
+
+    assert num_finished == total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
+                                        % (total_processes - num_finished)
+    assert num_running == 0, '%d processes still running' % num_running    
+    return all_finished_processes
