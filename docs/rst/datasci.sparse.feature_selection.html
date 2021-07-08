@@ -87,17 +87,18 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">datasci</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="datasci.html">datasci namespace</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="datasci.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="datasci.preprocessing.html">datasci.preprocessing namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="datasci.decomposition.html">datasci.decomposition namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="datasci.manifold.html">datasci.manifold namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="datasci.model_selection.html">datasci.model_selection namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="datasci.solvers.html">datasci.solvers namespace</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="datasci.sparse.html">datasci.sparse namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasci.core.html">datasci.core namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasci.manifold.html">datasci.manifold namespace</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="datasci.sparse.html">datasci.sparse namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="datasci.sparse.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datasci.sparse.classifiers.html">datasci.sparse.classifiers namespace</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">datasci.sparse.feature_selection namespace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-datasci.sparse.feature_selection.kffs">datasci.sparse.feature_selection.kffs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-datasci.sparse.feature_selection.kfold_loso_ifr">datasci.sparse.feature_selection.kfold_loso_ifr module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-datasci.sparse.feature_selection.kfold_shuffle_ifr">datasci.sparse.feature_selection.kfold_shuffle_ifr module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-datasci.sparse.feature_selection.sabs">datasci.sparse.feature_selection.sabs module</a></li>
 </ul>
 </li>
 </ul>
@@ -152,10 +153,6 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="modules.html">datasci</a> &raquo;</li>
-        
-          <li><a href="datasci.html">datasci namespace</a> &raquo;</li>
-        
           <li><a href="datasci.sparse.html">datasci.sparse namespace</a> &raquo;</li>
         
       <li>datasci.sparse.feature_selection namespace</li>
@@ -181,350 +178,6 @@
 <h1>datasci.sparse.feature_selection namespace<a class="headerlink" href="#datasci-sparse-feature-selection-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-datasci.sparse.feature_selection.IterativeFeatureRemoval">
-<span id="datasci-sparse-feature-selection-iterativefeatureremoval-module"></span><h2>datasci.sparse.feature_selection.IterativeFeatureRemoval module<a class="headerlink" href="#module-datasci.sparse.feature_selection.IterativeFeatureRemoval" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.IterativeFeatureRemoval.</code><code class="sig-name descname">IFR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repetition</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">partition_method</span><span class="o">=</span><span class="default_value">'stratified_k-fold'</span></em>, <em class="sig-param"><span class="n">nfolds</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">max_iters</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">cutoff</span><span class="o">=</span><span class="default_value">0.75</span></em>, <em class="sig-param"><span class="n">jumpratio</span><span class="o">=</span><span class="default_value">100.0</span></em>, <em class="sig-param"><span class="n">max_features_per_iter_ratio</span><span class="o">=</span><span class="default_value">0.8</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The Iterative Feature Removal algorithms extracts features for many data partitions independently and combines them and keep track of feature frequency, weights
-and iterations in which each feature was extracted. During execution, the data is partitioned into training and validation sets ‘repetition’ number of times and
-then for each partition, one feature set is extracted. So, a total of repetition * num_partitions independent feature sets are extracted and the results are
-merged to create the output.</p>
-<p>For each feature set, the algorithm can halt because of the following conditions:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>BSR on validation partition is below cutoff</p></li>
-<li><p>Jump does not occur in the array of sorted absolute weights</p></li>
-<li><p>Jump occurs but the weight at the jump is too small ( &lt; 10e-6)</p></li>
-<li><p>#selected features is greater than max_features_per_iter_ratio * #samples in training partition. This condition exists to prevent overfitting.</p></li>
-<li><p>max_iters number of iterations complete successfully</p></li>
-</ol>
-</div></blockquote>
-<p>When one of these conditions happen, further feature extraction on the current fold is stopped and begins on the next partition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>repetition</strong> (<em>int</em>) – Determines the number of times to partition the dataset. (default: 10)</p></li>
-<li><p><strong>partition_method</strong> (<em>string</em>) – A partition method that is compatible with calcom.utils.generate_partitions (default: ‘stratified_k-fold’)</p></li>
-<li><p><strong>nfolds</strong> (<em>int</em>) – The number of folds to partition data into (default: 3)</p></li>
-<li><p><strong>max_iters</strong> (<em>int</em>) – Determines the maximum number of iterations of IFR on one data partition(default: 5)</p></li>
-<li><p><strong>cutoff</strong> (<em>float</em>) – Threshold for the validation BSR (balanced success rate) to halt the process. (default: 0.75)</p></li>
-<li><p><strong>jumpratio</strong> (<em>float</em>) – The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)</p></li>
-<li><p><strong>max_features_per_iter_ratio</strong> (<em>float</em>) – A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
-if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
-on the current fold is stopped.</p></li>
-<li><p><strong>verbosity</strong> (<em>int</em>) – Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.diagnostic_information_">
-<code class="sig-name descname">diagnostic_information_</code><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.diagnostic_information_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Holds execution information for each interation of each partition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>The dataframe is indexed by feature_ids and contains the results of IFR. Each column contains different infromation for each feature as described below:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>frequency : How many times the feature is extracted</p></li>
-<li><p>weights : Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.
-The length of the weights is equal to the frequency.</p></li>
-<li><p>selection_iteration : Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.</p></li>
-</ul>
-</div></blockquote>
-</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.sparse.feature_selection.IterativeFeatureRemoval</span> <span class="k">as</span> <span class="nn">IFR</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">DS</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">IFR</span><span class="o">.</span><span class="n">IFR</span><span class="p">(</span>
-<span class="go">    repetition = 500,</span>
-<span class="go">    nfolds = 4,</span>
-<span class="go">    max_iters = 100,</span>
-<span class="go">    cutoff = .6,</span>
-<span class="go">    jumpratio = 5,</span>
-<span class="go">    max_features_per_iter_ratio = 2</span>
-<span class="go">    verbosity = 2,</span>
-<span class="go">    )</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">feature_select</span><span class="p">(</span><span class="n">ifr</span><span class="p">,</span>
-<span class="go">            attrname,</span>
-<span class="go">            selector_name=&#39;IFR&#39;,</span>
-<span class="go">            f_results_handle=&#39;results&#39;,</span>
-<span class="go">            append_to_meta=False,</span>
-<span class="go">            )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1">#see feature select method for details</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span><span class="o">.</span><span class="n">plot_basic_diagnostic_stats</span><span class="p">()</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>data        : m-by-n array of data, with m the number of observations.
-labels      : m vector of labels for the data</p>
-<p>return      : a dictionary of features {keys=feature : value=no_of_time_it_was_selected}</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.plot_basic_diagnostic_stats">
-<code class="sig-name descname">plot_basic_diagnostic_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validation_bsr_iteration_idx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_random_exp</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.plot_basic_diagnostic_stats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-datasci.sparse.feature_selection.helper">
-<span id="datasci-sparse-feature-selection-helper-module"></span><h2>datasci.sparse.feature_selection.helper module<a class="headerlink" href="#module-datasci.sparse.feature_selection.helper" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="datasci.sparse.feature_selection.helper.rank_features_by_attribute">
-<code class="sig-prename descclassname">datasci.sparse.feature_selection.helper.</code><code class="sig-name descname">rank_features_by_attribute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_df</span></em>, <em class="sig-param"><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.helper.rank_features_by_attribute" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method takes a features dataframe as input and ranks them based on a column/attribute which contains numerical data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>features_df</strong> (<em>pandas.DataFrame</em>) – This is a features dataframe that contains result of a feature selection.
-(check datasci.core.dataset.DataSet.feature_select method for details)</p></li>
-<li><p><strong>args</strong> (<em>dict</em>) – <p>This dictionary contains variables to determine which attribute to rank feature on and the
-order of ranking. Check details for various key and values below:
-‘attr’ (Mandatory): Attribute/ Column name in the features_df to rank the features on
-‘order’: Whether to rank in ascending or descending order. ‘asc’ for ascending and ‘desc’ for descending.</p>
-<blockquote>
-<div><p>(defaul: ‘desc’)</p>
-</div></blockquote>
-<dl class="simple">
-<dt>’feature_ids’ (list-like): To limit the ranking within certain features. List of indicators for the features to use.</dt><dd><p>e.g. [True, False, True], [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array.
-Default: None which corresponds to using all features.</p>
-</dd>
-</dl>
-</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>array of sorted features (index of features_df)</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.sparse.feature_selection.IterativeFeatureRemoval</span> <span class="k">as</span> <span class="nn">IFR</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">DS</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">IFR</span><span class="o">.</span><span class="n">IFR</span><span class="p">(</span>
-<span class="go">    verbosity = 2,</span>
-<span class="go">    nfolds = 4,</span>
-<span class="go">    repetition = 500,</span>
-<span class="go">    cutoff = .6,</span>
-<span class="go">    jumpratio = 5,</span>
-<span class="go">    max_iters = 100,</span>
-<span class="go">    max_features_per_iter_ratio = 2</span>
-<span class="go">    )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">feature_select</span><span class="p">(</span><span class="n">ifr</span><span class="p">,</span>
-<span class="go">            attrname,</span>
-<span class="go">            selector_name=&#39;IFR&#39;,</span>
-<span class="go">            f_results_handle=&#39;results&#39;,</span>
-<span class="go">            append_to_meta=False,</span>
-<span class="go">            )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">features_df</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;f_results&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ranking_method_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;frequency&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ranked_order</span> <span class="o">=</span>  <span class="n">rank_features_by_attribute</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">ranking_method_args</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.sparse.feature_selection.helper.rank_features_by_mean_attribute_value">
-<code class="sig-prename descclassname">datasci.sparse.feature_selection.helper.</code><code class="sig-name descname">rank_features_by_mean_attribute_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_df</span></em>, <em class="sig-param"><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.helper.rank_features_by_mean_attribute_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>CHECK THIS BEFORE COMMITING
-This method takes a features dataframe as input and ranks them based on a column/attribute which contains numerical data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>features_df</strong> (<em>pandas.DataFrame</em>) – This is a features dataframe that contains result of a feature selection.
-(check datasci.core.dataset.DataSet.feature_select method for details)</p></li>
-<li><p><strong>args</strong> (<em>dict</em>) – <p>This dictionary contains variables to determine which attribute to rank feature on and the
-order of ranking. Check details for various key and values below:
-‘attr’ (Mandatory): Attribute/ Column name in the features_df to rank the features on
-‘order’: Whether to rank in ascending or descending order. ‘asc’ for ascending and ‘desc’ for descending.</p>
-<blockquote>
-<div><p>(defaul: ‘desc’)</p>
-</div></blockquote>
-<dl class="simple">
-<dt>’feature_ids’ (list-like): To limit the ranking within certain features. List of indicators for the features to use.</dt><dd><p>e.g. [True, False, True], [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array.
-Default: None which corresponds to using all features.</p>
-</dd>
-</dl>
-<p>’method’: which operation to perform. Can be “mean” or “median”. (Default: “mean”)</p>
-</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>array of sorted features (index of features_df)</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.sparse.feature_selection.IterativeFeatureRemoval</span> <span class="k">as</span> <span class="nn">IFR</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">DS</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">IFR</span><span class="o">.</span><span class="n">IFR</span><span class="p">(</span>
-<span class="go">    verbosity = 2,</span>
-<span class="go">    nfolds = 4,</span>
-<span class="go">    repetition = 500,</span>
-<span class="go">    cutoff = .6,</span>
-<span class="go">    jumpratio = 5,</span>
-<span class="go">    max_iters = 100,</span>
-<span class="go">    max_features_per_iter_ratio = 2</span>
-<span class="go">    )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">feature_select</span><span class="p">(</span><span class="n">ifr</span><span class="p">,</span>
-<span class="go">            attrname,</span>
-<span class="go">            selector_name=&#39;IFR&#39;,</span>
-<span class="go">            f_results_handle=&#39;results&#39;,</span>
-<span class="go">            append_to_meta=False,</span>
-<span class="go">            )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">features_df</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;f_results&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ranking_method_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;frequency&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ranked_order</span> <span class="o">=</span>  <span class="n">rank_features_by_attribute</span><span class="p">(</span><span class="n">features_df</span><span class="p">,</span> <span class="n">ranking_method_args</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.sparse.feature_selection.helper.rank_features_within_attribute_class">
-<code class="sig-prename descclassname">datasci.sparse.feature_selection.helper.</code><code class="sig-name descname">rank_features_within_attribute_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_df</span></em>, <em class="sig-param"><span class="n">feature_class_attribute</span></em>, <em class="sig-param"><span class="n">new_feature_attribute_name</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">partitioner</span></em>, <em class="sig-param"><span class="n">sample_ids</span></em>, <em class="sig-param"><span class="n">scorer</span></em>, <em class="sig-param"><span class="n">classification_attr</span></em>, <em class="sig-param"><span class="n">classifier_factory_method</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.helper.rank_features_within_attribute_class" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="datasci.sparse.feature_selection.helper.reduce_feature_set_size">
-<code class="sig-prename descclassname">datasci.sparse.feature_selection.helper.</code><code class="sig-name descname">reduce_feature_set_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">features_dataframe</span></em>, <em class="sig-param"><span class="n">sample_ids</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_factory_method_handle</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">scorer</span></em>, <em class="sig-param"><span class="n">ranking_method_handle</span></em>, <em class="sig-param"><span class="n">ranking_method_args</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">test_sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">end</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">jump</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.helper.reduce_feature_set_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method takes a features dataframe (outut of a feature selection), ranks them by a ranking method and performs
-a feature set reduction using grid search method which is defined by start, end and jump parameters.</p>
-<p>Different training and test data may be used and the results will change accordingly. The following choices are avaible:</p>
-<dl class="simple">
-<dt>if test_sample_ids is None and partitioner is None:</dt><dd><p>Only training data is available, so the results will contain score on the Training data</p>
-</dd>
-<dt>if test_sample_ids is None and partitioner is not None:</dt><dd><p>Model is trained using partitions of sample_ids defined by partitioner, results contain the mean test score obtained during classification on these partitions</p>
-</dd>
-<dt>if test_sample_ids is not None and partitioner is None:</dt><dd><p>Model is trained on all sample_ids, and then it is then evaluated on test_sample_ids. Results contain evaluation score on test_sample_ids</p>
-</dd>
-<dt>if test_sample_ids is not None and partitioner is not None:</dt><dd><p>Model is trained using partitions of sample_ids defined by partitioner, and the best model is then evaluated on test_sample_ids. Results
-contain evaluation score on test_sample_ids</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>features_df</strong> (<em>pandas.DataFrame</em>) – This is a features dataframe that contains result of a feature selection.
-(check datasci.core.dataset.DataSet.feature_select method for details)</p></li>
-<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array.</p></li>
-<li><p><strong>attr</strong> (<em>string</em>) – Name of metadata attribute to classify on.</p></li>
-<li><p><strong>scorer</strong> (<em>object</em>) – Function which scores the prediction labels on training and test partitions. This function
-should accept two arguments: truth labels and prediction labels. This function should output a score
-between 0 and 1 which can be thought of as an accuracy measure. See
-sklearn.metrics.balanced_accuracy_score for an example.</p></li>
-<li><p><strong>ranking_method_handle</strong> (<em>method handle</em>) – handle of the feature ranking method</p></li>
-<li><p><strong>ranking_method_args</strong> (<em>dict</em>) – argument dictionary for the feature ranking method</p></li>
-<li><p><strong>partitioner</strong> (<em>object</em>) – Class-instance which partitions samples in batches of training and test split. This</p></li>
-<li><p><strong>must have the sklearn equivalent of a split method. The split method returns a list of</strong> (<em>instance</em>) – </p></li>
-<li><p><strong>partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for</strong> (<em>train-test</em>) – </p></li>
-<li><p><strong>example partitioner.</strong> (<em>an</em>) – </p></li>
-<li><p><strong>test_sample_ids</strong> – List of indicators for the samples to use for testing. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. (default = None, check the method
-description above to see how this affects the results)</p></li>
-<li><p><strong>start</strong> (<em>int</em>) – starting point of the grid search. (default: 5)</p></li>
-<li><p><strong>end</strong> (<em>int</em>) – end point of the grid search. Use -1 to set end as the size of features (default: 100)</p></li>
-<li><p><strong>jump</strong> (<em>int</em>) – gap between each sampled point in the grid (default: 5)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>‘optimal_n_results’: an array of m x 2 values, with m being the total values sampled from the grid in the search.
-The first column contains the number of top features (different values sampled from the grid search),  and the second
-column contains the score.  The array is sorted by score in descending order.</p>
-<p>’reduced_feature_ids’ : array of reduced features ids(index of features_df). The size of the reduced feature set is the
-smallest value n, out of the m sampled values, that produces the highest score.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>a dictionary that contains 2 key-value pairs</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.sparse.feature_selection.IterativeFeatureRemoval</span> <span class="k">as</span> <span class="nn">IFR</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">DS</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">IFR</span><span class="o">.</span><span class="n">IFR</span><span class="p">(</span>
-<span class="go">    verbosity = 2,</span>
-<span class="go">    nfolds = 4,</span>
-<span class="go">    repetition = 500,</span>
-<span class="go">    cutoff = .6,</span>
-<span class="go">    jumpratio = 5,</span>
-<span class="go">    max_iters = 100,</span>
-<span class="go">    max_features_per_iter_ratio = 2</span>
-<span class="go">    )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">feature_select</span><span class="p">(</span><span class="n">ifr</span><span class="p">,</span>
-<span class="go">            attrname,</span>
-<span class="go">            selector_name=&#39;IFR&#39;,</span>
-<span class="go">            f_results_handle=&#39;results&#39;,</span>
-<span class="go">            append_to_meta=False,</span>
-<span class="go">            )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">features_df</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;f_results&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">model_factory</span><span class="p">():</span>
-<span class="go">        return svm.LinearSVC(dual=False)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bsr</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">balanced_accuracy_score</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ranking_method_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;frequency&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">partitioner</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.sparse.feature_selection.helper</span> <span class="k">as</span> <span class="nn">fhelper</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reduced_feature_results</span> <span class="o">=</span> <span class="n">fhelper</span><span class="o">.</span><span class="n">reduce_feature_set_size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
-<span class="go">                        features_df,</span>
-<span class="go">                        sample_ids_training,</span>
-<span class="go">                        attrname,</span>
-<span class="go">                        model_factory,</span>
-<span class="go">                        bsr,</span>
-<span class="go">                        fhelper.rank_features_by_attribute,</span>
-<span class="go">                        ranking_method_args,</span>
-<span class="go">                        test_sample_ids=sample_ids_validation,</span>
-<span class="go">                        start = 5,</span>
-<span class="go">                        end = 100,</span>
-<span class="go">                        jump = 1)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">reduced_feature_results</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </div>
 <div class="section" id="module-datasci.sparse.feature_selection.kffs">
 <span id="datasci-sparse-feature-selection-kffs-module"></span><h2>datasci.sparse.feature_selection.kffs module<a class="headerlink" href="#module-datasci.sparse.feature_selection.kffs" title="Permalink to this headline">¶</a></h2>
@@ -595,7 +248,7 @@ features will be ranked in from least to greatest.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method. Results are stored in <a class="reference internal" href="../rst_copy/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="datasci.sparse.feature_selection.kffs.KFFS.classifiers_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.classifiers_</span></code></a>, <a class="reference internal" href="../rst_copy/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="datasci.sparse.feature_selection.kffs.KFFS.ranks_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.ranks_</span></code></a>, and <a class="reference internal" href="../rst_copy/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kffs.KFFS.results_" title="datasci.sparse.feature_selection.kffs.KFFS.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.results_</span></code></a>.</p>
+<dd class="field-even"><p>inplace method. Results are stored in <a class="reference internal" href="#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="datasci.sparse.feature_selection.kffs.KFFS.classifiers_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.classifiers_</span></code></a>, <a class="reference internal" href="#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="datasci.sparse.feature_selection.kffs.KFFS.ranks_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.ranks_</span></code></a>, and <a class="reference internal" href="#datasci.sparse.feature_selection.kffs.KFFS.results_" title="datasci.sparse.feature_selection.kffs.KFFS.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFFS.results_</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -657,7 +310,7 @@ the user defined splits defined by <code class="xref py py-attr docutils literal
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="../rst_copy/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_" title="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.results_</span></code></a>.</p>
+<dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_" title="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.results_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -735,7 +388,7 @@ the user defined splits defined by <code class="xref py py-attr docutils literal
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="../rst_copy/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_" title="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.results_</span></code></a>.</p>
+<dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_" title="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.results_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -751,56 +404,6 @@ training in test for a LOSO fold.</p></li>
 </dd>
 </dl>
 </dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-datasci.sparse.feature_selection.pathway_selection">
-<span id="datasci-sparse-feature-selection-pathway-selection-module"></span><h2>datasci.sparse.feature_selection.pathway_selection module<a class="headerlink" href="#module-datasci.sparse.feature_selection.pathway_selection" title="Permalink to this headline">¶</a></h2>
-<p>Module containing classes for pathway discovery in -omics data.</p>
-<dl class="py class">
-<dt id="datasci.sparse.feature_selection.pathway_selection.PathwayScore">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.pathway_selection.</code><code class="sig-name descname">PathwayScore</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">device</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">use_ray</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pathway_selection.PathwayScore" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pathway_selection.PathwayScore.convert_type">
-<code class="sig-name descname">convert_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pathway_selection.PathwayScore.convert_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pathway_selection.PathwayScore.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">pathways</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pathway_selection.PathwayScore.fit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pathway_selection.PathwayScore.transform">
-<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pathway_selection.PathwayScore.transform" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-datasci.sparse.feature_selection.pca_snr_selection">
-<span id="datasci-sparse-feature-selection-pca-snr-selection-module"></span><h2>datasci.sparse.feature_selection.pca_snr_selection module<a class="headerlink" href="#module-datasci.sparse.feature_selection.pca_snr_selection" title="Permalink to this headline">¶</a></h2>
-<p>This module contains a class which implements the PCA-SNR feature selection method.</p>
-<dl class="py class">
-<dt id="datasci.sparse.feature_selection.pca_snr_selection.PCASNR">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.pca_snr_selection.</code><code class="sig-name descname">PCASNR</code><a class="headerlink" href="#datasci.sparse.feature_selection.pca_snr_selection.PCASNR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pca_snr_selection.PCASNR.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pca_snr_selection.PCASNR.fit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pca_snr_selection.PCASNR.plot_snrs">
-<code class="sig-name descname">plot_snrs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pca_snr_selection.PCASNR.plot_snrs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.pca_snr_selection.PCASNR.snr">
-<code class="sig-name descname">snr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">w</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.pca_snr_selection.PCASNR.snr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
