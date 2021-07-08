@@ -32,6 +32,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -182,7 +183,7 @@
 <span id="datasci-sparse-feature-selection-kffs-module"></span><h2>datasci.sparse.feature_selection.kffs module<a class="headerlink" href="#module-datasci.sparse.feature_selection.kffs" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.kffs.</span></code><code class="sig-name descname"><span class="pre">KFFS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_weights_handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_rnk_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.kffs.</code><code class="sig-name descname">KFFS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">classifier</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">training_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>K-fold Feature Selection (kFFS) selects features using a classifier in a k-fold cross-validation experiment.
 Specifically, the given classifier is trained on each fold, the features in each fold are ranked and sorted,
@@ -197,13 +198,14 @@ by how many times a given feature was in the top n across each fold.</p>
 <li><p><strong>f_weights_handle</strong> (<em>str</em>) – Name of the classifier attribute containing the feature weights for a given fold.</p></li>
 <li><p><strong>f_rnk_func</strong> (<em>object</em>) – Function to be applied to feature weights for feature ranking. Default is None, and the
 features will be ranked in from least to greatest.</p></li>
+<li><p><strong>training_ids</strong> (<em>list</em>) – Optional list of training ids, to restrict feature selection further.</p></li>
 <li><p><strong>random_state</strong> (<em>int</em>) – Random state to generate k-fold partitions. Default is 0.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.classifiers_">
-<code class="sig-name descname"><span class="pre">classifiers_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">classifiers_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.classifiers_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains each classifier trained on each fold.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -214,7 +216,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.ranks_">
-<code class="sig-name descname"><span class="pre">ranks_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ranks_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.ranks_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains the final rankings of all the features.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -225,7 +227,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.results_">
-<code class="sig-name descname"><span class="pre">results_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.results_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">results_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.results_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains the feature weights and ranks for each fold, and the final rankings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -236,7 +238,7 @@ features will be ranked in from least to greatest.</p></li>
 
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kffs.KFFS.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kffs.KFFS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits the kFFS model to the training data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -260,7 +262,7 @@ features will be ranked in from least to greatest.</p></li>
 subject out (LOSO) partitions.</p>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.kfold_loso_ifr.</span></code><code class="sig-name descname"><span class="pre">KFLIFR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_handle</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits_kfold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state_kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_test_splits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_features</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jump_ratio</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_freq_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.kfold_loso_ifr.</code><code class="sig-name descname">KFLIFR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">weights_handle</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">n_splits_kfold</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">random_state_kfold</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">train_test_splits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gamma</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">n_top_features</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">jump_ratio</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sort_freq_classes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">imputer</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>This iterative feature removal (IFR) algorithm produces ranked feature sets from a single classifier and a data set.</p>
 <dl class="field-list simple">
@@ -288,12 +290,13 @@ that top features will be chosen until <span class="math notranslate nohighlight
 must provide a constant number of features to prune at each step via the parameter <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.n_top_features</span></code>.</p></li>
 <li><p><strong>sort_freq_classes</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the algorithm will sort frequency classes of feature by the mean of
 normalized weight across a LOSO experiment— providing a unique ranking. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>imputer</strong> (<em>object</em>) – Optional imputer to impute training set values with.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt id="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_">
-<code class="sig-name descname"><span class="pre">results_</span></code><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">results_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Outputs the feature frequencies and rankings for each fold provided by the
 k-fold partition defined by <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.n_splits_kfold</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.random_state_kfold</span></code>, or
 the user defined splits defined by <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.train_test_splits</span></code>.</p>
@@ -306,7 +309,7 @@ the user defined splits defined by <code class="xref py py-attr docutils literal
 
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_" title="datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFLIFR.results_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -333,12 +336,74 @@ training in test for a LOSO fold.</p></li>
 subject out (LOSO) partitions.</p>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.kfold_shuffle_ifr.</span></code><code class="sig-name descname"><span class="pre">KFSIFR</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scorer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_handle</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits_kfold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits_shuffle</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size_shuffle</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state_kfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state_shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_features</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jump_value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.kfold_shuffle_ifr.</code><code class="sig-name descname">KFSIFR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">weights_handle</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">n_splits_kfold</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">random_state_kfold</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">train_test_splits</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gamma</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.6</span></em>, <em class="sig-param"><span class="n">max_feature_threshold</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_splits_shuffle</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">random_state_shuffle</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">train_prop_shuffle</span><span class="o">=</span><span class="default_value">0.8</span></em>, <em class="sig-param"><span class="n">n_top_features</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">jump_ratio</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sort_freq_classes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">imputer</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<p>This iterative feature removal (IFR) algorithm produces ranked feature sets from a single classifier and a data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>classifier</strong> (<em>object</em>) – The classifier used to select features. The classifier should produce feature weights and ideally
+be sparse, so that relatively few features are weighted heavily compared to the total.</p></li>
+<li><p><strong>weights_handle</strong> (<em>str</em>) – The name of the <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.classifier</span></code> attribute where the weights are stored. The
+weights stored there should be an ndarray.</p></li>
+<li><p><strong>n_splits_kfold</strong> (<em>int</em>) – The number of folds, <code class="docutils literal notranslate"><span class="pre">k</span></code> used in the k-fold cross validation.</p></li>
+<li><p><strong>random_state_kfold</strong> (<em>int</em>) – The random seed used in generating the k-fold partitions. Good for reproducibility
+of results. The default is None.</p></li>
+<li><p><strong>train_test_splits</strong> (<em>list</em>) – An alternate list of (training, test) splits that replace the k-fold cross validation used
+in the algorithm. This is useful if you have a specific set of splits you want to use. The default is None,
+but if provided the arguments <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.n_splits_kfold</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.random_state_kfold</span></code> are
+ignored.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – Classification rate used to break the IFR loop. The IFR loop will stop once the number of
+features extracted reaches this proportion of the total features.</p></li>
+<li><p><strong>max_feature_threshold</strong> (<em>int</em>) – The maximum number of features that may be removed on an iteration of IFR.
+Default is None.</p></li>
+<li><p><strong>n_splits_shuffle</strong> (<em>int</em>) – The number of shuffle splits to use for the inner loop. Default is 100.</p></li>
+<li><p><strong>random_state_shuffle</strong> (<em>int</em>) – Random seed for shuffle splits.</p></li>
+<li><p><strong>n_top_features</strong> (<em>int</em>) – The number of top features to remove at each iteration of IFR. If this parameter is not
+given then <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.jump_ratio</span></code> will be used instead. The default is None.</p></li>
+<li><p><strong>jump_ratio</strong> (<em>float</em>) – The weight ratio used to determine the number of top features to remove for each iteration
+of IFR. For example let <span class="math notranslate nohighlight">\(r_i = w_{i}/w_{i+1}\)</span> denote the ratio of the
+<span class="math notranslate nohighlight">\(i\)</span> th largest weight and <span class="math notranslate nohighlight">\(i+1\)</span> largest weight, then <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.jump_ratio</span></code> = 2 means
+that top features will be chosen until <span class="math notranslate nohighlight">\(r_i \geq 2\)</span>. If this parameter is not given then the user
+must provide a constant number of features to prune at each step via the parameter <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.n_top_features</span></code>.</p></li>
+<li><p><strong>sort_freq_classes</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the algorithm will sort frequency classes of feature by the mean of
+normalized weight across a LOSO experiment— providing a unique ranking. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>imputer</strong> (<em>object</em>) – Optional imputer to impute training set values with.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_">
+<code class="sig-name descname">results_</code><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs the feature frequencies and rankings for each fold provided by the
+k-fold partition defined by <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.n_splits_kfold</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.random_state_kfold</span></code>, or
+the user defined splits defined by <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.train_test_splits</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.fit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the feature selection algorithm and stores the results in the attribute <a class="reference internal" href="#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_" title="datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.results_</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) – The data array used to select features via <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.classifier</span></code>.</p></li>
+<li><p><strong>y</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>)</em>) – The labels used to select features via <code class="xref py py-attr docutils literal notranslate"><span class="pre">KFSIFR.classifier</span></code>.</p></li>
+<li><p><strong>groups</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>)</em>) – Optional set up of labels defining the groups used in a
+Leave-One-Group-Out experiment. This is useful if you don’t want members of the same group in both the
+training in test for a LOSO fold.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -347,11 +412,11 @@ subject out (LOSO) partitions.</p>
 <span id="datasci-sparse-feature-selection-sabs-module"></span><h2>datasci.sparse.feature_selection.sabs module<a class="headerlink" href="#module-datasci.sparse.feature_selection.sabs" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.sparse.feature_selection.sabs.SABS">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.sparse.feature_selection.sabs.</span></code><code class="sig-name descname"><span class="pre">SABS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_updates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.sparse.feature_selection.sabs.</code><code class="sig-name descname">SABS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">iterations</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">store_updates</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">device</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <dl class="py method">
 <dt id="datasci.sparse.feature_selection.sabs.SABS.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.sabs.SABS.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

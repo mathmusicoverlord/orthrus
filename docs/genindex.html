@@ -32,6 +32,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -173,12 +175,17 @@
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rst/datasci.decomposition.html#datasci.decomposition.general.align_embedding">align_embedding() (in module datasci.decomposition.general)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rst/datasci.core.html#datasci.core.dataset.DataSet.autosummarize">autosummarize() (datasci.core.dataset.DataSet method)</a>
 </li>
@@ -241,14 +248,28 @@
 </li>
       </ul></li>
       <li>
+    datasci.model_selection.partitioning
+
+      <ul>
+        <li><a href="rst/datasci.model_selection.html#module-datasci.model_selection.partitioning">module</a>
+</li>
+      </ul></li>
+      <li>
+    datasci.preprocessing.normalizations
+
+      <ul>
+        <li><a href="rst/datasci.preprocessing.html#module-datasci.preprocessing.normalizations">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
     datasci.sparse.classifiers.svm
 
       <ul>
         <li><a href="rst/datasci.sparse.classifiers.html#module-datasci.sparse.classifiers.svm">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     datasci.sparse.feature_selection.kffs
 
@@ -328,13 +349,19 @@
       <ul>
         <li><a href="rst/datasci.manifold.html#datasci.manifold.mds.MDS.fit_transform">(datasci.manifold.mds.MDS method)</a>
 </li>
+        <li><a href="rst/datasci.preprocessing.html#datasci.preprocessing.normalizations.LogNormalizer.fit_transform">(datasci.preprocessing.normalizations.LogNormalizer method)</a>
+</li>
       </ul></li>
+      <li><a href="rst/datasci.core.html#datasci.core.dataset.from_ccd">from_ccd() (in module datasci.core.dataset)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rst/datasci.core.html#datasci.core.dataset.DataSet.generate_attr_from_queries">generate_attr_from_queries() (datasci.core.dataset.DataSet method)</a>
+</li>
       <li><a href="rst/datasci.core.html#datasci.core.helper.generate_experiment">generate_experiment() (in module datasci.core.helper)</a>
 </li>
   </ul></td>
@@ -377,6 +404,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rst/datasci.core.html#datasci.core.helper.load_object">load_object() (in module datasci.core.helper)</a>
 </li>
+      <li><a href="rst/datasci.preprocessing.html#datasci.preprocessing.normalizations.LogNormalizer">LogNormalizer (class in datasci.preprocessing.normalizations)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -399,6 +428,10 @@
 </li>
         <li><a href="rst/datasci.manifold.html#module-datasci.manifold.mds">datasci.manifold.mds</a>
 </li>
+        <li><a href="rst/datasci.model_selection.html#module-datasci.model_selection.partitioning">datasci.model_selection.partitioning</a>
+</li>
+        <li><a href="rst/datasci.preprocessing.html#module-datasci.preprocessing.normalizations">datasci.preprocessing.normalizations</a>
+</li>
         <li><a href="rst/datasci.sparse.classifiers.html#module-datasci.sparse.classifiers.svm">datasci.sparse.classifiers.svm</a>
 </li>
         <li><a href="rst/datasci.sparse.feature_selection.html#module-datasci.sparse.feature_selection.kffs">datasci.sparse.feature_selection.kffs</a>
@@ -410,6 +443,10 @@
         <li><a href="rst/datasci.sparse.feature_selection.html#module-datasci.sparse.feature_selection.sabs">datasci.sparse.feature_selection.sabs</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rst/datasci.core.html#datasci.core.helper.module_from_path">module_from_path() (in module datasci.core.helper)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -459,6 +496,8 @@
       <ul>
         <li><a href="rst/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR.results_">(datasci.sparse.feature_selection.kfold_loso_ifr.KFLIFR attribute)</a>
 </li>
+        <li><a href="rst/datasci.sparse.feature_selection.html#datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR.results_">(datasci.sparse.feature_selection.kfold_shuffle_ifr.KFSIFR attribute)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -472,15 +511,33 @@
 </li>
       <li><a href="rst/datasci.core.html#datasci.core.helper.save_object">save_object() (in module datasci.core.helper)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rst/datasci.core.html#datasci.core.helper.scatter_plotly">scatter_plotly() (in module datasci.core.helper)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rst/datasci.core.html#datasci.core.helper.scatter_pyplot">scatter_pyplot() (in module datasci.core.helper)</a>
 </li>
       <li><a href="rst/datasci.core.html#datasci.core.dataset.DataSet.slice_dataset">slice_dataset() (datasci.core.dataset.DataSet method)</a>
 </li>
+      <li><a href="rst/datasci.model_selection.html#datasci.model_selection.partitioning.TrainPartitioner.split">split() (datasci.model_selection.partitioning.TrainPartitioner method)</a>
+
+      <ul>
+        <li><a href="rst/datasci.model_selection.html#datasci.model_selection.partitioning.TrainTestPartitioner.split">(datasci.model_selection.partitioning.TrainTestPartitioner method)</a>
+</li>
+      </ul></li>
       <li><a href="rst/datasci.sparse.classifiers.html#datasci.sparse.classifiers.svm.SSVMClassifier">SSVMClassifier (class in datasci.sparse.classifiers.svm)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rst/datasci.model_selection.html#datasci.model_selection.partitioning.TrainPartitioner">TrainPartitioner (class in datasci.model_selection.partitioning)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rst/datasci.model_selection.html#datasci.model_selection.partitioning.TrainTestPartitioner">TrainTestPartitioner (class in datasci.model_selection.partitioning)</a>
 </li>
   </ul></td>
 </tr></table>
