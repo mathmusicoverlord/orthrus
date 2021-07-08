@@ -4,6 +4,6 @@ Getting Started
 .. toctree::
    :maxdepth: 4
 
-   what_is_a_dataset
+   what_is_the_dataset
    create_dataset
    visualize_data
