@@ -194,16 +194,16 @@
 and iterations in which each feature was extracted. During execution, the data is partitioned into training and validation sets ‘repetition’ number of times and
 then for each partition, one feature set is extracted. So, a total of repetition * num_partitions independent feature sets are extracted and the results are
 merged to create the output.</p>
-<dl class="simple">
-<dt>For each feature set, the algorithm can halt because of the following conditions:</dt><dd><ol class="arabic simple">
+<p>For each feature set, the algorithm can halt because of the following conditions:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><p>BSR on validation partition is below cutoff</p></li>
 <li><p>Jump does not occur in the array of sorted absolute weights</p></li>
 <li><p>Jump occurs but the weight at the jump is too small ( &lt; 10e-6)</p></li>
 <li><p>#selected features is greater than max_features_per_iter_ratio * #samples in training partition. This condition exists to prevent overfitting.</p></li>
 <li><p>max_iters number of iterations complete successfully</p></li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 <p>When one of these conditions happen, further feature extraction on the current fold is stopped and begins on the next partition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -214,7 +214,7 @@ merged to create the output.</p>
 <li><p><strong>max_iters</strong> (<em>int</em>) – Determines the maximum number of iterations of IFR on one data partition(default: 5)</p></li>
 <li><p><strong>cutoff</strong> (<em>float</em>) – Threshold for the validation BSR (balanced success rate) to halt the process. (default: 0.75)</p></li>
 <li><p><strong>jumpratio</strong> (<em>float</em>) – The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)</p></li>
-<li><p><strong>max_features_per_iter_ratio</strong> (<em>float</em>) – 0.8)
+<li><p><strong>max_features_per_iter_ratio</strong> (<em>float</em>) – A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
 if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
 on the current fold is stopped.</p></li>
 <li><p><strong>verbosity</strong> (<em>int</em>) – Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)</p></li>
