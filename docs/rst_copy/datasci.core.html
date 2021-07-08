@@ -215,234 +215,6 @@ used on the data. Default is the empty string.</p></li>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">vardata: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">dissimilarity_matrix: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.visualize">
-<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dissimilarity</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pyplot'</span></em>, <em class="sig-param"><span class="n">viz_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>. The user can restrict both the sample indices and feature indices, as well
-as color and mark the samples by chosen metadata attributes. The transformation will happen post
-restricting the features and samples.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-embedding.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have at most 3 columns.</p></li>
-<li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
-<li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
-<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
-[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
-<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>use_dissimilarity</strong> (<em>bool</em>) – If True the embedding will fit to the dissimilarity matrix stored in
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code>. The default is false.</p></li>
-<li><p><strong>backend</strong> (<em>str</em>) – Plotting backend to use. Can be either <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> or <code class="docutils literal notranslate"><span class="pre">plotly</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">pyplot</span></code>.</p></li>
-<li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>.__str__().</p></li>
-<li><p><strong>supervised</strong> (<em>bool</em>) – If True the attr labels are based to the embedding fit method, rather than None.</p></li>
-<li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
-</ul>
-</dd>
-</dl>
-<p>:param be prepended by <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code>. Default is None.:
-:param **kwargs: Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code> when using the</p>
-<blockquote>
-<div><p>backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
-indicating plot properties.</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>The fit embedding used to visualize.</p>
-<p>ndarray of shape (n_samples, n_components): The values of the embedding.</p>
-</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>class instance</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">MDS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">embedding</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">embedding</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span> <span class="n">no_axes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">embedding</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">embedding</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">cross_attr</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;PC 1&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;PC 2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">zlabel</span><span class="o">=</span><span class="s1">&#39;PC 3&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">mrkr_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">mrkr_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="s1">&#39;cross&#39;</span><span class="p">],</span>
-<span class="gp">... </span>             <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span><span class="mi">800</span><span class="p">),</span>
-<span class="gp">... </span>             <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
-used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-normalizer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
-as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
-<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
-[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
-<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>norm_name</strong> (<em>str</em>) – Common name for the normalization used. e.g. log, unit, etc… The default is
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.__str__().</p></li>
-<li><p><strong>normalize_args</strong> (<em>dict</em>) – <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>  <span class="k">as</span> <span class="n">SS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">SS</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normalizer</span><span class="o">=</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.impute">
-<code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Imputes the data of the dataset according to an imputer class. Appends the imputation method
-used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>imputer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-imputer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
-as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
-<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
-[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
-<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>impute_name</strong> (<em>str</em>) – Common name for the imputation used. e.g. knn, rf, median, etc .. The default is
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">imputer</span></code>.__str__().</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                    <span class="n">columns</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                    <span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="n">imputer</span><span class="o">=</span><span class="n">imputer</span><span class="p">,</span> <span class="n">impute_name</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.reformat_metadata">
-<code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
-Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
-pandas infer_dtypes function to automatically infer the datatypes for each attribute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>convert_dtypes</strong> (<em>bool</em>) – Flag for whether or not to infer the datatypes for the metadata and vardata.
-Default is false.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">reformat_metadata</span><span class="p">(</span><span class="n">convert_dtypes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.slice_dataset">
-<code class="sig-name descname">slice_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.slice_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method slices a DataSet at the prescribed sample and features ids.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
-[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
-<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
-[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _slice</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Slice of DataSet.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">samples</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;Species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;setosa&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_setosa</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">slice_dataset</span><span class="p">(</span><span class="n">sample_ids</span><span class="o">=</span><span class="n">samples</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
 <dt id="datasci.core.dataset.DataSet.autosummarize">
 <code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="o">=</span><span class="default_value">'metadata'</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method gives a human-readable output of summary statistics for the data/metadata/vardata.
@@ -474,46 +246,6 @@ See dash documentation for further details.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">autosummarize</span><span class="p">(</span><span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8787</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.save">
-<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code>/<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code>.ds where the spaces in <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> are replaced
-with underscores.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance of DataSet to. Default is None.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.core.dataset.DataSet.print_description">
-<code class="sig-name descname">print_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line_width</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.print_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method prints the description of the dataset in a human-readable format.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>line_width</strong> (<em>int</em>) – Number of characters per line to print for description.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -744,27 +476,268 @@ is ‘metadata’.</p>
 </div>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.dataset.load_dataset">
-<code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.load_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function loads and returns an instance of a DataSet class in pickle format.</p>
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.impute">
+<code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imputes the data of the dataset according to an imputer class. Appends the imputation method
+used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance of DataSet from.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imputer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
+imputer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>impute_name</strong> (<em>str</em>) – Common name for the imputation used. e.g. knn, rf, median, etc .. The default is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">imputer</span></code>.__str__().</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">columns</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="n">imputer</span><span class="o">=</span><span class="n">imputer</span><span class="p">,</span> <span class="n">impute_name</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
+used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
+normalizer.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have the same number of columns
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>norm_name</strong> (<em>str</em>) – Common name for the normalization used. e.g. log, unit, etc… The default is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.__str__().</p></li>
+<li><p><strong>normalize_args</strong> (<em>dict</em>) – <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>  <span class="k">as</span> <span class="n">SS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">SS</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normalizer</span><span class="o">=</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.print_description">
+<code class="sig-name descname">print_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line_width</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.print_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method prints the description of the dataset in a human-readable format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_width</strong> (<em>int</em>) – Number of characters per line to print for description.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.reformat_metadata">
+<code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
+Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
+pandas infer_dtypes function to automatically infer the datatypes for each attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>convert_dtypes</strong> (<em>bool</em>) – Flag for whether or not to infer the datatypes for the metadata and vardata.
+Default is false.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">reformat_metadata</span><span class="p">(</span><span class="n">convert_dtypes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
+as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code>/<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code>.ds where the spaces in <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> are replaced
+with underscores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance of DataSet to. Default is None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.slice_dataset">
+<code class="sig-name descname">slice_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.slice_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method slices a DataSet at the prescribed sample and features ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _slice</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Slice of DataSet.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span> <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">samples</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;Species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;setosa&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_setosa</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">slice_dataset</span><span class="p">(</span><span class="n">sample_ids</span><span class="o">=</span><span class="n">samples</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.core.dataset.DataSet.visualize">
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dissimilarity</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pyplot'</span></em>, <em class="sig-param"><span class="n">viz_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>. The user can restrict both the sample indices and feature indices, as well
+as color and mark the samples by chosen metadata attributes. The transformation will happen post
+restricting the features and samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
+embedding.fit_transform(<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code>) must have at most 3 columns.</p></li>
+<li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
+<li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
+<li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
+[‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
+<li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+[‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
+<li><p><strong>use_dissimilarity</strong> (<em>bool</em>) – If True the embedding will fit to the dissimilarity matrix stored in
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code>. The default is false.</p></li>
+<li><p><strong>backend</strong> (<em>str</em>) – Plotting backend to use. Can be either <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> or <code class="docutils literal notranslate"><span class="pre">plotly</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">pyplot</span></code>.</p></li>
+<li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>.__str__().</p></li>
+<li><p><strong>supervised</strong> (<em>bool</em>) – If True the attr labels are based to the embedding fit method, rather than None.</p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param be prepended by <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code>. Default is None.:
+:param **kwargs: Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code> when using the</p>
+<blockquote>
+<div><p>backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
+indicating plot properties.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>The fit embedding used to visualize.</p>
+<p>ndarray of shape (n_samples, n_components): The values of the embedding.</p>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>class instance</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">MDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">embedding</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">embedding</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span> <span class="n">no_axes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">embedding</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">embedding</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">cross_attr</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;PC 1&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;PC 2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">zlabel</span><span class="o">=</span><span class="s1">&#39;PC 3&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">mrkr_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">mrkr_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="s1">&#39;cross&#39;</span><span class="p">],</span>
+<span class="gp">... </span>             <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span><span class="mi">800</span><span class="p">),</span>
+<span class="gp">... </span>             <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -791,10 +764,111 @@ is ‘metadata’.</p>
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt id="datasci.core.dataset.load_dataset">
+<code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads and returns an instance of a DataSet class in pickle format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance of DataSet from.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span> <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="module-datasci.core.helper">
 <span id="datasci-core-helper-module"></span><h2>datasci.core.helper module<a class="headerlink" href="#module-datasci.core.helper" title="Permalink to this headline">¶</a></h2>
 <p>This module contains user-defined and general purpose helper functions use by the DataSci package.</p>
+<dl class="py function">
+<dt id="datasci.core.helper.default_val">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a default value when a module doesn’t contain an attribute.
+:param module: Module in consideration
+:param attr: The name of the attribute whose existence is in question.
+:type attr: str
+:param val: The value to be used in the case this attribute doesn’t exist. The default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The value of the attribute or the default value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.generate_experiment">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates the directory structure for an experiment and generates a parameters python file containing
+a template for experimental parameters to be exported for the experiment in mind. The experiment will automatically
+be placed in the Experiments directory of the project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the experiment.</p></li>
+<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#datasci.core.helper.generate_project" title="datasci.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
+for auto-generation of a project directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.generate_project">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates the directory structure for a project— this includes a Data, Experiments, and scripts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the project.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – The file path to the location where the project directory will be created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.get_close_matches_icase">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Case-insensitive version of difflib.get_close_matches</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.load_object">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">load_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.load_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads and returns any object stored in pickle format at the file_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance from.</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – If False and the file is not found, the function will return None. The default is True, so
+the function will error when the file is not found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pickle object stored at the file_path.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;./tol_vs_res_liver_ifr.pickle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="py function">
 <dt id="datasci.core.helper.method_exists">
 <code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">method_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.method_exists" title="Permalink to this definition">¶</a></dt>
@@ -817,111 +891,23 @@ is a method of the class instance.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.get_close_matches_icase">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Case-insensitive version of difflib.get_close_matches</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.scatter_pyplot">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">palette</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
-or numerical metadata.</p>
+<dt id="datasci.core.helper.module_from_path">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">module_from_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">module_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.module_from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function imports a module from a file path and returns the module object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
-must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
-attribute resp. The grp_mrkrs attribute is optional.</p></li>
-<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
-<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
-<li><p><strong>palette</strong> (<em>str</em>) – String signfying the seaborn palette to use. Default is ‘Accent’ for categorical metadata, and
-‘magma’ for numerical metadata.</p></li>
-<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
-markers to such as .,+,x,etc..</p></li>
-<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
-37 distinct markers.</p></li>
-<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
-determines the height of the figure. The default is (14, 10).</p></li>
-<li><p><strong>no_axes</strong> (<em>bool</em>) – Flag indicating whether or not to show the axes in the plot.</p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
-<li><p><strong>block</strong> (<em>bool</em>) – Passed to pyplot’s show function. If True the user must close the pervious plot before
-another plot will appear.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – All keyword arguments are passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 2
-or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 3.</p></li>
+<li><p><strong>module_name</strong> (<em>string</em>) – Name of the module.</p></li>
+<li><p><strong>module_path</strong> (<em>string</em>) – Path of the module</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pyplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.scatter_plotly">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
-or numerical metadata.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
-must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
-attribute resp. The grp_mrkrs attribute is optional.</p></li>
-<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
-<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
-<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
-markers to such as .,+,x,etc..</p></li>
-<li><p><strong>mrkr_size</strong> (<em>int</em>) – The size to be used for the markers. Default is 10.</p></li>
-<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
-37 distinct markers.</p></li>
-<li><p><strong>xlabel</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
-<li><p><strong>ylabel</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
-<li><p><strong>zlabel</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
-<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
-determines the height of the figure. The default is (900, 800).</p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
-<li><p><strong>use_dash</strong> (<em>bool</em>) – Flag indicating whether to host the figure through dash.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to <code class="docutils literal notranslate"><span class="pre">plotly.express.scatter</span></code> and then to <code class="docutils literal notranslate"><span class="pre">dash.Dash.app.run_server</span></code> for
-configuring host server. See dash documentation for further details.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The figure object for more advanced plots</p>
+<dd class="field-even"><p>The module pointed to by the file path.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>fig</p>
+<dd class="field-odd"><p>object</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_plotly</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_plotly</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
@@ -996,100 +982,6 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.generate_project">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function creates the directory structure for a project— this includes a Data, Experiments, and scripts directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – The name of the project.</p></li>
-<li><p><strong>file_path</strong> (<em>str</em>) – The file path to the location where the project directory will be created.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.generate_experiment">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function creates the directory structure for an experiment and generates a parameters python file containing
-a template for experimental parameters to be exported for the experiment in mind. The experiment will automatically
-be placed in the Experiments directory of the project directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – The name of the experiment.</p></li>
-<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#datasci.core.helper.generate_project" title="datasci.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
-for auto-generation of a project directory.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.module_from_path">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">module_from_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">module_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.module_from_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function imports a module from a file path and returns the module object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>module_name</strong> (<em>string</em>) – Name of the module.</p></li>
-<li><p><strong>module_path</strong> (<em>string</em>) – Path of the module</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The module pointed to by the file path.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.default_val">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a default value when a module doesn’t contain an attribute.
-:param module: Module in consideration
-:param attr: The name of the attribute whose existence is in question.
-:type attr: str
-:param val: The value to be used in the case this attribute doesn’t exist. The default is None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The value of the attribute or the default value.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="datasci.core.helper.load_object">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">load_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.load_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function loads and returns any object stored in pickle format at the file_path.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance from.</p></li>
-<li><p><strong>block</strong> (<em>bool</em>) – If False and the file is not found, the function will return None. The default is True, so
-the function will error when the file is not found.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pickle object stored at the file_path.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;./tol_vs_res_liver_ifr.pickle&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
 <dt id="datasci.core.helper.save_object">
 <code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an an object in pickle format at the specified path.</p>
@@ -1101,6 +993,108 @@ the function will error when the file is not found.</p></li>
 <dd class="field-even"><p>inplace method.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.scatter_plotly">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
+or numerical metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
+must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
+attribute resp. The grp_mrkrs attribute is optional.</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
+<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
+<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
+markers to such as .,+,x,etc..</p></li>
+<li><p><strong>mrkr_size</strong> (<em>int</em>) – The size to be used for the markers. Default is 10.</p></li>
+<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
+37 distinct markers.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
+<li><p><strong>zlabel</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
+<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
+determines the height of the figure. The default is (900, 800).</p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
+<li><p><strong>use_dash</strong> (<em>bool</em>) – Flag indicating whether to host the figure through dash.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to <code class="docutils literal notranslate"><span class="pre">plotly.express.scatter</span></code> and then to <code class="docutils literal notranslate"><span class="pre">dash.Dash.app.run_server</span></code> for
+configuring host server. See dash documentation for further details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The figure object for more advanced plots</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>fig</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_plotly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_plotly</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="datasci.core.helper.scatter_pyplot">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">palette</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
+or numerical metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
+must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
+attribute resp. The grp_mrkrs attribute is optional.</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
+<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
+<li><p><strong>palette</strong> (<em>str</em>) – String signfying the seaborn palette to use. Default is ‘Accent’ for categorical metadata, and
+‘magma’ for numerical metadata.</p></li>
+<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
+markers to such as .,+,x,etc..</p></li>
+<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
+37 distinct markers.</p></li>
+<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
+determines the height of the figure. The default is (14, 10).</p></li>
+<li><p><strong>no_axes</strong> (<em>bool</em>) – Flag indicating whether or not to show the axes in the plot.</p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – Passed to pyplot’s show function. If True the user must close the pervious plot before
+another plot will appear.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – All keyword arguments are passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 2
+or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pyplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
