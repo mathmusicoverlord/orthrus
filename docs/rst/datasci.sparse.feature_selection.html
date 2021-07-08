@@ -236,11 +236,11 @@ on the current fold is stopped.</p></li>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p>The dataframe is indexed by feature_ids and contains the results of IFR. Each column contains different infromation for each feature as described below:</p>
 <blockquote>
-<div><p>frequency : How many times the feature is extracted</p>
-<dl class="simple">
-<dt>weights : Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.</dt><dd><p>The length of the weights is equal to the frequency.</p>
-</dd>
-</dl>
+<div><p>frequency : How many times the feature is extracted
+weights : Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.</p>
+<blockquote>
+<div><p>The length of the weights is equal to the frequency.</p>
+</div></blockquote>
 <p>selection_iteration : Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.</p>
 </div></blockquote>
 </p>
