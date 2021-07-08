@@ -18,6 +18,7 @@ class IFR:
     merged to create the output.  
 
     For each feature set, the algorithm can halt because of the following conditions:
+
         1. BSR on validation partition is below cutoff
         2. Jump does not occur in the array of sorted absolute weights
         3. Jump occurs but the weight at the jump is too small ( < 10e-6)
@@ -39,9 +40,9 @@ class IFR:
 
         jumpratio (float): The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)
 
-        max_features_per_iter_ratio (float) = A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
-                                             if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
-                                             on the current fold is stopped. 
+        max_features_per_iter_ratio (float) : A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
+            if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
+            on the current fold is stopped.
   
         verbosity (int) : Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)
                 
@@ -49,11 +50,12 @@ class IFR:
         diagnostic_information_ (dict): Holds execution information for each interation of each partition.
 
     Return:
-        results (pandas.DataFrame): The dataframe is indexed by feature_ids and contains the results of IFR. Each column contains different infromation for each feature as described below:
-                frequency: How many times the feature is extracted
-                weights: Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.
-                            The length of the weights is equal to the frequency.
-                selection_iteration: Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.
+        pandas.DataFrame : The dataframe is indexed by feature_ids and contains the results of IFR. Each column contains different infromation for each feature as described below:
+
+            * frequency \: How many times the feature is extracted
+            * weights \: Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.
+              The length of the weights is equal to the frequency.
+            * selection_iteration \: Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.
     Examples:
             >>> import datasci.core.dataset as DS
             >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
