@@ -11,8 +11,6 @@ but not limited to:
    * Classification, e.g., Support Vector Machines (SVM), Random Forest (RF), Artificial Neural Networks (ANN)
    * Feature selection
 
-A :py:class:`DataSet <datasci.core.dataset.DataSet>` object is primarily comprised of three data structures, :py:attr:`datasci.core.dataset.DataSet.data`, :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>`
-
-``test``
+A :py:class:`DataSet <datasci.core.dataset.DataSet>` object is primarily comprised of three data structures\: :py:attr:`data <DataSet.data>` , :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>`
 
 A key feature of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is that ...
