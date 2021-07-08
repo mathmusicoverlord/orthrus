@@ -9,7 +9,8 @@ Welcome to DataSci's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
+   /rst/getting_started
    /rst/modules
 
 
