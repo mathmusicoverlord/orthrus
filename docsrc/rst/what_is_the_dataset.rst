@@ -1,4 +1,18 @@
-What is the DataSet object?
+What is a DataSet object?
 ===========================
 
-The :py:attr:`DataSet <datasci.core.dataset.DataSet>` object.
+A :py:class:`DataSet <datasci.core.dataset.DataSet>` object is a data container designed to automate statistical, machine learning, and manifold learning tasks including, 
+but not limited to:
+
+   * Data pre-processing, e.g., batch correction, normalization, imputation
+   * Statistical summarization of data and associated metadata
+   * Data visualization, e.g., Principal Component Analysis (PCA), Multi-dimensional Scaling (MDS), 
+     Uniform Manifold Projection and Approximation (UMAP)
+   * Classification, e.g., Support Vector Machines (SVM), Random Forest (RF), Artificial Neural Networks (ANN)
+   * Feature selection
+
+A :py:class:`DataSet <datasci.core.dataset.DataSet>` object is primarily comprised of three data structures,
+ :py:attr:`data <datasci.core.dataset.DataSet.data>`, :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`,
+  and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>`
+
+A key feature of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is that ...
