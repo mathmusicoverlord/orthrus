@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    script_args = exp_params.CLASSIFIER_ARGS
+    script_args = exp_params.CLASSIFY_ARGS
 
     ## required script params
     results_dir = script_args.get('RESULTS_DIR', exp_params.RESULTS_DIR)
