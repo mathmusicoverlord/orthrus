@@ -214,18 +214,10 @@ used on the data. Default is the empty string.</p></li>
 <li><p><strong>imputation_method</strong> (<em>str</em>) – Label indicating the imputation used on the data. Default is the empty string.</p></li>
 </ul>
 </dd>
-</dl>
-<dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.experiments">
-<code class="sig-name descname">experiments</code><a class="headerlink" href="#datasci.core.dataset.DataSet.experiments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>experiments</strong> (<em>dict</em>) – Holds experimental results. e.g. from <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
 </dd>
 </dl>
-</dd></dl>
-
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
@@ -314,7 +306,7 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 </dd>
 </dl>
 <p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the classification results will be stored to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+:param inplace: If True the classification results will be stored to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
@@ -326,7 +318,7 @@ features will be ranked from greatest to least importance. e.g. rank = 1 most im
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
 samples will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -409,14 +401,14 @@ etc.The attribute should be array-like with rows corresponding to the features. 
 </dd>
 </dl>
 <p>:param <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+:param inplace: If True the feature selection results will be stored to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>(selector) - Contains the fit feature selector. (f_weights) - Contains the feature weights and
