@@ -13,6 +13,6 @@ but not limited to:
 
 A :py:class:`DataSet <datasci.core.dataset.DataSet>` object is primarily comprised of three data structures\: :py:attr:`data <datasci.core.dataset.DataSet.data>` , :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>`
 
-:py:meth:`init <datasci.core.dataset.DataSet.__init__>`
+:py:attr:`init <datasci.core.dataset.DataSet.classify.sample_ids>`
 
 A key feature of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is that ...
