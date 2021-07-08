@@ -41,19 +41,26 @@ if __name__ == '__main__':
     from umap import UMAP
     from datasci.manifold.mds import MDS
     from datasci.core.helper import module_from_path
+    from datasci.core.helper import default_val
     import pandas as pd
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    exp_name = exp_params.EXP_NAME
-    class_attr = exp_params.CLASS_ATTR
-    try:
-        cross_attr = exp_params.CROSS_ATTR
-    except AttributeError:
-        cross_attr = None
-    ds = exp_params.DATASET
-    sample_ids = exp_params.SAMPLE_IDS
-    feature_ids = exp_params.FEATURE_IDS
+    script_args = exp_params.VISUALIZE_ARGS
+
+    ## required script params
+    fig_dir = script_args.get('FIG_DIR', exp_params.FIG_DIR)
+    exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
+    class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
+    ds = script_args.get('DATASET', exp_params.DATASET)
+
+    ## optional script params
+    sample_ids = script_args.get('SAMPLE_IDS', default_val(exp_params, 'SAMPLE_IDS')),
+    feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
+    cross_attr = script_args.get('CROSS_ATTR', default_val(exp_params, 'CROSS_ATTR'))
+    save_name = script_args.get('SAVE_NAME', default_val(exp_params, 'VISUALIZE_SAVE_NAME'))
+    title = script_args.get('TITLE', default_val(exp_params, 'VISUALIZE_TITLE', val=''))
+    subtitle = script_args.get('SUBTITLE', default_val(exp_params, 'VISUALIZE_SUBTITLE', val=''))
 
     # grab dimension
     if args.dim == 1:
@@ -87,10 +94,14 @@ if __name__ == '__main__':
         backend_args = dict(figsize=(1500, 1000))
 
     # set save name
-    if cross_attr is None:
-        save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
-    else:
-        save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower(), cross_attr.lower()])
+    if save_name is None:
+        if cross_attr is None:
+            save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
+        else:
+            save_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower(), cross_attr.lower()])
+
+    # set figure directory just in case
+    ds.path = fig_dir
 
     # visualize data
     ds.visualize(embedding=embedding,
@@ -99,7 +110,8 @@ if __name__ == '__main__':
                  attr=class_attr,
                  cross_attr=cross_attr,
                  backend=backend,
-                 subtitle='', # <--- default show normalization and imputation methods used
+                 subtitle=subtitle, # <--- default show normalization and imputation methods used
+                 title=title,
                  save=True,
                  save_name=save_name,
                  **backend_args)

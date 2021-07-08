@@ -378,7 +378,12 @@ class DataSet:
 
         return embedding, embedding_vals
 
-    def normalize(self, normalizer, feature_ids=None, sample_ids=None, norm_name: str = None):
+    def normalize(self,
+                  normalizer,
+                  feature_ids=None,
+                  sample_ids=None,
+                  norm_name: str = None,
+                  normalize_args=None):
         """
         Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
         used to :py:attr:`DataSet.normalization_method`.
@@ -396,6 +401,9 @@ class DataSet:
 
             norm_name (str): Common name for the normalization used. e.g. log, unit, etc... The default is
                 :py:attr:`normalizer`.__str__().
+
+            normalize_args (dict)L Dictionary of keyword arguments to be passed to fit_transform method of the
+                :py:attr:`normalizer`.
 
         Returns:
             inplace method.
@@ -415,12 +423,15 @@ class DataSet:
         if norm_name is None:
             norm_name = normalizer.__str__()
 
+        if normalize_args is None:
+            normalize_args = {}
+
         # slice the data set
         ds = self.slice_dataset(feature_ids, sample_ids)
         data = ds.data
 
         # transform data
-        data_trans = normalizer.fit_transform(data.values)
+        data_trans = normalizer.fit_transform(data.values, **normalize_args)
 
         # create dataframe from transformed data
         data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
@@ -1161,17 +1172,17 @@ class DataSet:
                 s_weights = eval("classifier" + "." + s_weights_handle)
                 s_weight_results[s_weights_name] = np.nan
                 s_weight_results.loc[sample_index.take(train_index), s_weights_name] = s_weights
-                if not (f_rnk_func is None):
+                if not (s_rnk_func is None):
                     s_rnk_name = method_name + "_s_rank_" + str(i)
-                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    weights = s_weight_results.loc[sample_index.take(train_index), s_weights_name]
                     s_weight_results[s_rnk_name] = np.nan
-                    s_weight_results.loc[feature_ids, s_rnk_name] = (-s_rnk_func(weights)).argsort()
+                    s_weight_results.loc[sample_index.take(train_index), s_rnk_name] = (-s_rnk_func(weights)).argsort()
                     s_weight_results[s_rnk_name] = s_weight_results[s_rnk_name].astype('Int64')
                 else:
                     s_rnk_name = method_name + "_s_rank_" + str(i)
-                    weights = s_weight_results.loc[feature_ids, s_weights_name]
+                    weights = s_weight_results.loc[sample_index.take(train_index), s_weights_name]
                     s_weight_results[s_rnk_name] = np.nan
-                    s_weight_results.loc[feature_ids, s_rnk_name] = (-np.array(weights)).argsort()
+                    s_weight_results.loc[sample_index.take(train_index), s_rnk_name] = (-np.array(weights)).argsort()
 
         # print means and standard deviations
         if pd.api.types.infer_dtype(train_score) == 'floating':
