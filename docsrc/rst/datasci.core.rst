@@ -7,8 +7,6 @@ Submodules
 datasci.core.dataset module
 ---------------------------
 
-.. module:: datasci.core.dataset
-
 .. automodule:: datasci.core.dataset
    :members:
    :undoc-members:
