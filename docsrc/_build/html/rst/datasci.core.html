@@ -539,7 +539,7 @@ as <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
 used to <code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code>.</p>
 <dl class="field-list simple">
@@ -554,6 +554,7 @@ as <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>norm_name</strong> (<em>str</em>) – Common name for the normalization used. e.g. log, unit, etc… The default is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.__str__().</p></li>
+<li><p><strong>normalize_args</strong> (<em>dict</em>) – <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -812,6 +813,21 @@ indicating plot properties.</p>
 <div class="section" id="module-datasci.core.helper">
 <span id="datasci-core-helper-module"></span><h2>datasci.core.helper module<a class="headerlink" href="#module-datasci.core.helper" title="Permalink to this headline">¶</a></h2>
 <p>This module contains user-defined and general purpose helper functions use by the DataSci package.</p>
+<dl class="py function">
+<dt id="datasci.core.helper.default_val">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a default value when a module doesn’t contain an attribute.
+:param module: Module in consideration
+:param attr: The name of the attribute whose existence is in question.
+:type attr: str
+:param val: The value to be used in the case this attribute doesn’t exist. The default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The value of the attribute or the default value.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt id="datasci.core.helper.generate_experiment">
 <code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
