@@ -40,6 +40,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.mathjax']
 
+napoleon_include_private_with_doc = False
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
