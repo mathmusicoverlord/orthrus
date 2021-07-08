@@ -361,7 +361,12 @@ class DataSet:
 
         return embedding
 
-    def normalize(self, normalizer, feature_ids=None, sample_ids=None, norm_name: str = None):
+    def normalize(self, 
+                normalizer, 
+                feature_ids=None,
+                sample_ids=None, 
+                norm_name: str = None,
+                supervised_attr: str = None):
         """
         Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
         used to :py:attr:`DataSet.normalization_method`.
@@ -379,6 +384,8 @@ class DataSet:
 
             norm_name (str): Common name for the normalization used. e.g. log, unit, etc... The default is
                 :py:attr:`normalizer`.__str__().
+
+            supervised_attr (string): If not None, the supervised_attr labels are based to the normalizer fit method, rather than None.
 
         Returns:
             inplace method.
@@ -401,9 +408,17 @@ class DataSet:
         # slice the data set
         ds = self.slice_dataset(feature_ids, sample_ids)
         data = ds.data
+        metadata = ds.metadata
 
         # transform data
-        data_trans = normalizer.fit_transform(data.values)
+        if supervised_attr != None:
+            data_trans = normalizer.fit_transform(data.values, y=metadata[supervised_attr].values)
+        else:
+            try:
+                data_trans = normalizer.fit_transform(data.values, y=None)
+            except TypeError:
+                data_trans = normalizer.fit_transform(data.values)
+
 
         # create dataframe from transformed data
         data_trans = data.__class__(index=data.index, columns=data.columns, data=data_trans)
@@ -889,6 +904,7 @@ class DataSet:
                  f_rnk_func=None,
                  s_rnk_func=None,
                  experiment_name=None,
+                 verbose: bool = True,
                  **kwargs):
         """
         This method runs a classification experiment. The user provides a classifier, a class to partition the data
@@ -958,6 +974,8 @@ class DataSet:
 
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
                 :py:attr:`DataSet.experiments`. Default is ``attr`` + ``classifier_name`` + ``partitioner_name`` + ``scorer_name``.
+
+            verbose (boolean): If True, logs will be printed to console. Default = True
         Returns:
             dict : (classifiers) - Contains the fit classifiers. (scores) - Contains the training and test scores
                 provided by ``scorer`` across partitions given by ``partitioner``. (prediction_results) - Contains the
@@ -1085,28 +1103,29 @@ class DataSet:
 
             # get scores
             title = r"%s, Split %d of %d, Scores: " % (classifier_name, i+1, n_splits)
-            print(title)
-            print("="*len(title))
+            print_str = title + '\n'
+            print_str += "="*len(title) + '\n'
             score_name = method_name + "_" + scorer_name + "_" + str(i)
             train_score = scorer(y_train, y_pred_train, **scorer_args)
             if pd.api.types.infer_dtype(train_score) == 'floating':
-                print(r"Training %s: %.2f%%" % (scorer_name, train_score*100))
+                print_str += r"Training %s: %.2f%%" % (scorer_name, train_score*100) + '\n'
             else:
-                print(r"Training %s:" % (scorer_name,))
-                print(train_score)
+                print_str += r"Training %s:" % (scorer_name,) + '\n'
+                print_str += train_score + '\n'
             if not (test_index is None):
-                print("-"*len(title))
+                print_str += "-"*len(title) + '\n'
                 test_score = scorer(y_true, y_pred_test, **scorer_args)
                 if pd.api.types.infer_dtype(test_score) == 'floating':
-                    print(r"Test %s: %.2f%%" % (scorer_name, test_score * 100))
+                    print_str += r"Test %s: %.2f%%" % (scorer_name, test_score * 100) + '\n'
                 else:
-                    print(r"Test %s:" % (scorer_name,))
-                    print(test_score)
+                    print_str += r"Test %s:" % (scorer_name,) + '\n'
+                    print_str += test_score + '\n'
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
             else:
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, pd.NA])
-            print("\n")
-
+            print_str += "\n"
+            if verbose:
+                print(print_str)
             # append prediction results
             labels_name = method_name + "_labels_" + str(i)
             split_labels_name = method_name + "_split_labels_" + str(i)
@@ -1157,28 +1176,31 @@ class DataSet:
                     s_weight_results.loc[feature_ids, s_rnk_name] = (-np.array(weights)).argsort()
 
         # print means and standard deviations
+        print_str = ''
         if pd.api.types.infer_dtype(train_score) == 'floating':
             title = r"%s, Summary, Scores: " % (classifier_name,)
-            print(title)
-            print("=" * len(title))
+            print_str += title + '\n'
+            print_str += "=" * len(title) + '\n'
             mean_train_score = scores.loc['Train'].mean()
             std_train_score = scores.loc['Train'].std()
             min_train_score = scores.loc['Train'].min()
             max_train_score = scores.loc['Train'].max()
-            print(r"Training %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_train_score * 100, std_train_score * 100))
-            print(r"Max. Training %s: %.2f%%" % (scorer_name, max_train_score * 100))
-            print(r"Min. Training %s: %.2f%%" % (scorer_name, min_train_score * 100))
+            print_str += r"Training %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_train_score * 100, std_train_score * 100) + '\n'
+            print_str += r"Max. Training %s: %.2f%%" % (scorer_name, max_train_score * 100) + '\n'
+            print_str += r"Min. Training %s: %.2f%%" % (scorer_name, min_train_score * 100) + '\n'
         if not (test_index is None):
             if pd.api.types.infer_dtype(test_score) == 'floating':
-                print("-"*len(title))
+                print_str +="-"*len(title) + '\n'
                 mean_test_score = scores.loc['Test'].mean()
                 std_test_score = scores.loc['Test'].std()
                 min_test_score = scores.loc['Test'].min()
                 max_test_score = scores.loc['Test'].max()
-                print(r"Test %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_test_score * 100, std_test_score * 100))
-                print(r"Max. Test %s: %.2f%%" % (scorer_name, max_test_score * 100))
-                print(r"Min. Test %s: %.2f%%" % (scorer_name, min_test_score * 100))
+                print_str +=r"Test %s: %.2f%% +/- %.2f%%" % (scorer_name, mean_test_score * 100, std_test_score * 100) + '\n'
+                print_str +=r"Max. Test %s: %.2f%%" % (scorer_name, max_test_score * 100) + '\n'
+                print_str +=r"Min. Test %s: %.2f%%" % (scorer_name, min_test_score * 100) + '\n'
 
+        if verbose:
+            print(print_str)
         if append_to_meta:
             self.metadata = pd.concat([self.metadata, predict_results], axis=1)
             self.vardata = pd.concat([self.vardata, f_weight_results], axis=1)
