@@ -50,6 +50,34 @@ class DataSet:
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
 
     Attributes:
+        name (str): Reference name for the dataset. Default is the empty string.
+
+        description (str): Short description of data set.
+
+        path (str): File path for saving DataSet instance and related outputs. Default is the empty string.
+
+        data (pandas.DataFrame): Numerical data or features of the data set arranged as samples x features.
+            Default is the empty DataFrame.
+
+        metadata (pandas.DataFrame): Categorical data or attributes of the dataset arranged as samples x attributes.
+            The sample labels in the index column should be the same format as those used for the data DataFrame.
+            If labels are missing or there are more labels than in the data, the class will automatically restrict
+            to just those samples used in the data and fill in NaN where there are missing samples. Default is the
+            empty DataFrame.
+
+        vardata (pandas.DataFrame): Categorical data or attributes of the features on the dataset arranged as
+            features x attributes. The feature labels in the index column should be the same format as those used for
+            the columns in the data DataFrame. Default is None.
+
+        dissimilarity_matrix (pandas.DataFrame): Symmetric matrix whose columns and index are given by the samples.
+            Its contents give the pairwise dissimilarities between the samples. Default is None.
+
+        normalization_method (str): Label indicating the normalization used on the data. Future normalization will
+            append as normalization_1/normalization_2/.../normalization_n indicating the sequence of normalizations
+            used on the data. Default is the empty string.
+
+        imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
+
         experiments (dict): Holds experimental results. e.g. from :py:meth:`DataSet.classify`.
 
 
@@ -1502,6 +1530,7 @@ def from_ccd(file_path: str, name: str = None, index_col: str = '_id'):
     # create and return DS object
     ds = DataSet(name=name, description=description, path=path, data=data_df, metadata=metadata_df)
     return ds
+
 
 
 #def load_geo(**kwargs):
