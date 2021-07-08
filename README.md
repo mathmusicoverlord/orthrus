@@ -29,8 +29,8 @@ from datasci.core.dataset import DataSet as DS
 import pandas as pd
 
 # load data and metadata
-data = pd.read_csv("./test_data/iris_data.csv", index_col=0)
-metadata = pd.read_csv("./test_data/iris_metadata.csv", index_col=0)
+data = pd.read_csv("test_data/Iris/Data/iris_data.csv", index_col=0)
+metadata = pd.read_csv("test_data/Iris/Data/iris_metadata.csv", index_col=0)
 
 # create DataSet instance
 ds = DS(name='iris', path='./test_data', data=data, metadata=metadata)
