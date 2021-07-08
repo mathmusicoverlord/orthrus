@@ -187,23 +187,35 @@
 These classes must have the sklearn equivalent of a split method. The split method returns a list of train-test partitions;
 one for each fold in the experiment. See sklearn.model_selection.KFold for an example partitioner.</p>
 <dl class="py class">
-<dt id="datasci.model_selection.partitioning.TrainPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainPartitioner</code><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner" title="Permalink to this definition">¶</a></dt>
+<dt id="datasci.model_selection.partitioning.TrainTestPartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainTestPartitioner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.model_selection.partitioning.TrainPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner.split" title="Permalink to this definition">¶</a></dt>
+<dt id="datasci.model_selection.partitioning.TrainTestPartitioner.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.model_selection.partitioning.TrainTestPartitioner.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner.split" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="datasci.model_selection.partitioning.TrainTestPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainTestPartitioner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner" title="Permalink to this definition">¶</a></dt>
+<dt id="datasci.model_selection.partitioning.TrainPartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainPartitioner</code><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.model_selection.partitioning.TrainTestPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner.split" title="Permalink to this definition">¶</a></dt>
+<dt id="datasci.model_selection.partitioning.TrainPartitioner.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="datasci.model_selection.partitioning.TrainPartitioner.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner.split" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
