@@ -238,10 +238,10 @@ on the current fold is stopped.</p></li>
 <blockquote>
 <div><ul class="simple">
 <li><p>frequency : How many times the feature is extracted</p></li>
-<li><p>weights : Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.</p></li>
+<li><p>weights : Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.
+The length of the weights is equal to the frequency.</p></li>
+<li><p>selection_iteration : Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.</p></li>
 </ul>
-<p>The length of the weights is equal to the frequency.
-* selection_iteration : Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.</p>
 </div></blockquote>
 </p>
 </dd>
