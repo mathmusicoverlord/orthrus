@@ -6,27 +6,34 @@ import random
 from calcom.solvers import LPPrimalDualPy
 import copy 
 import sklearn
+from sklearn.metrics import balanced_accuracy_score
 import calcom
 import ray
+
 class IFR:
 
-
     """
-    The Iterative Feature Removal algorithms extracts features for many data partitions independently and combines them and keep track of feature frequency, weights 
-    and iterations in which each feature was extracted. During execution, the data is partitioned into training and validation sets 'repetition' number of times and 
-    then for each partition, one feature set is extracted. So, a total of repetition * num_partitions independent feature sets are extracted and the results are 
-    merged to create the output.  
-
+    The Iterative Feature Removal algorithms extracts features for many data partitions independently, and combines 
+    them and keep track of feature frequency, weights and iterations in which each feature was extracted. During execution, 
+    the data is partitioned into training and validation sets 'repetition' number of times and then for each partition
+    one feature set is extracted. So, a total of repetition * num_partitions independent feature sets are extracted 
+    and the results are merged to create the output. These independent feature set extractions are batched 
+    and run in parallel using python ray package.
+    
     For each feature set, the algorithm can halt because of the following conditions:
+
         1. BSR on validation partition is below cutoff
         2. Jump does not occur in the array of sorted absolute weights
         3. Jump occurs but the weight at the jump is too small ( < 10e-6)
-        4. #selected features is greater than max_features_per_iter_ratio * #samples in training partition. This condition exists to prevent overfitting.
+        4. Number of features selected for the current iteration is greater than max_features_per_iter_ratio * num_samples in training partition. This condition prevents overfitting.
         5. max_iters number of iterations complete successfully
 
-    When one of these conditions happen, further feature extraction on the current fold is stopped and begins on the next partition.
+    When one of these conditions happen, further feature extraction on the current fold is stopped.
 
     Parameters:
+        classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
+                of a ``fit`` and ``predict`` method.
+
         repetition (int): Determines the number of times to partition the dataset. (default: 10)
         
         partition_method (string): A partition method that is compatible with calcom.utils.generate_partitions (default: 'stratified_k-fold')
@@ -39,46 +46,53 @@ class IFR:
 
         jumpratio (float): The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)
 
-        max_features_per_iter_ratio (float) = A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
-                                             if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
-                                             on the current fold is stopped. 
-  
+        max_features_per_iter_ratio (float) : A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
+            if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
+            on the current fold is stopped.
+
         verbosity (int) : Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)
+        
+        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used 
+            in resource constrained situation; lower the number of process if you are getting errors/exceptions
                 
     Attributes:
         diagnostic_information_ (dict): Holds execution information for each interation of each partition.
 
-    Return:
-        results (pandas.DataFrame): The dataframe is indexed by feature_ids and contains the results of IFR. Each column contains different infromation for each feature as described below:
-                frequency: How many times the feature is extracted
-                weights: Contains a list of weights, from the weight vectors during training on different partitions. Each value corresponds to the weight for the feature over different extractions.
-                            The length of the weights is equal to the frequency.
-                selection_iteration: Contains a list of indices of the iteration when the feature was extracted over different data partitions. The length of the list is equal to the frequency.
+
     Examples:
             >>> import datasci.core.dataset as DS
             >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
             
+            >>> dataset_dirpath = os.path.join(consts.DATA_SET_LOCATION, 'metabolomics', 'urine', 'adult_urine') 
+            >>> file_path = os.path.join(dataset_dirpath, 'DoD-Urine-Adult_skyline-list-for-Eric_20200605_adjusted.ds') 
             >>> x = DS.load_dataset(file_path)
+            >>> model = calcom.classifiers.SSVMClassifier()
+            >>> model.params['C'] = 1.
+            >>> model.params['method'] = calcom.solvers.LPPrimalDualPy
+            >>> model.params['use_cuda'] = False
             >>> ifr = IFR.IFR(
+                model,
                 repetition = 500,
                 nfolds = 4,
                 max_iters = 100,
                 cutoff = .6,
                 jumpratio = 5,
-                max_features_per_iter_ratio = 2
+                max_features_per_iter_ratio = 2,
                 verbosity = 2,
                 )
 
+            >>> #see feature select method for details
             >>> result = x.feature_select(ifr,
                         attrname,
                         selector_name='IFR',
                         f_results_handle='results',
                         append_to_meta=False,
                         )
-            >>> #see feature select method for details
-            >>> ifr.plot_basic_diagnostic_stats()
+    
+    See :py:meth:`IFR.fit` to understand the output of `IFR`.
     """
     def __init__(self,
+                classifier,
                 repetition=10,
                 partition_method = 'stratified_k-fold',
                 nfolds = 3,
@@ -86,7 +100,8 @@ class IFR:
                 cutoff=0.75,
                 jumpratio=100.,
                 max_features_per_iter_ratio=0.8,
-                verbosity=0):
+                verbosity=0,
+                max_processes=100):
 
         self.repetition = repetition   # Number of time the data is randomly partitioned.
         self.partition_method =  partition_method # Passed to calcom.utils.generate_partitions
@@ -101,13 +116,16 @@ class IFR:
                                             'features', 'true_feature_count', 'cap_breached']
         self._initialize_diagnostic_dictionary(self.diagnostic_information_)
         self.diagnostic_information_['exit_reasons'] = []
-        self.scorer = sklearn.metrics.balanced_accuracy_score
-        model = calcom.classifiers.SSVMClassifier()
-        model.params['C'] = 1.
-        model.params['method'] = LPPrimalDualPy
-        model.params['use_cuda'] = True
-        self.model = model
-        self.num_processes = 20
+        self.scorer = balanced_accuracy_score
+        
+        if classifier == None:
+            classifier = calcom.classifiers.SSVMClassifier()
+            classifier.params['C'] = 1.
+            classifier.params['method'] = LPPrimalDualPy
+            classifier.params['use_cuda'] = False
+        
+        self.classifier = classifier
+        self.max_processes = max_processes
         super(IFR, self).__init__()
     #
 
@@ -181,14 +199,25 @@ class IFR:
             
     def fit(self, data, labels):
         '''
-        data        : m-by-n array of data, with m the number of observations.
-        labels      : m vector of labels for the data
+        Args:
+        data (ndarray of shape (m, n))): array of data, with m the number of observations in R^n.
+        labels (ndarray of shape (m))): vector of labels for the data
 
-        return      : a dictionary of features {keys=feature : value=no_of_time_it_was_selected}
+        Return:
+        (pandas.DataFrame) : The dataframe contains the results of IFR. It is indexed by feature_ids and each column 
+        contains different information for each feature as described below:
+
+            * frequency \: How many times the feature is extracted
+            * weights \: Contains a list of weights, from the weight vectors during training on different partitions. 
+              Each value corresponds to the weight for the feature over different extractions. The length of the weights 
+              is equal to the frequency.
+            * selection_iteration \: Contains a list of indices of the iteration when the feature was extracted over 
+              different data partitions. The length of the list is equal to the frequency.
         '''
         import calcom
         import numpy as np
 
+        ray.init()
         m,n = np.shape(data)
 
         if self.verbosity>0:
@@ -212,6 +241,11 @@ class IFR:
         n_data_partition = 0
         processes = []
         # start processing
+        total_tasks = self.repetition * self.nfolds
+        num_running = 0
+        num_finished = 0
+
+        all_finished_processes = []
         for n_rep in range(self.repetition):
 
             partitions = calcom.utils.generate_partitions(labels, method=self.partition_method, nfolds=self.nfolds)
@@ -227,43 +261,48 @@ class IFR:
                 validation_data = data[validation_idx, :]
                 validation_labels = labels[validation_idx]
 
+                if num_running == self.max_processes:
+                    finished_processes, processes = ray.wait(processes)
+                    num_running -=len(finished_processes)
+                    num_finished +=len(finished_processes)
+                    all_finished_processes.extend(finished_processes)
+        
                 processes.append(self.select_features_for_data_partition.remote(self, train_data, validation_data, train_labels, validation_labels))
+                num_running+=1
+        #wait for all processes to finish
+        finished_processes, processes = ray.wait(processes, num_returns=len(processes))
 
-        num_done = 0
-        total = len(processes)
-        while(len(processes) > 0):
-            if len(processes) < self.num_processes:
-                num_returns = len(processes)
-            else:
-                num_returns = self.num_processes
-            finished_processes, processes = ray.wait(processes, num_returns=num_returns)
-            num_done += len(finished_processes)
-            for process in finished_processes:
-                results = ray.get(process)
-                # update the feature set dictionary based on the features collected for current fold
-                list_of_features_for_curr_fold = results['list_of_features']
-                self._update_frequency_in_results(list_of_features_for_curr_fold)
-                
-                list_of_weights_for_curr_fold = results['list_of_weights']
-                self._update_weights_in_results(list_of_features_for_curr_fold, list_of_weights_for_curr_fold) 
-                list_of_selection_iterations_for_current_fold = results['list_of_selection_iteration']
-                self._update_selection_iteration_in_results(list_of_selection_iterations_for_current_fold)   
-                
-                n_iters = results['n_iters']
-                diagnostic_info_dictionary = results['diagnostic_info_dictionary']
-                exit_reason = results['exit_reason']
-                                
-                self._sanity_check_diagnostics(diagnostic_info_dictionary, n_iters)
-                #save the diagnostic information for this data partition
-                self._add_diagnostic_info_for_data_partition(diagnostic_info_dictionary, n_data_partition, exit_reason)
+        num_running -=len(finished_processes)
+        num_finished +=len(finished_processes)
+        all_finished_processes.extend(finished_processes)
+
+        assert num_finished == total_tasks, 'All processes were not processed. %d processes are unaccounted for.' % (total_tasks - num_finished)
+        assert num_running == 0, '%d processes still running' % num_running
+        for process in all_finished_processes:
+            results = ray.get(process)
+            # update the feature set dictionary based on the features collected for current fold
+            list_of_features_for_curr_fold = results['list_of_features']
+            self._update_frequency_in_results(list_of_features_for_curr_fold)
+            
+            list_of_weights_for_curr_fold = results['list_of_weights']
+            self._update_weights_in_results(list_of_features_for_curr_fold, list_of_weights_for_curr_fold) 
+            list_of_selection_iterations_for_current_fold = results['list_of_selection_iteration']
+            self._update_selection_iteration_in_results(list_of_selection_iterations_for_current_fold)   
+            
+            n_iters = results['n_iters']
+            diagnostic_info_dictionary = results['diagnostic_info_dictionary']
+            exit_reason = results['exit_reason']
+                            
+            self._sanity_check_diagnostics(diagnostic_info_dictionary, n_iters)
+            #save the diagnostic information for this data partition
+            self._add_diagnostic_info_for_data_partition(diagnostic_info_dictionary, n_data_partition, exit_reason)
             #
 
-        assert num_done == total, 'All processes were not processed.'
         if self.verbosity>0:
             print("=====================================================")
             print("Finishing Execution. %d features out of a total of %d features were selected."% ((self.results['frequency'] > 0).sum(), data.shape[1]))
             print("=====================================================")
-
+        ray.shutdown()
         return self.results
 
     @ray.remote(num_gpus=0.1)
@@ -291,12 +330,11 @@ class IFR:
                 print("Checking BSR of complementary problem... ",end="")
             #
 
-            #redefine SSVM classifier with new random parameters
-            model = copy.deepcopy(self.model)
+            #create a copy of the classifier
+            model = copy.deepcopy(self.classifier)
 
             tr_d = np.array( train_data[:,active_mask] )
             te_d = np.array( validation_data[:,active_mask] )
-            #import pdb; pdb.set_trace()
             try:
                 model.fit(tr_d, train_labels)
             except Exception as e:
