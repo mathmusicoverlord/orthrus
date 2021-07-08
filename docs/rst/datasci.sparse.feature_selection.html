@@ -275,30 +275,6 @@ The length of the weights is equal to the frequency.</p></li>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._initialize_results">
-<code class="sig-name descname">_initialize_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_attributes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._initialize_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes self.results attribute</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_frequency_in_results">
-<code class="sig-name descname">_update_frequency_in_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_frequency_in_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Increments the values of features by 1, for passed features, in frequency column of self.results</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_selection_iteration_in_results">
-<code class="sig-name descname">_update_selection_iteration_in_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features</span></em>, <em class="sig-param"><span class="n">iteration</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_selection_iteration_in_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Appends the iteration number, for passed features, in selection_iteration column of self.results</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_weights_in_results">
-<code class="sig-name descname">_update_weights_in_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features</span></em>, <em class="sig-param"><span class="n">weights</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR._update_weights_in_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Appends the weight for passed features in the weights column in self.results</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>data        : m-by-n array of data, with m the number of observations.
