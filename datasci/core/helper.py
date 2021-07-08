@@ -748,7 +748,7 @@ def generate_project(name: str, file_path: str):
     os.makedirs(exps_dir, exist_ok=True)
 
     # define data directory
-    scripts_dir = os.path.join(proj_dir, 'scripts')
+    scripts_dir = os.path.join(proj_dir, 'Scripts')
     os.makedirs(scripts_dir)
 
 def generate_experiment(name: str, proj_dir: str):
@@ -795,7 +795,7 @@ def generate_experiment(name: str, proj_dir: str):
                   "# set experiment name\n" \
                   "EXP_NAME = \'" + name + "\'\n\n" \
                   "# set working directories\n" \
-                  "PROJ_DIR = \'" + proj_dir + "\' # <---- put your absolute path\n" \
+                  "PROJ_DIR = \'" + proj_dir + "\'  # <---- put your absolute path\n" \
                   "DATA_DIR = os.path.join(PROJ_DIR, \'Data\')\n" \
                   "EXP_DIR = os.path.join(PROJ_DIR, \'Experiments\', EXP_NAME)\n" \
                   "RESULTS_DIR = os.path.join(EXP_DIR, \'Results\')\n\n" \
@@ -805,7 +805,7 @@ def generate_experiment(name: str, proj_dir: str):
                   "FIG_DIR = os.path.join(EXP_DIR, \'Figures\', dt.__str__())\n" \
                   "os.makedirs(FIG_DIR, exist_ok=True)\n\n" \
                   "# load dataset\n" \
-                  "DATASET = load_dataset(\'/path/to/dataset.ds\')\n" \
+                  "DATASET = load_dataset(os.path.join(DATA_DIR, \'dataset.ds\'))\n" \
                   "DATASET.path = FIG_DIR\n\n" \
                   "# restrict samples\n" \
                   "SAMPLE_IDS = DATASET.metadata.query(\'query here\').index\n\n" \
