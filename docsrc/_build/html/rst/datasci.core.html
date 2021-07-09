@@ -327,7 +327,7 @@ used on the data. Default is the empty string.</p>
 <dl class="py attribute">
 <dt id="datasci.core.dataset.DataSet.experiments">
 <code class="sig-name descname">experiments</code><a class="headerlink" href="#datasci.core.dataset.DataSet.experiments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
+<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
@@ -380,7 +380,7 @@ See dash documentation for further details.</p></li>
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.classify">
-<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">predict_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">predict_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method runs a classification experiment. The user provides a classifier, a class to partition the data
 into train/test partitions, and a scoring method. The experiment returns the fit classifiers across the
 train/test partitions, the train/test scores. Additionally, the experiment will either return, or append
@@ -422,8 +422,8 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 </ul>
 </dd>
 </dl>
-<p>:param <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the classification results will be stored to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<p>:param <a class="reference internal" href="#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
@@ -435,7 +435,8 @@ features will be ranked from greatest to least importance. e.g. rank = 1 most im
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
 samples will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
+<a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – If True, logs will be printed to console. Default = True</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -517,15 +518,15 @@ etc.The attribute should be array-like with rows corresponding to the features. 
 </ul>
 </dd>
 </dl>
-<p>:param <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<p>:param <a class="reference internal" href="#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
+<a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>(selector) - Contains the fit feature selector. (f_weights) - Contains the feature weights and
@@ -610,13 +611,13 @@ is ‘metadata’.</p>
 <dt id="datasci.core.dataset.DataSet.impute">
 <code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imputes the data of the dataset according to an imputer class. Appends the imputation method
-used to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.imputation_method" title="datasci.core.dataset.DataSet.imputation_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code></a>.</p>
+used to <a class="reference internal" href="#datasci.core.dataset.DataSet.imputation_method" title="datasci.core.dataset.DataSet.imputation_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imputer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-imputer.fit_transform(<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+imputer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
+as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
@@ -645,21 +646,22 @@ as <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.cor
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
-used to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.normalization_method" title="datasci.core.dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
+used to <a class="reference internal" href="#datasci.core.dataset.DataSet.normalization_method" title="datasci.core.dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-normalizer.fit_transform(<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+normalizer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
+as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>norm_name</strong> (<em>str</em>) – Common name for the normalization used. e.g. log, unit, etc… The default is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.__str__().</p></li>
+<li><p><strong>supervised_attr</strong> (<em>string</em>) – If not None, the supervised_attr labels are based to the normalizer fit method, rather than None.</p></li>
 <li><p><strong>normalize_args</strong> (<em>dict</em>) – <code class="xref py py-attr docutils literal notranslate"><span class="pre">normalizer</span></code>.</p></li>
 </ul>
 </dd>
@@ -726,7 +728,7 @@ Default is false.</p>
 <dt id="datasci.core.dataset.DataSet.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-as <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
+as <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
 with underscores.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -759,14 +761,14 @@ with underscores.</p>
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Slice of DataSet.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -793,7 +795,7 @@ restricting the features and samples.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-embedding.fit_transform(<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
+embedding.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
 <li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
 <li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
@@ -801,19 +803,19 @@ embedding.fit_transform(<a class="reference internal" href="../rst_copy/datasci.
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>use_dissimilarity</strong> (<em>bool</em>) – If True the embedding will fit to the dissimilarity matrix stored in
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.dissimilarity_matrix" title="datasci.core.dataset.DataSet.dissimilarity_matrix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code></a>. The default is false.</p></li>
+<a class="reference internal" href="#datasci.core.dataset.DataSet.dissimilarity_matrix" title="datasci.core.dataset.DataSet.dissimilarity_matrix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code></a>. The default is false.</p></li>
 <li><p><strong>backend</strong> (<em>str</em>) – Plotting backend to use. Can be either <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> or <code class="docutils literal notranslate"><span class="pre">plotly</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">pyplot</span></code>.</p></li>
 <li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>.__str__().</p></li>
 <li><p><strong>supervised</strong> (<em>bool</em>) – If True the attr labels are based to the embedding fit method, rather than None.</p></li>
 <li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
-<a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
+<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
+<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
 </ul>
 </dd>
 </dl>
-<p>:param be prepended by <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>. Default is None.:
+<p>:param be prepended by <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>. Default is None.:
 :param **kwargs: Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code> when using the</p>
 <blockquote>
 <div><p>backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
@@ -885,7 +887,7 @@ indicating plot properties.</p>
 <dd class="field-odd"><p>Class instance of Dataset.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-even"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -906,7 +908,7 @@ indicating plot properties.</p>
 <dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -919,6 +921,53 @@ indicating plot properties.</p>
 <div class="section" id="module-datasci.core.helper">
 <span id="datasci-core-helper-module"></span><h2>datasci.core.helper module<a class="headerlink" href="#module-datasci.core.helper" title="Permalink to this headline">¶</a></h2>
 <p>This module contains user-defined and general purpose helper functions use by the DataSci package.</p>
+<dl class="py function">
+<dt id="datasci.core.helper.batch_jobs_">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">batch_jobs_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function_handle</span></em>, <em class="sig-param"><span class="n">list_of_arguments</span></em>, <em class="sig-param"><span class="n">max_processes</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">verbose_frequency</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
+which defines the worker, and a list of arguments for the jobs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function_handle</strong> – Handle of the function or job</p></li>
+<li><p><strong>of arguments</strong> (<em>list</em>) – It is a list of argument list (see example below).</p></li>
+<li><p><strong>max_processes</strong> (<em>int</em>) – Defines the maximum number of jobs to run in parallel. It is intended to be used
+in resource constrained situation; lower the number of process if you are getting errors/exceptions</p></li>
+<li><p><strong>verbose_frequency</strong> (<em>int</em>) – This parameter controls the frequency of progress outputs to console; an output is
+printed to console after every verbose_frequency number of processes complete execution. (default: 10)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
+Note:
+1. The order of elements in return does not match the order of elements in arguments.
+2. This method calls ray.init() but doesn’t call ray.shutdown() to preseve object references. It must be done</p>
+<blockquote>
+<div><p>after the object references have been used</p>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">batch_jobs_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">job_handle</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_args</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">list_of_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">process_refs</span> <span class="o">=</span> <span class="n">batch_jobs_</span><span class="p">(</span><span class="n">job_handle</span><span class="p">,</span> <span class="n">list_of_args</span><span class="p">,</span> <span class="n">max_processes</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">verbose_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">process_refs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">process</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="py function">
 <dt id="datasci.core.helper.default_val">
 <code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
@@ -944,7 +993,7 @@ be placed in the Experiments directory of the project directory.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – The name of the experiment.</p></li>
-<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="../rst_copy/datasci.core.html#datasci.core.helper.generate_project" title="datasci.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
+<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#datasci.core.helper.generate_project" title="datasci.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
 for auto-generation of a project directory.</p></li>
 </ul>
 </dd>
