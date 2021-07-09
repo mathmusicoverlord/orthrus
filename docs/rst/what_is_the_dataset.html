@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>What is the DataSet object? &mdash; DataSci 1 documentation</title>
+  <title>What is a DataSet object? &mdash; DataSci 1 documentation</title>
   
 
   
@@ -32,6 +32,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -87,20 +89,9 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">What is the DataSet object?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dataset-structure">DataSet Structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#see-also">See Also</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l4"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">What is a DataSet object?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="add_new_attributes_using_queries.html">Adding new attributes to metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalization_and_imputation.html">Data Normalization and Imputation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
@@ -154,7 +145,7 @@
         
           <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
         
-      <li>What is the DataSet object?</li>
+      <li>What is a DataSet object?</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -173,11 +164,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="what-is-the-dataset-object">
-<h1>What is the DataSet object?<a class="headerlink" href="#what-is-the-dataset-object" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is a data container designed to automate statistical, machine learning,
-and manifold learning tasks including, but not limited to:</p>
-<ul class="simple">
+  <div class="section" id="what-is-a-dataset-object">
+<h1>What is a DataSet object?<a class="headerlink" href="#what-is-a-dataset-object" title="Permalink to this headline">¶</a></h1>
+<p>A <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is a data container designed to automate statistical, machine learning, and manifold learning tasks including,
+but not limited to:</p>
+<blockquote>
+<div><ul class="simple">
 <li><p>Data pre-processing, e.g., batch correction, normalization, imputation</p></li>
 <li><p>Statistical summarization of data and associated metadata</p></li>
 <li><p>Data visualization, e.g., Principal Component Analysis (PCA), Multi-dimensional Scaling (MDS),
@@ -185,153 +177,9 @@ Uniform Manifold Projection and Approximation (UMAP)</p></li>
 <li><p>Classification, e.g., Support Vector Machines (SVM), Random Forest (RF), Artificial Neural Networks (ANN)</p></li>
 <li><p>Feature selection</p></li>
 </ul>
-<div class="section" id="dataset-structure">
-<h2>DataSet Structure<a class="headerlink" href="#dataset-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is primarily composed of three
-data structures: <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a>, <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>,
-and <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a>, each of which is a
-<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas.DataFrame</a> object containing an indexed rectangular array of values.
-These dataframes are described as follows:</p>
-<ul>
-<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> respresent samples, e.g., participants in a clinical study.
-The columns represent the features, or observations, of each sample e.g., RNA seq expression values, metabolite peak areas for given <em>m/z</em> s
-and retention times, or shedding scores across multiple virus and bacteria. The rows of the data are labeled via the <code class="docutils literal notranslate"><span class="pre">index</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
-and the columns are labeled via the <code class="docutils literal notranslate"><span class="pre">columns</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DATASCI_PATH&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">data</span>
-
-<span class="go">    sepal_length  sepal_width  petal_length  petal_width</span>
-<span class="go">0             5.1          3.5           1.4          0.2</span>
-<span class="go">1             4.9          3.0           1.4          0.2</span>
-<span class="go">2             4.7          3.2           1.3          0.2</span>
-<span class="go">3             4.6          3.1           1.5          0.2</span>
-<span class="go">4             5.0          3.6           1.4          0.2</span>
-<span class="go">..            ...          ...           ...          ...</span>
-<span class="go">145           6.7          3.0           5.2          2.3</span>
-<span class="go">146           6.3          2.5           5.0          1.9</span>
-
-<span class="go">147           6.5          3.0           5.2          2.0</span>
-
-<span class="go">[150 rows x 4 columns]</span>
-</pre></div>
-</div>
-</li>
-<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent samples. The columns represent
-decriptive data for each sample, e.g., class label, age, time point, species.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># print metadata</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span>
-
-<span class="go">      species</span>
-<span class="go">0       setosa</span>
-<span class="go">1       setosa</span>
-<span class="go">2       setosa</span>
-<span class="go">3       setosa</span>
-<span class="go">4       setosa</span>
-<span class="go">..         ...</span>
-<span class="go">145  virginica</span>
-
-<span class="go">[150 rows x 1 columns]</span>
-</pre></div>
-</div>
-</li>
-<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent features, or observations. The columns represent
-descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a measured bacteria.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DATASCI_PATH&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                               <span class="s1">&#39;test_data/GSE73072/Data/GSE73072.ds&#39;</span><span class="p">))</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print vardata (2 columns for example)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">vardata</span><span class="p">[[</span><span class="s1">&#39;GENE_ID_REF&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">]]</span>
-
-<span class="go">                 GENE_ID_REF                                        Description</span>
-<span class="go">ID_REF</span>
-<span class="go">10_at                   10.0  N-acetyltransferase 2 (arylamine N-acetyltrans...</span>
-<span class="go">100_at                 100.0                                adenosine deaminase</span>
-<span class="go">1000_at               1000.0          cadherin 2, type 1, N-cadherin (neuronal)</span>
-<span class="go">10000_at             10000.0  v-akt murine thymoma viral oncogene homolog 3 ...</span>
-<span class="go">10001_at             10001.0                         mediator complex subunit 6</span>
-<span class="go">                      ...                                                ...</span>
-<span class="go">AFFX-ThrX-5_at           NaN                                                NaN</span>
-<span class="go">AFFX-ThrX-M_at           NaN                                                NaN</span>
-<span class="go">AFFX-TrpnX-3_at          NaN                                                NaN</span>
-<span class="go">AFFX-TrpnX-5_at          NaN                                                NaN</span>
-<span class="go">AFFX-TrpnX-M_at          NaN                                                NaN</span>
-<span class="go">[12023 rows x 2 columns]</span>
-</pre></div>
-</div>
-</li>
-</ul>
-<p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> instance.
-Note: In order to run the code above you must first <code class="docutils literal notranslate"><span class="pre">export</span></code> your DataSci repository path, e.g., <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DATASCI_PATH=/path/to/DataSci/</span></code>, and run the script
-<a class="reference external" href="../../../../test_data/GSE73072/Scripts/generate_dataset.py">generate_dataset.py</a> located in the <a class="reference external" href="../../../../test_data/GSE73072">GSE73072 project directory</a>.
-If you are a part of the CSU team and want access to the full GSE73072 <code class="docutils literal notranslate"><span class="pre">DataSet</span></code>, roughly 20000 genes, download the DataSet object by accessing <code class="docutils literal notranslate"><span class="pre">/data4/kehoe/workspace/datasets/GSE73072.ds</span></code>
-on katrina’s racecar, or download it by accessing <a class="reference external" href="https://drive.google.com/drive/folders/1NcJ3-W2XF0rwsI4L_GA3mvfCL8Dg3NT8?usp=sharing">this folder</a> on google drive.</p>
-</div>
-<div class="section" id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
-<p>The main goal of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is promote modularity and compatibility with other
-data science and machine learning packages, e.g., <a class="reference external" href="https://scikit-learn.org/stable/">sklearn</a>. For example, if a user wishes to visualize their dataset,
-rather than hard code or wrap a specific visualization algorithm into the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class to make it available to them,
-they would pass an embedding object, such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">PCA</a>, to the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method which will apply the specific visualization method for the user. The main utility of
-the visualization method is to take care of the boiler plate code associated with applying the embedding class, such as generating labels and grabbing the
-data matrix, and plot generation. See the example below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DATASCI_PATH&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define embedding</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize species of iris with pca</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">pca</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">subtitle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">save_name</span><span class="o">=</span><span class="s1">&#39;iris_species_pca&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="align-center figure" id="id1">
-<a class="reference internal image-reference" href="../figures/iris_viz_example.png"><img alt="alternate text" src="../figures/iris_viz_example.png" style="width: 800px;" /></a>
-<p class="caption"><span class="caption-text">2D PCA embedding of the Iris dataset</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-<p>Visit the <a class="reference external" href="visualize_data.html">Visualizing Data</a> tutorial for more examples related to data visualization.</p>
-</div>
-<div class="section" id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="create_dataset.html#some-problems-you-may-encounter">Some Problems You May Encounter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="create_dataset.html#solutions">Solutions</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="visualize_data.html">Visualizing Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="visualize_data.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualize_data.html#customizing-plots">Customizing Plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualize_data.html#saving-plots">Saving Plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualize_data.html#using-plotly">Using Plotly</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="visualize_data.html#id2">Dash</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
+</div></blockquote>
+<p>A <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is primarily comprised of three data structures: <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> , <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>, and <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a></p>
+<p>A key feature of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is that …</p>
 </div>
 
 
@@ -348,7 +196,7 @@ data matrix, and plot generation. See the example below:</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+        &#169; Copyright 2021, Eric Kehoe.
 
     </p>
   </div>
