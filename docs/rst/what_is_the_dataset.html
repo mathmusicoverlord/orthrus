@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>What is a DataSet object? &mdash; DataSci 1 documentation</title>
+  <title>What is the DataSet object? &mdash; DataSci 1 documentation</title>
   
 
   
@@ -89,7 +89,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">What is a DataSet object?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">What is the DataSet object?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
 </ul>
@@ -145,7 +145,7 @@
         
           <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
         
-      <li>What is a DataSet object?</li>
+      <li>What is the DataSet object?</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -164,12 +164,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="what-is-a-dataset-object">
-<h1>What is a DataSet object?<a class="headerlink" href="#what-is-a-dataset-object" title="Permalink to this headline">¶</a></h1>
-<p>A <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is a data container designed to automate statistical, machine learning, and manifold learning tasks including,
-but not limited to:</p>
-<blockquote>
-<div><ul class="simple">
+  <div class="section" id="what-is-the-dataset-object">
+<h1>What is the DataSet object?<a class="headerlink" href="#what-is-the-dataset-object" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is a data container designed to automate statistical, machine learning,
+and manifold learning tasks including, but not limited to:</p>
+<ul class="simple">
 <li><p>Data pre-processing, e.g., batch correction, normalization, imputation</p></li>
 <li><p>Statistical summarization of data and associated metadata</p></li>
 <li><p>Data visualization, e.g., Principal Component Analysis (PCA), Multi-dimensional Scaling (MDS),
@@ -177,13 +176,16 @@ Uniform Manifold Projection and Approximation (UMAP)</p></li>
 <li><p>Classification, e.g., Support Vector Machines (SVM), Random Forest (RF), Artificial Neural Networks (ANN)</p></li>
 <li><p>Feature selection</p></li>
 </ul>
-</div></blockquote>
-<p>A <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is primarily composed of three
+<p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is primarily composed of three
 data structures: <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a>, <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>,
 and <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a>, each of which is a
-<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas.DataFrame</a> object. These dataframes represent the following:</p>
+<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas.DataFrame</a> object containing an indexed rectangular array of values.
+These dataframes are described as follows:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> :</p></li>
+<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> respresent samples, e.g., participants in a clinical study.
+The columns represent the features, or observations, of each sample e.g., RNA seq expression values, metabolite peak areas for given <em>m/z</em> s
+and retention times, or shedding scores across multiple virus and bacteria. The rows of the data are labeled via the <code class="docutils literal notranslate"><span class="pre">index</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
+and the columns are labeled via the <code class="docutils literal notranslate"><span class="pre">columns</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p></li>
 </ul>
 <p>A key feature of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is that …blah blah blah</p>
 </div>
