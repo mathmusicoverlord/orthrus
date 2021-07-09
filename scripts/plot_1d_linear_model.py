@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # set experiment parameters
     exp_params = module_from_path('exp_params', args.exp_params)
-    script_args = exp_params.PLOT_1D_MODEL_ARGS
+    script_args = exp_params.PLOT_1D_LINEAR_MODEL_ARGS
 
     ## required script params
     results_dir = script_args.get('RESULTS_DIR', exp_params.RESULTS_DIR)
