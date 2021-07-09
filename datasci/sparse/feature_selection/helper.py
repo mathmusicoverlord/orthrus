@@ -1,11 +1,12 @@
 import numpy as np
-import sys
-import pandas as pd
+import ray
+import copy
+from datasci.core.helper import batch_jobs_
 def reduce_feature_set_size(ds, 
                             features_dataframe, 
                             sample_ids,
                             attr:str,
-                            classifier_factory_method_handle: str, 
+                            classifier, 
                             scorer, 
                             ranking_method_handle,
                             ranking_method_args: dict,
@@ -14,27 +15,34 @@ def reduce_feature_set_size(ds,
                             start = 5, 
                             end = 100, 
                             jump = 5, 
+                            max_processes=10,
+                            verbose_frequency=10,
                             **kwargs):
     """
-    This method takes a features dataframe (outut of a feature selection), ranks them by a ranking method and performs 
-    a feature set reduction using grid search method which is defined by start, end and jump parameters. 
+    This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
+    a feature set reduction using grid search method, which is defined by start, end and jump parameters. 
 
-    Different training and test data may be used and the results will change accordingly. The following choices are avaible:
+    Different training and test data may be used and the results will change accordingly. The following choices are available:
     
     if test_sample_ids is None and partitioner is None:
+        
         Only training data is available, so the results will contain score on the Training data
 
-    if test_sample_ids is None and partitioner is not None:
-        Model is trained using partitions of sample_ids defined by partitioner, results contain the mean test score obtained during classification on these partitions
-
     if test_sample_ids is not None and partitioner is None:
-        Model is trained on all sample_ids, and then it is then evaluated on test_sample_ids. Results contain evaluation score on test_sample_ids
+        
+        Model is trained on all sample_ids, and then it is then evaluated on test_sample_ids. Results contain evaluation score on test_sample_ids.
+    
+    if test_sample_ids is None and partitioner is not None:
+        
+        Model is trained on partitions of sample_ids created by partitioner; results will contain the mean validation score, 
+        obtained during validation on these different partitions.
 
     if test_sample_ids is not None and partitioner is not None:
-        Model is trained using partitions of sample_ids defined by partitioner, and the best model is then evaluated on test_sample_ids. Results
-        contain evaluation score on test_sample_ids
+        
+        Model is trained using partitions of sample_ids defined by partitioner, and then the test_sample_ids are evaluated using all models. Results
+        contain mean evaluation score on test_sample_ids.
 
-    Parameters:
+    Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
                                         (check datasci.core.dataset.DataSet.feature_select method for details)
 
@@ -42,6 +50,9 @@ def reduce_feature_set_size(ds,
             ['human1', 'human3'], etc..., can also be pandas series or numpy array.
 
         attr (string): Name of metadata attribute to classify on.
+
+        classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
+                of a ``fit`` and ``predict`` method.
 
         scorer (object): Function which scores the prediction labels on training and test partitions. This function
             should accept two arguments: truth labels and prediction labels. This function should output a score
@@ -53,9 +64,9 @@ def reduce_feature_set_size(ds,
         ranking_method_args (dict): argument dictionary for the feature ranking method
 
         partitioner (object): Class-instance which partitions samples in batches of training and test split. This
-        instance must have the sklearn equivalent of a split method. The split method returns a list of
-        train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
-        an example partitioner. (default = None, check the method description above to see how this affects the results)
+            instance must have the sklearn equivalent of a split method. The split method returns a list of
+            train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
+            an example partitioner. (default = None, check the method description above to see how this affects the results)
 
         test_sample_ids: List of indicators for the samples to use for testing. e.g. [1,3], [True, False, True],
             ['human1', 'human3'], etc..., can also be pandas series or numpy array. (default = None, check the method 
@@ -67,15 +78,21 @@ def reduce_feature_set_size(ds,
         
         jump (int) : gap between each sampled point in the grid (default: 5)
 
+        max_processes (int) : this method uses ray package to create parallel process, this parameter defines the max
+            number of process to run (default: 10)
+
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs to console; an output is 
+            printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+
     Return:
     
-        a dictionary that contains 2 key-value pairs:
-            'optimal_n_results': an array of m x 2 values, with m being the total values sampled from the grid in the search. 
+        (dict): contains 2 key-value pairs:
+            'optimal_n_results': ndarray of shape (m, 2), with m being the total values sampled from the grid in the search. 
             The first column contains the number of top features (different values sampled from the grid search),  and the second 
             column contains the score.  The array is sorted by score in descending order.
         
-            'reduced_feature_ids' : array of reduced features ids(index of features_df). The size of the reduced feature set is the 
-            smallest value n, out of the m sampled values, that produces the highest score.
+            'reduced_feature_ids' : ndarray of shape (n, ), n is the smallest number of features, out of the m sampled values, 
+            that produced the highest score. It contains reduced features ids (index of features_df).
 
     Example:
             >>> import datasci.core.dataset as DS
@@ -99,8 +116,7 @@ def reduce_feature_set_size(ds,
                         )
             >>> features_df = results['f_results']
 
-            >>> def model_factory():
-                    return svm.LinearSVC(dual=False)
+            >>> classifier =  svm.LinearSVC(dual=False)
 
             >>> bsr = sklearn.metrics.balanced_accuracy_score
 
@@ -114,14 +130,16 @@ def reduce_feature_set_size(ds,
                                     features_df, 
                                     sample_ids_training,
                                     attrname,
-                                    model_factory, 
+                                    classifier, 
                                     bsr, 
                                     fhelper.rank_features_by_attribute,
                                     ranking_method_args,
-                                    test_sample_ids=sample_ids_validation,
+                                    patitioner=partitioner,
                                     start = 5, 
                                     end = 100, 
-                                    jump = 1)
+                                    jump = 1,
+                                    max_processes=10,
+                                    verbose_frequency=10)
 
             >>> print(reduced_feature_results)
     """
@@ -133,52 +151,32 @@ def reduce_feature_set_size(ds,
 
     n_attrs = np.arange(start, end+ 1, jump)
 
-    results = np.zeros((n_attrs.shape[0], 2))
-
+    list_of_arguments = []
     #for each subset of top features
-    for i, n in enumerate(n_attrs):
+    for i, n  in enumerate(n_attrs):
+        classifier_copy = copy.deepcopy(classifier)
+        arguments = [classifier_copy, 
+                        ds, 
+                        attr, 
+                        ranked_features,
+                        0,
+                        n, 
+                        sample_ids, 
+                        scorer, 
+                        partitioner, 
+                        test_sample_ids,
+                        kwargs]
+        list_of_arguments.append(arguments)
 
-        print("\n\n\n=======================================================")
-        print("Using n = ", n, " features")
-        print("=======================================================\n\n\n")
+    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, max_processes=max_processes, verbose_frequency=verbose_frequency)
+    results = np.zeros((len(list_of_arguments), 2))
 
-        model = classifier_factory_method_handle()   
-        classification_result = ds.classify(model,
-                    attr,
-                    feature_ids=ranked_features[:n],
-                    sample_ids=sample_ids,
-                    scorer=scorer,
-                    partitioner=partitioner,
-                    **kwargs
-                    )
-                
-        if test_sample_ids is not None:
-
-            #code duplication. make it a function!
-            try:
-                data = ds.data[ds.vardata.index[test_sample_ids]]
-            except IndexError:
-                try:
-                    data = ds.data[test_sample_ids]
-                except KeyError:
-                    data = ds.data[ds.data.columns[test_sample_ids]]
-
-            data = data[ranked_features[:n]].values
-            labels = ds.metadata[attr].loc[test_sample_ids]
-
-            predicted_labels = classification_result['classifiers'].values[0].predict(data)
-            score = scorer(labels, predicted_labels)
-
-        else:
-            if partitioner is not None:
-                score = np.mean(classification_result['scores'].loc['Test'].values)
-            else:
-                score = np.mean(classification_result['scores'].loc['Training'].values)
-            
-        print('Test score:\t', score)
-        results[i, 0] = n
+    for i, process in enumerate(finished_processes):
+        score, feature_set_length , _ = ray.get(process)
+        results[i, 0] = feature_set_length
         results[i, 1] = score
-
+    
+    ray.shutdown()
     #find the best n, i.e. smallest n that produced largest score
     results = results[results[:,1].argsort()[::-1]]
     max_bsr = np.max(results[:, 1])
@@ -194,25 +192,242 @@ def reduce_feature_set_size(ds,
     return returns
 
 
+def sliding_window_classification_on_ranked_features(ds, 
+                            features_dataframe, 
+                            sample_ids,
+                            attr:str,
+                            model, 
+                            scorer, 
+                            ranking_method_handle,
+                            ranking_method_args: dict,
+                            partitioner=None, 
+                            test_sample_ids=None,
+                            window_size = 50, 
+                            stride = 5,
+                            verbose_limit=10,
+                            max_processes = 10,
+                            **kwargs):
+    """
+    This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
+    a sliding window classification experiment for various feature sets, defined by window size and stride. The result contains
+    score on various feature sets. Different training and test data may be used and the results change accordingly. The following choices are avaible:
+    
+    if test_sample_ids is None and partitioner is None:
+        
+        Only training data is available, so the results will contain score on the Training data
+
+    if test_sample_ids is not None and partitioner is None:
+        
+        Model is trained on all sample_ids, and then it is then evaluated on test_sample_ids. Results contain evaluation score on test_sample_ids.
+    
+    if test_sample_ids is None and partitioner is not None:
+        
+        Model is trained on partitions of sample_ids created by partitioner; results will contain the mean validation score, 
+        obtained during validation on these different partitions.
+
+    if test_sample_ids is not None and partitioner is not None:
+        
+        Model is trained using partitions of sample_ids defined by partitioner, and then the test_sample_ids are evaluated using all models. Results
+        contain mean evaluation score on test_sample_ids.
+
+    Args:
+        features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
+                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+
+        sample_ids (like-like): List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
+            ['human1', 'human3'], etc..., can also be pandas series or numpy array.
+
+        attr (string): Name of metadata attribute to classify on.
+
+        classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
+                of a ``fit`` and ``predict`` method.
+
+        scorer (object): Function which scores the prediction labels on training and test partitions. This function
+            should accept two arguments: truth labels and prediction labels. This function should output a score
+            between 0 and 1 which can be thought of as an accuracy measure. See
+            sklearn.metrics.balanced_accuracy_score for an example.
+
+        ranking_method_handle (method handle) : handle of the feature ranking method
+
+        ranking_method_args (dict): argument dictionary for the feature ranking method
+
+        partitioner (object): Class-instance which partitions samples in batches of training and test split. This
+            instance must have the sklearn equivalent of a split method. The split method returns a list of
+            train-test partitions; one for each fold in the experiment. See sklearn.model_selection.KFold for
+            an example partitioner. (default = None, check the method description above to see how this affects the results)
+
+        test_sample_ids: List of indicators for the samples to use for testing. e.g. [1,3], [True, False, True],
+            ['human1', 'human3'], etc..., can also be pandas series or numpy array. (default = None, check the method 
+            description above to see how this affects the results)
+        
+        window_size = 50, 
+
+        stride = 1,
+
+        max_processes (int) : this method uses ray package to create parallel process, this parameter defines the max
+            number of process to run (default: 10)
+
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs to console; an output is 
+            printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+
+    Return:
+        (ndarray of shape (num_windows, 2)):  The first column contains the starting position of the window,
+        and the second column contains the score.  The array is sorted by first column in ascending order.
+
+
+    Example:
+            >>> import datasci.core.dataset as DS
+            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            
+            >>> x = DS.load_dataset(file_path)
+            >>> ifr = IFR.IFR(
+                verbosity = 2,
+                nfolds = 4,
+                repetition = 500,
+                cutoff = .6,
+                jumpratio = 5,
+                max_iters = 100,
+                max_features_per_iter_ratio = 2
+                )
+            >>> result = x.feature_select(ifr,
+                        attrname,
+                        selector_name='IFR',
+                        f_results_handle='results',
+                        append_to_meta=False,
+                        )
+            >>> features_df = results['f_results']
+
+            >>> classifier = svm.LinearSVC(dual=False)
+
+            >>> bsr = sklearn.metrics.balanced_accuracy_score
+
+            >>> ranking_method_args = {'attr': 'frequency'}
+
+            >>> partitioner = KFold(n_splits=5, shuffle=True, random_state=0)
+
+            >>> import datasci.sparse.feature_selection.helper as fhelper
+
+            >>> sliding_window_results = fhelper.sliding_window_classification_on_ranked_features(x, 
+                                    features_df, 
+                                    sample_ids_training,
+                                    attrname,
+                                    classifier, 
+                                    bsr, 
+                                    fhelper.rank_features_by_attribute,
+                                    ranking_method_args,
+                                    patitioner=partitioner,
+                                    window_size = 50, 
+                                    stride = 5,
+                                    verbose_limit=10,
+                                    max_processes = 10)
+
+            >>> print(sliding_window_results)
+    """
+    features_dataframe = features_dataframe[features_dataframe[ranking_method_args['attr']]>0]
+    ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
+
+    n_attrs = np.arange(0, ranked_features.shape[0], stride)
+    
+    list_of_arguments = []
+    #for each subset of top features
+    for i, n  in enumerate(n_attrs):
+        model_copy = copy.deepcopy(model)
+        arguments = [model_copy, 
+                        ds, 
+                        attr, 
+                        ranked_features,
+                        n,
+                        n+window_size, 
+                        sample_ids, 
+                        scorer, 
+                        partitioner, 
+                        test_sample_ids,
+                        kwargs]
+        list_of_arguments.append(arguments)
+
+    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, max_processes=max_processes, verbose_limit=verbose_limit)
+    results = np.zeros((len(list_of_arguments), 2))
+    for i, process in enumerate(finished_processes):
+        score, _ , min_feature_index = ray.get(process)
+        results[i, 0] = min_feature_index
+        results[i, 1] = score
+    results = results[results[:,0].argsort()]
+    ray.shutdown()
+    
+    return results
+
+@ray.remote
+def run_single_classification_experiment_(model, 
+                        ds, 
+                        attr, 
+                        features,
+                        feature_start_index,
+                        feature_end_index,
+                        sample_ids, 
+                        scorer, 
+                        partitioner, 
+                        test_sample_ids,
+                        kwargs):
+    
+    features = features[feature_start_index: feature_end_index]
+    
+    classification_result = ds.classify(model,
+                attr,
+                feature_ids=features,
+                sample_ids=sample_ids,
+                scorer=scorer,
+                partitioner=partitioner,
+                **kwargs
+                )
+
+    if test_sample_ids is not None:
+        #code duplication. make it a function!
+        try:
+            data = ds.data[ds.vardata.index[test_sample_ids]]
+        except IndexError:
+            try:
+                data = ds.data[test_sample_ids]
+            except KeyError:
+                data = ds.data[ds.data.columns[test_sample_ids]]
+
+        data = data[features].values
+        labels = ds.metadata[attr].loc[test_sample_ids]
+
+        scores = []
+        for classifier in classification_result['classifiers'].values:
+            predicted_labels = classifier.predict(data)
+            scores.append(scorer(labels, predicted_labels))
+        score = np.mean(np.array(scores))
+
+    else:
+        if partitioner is not None:
+            score = np.mean(classification_result['scores'].loc['Test'].values)
+        else:
+            score = np.mean(classification_result['scores'].loc['Training'].values)
+
+
+    return score, feature_end_index-feature_start_index, feature_start_index
+
+
 def rank_features_by_attribute(features_df, args):
     """
-    This method takes a features dataframe as input and ranks them based on a column/attribute which contains numerical data.  
+    This method takes a features dataframe as input and ranks the features based on a numerical column/attribute.  
 
-    Parameters:
+    Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
                                         (check datasci.core.dataset.DataSet.feature_select method for details)
 
         args (dict): This dictionary contains variables to determine which attribute to rank feature on and the
                     order of ranking. Check details for various key and values below:
-                    'attr' (Mandatory): Attribute/ Column name in the features_df to rank the features on
+                    'attr' (Mandatory): Attribute/column name from features_df to rank the features on
                     'order': Whether to rank in ascending or descending order. 'asc' for ascending and 'desc' for descending.
                              (defaul: 'desc') 
-                    'feature_ids' (list-like): To limit the ranking within certain features. List of indicators for the features to use. 
+                    'feature_ids' (list-like): List of identifiers for the features to limit the ranking within certain features only. 
                             e.g. [True, False, True], ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. 
-                            Default: None which corresponds to using all features.
+                            Default: None, which corresponds to using all features.
           
     Return:
-        array of sorted features (index of features_df) 
+        ndarray of shape (n, )): n = number of features in feature_ids or features_df (if feature_ids is None). It contains sorted feature ids (index of features_df).
 
     Examples:
             >>> import datasci.core.dataset as DS
@@ -235,8 +450,11 @@ def rank_features_by_attribute(features_df, args):
                         append_to_meta=False,
                         )
             >>> features_df = results['f_results']
-            >>> ranking_method_args = {'attr': 'frequency'}
-            >>> ranked_order =  rank_features_by_attribute(features_df, ranking_method_args)
+            >>> feature_subset = features_df['frequency'] > 5
+            >>> ranking_method_args = {'attr': 'frequency', feature_ids: feature_subset}
+        
+            feature will ranked on frequency attribute in descending and will occur only within feature_subset features.
+            >>> ranked_feature_ids =  rank_features_by_attribute(features_df, ranking_method_args)
     """
     #create an array whose first column is feature indices and 
     #second column is values of the "attr" 
@@ -260,32 +478,33 @@ def rank_features_by_attribute(features_df, args):
     elif order=='asc':
         feature_array = feature_array[feature_array[:,1].argsort()]
     else:
-        raise ValueError('%s is an incorrect value for rank "order" in args. It should "asc" for ascending or "desc" for descending.'%order)
+        raise ValueError('%s is an incorrect value for rank "order" in args. It should "asc" \
+            for ascending or "desc" for descending.'%order)
     
     return feature_array[:, 0]
 
 
 def rank_features_by_mean_attribute_value(features_df, args):
     """
-    CHECK THIS BEFORE COMMITING
-    This method takes a features dataframe as input and ranks them based on a column/attribute which contains numerical data.  
+    This method takes a features dataframe as input and ranks the features based on the 
+    mean/meadian value a column/attribute, which contains list of numerical data.  
 
-    Parameters:
+    Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
                                         (check datasci.core.dataset.DataSet.feature_select method for details)
 
         args (dict): This dictionary contains variables to determine which attribute to rank feature on and the
                     order of ranking. Check details for various key and values below:
-                    'attr' (Mandatory): Attribute/ Column name in the features_df to rank the features on
+                    'attr' (Mandatory): Attribute/column name from features_df to rank the features on
                     'order': Whether to rank in ascending or descending order. 'asc' for ascending and 'desc' for descending.
-                             (defaul: 'desc')
-                    'feature_ids' (list-like): To limit the ranking within certain features. List of indicators for the features to use. 
+                             (defaul: 'desc') 
+                    'feature_ids' (list-like): List of identifiers for the features to limit the ranking within certain features only. 
                             e.g. [True, False, True], ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. 
-                            Default: None which corresponds to using all features.
-                    'method': which operation to perform. Can be "mean" or "median". (Default: "mean")
+                            Default: None, which corresponds to using all features.
+                    'method': which operation to perform, can be "mean" or "median". (Default: "mean")
           
     Return:
-        array of sorted features (index of features_df) 
+        ndarray of shape (n, )): n = number of features in feature_ids or features_df (if feature_ids is None). It contains sorted feature ids (index of features_df).
 
     Examples:
             >>> import datasci.core.dataset as DS
@@ -308,8 +527,10 @@ def rank_features_by_mean_attribute_value(features_df, args):
                         append_to_meta=False,
                         )
             >>> features_df = results['f_results']
-            >>> ranking_method_args = {'attr': 'frequency'}
-            >>> ranked_order =  rank_features_by_attribute(features_df, ranking_method_args)
+            >>> ranking_method_args = {'attr': 'selection_iteration', 'order': asc, 'method': 'median'}
+            The selection_iteration column in the features_df contains a list of integer values. 
+            In this example the features will be ranked by the median value of selection_iteration in ascending order.
+            >>> ranked_feature_ids =  rank_features_by_mean_attribute_value(features_df, ranking_method_args)
     """
     #create an array whose first column is feature indices and 
     #second column is values of the "attr" 
@@ -360,12 +581,6 @@ def rank_features_within_attribute_class(features_df,
                                     **kwargs):
     features_df[new_feature_attribute_name] = 0
 
-    #get ranked features
-    # args = {'attr': feature_class_attribute}
-    # if feature_ids is not None:
-    #     args['feature_ids'] = feature_ids
-    # ranked_features = rank_features_by_attribute(features_df, args)
-
     if feature_ids is None:
         feature_ids = features_df.index
     #get unique values (classes) for the attributes
@@ -403,7 +618,4 @@ def rank_features_within_attribute_class(features_df,
             mean_of_abs_weights = val
             
         features_df.loc[features, new_feature_attribute_name] = mean_of_abs_weights
-
-
-        
 

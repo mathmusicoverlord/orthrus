@@ -71,4 +71,5 @@ TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
                                                )                       
                             )
 
-# other parametersVISUALIZE_ARGS = dict()
+# other parameters
+VISUALIZE_ARGS = dict()
