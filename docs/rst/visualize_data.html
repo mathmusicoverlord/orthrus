@@ -32,15 +32,13 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Adding new attributes to metadata" href="add_new_attributes_using_queries.html" />
+    <link rel="next" title="datasci" href="modules.html" />
     <link rel="prev" title="Creating a DataSet" href="create_dataset.html" /> 
 </head>
 
@@ -89,29 +87,9 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="what_is_the_dataset.html">What is the DataSet object?</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="what_is_the_dataset.html#dataset-structure">DataSet Structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="what_is_the_dataset.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="what_is_the_dataset.html#see-also">See Also</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Visualizing Data</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="what_is_the_dataset.html">What is the DataSet object?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#customizing-plots">Customizing Plots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#saving-plots">Saving Plots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#using-plotly">Using Plotly</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Dash</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="add_new_attributes_using_queries.html">Adding new attributes to metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalization_and_imputation.html">Data Normalization and Imputation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
@@ -165,8 +143,6 @@
         
           <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
         
-          <li><a href="what_is_the_dataset.html">What is the DataSet object?</a> &raquo;</li>
-        
       <li>Visualizing Data</li>
     
     
@@ -188,143 +164,6 @@
             
   <div class="section" id="visualizing-data">
 <h1>Visualizing Data<a class="headerlink" href="#visualizing-data" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial we will go over some of the finer points of using the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method
-of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. For all
-of these examples we will use the GSE73072 dataset, as it contains enough
-complexity to demostrate the utitlity of the method, see the
-<a class="reference external" href="what_is_the_dataset.html">What is the DataSet class?</a> tutorial for
-details on how to access this dataset. First we load the dataset:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
-<span class="gp">... </span>                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
-<p>One can easily start plotting their data without any in-depth knowledge of the method. In this example we will
-plot the GSE73072 data in 2D using <a class="reference internal" href="datasci.manifold.html#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a> and coloring
-the plot by the <code class="docutils literal notranslate"><span class="pre">virus</span></code> attribute:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.manifold.mds</span> <span class="kn">import</span> <span class="n">MDS</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize the data with MDS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="o">.</span>
-<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="align-center figure">
-<a class="reference internal image-reference" href="rst/../../../figures/gse73073_mds_viz_example_1.png"><img alt="alternate text" src="rst/../../../figures/gse73073_mds_viz_example_1.png" style="width: 800px;" /></a>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">alpha</span></code> parameter here denotes the transparency of the markers, and is useful when there
-is overlap of the colored classes.</p>
-</div>
-<div class="section" id="customizing-plots">
-<h2>Customizing Plots<a class="headerlink" href="#customizing-plots" title="Permalink to this headline">¶</a></h2>
-<p>By default the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a>
-method uses <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a> as a backend and the
-<a class="reference external" href="https://seaborn.pydata.org/tutorial/color_palettes.html">seaborn</a> palettes for coloring. For example we can
-specify <code class="docutils literal notranslate"><span class="pre">palette='bright'</span></code> and <code class="docutils literal notranslate"><span class="pre">mrkr_list=['o']</span></code> to use the bright seaborn color palette and circle Pyplot
-markers:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># plot with bright palette and circle markers</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bright&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">mrkr_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">],</span>
-<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="align-center figure">
-<a class="reference internal image-reference" href="rst/../../../figures/gse73073_mds_viz_example_2.png"><img alt="alternate text" src="rst/../../../figures/gse73073_mds_viz_example_2.png" style="width: 800px;" /></a>
-</div>
-<p>In fact any keyword arguments that can be passed to
-<a class="reference external" href="https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html">matplotlib.axes.Axes.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=2</span></code>) and
-<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=3</span></code>) can also be
-passed to the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
-the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types via the keyword argument <code class="docutils literal notranslate"><span class="pre">sample_ids</span></code>, color the samples by time point in hours,
-use different markers for virus types via the <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> argument, and embed into 3D rather than 2D via the <code class="docutils literal notranslate"><span class="pre">dim</span></code> argument:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># restrict the samples to H1N1 and H3N2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_ids</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;virus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;H1N1&#39;</span><span class="p">,</span> <span class="s1">&#39;H3N2&#39;</span><span class="p">])</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># represent time_point_hr as a continuous variable</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize the data with MDS in 3D</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">sample_ids</span><span class="o">=</span><span class="n">sample_ids</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">cross_attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">subtitle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="align-center figure">
-<a class="reference internal image-reference" href="rst/../../../figures/gse73073_mds_viz_example_3.png"><img alt="alternate text" src="rst/../../../figures/gse73073_mds_viz_example_3.png" style="width: 800px;" /></a>
-</div>
-<p>Similarly we can restrict the features to use in the visualization by specifying the <code class="docutils literal notranslate"><span class="pre">feature_ids</span></code> keyword argument.</p>
-</div>
-<div class="section" id="saving-plots">
-<h2>Saving Plots<a class="headerlink" href="#saving-plots" title="Permalink to this headline">¶</a></h2>
-<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. By default
-plots will save to the <code class="docutils literal notranslate"><span class="pre">DataSet.path</span></code> directory and with the name <code class="docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">attr</span></code> _  <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> _ <code class="docutils literal notranslate"><span class="pre">dim</span></code>
-with the appropriate extension. Alternatively one can specify the keyword argument <code class="docutils literal notranslate"><span class="pre">save_name</span></code> without an extension, e.g., <code class="docutils literal notranslate"><span class="pre">save_name=gse73072_mds_dim3</span></code>.</p>
-</div>
-<div class="section" id="using-plotly">
-<h2>Using Plotly<a class="headerlink" href="#using-plotly" title="Permalink to this headline">¶</a></h2>
-<p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
-and <a class="reference external" href="https://plotly.com/python/">Plotly</a>. Pyplot is ideal for generating non-interative plots, such as
-figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
-or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below to demonstrate the Plotly
-backend. Here is one where export the interative plotly figure to an <code class="docutils literal notranslate"><span class="pre">.html</span></code> file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># set figure directory</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
-<span class="gp">... </span>                       <span class="s2">&quot;docsrc/_build/html/figures&quot;</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize data using plotly</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">save_name</span><span class="o">=</span><span class="s1">&#39;gse73073_mds_viz_example_4&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Click to view output: <a class="reference external" href="../figures/gse73073_mds_viz_example_4.html">gse73073_mds_viz_example_4.html</a>.</p>
-<div class="section" id="id2">
-<h3>Dash<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Just like with Pyplot the user can
-specify any keyword arguments used in Plotly’s <a class="reference external" href="https://plotly.com/python-api-reference/generated/plotly.express.scatter">scatter</a> function
-to customize their plots further. In addition the user can also host their figures on a server, by specify the keyword argument <code class="docutils literal notranslate"><span class="pre">use_dash=True</span></code>,
-and configure the server settings by specifying any keyword arguments used in Plotly Dash’s <a class="reference external" href="https://dash.plotly.com/devtools">run_server</a> method.
-Here is an example where we host our figure on <code class="docutils literal notranslate"><span class="pre">localhost:5000</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># host figure on localhost:5000</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">port</span><span class="o">=</span><span class="s1">&#39;5000&#39;</span><span class="p">)</span>
-
-<span class="go">Dash is running on http://127.0.0.1:5000/</span>
-<span class="go">* Serving Flask app &quot;datasci.core.helper&quot; (lazy loading)</span>
-<span class="go">* Environment: production</span>
-<span class="go">  WARNING: This is a development server. Do not use it in a production deployment.</span>
-<span class="go">  Use a production WSGI server instead.</span>
-<span class="go">* Debug mode: off</span>
-<span class="go">* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)</span>
-</pre></div>
-</div>
-</div>
-</div>
 </div>
 
 
@@ -333,7 +172,7 @@ Here is an example where we host our figure on <code class="docutils literal not
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="add_new_attributes_using_queries.html" class="btn btn-neutral float-right" title="Adding new attributes to metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="datasci" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="create_dataset.html" class="btn btn-neutral float-left" title="Creating a DataSet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
@@ -341,7 +180,7 @@ Here is an example where we host our figure on <code class="docutils literal not
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+        &#169; Copyright 2021, Eric Kehoe.
 
     </p>
   </div>

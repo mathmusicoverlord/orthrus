@@ -32,8 +32,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -186,8 +184,37 @@ These dataframes are described as follows:</p>
 The columns represent the features, or observations, of each sample e.g., RNA seq expression values, metabolite peak areas for given <em>m/z</em> s
 and retention times, or shedding scores across multiple virus and bacteria. The rows of the data are labeled via the <code class="docutils literal notranslate"><span class="pre">index</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
 and the columns are labeled via the <code class="docutils literal notranslate"><span class="pre">columns</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p></li>
+<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent samples. The columns represent
+decriptive data for each sample, e.g., class label, age, time point, species.</p></li>
+<li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent features, or observations. The columns represent
+descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a bacteria.</p></li>
 </ul>
-<p>A key feature of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is that …blah blah blah</p>
+<p>The main goal of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is promote modularity and compatibility with other
+data science and machine learning packages, e.g., <a class="reference external" href="https://scikit-learn.org/stable/">sklearn</a>. For example, if a user wishes to visualize their dataset,
+rather than hard code or wrap a specific visualization algorithm into the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class to make it available to them,
+they would pass an embedding object, such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">PCA</a>, to the
+<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method which will apply the specific visualization method for the user. The main utility of
+the visualization method is to take care of the boiler plate code associated with applying the embedding class, such as generating labels and grabbing the
+data matrix, and plot generation. See the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="c1"># load dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DATASCI_PATH&#39;</span><span class="p">],</span>
+                              <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
+
+<span class="c1"># define embedding</span>
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># visualize species of iris with pca</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">pca</span><span class="p">,</span>
+             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+             <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+             <span class="n">save_name</span><span class="o">=</span><span class="s1">&#39;iris_species_pca&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 
 
