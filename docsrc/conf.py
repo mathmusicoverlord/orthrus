@@ -21,8 +21,8 @@ for root, subdirs, files in os.walk('../datasci/'):
 # -- Project information -----------------------------------------------------
 
 project = 'DataSci'
-copyright = '2021, Eric Kehoe'
-author = 'Eric Kehoe'
+copyright = '2021, Eric Kehoe, Kartikay Sharma'
+author = 'Eric Kehoe, Kartikay Sharma'
 
 # The full version, including alpha/beta/rc tags
 release = '1'
