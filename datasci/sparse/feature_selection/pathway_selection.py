@@ -71,10 +71,11 @@ class PathwayScore(BaseEstimator):
 
         # find pathway subspaces
         futures = []
+        X_remote = ray.put(self.X_)
         for cls in self.classes_:
             for pathway in pathways:
                 sample_ids = np.where(self.y_ == cls)[0]
-                futures.append(generate_subspace.remote(self.X_, sample_ids, pathway))
+                futures.append(generate_subspace.remote(X_remote, sample_ids, pathway))
 
         # setup progess bar
         print("Generating subspaces...")
@@ -122,10 +123,10 @@ class PathwayScore(BaseEstimator):
 
         # define angle function
         @ray.remote
-        def angle(X, Y):
+        def angle(X, i, j, Y):
 
             # convert types
-            Z = self.convert_type(X)
+            Z = self.convert_type(X[i, j])
             W = self.convert_type(Y)
 
             # compute product
@@ -137,9 +138,11 @@ class PathwayScore(BaseEstimator):
 
         # find angles between incoming samples and pathway subspaces
         futures = []
+        subspaces_remote = ray.put(self.subspaces_)
+        X_remote = ray.put(X)
         for i, cls in enumerate(self.classes_):
             for j, pathway in enumerate(self.pathways_):
-                futures.append(angle.remote(self.subspaces_[i, j], X))
+                futures.append(angle.remote(subspaces_remote, i, j, X_remote))
 
         # setup progess bar
         print("Computing angles...")
