@@ -73,15 +73,15 @@ class KFSIFR(BaseEstimator):
                  n_splits_kfold: int,
                  random_state_kfold=None,
                  train_test_splits=None,
-                 gamma: float = .6,
+                 gamma: float=.6,
                  max_feature_threshold=None,
-                 n_splits_shuffle = 100,
-                 random_state_shuffle = None,
-                 train_prop_shuffle = .8,
-                 n_top_features: int = None,
-                 jump_ratio: float = None,
+                 n_splits_shuffle=100,
+                 random_state_shuffle= None,
+                 train_prop_shuffle=.8,
+                 n_top_features: int=None,
+                 jump_ratio: float=None,
                  sort_freq_classes=False,
-                 imputer = None):
+                 imputer=None):
 
         # set parameters
         self.classifier = classifier

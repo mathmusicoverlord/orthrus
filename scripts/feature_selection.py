@@ -32,10 +32,10 @@ if __name__ == '__main__':
         exp_name = script_args.get('EXP_NAME', exp_params.EXP_NAME)
         class_attr = script_args.get('CLASS_ATTR', exp_params.CLASS_ATTR)
         ds = script_args.get('DATASET', exp_params.DATASET)
-        classifier = script_args.get('CLASSIFIER', exp_params.CLASSIFIER)
-        feature_selector = script_args.get('FEATURE_SELECTOR', exp_params.FEATURE_SELECTOR)
+        feature_selector = script_args.get('FEATURE_SELECTOR',
+                                           default_val(exp_params, 'FEATURE_SELECTOR'))
         results_handle = script_args.get('RESULTS_HANDLE',
-                                         exp_params.FEATURE_SELECTION_RESULTS_HANDLE)
+                                         default_val(exp_params, 'FEATURE_SELECTION_RESULTS_HANDLE'))
 
         ## optional script params
         sample_ids = script_args.get('SAMPLE_IDS', default_val(exp_params, 'SAMPLE_IDS')),
@@ -58,6 +58,8 @@ if __name__ == '__main__':
         if results_file_name is None:
             save_object(result,
                         os.path.join(results_dir,
-                                     '_'.join([ds.name, exp_name, args.score, 'feature_selection_results.pickle'])))
+                                     '_'.join([ds.name, exp_name, 'feature_selection_results.pickle'])))
+            result['f_results'].to_csv(os.path.join(results_dir, '_'.join([ds.name, exp_name, 'feature_ranks.csv'])))
         else:
-            save_object(result, os.path.join(results_dir, results_file_name))
+            save_object(result, os.path.join(results_dir, results_file_name + '.pickle'))
+            result['f_results'].to_csv(os.path.join(results_dir, results_file_name + '.csv'))
