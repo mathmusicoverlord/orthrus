@@ -32,6 +32,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -183,11 +185,11 @@
 <span id="datasci-preprocessing-batch-corrections-module"></span><h2>datasci.preprocessing.batch_corrections module<a class="headerlink" href="#module-datasci.preprocessing.batch_corrections" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.preprocessing.batch_corrections.Harmony">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.preprocessing.batch_corrections.</span></code><code class="sig-name descname"><span class="pre">Harmony</span></code><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Harmony" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.batch_corrections.</code><code class="sig-name descname">Harmony</code><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Harmony" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="datasci.preprocessing.batch_corrections.Harmony.fit_transform">
-<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Harmony.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Harmony.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper of Harmony algorithm implmented in harmonypy package
 see: <a class="reference external" href="https://github.com/slowkow/harmonypy">https://github.com/slowkow/harmonypy</a></p>
 <dl class="field-list simple">
@@ -211,11 +213,11 @@ see: <a class="reference external" href="https://github.com/slowkow/harmonypy">h
 
 <dl class="py class">
 <dt id="datasci.preprocessing.batch_corrections.Limma">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.preprocessing.batch_corrections.</span></code><code class="sig-name descname"><span class="pre">Limma</span></code><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Limma" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.batch_corrections.</code><code class="sig-name descname">Limma</code><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Limma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="datasci.preprocessing.batch_corrections.Limma.fit_transform">
-<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Limma.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.batch_corrections.Limma.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pure numpy implementation of the code found at:</p>
 <p><a class="reference external" href="https://github.com/chichaumiau/removeBatcheffect/blob/master/limma.py">https://github.com/chichaumiau/removeBatcheffect/blob/master/limma.py</a></p>
 <p>based on our weak understanding of what the patsy package does and
@@ -254,11 +256,11 @@ which aren’t implemented in this version.</p>
 <span id="datasci-preprocessing-normalizations-module"></span><h2>datasci.preprocessing.normalizations module<a class="headerlink" href="#module-datasci.preprocessing.normalizations" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="datasci.preprocessing.normalizations.LogNormalizer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.preprocessing.normalizations.</span></code><code class="sig-name descname"><span class="pre">LogNormalizer</span></code><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.normalizations.</code><code class="sig-name descname">LogNormalizer</code><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="datasci.preprocessing.normalizations.LogNormalizer.fit_transform">
-<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies element wise log to the data. Any values that are negative infinity are set to zero after applying log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -277,11 +279,11 @@ which aren’t implemented in this version.</p>
 
 <dl class="py class">
 <dt id="datasci.preprocessing.normalizations.MedianFoldChangeNormalizer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.preprocessing.normalizations.</span></code><code class="sig-name descname"><span class="pre">MedianFoldChangeNormalizer</span></code><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.normalizations.</code><code class="sig-name descname">MedianFoldChangeNormalizer</code><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="datasci.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform">
-<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">controls</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
