@@ -54,4 +54,4 @@ data matrix, and plot generation. See the example below::
                save=True,
                save_name='iris_species_pca')
 
-View the :doc:`visualize <./visualize_data.rst>` module 
+Visit the `Visualizing Data <visualize_data.html>`_ module 
