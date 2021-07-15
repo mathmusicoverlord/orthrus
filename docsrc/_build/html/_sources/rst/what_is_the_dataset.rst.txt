@@ -94,4 +94,11 @@ data matrix, and plot generation. See the example below::
   ...              save=True,
   ...              save_name='iris_species_pca')
 
+.. figure:: ../Figures/iris_viz_example.png
+  :width: 200px
+  :align: center
+  :height: 100px
+  :alt: alternate text
+  :figclass: align-center
+
 Visit the `Visualizing Data <visualize_data.html>`_ tutorial for more examples related to data visualization.
