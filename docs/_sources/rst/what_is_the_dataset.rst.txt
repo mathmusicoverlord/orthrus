@@ -91,14 +91,17 @@ data matrix, and plot generation. See the example below::
   >>> # visualize species of iris with pca
   >>> ds.visualize(embedding=pca,
   ...              attr='species',
+  ...              title='',
+  ...              subtitle='',
   ...              save=True,
   ...              save_name='iris_species_pca')
 
-.. figure:: ../Figures/iris_viz_example.png
-  :width: 200px
+.. figure:: ../../figures/iris_viz_example.png
+  :width: 800px
   :align: center
-  :height: 100px
   :alt: alternate text
   :figclass: align-center
+
+  2D PCA embedding of the Iris dataset
 
 Visit the `Visualizing Data <visualize_data.html>`_ tutorial for more examples related to data visualization.
