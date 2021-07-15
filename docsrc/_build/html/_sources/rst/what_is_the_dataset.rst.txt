@@ -20,13 +20,53 @@ These dataframes are described as follows:
 * :py:attr:`data <datasci.core.dataset.DataSet.data>` \: The rows of the ``DataFrame`` respresent samples, e.g., participants in a clinical study.
   The columns represent the features, or observations, of each sample e.g., RNA seq expression values, metabolite peak areas for given *m/z* s
   and retention times, or shedding scores across multiple virus and bacteria. The rows of the data are labeled via the ``index`` of the ``DataFrame``
-  and the columns are labeled via the ``columns`` of the ``DataFrame``.
+  and the columns are labeled via the ``columns`` of the ``DataFrame``. ::
+
+    >>> # imports
+    >>> from datasci.core.dataset import load_dataset
+
+    >>> # load dataset
+    >>> ds = load_dataset(os.path.join(os.environ['DATASCI_PATH'],
+    ...                                'test_data/Iris/Data/iris.ds'))
+
+    >>> # print data
+    >>> ds.data
+
+        sepal_length  sepal_width  petal_length  petal_width
+    0             5.1          3.5           1.4          0.2
+    1             4.9          3.0           1.4          0.2
+    2             4.7          3.2           1.3          0.2
+    3             4.6          3.1           1.5          0.2
+    4             5.0          3.6           1.4          0.2
+    ..            ...          ...           ...          ...
+    145           6.7          3.0           5.2          2.3
+    146           6.3          2.5           5.0          1.9
+    147           6.5          3.0           5.2          2.0
+
+    [150 rows x 4 columns]
+
 
 * :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>` \: The rows of the ``DataFrame`` represent samples. The columns represent
-  decriptive data for each sample, e.g., class label, age, time point, species.
+  decriptive data for each sample, e.g., class label, age, time point, species. ::
+  
+    >>> # print metadata
+    >>> ds.metadata
+
+          species
+    0       setosa
+    1       setosa
+    2       setosa
+    3       setosa
+    4       setosa
+    ..         ...
+    145  virginica
+
+    [150 rows x 1 columns]
 
 * :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>` \: The rows of the ``DataFrame`` represent features, or observations. The columns represent
-  descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a bacteria. 
+  descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a bacteria. ::
+
+See the `Creating a DataSet <create_dataset.html>`_ tutorial for an depth guide to constructing a :py:class:`DataSet <datasci.core.dataset.DataSet>` instance.  
 
 The main goal of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is promote modularity and compatibility with other
 data science and machine learning packages, e.g., `sklearn <https://scikit-learn.org/stable/>`_. For example, if a user wishes to visualize their dataset,
@@ -36,22 +76,22 @@ they would pass an embedding object, such as `PCA <https://scikit-learn.org/stab
 the visualization method is to take care of the boiler plate code associated with applying the embedding class, such as generating labels and grabbing the 
 data matrix, and plot generation. See the example below::
 
-  # imports
-  import os
-  from datasci.core.dataset import load_dataset
-  from sklearn.decomposition import PCA
+  >>> # imports
+  >>> import os
+  >>> from datasci.core.dataset import load_dataset
+  >>> from sklearn.decomposition import PCA
 
-  # load dataset
-  ds = load_dataset(os.path.join(os.environ['DATASCI_PATH'],
-                                'test_data/Iris/Data/iris.ds'))
+  >>> # load dataset
+  >>> ds = load_dataset(os.path.join(os.environ['DATASCI_PATH'],
+  ...                                'test_data/Iris/Data/iris.ds'))
 
-  # define embedding
-  pca = PCA(n_components=2, whiten=True)
+  >>> # define embedding
+  >>> pca = PCA(n_components=2, whiten=True)
 
-  # visualize species of iris with pca
-  ds.visualize(embedding=pca,
-               attr='species',
-               save=True,
-               save_name='iris_species_pca')
+  >>> # visualize species of iris with pca
+  >>> ds.visualize(embedding=pca,
+  ...              attr='species',
+  ...              save=True,
+  ...              save_name='iris_species_pca')
 
-Visit the `Visualizing Data <visualize_data.html>`_ module 
+Visit the `Visualizing Data <visualize_data.html>`_ tutorial for more examples related to data visualization.
