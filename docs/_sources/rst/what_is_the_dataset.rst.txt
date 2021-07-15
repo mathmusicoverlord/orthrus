@@ -53,3 +53,5 @@ data matrix, and plot generation. See the example below::
                attr='species',
                save=True,
                save_name='iris_species_pca')
+
+View the :ref:`visualize_data` module 
