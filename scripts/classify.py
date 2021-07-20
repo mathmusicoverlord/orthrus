@@ -45,6 +45,7 @@ if __name__ == '__main__':
     sample_ids = script_args.get('SAMPLE_IDS',  default_val(exp_params, 'SAMPLE_IDS')),
     feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
     classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
+    scorer_args = script_args.get('SCORER_ARGS', default_val(exp_params, 'CLASSIFY_SCORER_ARGS'))
     classifier_fweights_handle = script_args.get('CLASSIFIER_FWEIGHTS_HANDLE',
                                                  default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
     classifier_sweights_handle = script_args.get('CLASSIFIER_SWEIGHTS_HANDLE',
@@ -75,6 +76,7 @@ if __name__ == '__main__':
                                          partitioner_name=partitioner_name,
                                          scorer=scorer,
                                          scorer_name=args.score,
+                                         scorer_args=scorer_args,
                                          f_weights_handle=classifier_fweights_handle,
                                          s_weights_handle=classifier_sweights_handle)
 

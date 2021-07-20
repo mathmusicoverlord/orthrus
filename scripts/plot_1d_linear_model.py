@@ -36,6 +36,7 @@ if __name__ == '__main__':
     from sklearn.decomposition import PCA
     from datasci.decomposition.general import OrthTransform
     import numpy as np
+    import pandas as pd
     import os
     from datasci.core.helper import module_from_path
     from datasci.core.helper import default_val
@@ -55,6 +56,7 @@ if __name__ == '__main__':
     sample_ids = script_args.get('SAMPLE_IDS',  default_val(exp_params, 'SAMPLE_IDS')),
     feature_ids = script_args.get('FEATURE_IDS', default_val(exp_params, 'FEATURE_IDS'))
     train_test_attr = script_args.get('TRAIN_TEST_ATTR', default_val(exp_params, 'TRAIN_TEST_ATTR'))
+    mrkr_list = script_args.get('MRKR_LIST', default_val(exp_params, 'MRKR_LIST'))
     classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
     weights_handle = script_args.get('WEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
     bias_handle = script_args.get('BIAS_HANDLE', default_val(exp_params, 'CLASSIFIER_BIAS_HANDLE'))
@@ -70,6 +72,8 @@ if __name__ == '__main__':
         # grab scores
         #train_score = classifier_results['scores'].iloc[i]['Train'].item()
         test_score = classifier_results['scores'].loc['Test'].values[i]
+        if pd.api.types.infer_dtype(test_score) != 'floating':
+            test_score = pd.NA
 
         # extract weights vector
         w = eval("classifier." + weights_handle).reshape(-1, 1)
@@ -100,7 +104,7 @@ if __name__ == '__main__':
                              palette='bright',
                              alpha=.6,
                              edgecolors='face',
-                             mrkr_list=['^', 'o'],
+                             mrkr_list=mrkr_list,
                              s=200,
                              linewidths=0,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
@@ -120,7 +124,7 @@ if __name__ == '__main__':
                              palette='bright',
                              alpha=.6,
                              edgecolors='face',
-                             mrkr_list=['^', 'o'],
+                             mrkr_list=mrkr_list,
                              s=200,
                              linewidths=0,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
@@ -138,7 +142,7 @@ if __name__ == '__main__':
                              xlabel='Model Axis',
                              ylabel='PC 1 Orth.',
                              backend='plotly',
-                             mrkr_list=['diamond', 'circle'],
+                             mrkr_list=mrkr_list,
                              opacity=.7,
                              figsize=(1500, 1000),
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
@@ -157,7 +161,7 @@ if __name__ == '__main__':
                              ylabel='PC 1 Orth.',
                              zlabel='PC 2 Orth.',
                              backend='plotly',
-                             mrkr_list=['diamond', 'circle'],
+                             mrkr_list=mrkr_list,
                              opacity=.7,
                              figsize=(1500, 1000),
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
@@ -165,3 +169,18 @@ if __name__ == '__main__':
                              save_name='_'.join(
                                  [ds.name, exp_name, 'classifier', str(i), 'features', str(n_features), classifier_name,
                                   class_attr.lower(), '3d']))
+
+        # save classifier scores
+        ds_slice = ds.slice_dataset(feature_ids=feature_ids)
+        scores = ds_slice.data.apply(lambda x: (np.dot(x, w) - b).item(), axis=1)
+        scores.name = 'score'
+        scores = scores.to_frame()
+        scores[class_attr] = ds_slice.metadata[class_attr]
+        scores[train_test_attr] = ds_slice.metadata[train_test_attr]
+        scores.to_csv(os.path.join(results_dir,
+                                   '_'.join([ds.name,
+                                             exp_name,
+                                             'classifier',
+                                             str(i), 'features',
+                                             str(n_features), classifier_name,
+                                             class_attr.lower(), 'scores.csv'])))
