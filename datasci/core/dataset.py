@@ -1112,9 +1112,8 @@ class DataSet:
                 
             try:
                 splits = split(X, y, groups=groups)
-            except AttributeError:
+            except (AttributeError, TypeError):
                 splits = split(X, y)
-
             try:
                 _ = (e for e in splits)
             except TypeError:
