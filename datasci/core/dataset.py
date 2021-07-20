@@ -1165,7 +1165,7 @@ class DataSet:
                 print_str += r"Training %s: %.2f%%" % (scorer_name, train_score*100) + '\n'
             else:
                 print_str += r"Training %s:" % (scorer_name,) + '\n'
-                print_str += train_score + '\n'
+                print_str += str(train_score) + '\n'
             if not (test_index is None):
                 print_str += "-"*len(title) + '\n'
                 test_score = scorer(y_true, y_pred_test, **scorer_args)
@@ -1173,7 +1173,7 @@ class DataSet:
                     print_str += r"Test %s: %.2f%%" % (scorer_name, test_score * 100) + '\n'
                 else:
                     print_str += r"Test %s:" % (scorer_name,) + '\n'
-                    print_str += test_score + '\n'
+                    print_str += str(test_score) + '\n'
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, test_score])
             else:
                 scores[score_name] = pd.Series(index=['Train', 'Test'], data=[train_score, pd.NA])
