@@ -11,6 +11,9 @@ and manifold learning tasks including, but not limited to:
 * Classification, e.g., Support Vector Machines (SVM), Random Forest (RF), Artificial Neural Networks (ANN)
 * Feature selection
 
+DataSet Structure
+-----------------
+
 The :py:class:`DataSet <datasci.core.dataset.DataSet>` object is primarily composed of three
 data structures\: :py:attr:`data <datasci.core.dataset.DataSet.data>`, :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`,
 and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>`, each of which is a 
@@ -91,7 +94,10 @@ These dataframes are described as follows:
 
 See the `Creating a DataSet <create_dataset.html>`_ tutorial for an depth guide to constructing a :py:class:`DataSet <datasci.core.dataset.DataSet>` instance.
 Note: In order to run the code above you must first ``export`` your DataSci repository path, e.g., ``export DATASCI_PATH=/path/to/DataSci/``, and run the script
-`generate_dataset.py <../../../../test_data/GSE73072/Scripts/generate_dataset.py>`_ located in the `GSE73072 project directory <../../../../test_data/GSE73072>`_
+`generate_dataset.py <../../../../test_data/GSE73072/Scripts/generate_dataset.py>`_ located in the `GSE73072 project directory <../../../../test_data/GSE73072>`_.
+
+Basic Usage
+-----------
 
 The main goal of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is promote modularity and compatibility with other
 data science and machine learning packages, e.g., `sklearn <https://scikit-learn.org/stable/>`_. For example, if a user wishes to visualize their dataset,
