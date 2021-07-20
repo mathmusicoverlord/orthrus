@@ -230,9 +230,35 @@ decriptive data for each sample, e.g., class label, age, time point, species.</p
 </div>
 </li>
 <li><p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent features, or observations. The columns represent
-descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a bacteria.</p></li>
+descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a measured bacteria.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DATASCI_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s1">&#39;test_data/GSE73072/Data/GSE73072.ds&#39;</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print vardata (2 columns for example)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">vardata</span><span class="p">[[</span><span class="s1">&#39;GENE_ID_REF&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">]]</span>
+
+<span class="go">                 GENE_ID_REF                                        Description</span>
+<span class="go">ID_REF</span>
+<span class="go">10_at                   10.0  N-acetyltransferase 2 (arylamine N-acetyltrans...</span>
+<span class="go">100_at                 100.0                                adenosine deaminase</span>
+<span class="go">1000_at               1000.0          cadherin 2, type 1, N-cadherin (neuronal)</span>
+<span class="go">10000_at             10000.0  v-akt murine thymoma viral oncogene homolog 3 ...</span>
+<span class="go">10001_at             10001.0                         mediator complex subunit 6</span>
+<span class="go">                      ...                                                ...</span>
+<span class="go">AFFX-ThrX-5_at           NaN                                                NaN</span>
+<span class="go">AFFX-ThrX-M_at           NaN                                                NaN</span>
+<span class="go">AFFX-TrpnX-3_at          NaN                                                NaN</span>
+<span class="go">AFFX-TrpnX-5_at          NaN                                                NaN</span>
+<span class="go">AFFX-TrpnX-M_at          NaN                                                NaN</span>
+<span class="go">[12023 rows x 2 columns]</span>
+</pre></div>
+</div>
+</li>
 </ul>
-<p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> instance.</p>
+<p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> instance.
+Note: In order to run the code above you must first <code class="docutils literal notranslate"><span class="pre">export</span></code> your DataSci repository path, e.g., <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DATASCI_PATH=/path/to/DataSci/</span></code>, and run the script
+<a class="reference external" href="../../../../test_data/GSE73072/Scripts/generate_dataset.py">generate_dataset.py</a> located in the <a class="reference external" href="../../../../test_data/GSE73072">GSE73072 project directory</a></p>
 <p>The main goal of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is promote modularity and compatibility with other
 data science and machine learning packages, e.g., <a class="reference external" href="https://scikit-learn.org/stable/">sklearn</a>. For example, if a user wishes to visualize their dataset,
 rather than hard code or wrap a specific visualization algorithm into the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class to make it available to them,

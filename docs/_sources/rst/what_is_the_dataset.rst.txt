@@ -64,9 +64,34 @@ These dataframes are described as follows:
     [150 rows x 1 columns]
 
 * :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>` \: The rows of the ``DataFrame`` represent features, or observations. The columns represent
-  descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a bacteria. ::
+  descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a measured bacteria. ::
 
-See the `Creating a DataSet <create_dataset.html>`_ tutorial for an depth guide to constructing a :py:class:`DataSet <datasci.core.dataset.DataSet>` instance.  
+    >>> # load dataset
+    >>> ds = load_dataset(os.path.join(os.environ['DATASCI_PATH'],
+    ...                                'test_data/GSE73072/Data/GSE73072.ds'))
+
+    >>> # print vardata (2 columns for example)
+    >>> ds.vardata[['GENE_ID_REF', 'Description']]
+
+                     GENE_ID_REF                                        Description
+    ID_REF                                                                         
+    10_at                   10.0  N-acetyltransferase 2 (arylamine N-acetyltrans...
+    100_at                 100.0                                adenosine deaminase
+    1000_at               1000.0          cadherin 2, type 1, N-cadherin (neuronal)
+    10000_at             10000.0  v-akt murine thymoma viral oncogene homolog 3 ...
+    10001_at             10001.0                         mediator complex subunit 6
+                          ...                                                ...
+    AFFX-ThrX-5_at           NaN                                                NaN
+    AFFX-ThrX-M_at           NaN                                                NaN
+    AFFX-TrpnX-3_at          NaN                                                NaN
+    AFFX-TrpnX-5_at          NaN                                                NaN
+    AFFX-TrpnX-M_at          NaN                                                NaN
+    [12023 rows x 2 columns]
+
+
+See the `Creating a DataSet <create_dataset.html>`_ tutorial for an depth guide to constructing a :py:class:`DataSet <datasci.core.dataset.DataSet>` instance.
+Note: In order to run the code above you must first ``export`` your DataSci repository path, e.g., ``export DATASCI_PATH=/path/to/DataSci/``, and run the script
+`generate_dataset.py <../../../../test_data/GSE73072/Scripts/generate_dataset.py>`_ located in the `GSE73072 project directory <../../../../test_data/GSE73072>`_
 
 The main goal of the :py:class:`DataSet <datasci.core.dataset.DataSet>` object is promote modularity and compatibility with other
 data science and machine learning packages, e.g., `sklearn <https://scikit-learn.org/stable/>`_. For example, if a user wishes to visualize their dataset,
