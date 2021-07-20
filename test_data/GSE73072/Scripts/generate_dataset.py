@@ -36,7 +36,7 @@ if __name__ == "__main__":
         data.loc[gsm_name, idx] = values
 
     # grab description of dataset
-    description = ' '.join([metadata[col].unique()[0] for col in metadata.filter(regex='protocol*!').columns])
+    description = ' '.join([metadata[col].unique()[0] for col in metadata.filter(regex='protocol*').columns])
 
     # remove protocol columns
     meta_cols = metadata.columns[~metadata.columns.str.contains('protocol')]
