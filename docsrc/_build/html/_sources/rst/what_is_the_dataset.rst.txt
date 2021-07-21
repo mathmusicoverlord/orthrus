@@ -142,5 +142,6 @@ See Also
 .. toctree::
   :maxdepth: 4
 
-  `Creating a DataSet <visualize_data.html>`_
+  test
+  `Creating a DataSet <create_dataset.html>`_
   `Visualizing Data <visualize_data.html>`_
