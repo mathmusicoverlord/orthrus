@@ -136,3 +136,11 @@ data matrix, and plot generation. See the example below::
   2D PCA embedding of the Iris dataset
 
 Visit the `Visualizing Data <visualize_data.html>`_ tutorial for more examples related to data visualization.
+
+See Also
+--------
+.. toctree::
+  :maxdepth: 4
+
+  `Creating a DataSet <visualize_data.html>`_
+  `Visualizing Data <visualize_data.html>`_
