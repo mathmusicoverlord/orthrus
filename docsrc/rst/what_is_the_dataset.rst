@@ -95,6 +95,8 @@ These dataframes are described as follows:
 See the `Creating a DataSet <create_dataset.html>`_ tutorial for an depth guide to constructing a :py:class:`DataSet <datasci.core.dataset.DataSet>` instance.
 Note: In order to run the code above you must first ``export`` your DataSci repository path, e.g., ``export DATASCI_PATH=/path/to/DataSci/``, and run the script
 `generate_dataset.py <../../../../test_data/GSE73072/Scripts/generate_dataset.py>`_ located in the `GSE73072 project directory <../../../../test_data/GSE73072>`_.
+If you are a part of the CSU team and want access to the full GSE73072 ``DataSet``, roughly ~20000 genes, download the DataSet object by accessing ``/data4/kehoe/workspace/datasets/GSE73072.ds``
+on katrina's racecar, or download it by accessing `this folder <https://drive.google.com/drive/folders/1NcJ3-W2XF0rwsI4L_GA3mvfCL8Dg3NT8?usp=sharing>`_ on google drive.
 
 Basic Usage
 -----------
