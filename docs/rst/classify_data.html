@@ -32,16 +32,12 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Adding new attributes to metadata" href="add_new_attributes_using_queries.html" />
-    <link rel="prev" title="Visualizing Data" href="visualize_data.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,21 +83,8 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="what_is_the_dataset.html">What is the DataSet object?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Classification</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#train-test-split-with-linear-svm">Train/Test Split with Linear SVM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#gse7302-k-fold-cross-validation-with-ssvm-on-gpu">GSE7302: k-Fold Cross-Validation with SSVM on GPU</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#multi-class-classification">Multi-class classification</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="add_new_attributes_using_queries.html">Adding new attributes to metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalization_and_imputation.html">Data Normalization and Imputation</a></li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
 </ul>
 
@@ -151,8 +134,6 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
-        
       <li>Classification</li>
     
     
@@ -174,278 +155,7 @@
             
   <div class="section" id="classification">
 <h1>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial we will learn how to setup and perform classification experiments using the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a> method of the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. We start by loading the Iris dataset
-provided in the DataSci package:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
-<span class="gp">... </span>                         <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="train-test-split-with-linear-svm">
-<h2>Train/Test Split with Linear SVM<a class="headerlink" href="#train-test-split-with-linear-svm" title="Permalink to this headline">¶</a></h2>
-<p>Our first experiment will be simple. Train a
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html">linear support vector machine classifier</a>
-(SVM) on 80% of the data to distinguish between the <em>setosa</em> and <em>versicolor</em> iris species, test the trained SVM model
-on the left over 20%, and record the
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html">balanced success rate</a> (bsr):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ShuffleSplit</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the sample ids</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">setosa_versicolor</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;setosa&#39;</span><span class="p">,</span> <span class="s1">&#39;versicolor&#39;</span><span class="p">])</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the partitioner</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">train_test_part</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># for reproducibility</span>
-<span class="gp">... </span>                               <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>   <span class="c1"># test_size=.2 implicitly,</span>
-<span class="gp">... </span>                               <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                               <span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the classifier</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">svm</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">()</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the classification experiment</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_results</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">svm</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;SVM&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>  <span class="c1"># what you are classifying</span>
-<span class="gp">... </span>                                     <span class="n">sample_ids</span><span class="o">=</span><span class="n">setosa_versicolor</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner</span><span class="o">=</span><span class="n">train_test_part</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;80Train_20Test&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;BSR&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="p">)</span>
-
-<span class="go">SVM, Split 1 of 1, Scores:</span>
-<span class="go">===========================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">---------------------------</span>
-<span class="go">Test BSR: 100.00%</span>
-
-<span class="go">SVM, Summary, Scores:</span>
-<span class="go">======================</span>
-<span class="go">Training BSR: 100.00% +/- nan%</span>
-<span class="go">Max. Training BSR: 100.00%</span>
-<span class="go">Min. Training BSR: 100.00%</span>
-<span class="go">----------------------</span>
-<span class="go">Test BSR: 100.00% +/- nan%</span>
-<span class="go">Max. Test BSR: 100.00%</span>
-<span class="go">Min. Test BSR: 100.00%</span>
-</pre></div>
-</div>
-<p>The classification results are represented as a dictionary containing the classifiers,
-classification scores, partitioning and classification labels, classifier feature weights,
-and the classifier sample weights respectively. To obtain the feature weights or sample weights
-of the classification model we have to let the classify method know where the feature or sample weights reside
-in the classifier object by specifying either the <code class="docutils literal notranslate"><span class="pre">f_weights_handle</span></code> and/or <code class="docutils literal notranslate"><span class="pre">s_weights_handle</span></code> parameter.
-For the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html">LinearSVC</a>
-the feature weights reside in the <code class="docutils literal notranslate"><span class="pre">coef_</span></code> attribute. Here is an example where we extract the feature weights by adjusting
-the above code slightly:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># classify (/w extracting the model weights)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_results</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">svm</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;SVM&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>  <span class="c1"># what you are classifying</span>
-<span class="gp">... </span>                                     <span class="n">sample_ids</span><span class="o">=</span><span class="n">setosa_versicolor</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner</span><span class="o">=</span><span class="n">train_test_part</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;80Train_20Test&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;BSR&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;coef_&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print the feature weights</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classification_results</span><span class="p">[</span><span class="s1">&#39;f_weights&#39;</span><span class="p">])</span>
-
-<span class="go">              species_80Train_20Test_SVM_f_weights_0  species_80Train_20Test_SVM_f_rank_0</span>
-<span class="go">sepal_length                               -0.213456                                    2</span>
-<span class="go">sepal_width                                -0.403911                                    3</span>
-<span class="go">petal_length                                0.831287                                    0</span>
-<span class="go">petal_width                                 0.413565                                    1</span>
-</pre></div>
-</div>
-<p>We can see the largest weight feature in the SVM model is the <code class="docutils literal notranslate"><span class="pre">petal_length</span></code> of the flower,
-this is reflected in the rank of the feature.</p>
-</div>
-<div class="section" id="gse7302-k-fold-cross-validation-with-ssvm-on-gpu">
-<h2>GSE7302: k-Fold Cross-Validation with SSVM on GPU<a class="headerlink" href="#gse7302-k-fold-cross-validation-with-ssvm-on-gpu" title="Permalink to this headline">¶</a></h2>
-<p>In this example we will run a k-fold cross-validation experiment with the GSE73072 dataset
-using <a class="reference internal" href="datasci.sparse.classifiers.html#datasci.sparse.classifiers.svm.SSVMClassifier" title="datasci.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">Support</span> <span class="pre">Vector</span> <span class="pre">Machines</span></code></a> (SSVM)
-on a GPU to distguish between shedding and non-shedding individuals infected with HRV in the
-first 24 hours of exposure. First we load the dataset:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
-<span class="gp">... </span>                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Then we set the sample ids, partitioner, and the classifier:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the sample ids</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hrv_first_24</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;virus==&#39;HRV&#39; &amp;  0&lt;=time_point_hr&lt;=24&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the partitioner</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="gp">... </span>                        <span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the classifier</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">SSVM</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Using the GPU</span>
-<span class="gp">... </span>            <span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>We now run the experiment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the classification experiment</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_results</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">ssvm</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;SSVM&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Shedding&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">sample_ids</span><span class="o">=</span><span class="n">hrv_first_24</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;5-Fold&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;BSR&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;weights_&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">groups</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>  <span class="c1"># passed to the StratifiedKFold.split() for balanced splitting</span>
-<span class="gp">... </span>                                     <span class="p">)</span>
-
-<span class="go">SSVM, Split 1 of 5, Scores:</span>
-<span class="go">============================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">----------------------------</span>
-<span class="go">Test BSR: 57.25%</span>
-
-<span class="go">SSVM, Split 2 of 5, Scores:</span>
-<span class="go">============================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">----------------------------</span>
-<span class="go">Test BSR: 51.25%</span>
-
-<span class="go">SSVM, Split 3 of 5, Scores:</span>
-<span class="go">============================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">----------------------------</span>
-<span class="go">Test BSR: 60.75%</span>
-
-<span class="go">SSVM, Split 4 of 5, Scores:</span>
-<span class="go">============================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">----------------------------</span>
-<span class="go">Test BSR: 81.75%</span>
-
-<span class="go">SSVM, Split 5 of 5, Scores:</span>
-<span class="go">============================</span>
-<span class="go">Training BSR: 100.00%</span>
-<span class="go">----------------------------</span>
-<span class="go">Test BSR: 57.90%</span>
-
-<span class="go">SSVM, Summary, Scores:</span>
-<span class="go">=======================</span>
-<span class="go">Training BSR: 100.00% +/- 0.00%</span>
-<span class="go">Max. Training BSR: 100.00%</span>
-<span class="go">Min. Training BSR: 100.00%</span>
-<span class="go">-----------------------</span>
-<span class="go">Test BSR: 61.78% +/- 11.69%</span>
-<span class="go">Max. Test BSR: 81.75%</span>
-<span class="go">Min. Test BSR: 51.25%</span>
-</pre></div>
-</div>
-<p>We can also save the results for later:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">save_object</span>
-
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save the results</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">save_object</span><span class="p">(</span><span class="n">classification_results</span><span class="p">,</span> <span class="s2">&quot;/path/to/classification/results.pickle&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>In this particular classification problem we are seeing sub-optimal results. We may benefit from performing
-first a feature selection experiment, see <a class="reference external" href="feature_selection.html">Feature Selection</a> for a few tutorials on
-these types of experiments.</p>
-</div>
-<div class="section" id="multi-class-classification">
-<h2>Multi-class classification<a class="headerlink" href="#multi-class-classification" title="Permalink to this headline">¶</a></h2>
-<p>In this example we will use the
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">Random Forest Classifier</a>
-to classify the 3 species in the Iris dataset. First load the Iris dataset according to the first example. Then set the
-classifier and partitioner. In this example we’ll do a simple train/test split and use a
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html">confusion matrix</a> to evaluate the
-classification results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>  <span class="c1"># for class balancing</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span> <span class="k">as</span> <span class="n">RF</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the partitioner</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">train_test_part</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="gp">... </span>                                         <span class="n">train_size</span><span class="o">=.</span><span class="mi">6</span><span class="p">,</span>
-<span class="gp">... </span>                                         <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                                         <span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the classifier</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">RF</span><span class="p">(</span><span class="n">class_weight</span><span class="o">=</span><span class="s2">&quot;balanced_subsample&quot;</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># use multi-threading across trees</span>
-<span class="gp">... </span>        <span class="p">)</span>
-</pre></div>
-</div>
-<p>Now we run the classification experiment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the classification experiment</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_results</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">rf</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">classifier_name</span><span class="o">=</span><span class="s1">&#39;Random_Forest&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner</span><span class="o">=</span><span class="n">train_test_part</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">partitioner_name</span><span class="o">=</span><span class="s1">&#39;60_Train_40_Test&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer</span><span class="o">=</span><span class="n">confusion_matrix</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer_name</span><span class="o">=</span><span class="s1">&#39;Confusion_Mat&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">scorer_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;setosa&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                                              <span class="s1">&#39;virginica&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                                              <span class="s1">&#39;versicolor&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                                                      <span class="p">),</span>
-<span class="gp">... </span>                                     <span class="n">f_weights_handle</span><span class="o">=</span><span class="s1">&#39;feature_importances_&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="n">groups</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                     <span class="p">)</span>
-
-<span class="go">Random_Forest, Split 1 of 1, Scores:</span>
-<span class="go">=====================================</span>
-<span class="go">Training Confusion_Mat:</span>
-<span class="go">[[30  0  0]</span>
-<span class="go">[ 0 30  0]</span>
-<span class="go">[ 0  0 30]]</span>
-<span class="go">-------------------------------------</span>
-<span class="go">Test Confusion_Mat:</span>
-<span class="go">[[20  0  0]</span>
-<span class="go">[ 0 19  1]</span>
-<span class="go">[ 0  1 19]]</span>
-</pre></div>
-</div>
-<p>Note: In order to understand the rows and columns of the confusion matrix, we must pass the
-species labels in the <code class="docutils literal notranslate"><span class="pre">labels</span></code> keyword argument to the <code class="docutils literal notranslate"><span class="pre">scorer</span></code>, which we do in the
-dictionary <code class="docutils literal notranslate"><span class="pre">scorer_args</span></code>. We can measure the feature importance by viewing the impurity-based weights
-returned by the Random Forest model:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># view the feature_importances</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classification_results</span><span class="p">[</span><span class="s1">&#39;f_weights&#39;</span><span class="p">])</span>
-
-<span class="go">             species_60_Train_40_Test_Random_Forest_f_weights_0   species_60_Train_40_Test_Random_Forest_f_rank_0</span>
-<span class="go">sepal_length                                           0.104920                                                 3</span>
-<span class="go">sepal_width                                            0.029557                                                 2</span>
-<span class="go">petal_length                                           0.408352                                                 0</span>
-<span class="go">petal_width                                            0.457171                                                 1</span>
-</pre></div>
-</div>
-</div>
+<p>In this tutorial we will learn how to perform a classification experiment…</p>
 </div>
 
 
@@ -453,10 +163,6 @@ returned by the Random Forest model:</p>
            
           </div>
           <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="add_new_attributes_using_queries.html" class="btn btn-neutral float-right" title="Adding new attributes to metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="visualize_data.html" class="btn btn-neutral float-left" title="Visualizing Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
 
   <hr/>
 
