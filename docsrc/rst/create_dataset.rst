@@ -1,2 +1,147 @@
 Creating a DataSet
 ==================
+There are number of options available to create a new :py:class:`DataSet <datasci.core.dataset.DataSet>` file:
+    
+1. By utilizing the :py:class:`DataSet's <datasci.core.dataset.DataSet>` :py:meth:`__init__ <datasci.core.dataset.DataSet.__init__>` method:
+    The :py:attr:`data <datasci.core.dataset.DataSet.data>` , :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>` variables in :py:class:`DataSet <datasci.core.dataset.DataSet>` object are `Pandas.DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. 
+    So, we should ensure that either these variables are read as Pandas.DataFrame or should be converted into one before we can create the dataset.
+    :: 
+        import pandas as pd
+        #load the data matrix as a Pandas.DataFrame from a csv file 
+        path_to_data = 'path/to/data_matrix.csv'
+        data_df = pd.read_csv(path_to_data)
+
+        #do the same thing for metadata and vardata
+        path_to_metadata = 'path/to/metadata.csv'
+        metadata_df = pd.read_csv(path_to_metadata)
+        path_to_vardata = 'path/to/vardata.csv'
+        vardata_df = pd.read_csv(path_to_vardata)
+
+    Next, we can add some more details to the object such as the dataset name and description
+    ::
+        name = 'first_dataset'
+        description = 'The dataset was created with \n \
+               1. data file = %s \n \
+               2. metadata file = %s \n \
+               3. vardata file = %s \n \
+        The data matrix had been previously element-wise log-normalized.' %(path_to_data,
+            path_to_metadata, path_to_vardata)
+
+    Now let's create and save the dataset object
+    ::
+        from datasci.core.dataset import DataSet as DS
+        import os
+        ds = DS(name=name, 
+                description=description,
+                data=data_df,
+                metadata=metadata_df, 
+                vardata=vardata_df)
+        save_path = 'path/to/dst/dir'
+        ds.save(file_path = os.path.join(save_path, ds.name+'.ds'))
+
+    Another example:
+    ::
+        from pydataset import data as pydat
+        from datasci.core.dataset import DataSet as DS
+        df = pydat('iris')
+        data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+        metadata = df[['Species']]
+        ds = DS(name='Iris', data=data, metadata=metadata)
+    
+
+2. Converting a `CCDataSet <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/io/CCDataSet.py>`_ object to :py:class:`DataSet <datasci.core.dataset.DataSet>` object
+    We can utilize :py:meth:`from_ccd <datasci.core.dataset.from_ccd>` method to convert a ``CCDataSet`` object to a ``Dataset`` object.
+    :: 
+        from datasci.core.dataset import from_ccd     
+        ccd_path = 'path/to/gse_730732.h5' #this is the ccd file!
+        ds = from_ccd(ccd_path) 
+    
+
+Some Problems You May Encounter
+-------------------------------
+
+Sometimes there may be issues with datatypes in the :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, so it may be necessary to apply reformat method to proper datatypes. 
+Let's check the `shedding` column in gse_730732 dataset.
+::
+    >>> ds.metadata['shedding'].value_counts()
+
+    True     1764
+    False    1122
+    Name: shedding, dtype: int64
+
+Now, let's find indices where the column has ``True`` values and check the count
+::
+    >>> print("Num Shedders: ", (ds.metadata['shedding'] == True).sum())
+
+    Num Shedders: 0
+
+This is an incorrect behavior and this  happens because the elements and datatype of `shedding` attribute are ``string`` and ``Object`` respectively.
+::
+    >>> print(ds.metadata['shedding'].unique())
+
+    array(['True', 'False'], dtype=object)
+
+
+Solutions
+---------
+1. Use :py:meth:`reformat_metadata <datasci.core.dataset.DataSet.reformat_metadata>` method:
+    Try the inbuild method first to see if datatypes are inferred automatically.
+    ::
+        >>> ds.reformat_metadata(convert_dtypes=True)
+        >>> print("Num Shedders: ", (ds.metadata['shedding'] == True).sum())
+
+        Num Shedders: 0
+    But unfortunately in this case, the problem was not resolved. So let's try the second method.
+   
+2. Change datatypes manually
+    This requires manually checking the datatypes and updating them manually. Some examples are shown below:
+    ::
+        >>> ds.metadata['shedding'] = ds.metadata['shedding'].replace({'True': True, 'False': False})
+        >>> print("Num Shedders: ", (ds.metadata['shedding'] == True).sum())
+
+        Num Shedders: 1764
+
+
+    Here's another example of the problem
+    ::    
+        >>> print(ds.metadata['time_id'])
+        
+        GSM1881744    -21
+        GSM1881745      0
+        GSM1881746      5
+        GSM1881747     12
+        GSM1881748     21
+                    ... 
+        GSM1884625    118
+        GSM1884626    125
+        GSM1884627    132
+        GSM1884628    142
+        GSM1884629    166
+        Name: time_id, Length: 2886, dtype: object
+
+    But the datatype for the ``pandas.Series`` is ``string`` and any filtering as shown below will throw ``TypeError``.
+    ::
+        >>> print(ds.metadata['time_id']  > 0)
+        
+        TypeError: '>' not supported between instances of 'str' and 'int'
+
+    Solution: Change datatypes manually
+    ::
+        >>> ds.metadata = ds.metadata.astype({'time_id': 'int32'})
+        >>> print(ds.metadata['time_id']  > 0)
+
+        GSM1881744    False
+        GSM1881745    False
+        GSM1881746     True
+        GSM1881747     True
+        GSM1881748     True
+                    ...  
+        GSM1884625     True
+        GSM1884626     True
+        GSM1884627     True
+        GSM1884628     True
+        GSM1884629     True
+        Name: time_id, Length: 2886, dtype: bool  
+
+
+        
