@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="datasci",  # Replace with your own username
     version="0.0.1",
-    author="Eric Kehoe",
+    author="Eric Kehoe, Kartikay Sharma",
     author_email="ekehoe32@gmail.com",
     description="A package for automating pre-processing, visualization, and classification of generic data sets",
     long_description=long_description,
