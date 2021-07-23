@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Adding new attributes to metadata &mdash; DataSci 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DataSci
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DataSci</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Adding new attributes to metadata</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/rst/add_new_attributes_using_queries.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-new-attributes-to-metadata">
+<h1>Adding new attributes to metadata<a class="headerlink" href="#adding-new-attributes-to-metadata" title="Permalink to this headline">¶</a></h1>
+<p>There may be situations where the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> does not have a direct attribute you want to visualize or classify with. For instance,
+while the GSE_730732 dataset has a <cite>shedding</cite> attribute, it does not have an attribute for <cite>control</cite> class; the <cite>control</cite> class is inferred
+from time. In this instance, all samples with <cite>time_id</cite> &lt;= 0 are considered controls. The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.generate_attr_from_queries" title="datasci.core.dataset.DataSet.generate_attr_from_queries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code></a>
+method can be used to create new attributes using queries, which can then be used for classifciation and visualization.</p>
+<dl class="simple">
+<dt>Let’s consider the example that we want to visualize the following classes:</dt><dd><ol class="arabic simple">
+<li><p>Controls (all samples with <cite>time_id</cite> &lt;= 0)</p></li>
+<li><p>Shedders in hours 1 to 8 (all samples with <cite>time_id</cite> &gt; 0 and <cite>time_id</cite> &lt; 9 and ‘shedding’ = True)</p></li>
+</ol>
+</dd>
+</dl>
+<p>Load the GSE_730732 data, and recall that we fixed the issues in types of various attributes in (refernce create_dataset.rst file)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;path/to/gse73072.ds&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we’ll use <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">Pandas.DataFrame.query</a> method
+to filter the required samples.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">controls_query</span> <span class="o">=</span> <span class="s1">&#39;time_id&lt;=0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#filter metadata DataFrame and check number of samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">controls_query</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="go">(272, 11)</span>
+</pre></div>
+</div>
+<p>We can do the same for the shedders class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">shedders_query</span> <span class="o">=</span> <span class="s1">&#39;time_id&gt; 0 and time_id&lt;=8 and shedding == True&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#filter metadata DataFrame and check number of samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">shedders_query</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="go">(116, 11)</span>
+</pre></div>
+</div>
+<p>Now that we have queries for both the classes, we can use these queries to create a new attribute in the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> DataFrame. First, we
+need to create a dictionary, where the keys are the labels for the attribute and the values are the queries we defined above. Next,
+we will use <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.generate_attr_from_queries" title="datasci.core.dataset.DataSet.generate_attr_from_queries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code></a> method to add a new attribute.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;controls&#39;</span><span class="p">:</span> <span class="n">controls_query</span><span class="p">,</span> <span class="s1">&#39;shedders&#39;</span><span class="p">:</span> <span class="n">shedders_query</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_attribute_name</span> <span class="o">=</span> <span class="s1">&#39;Response&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">generate_attr_from_queries</span><span class="p">(</span><span class="n">new_attribute_name</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">attr_exist_mode</span><span class="o">=</span><span class="s1">&#39;overwrite&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#let&#39;s check the values for the new attribute</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">new_attribute_name</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+<span class="go">controls    272</span>
+<span class="go">shedders    116</span>
+<span class="go">Name: Response, dtype: int64</span>
+</pre></div>
+</div>
+<p>Finally, we can use this new attribute for visualization using MDS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">MDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#restrict the samples to the two labels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_ids</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">new_attribute_name</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="s1">&#39;controls&#39;</span><span class="p">,</span> <span class="s1">&#39;shedders&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">new_attribute_name</span><span class="p">,</span> <span class="n">sample_ids</span><span class="o">=</span><span class="n">sample_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="align-center figure" id="id1">
+<a class="reference internal image-reference" href="figures/add_new_queries_gse73072_visualization.png"><img alt="2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)" src="figures/add_new_queries_gse73072_visualization.png" style="width: 800px;" /></a>
+<p class="caption"><span class="caption-text">2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>Remember that the new attribute is available only in this particular <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object, and has not yet been stored on disk. To make these changes permanent
+store this <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object on disk by calling  <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save</span></code></a> method.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

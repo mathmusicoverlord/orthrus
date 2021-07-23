@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Data Normalization and Imputation &mdash; DataSci 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DataSci
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DataSci</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Data Normalization and Imputation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/rst/normalization_and_imputation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-normalization-and-imputation">
+<h1>Data Normalization and Imputation<a class="headerlink" href="#data-normalization-and-imputation" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class makes it convinient to normalize and impute data by providing methods such as
+<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.normalize" title="datasci.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> and
+<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.impute" title="datasci.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a>. These methods are compatible with various normalization and imputation methods available
+in <a class="reference external" href="https://scikit-learn.org/stable/index.html">sklearn</a> package. Please check the method documentation for more details and how to write custom
+normalization and imputation methods</p>
+<div class="section" id="normalization">
+<h2>Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h2>
+<p>The dataset package provides various normalization (<a class="reference internal" href="datasci.preprocessing.html#datasci.preprocessing.normalizations.LogNormalizer" title="datasci.preprocessing.normalizations.LogNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogNormalizer</span></code></a> and
+<a class="reference internal" href="datasci.preprocessing.html#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer" title="datasci.preprocessing.normalizations.MedianFoldChangeNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MedianFoldChangeNormalizer</span></code></a>) and batch correction normlizations
+such as <a class="reference internal" href="datasci.preprocessing.html#datasci.preprocessing.batch_corrections.Limma" title="datasci.preprocessing.batch_corrections.Limma"><code class="xref py py-class docutils literal notranslate"><span class="pre">Limma</span></code></a> and <a class="reference internal" href="datasci.preprocessing.html#datasci.preprocessing.batch_corrections.Harmony" title="datasci.preprocessing.batch_corrections.Harmony"><code class="xref py py-class docutils literal notranslate"><span class="pre">Harmony</span></code></a>.</p>
+<p><a class="reference internal" href="datasci.preprocessing.html#datasci.preprocessing.normalizations.LogNormalizer" title="datasci.preprocessing.normalizations.LogNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogNormalizer</span></code></a>, which performs a element wise log operations is an unsupervised
+normalization method. Let’s take a look on how to use it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.preprocessing.normalizations</span> <span class="kn">import</span> <span class="n">LogNormalizer</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;/path/to/ds&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalization_method</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log_normalizer</span> <span class="o">=</span> <span class="n">LogNormalizer</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">log_normalizer</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="n">normalization_method</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#updated data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;normalized data&#39;</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.normalize" title="datasci.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method updates the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> after performing the normalization operation. Next,
+let’s take a look a look at how to use a batch correction normalization method, say Limma. Since these methods are supervised, in addition to the data matrix <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.normalize" title="datasci.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a>
+method takes <cite>supervised_attr</cite> parameter (the name of attribute in <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>) as additional input; the label information for this attribute is used for normalization.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.preprocessing.batch_corrections</span> <span class="kn">import</span> <span class="n">Limma</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">limma</span> <span class="o">=</span> <span class="n">Limma</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">limma</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="s1">&#39;Limma&#39;</span><span class="p">,</span> <span class="n">supervised_attr</span><span class="o">=</span><span class="s1">&#39;BatchID&#39;</span><span class="p">)</span> <span class="c1">#ds.metadata must contain BatchID attribute</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="imputation">
+<h2>Imputation<a class="headerlink" href="#imputation" title="Permalink to this headline">¶</a></h2>
+<p>Similar to <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.normalize" title="datasci.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.impute" title="datasci.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a> method may be used to impute missing values. As described
+at the beginning of the document, this method can work with a variety of imputation methods from packages like <a class="reference external" href="https://scikit-learn.org/stable/index.html">sklearn</a> . Please see the method documentation
+on the restrictions and how to write custom imputation methods.</p>
+<p>Let’s look at an example. Suppose that our data contains missing values, which are represented as zero in this case, and we want to impute them using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html">KNNImputer</a> from
+<cite>sklearn</cite> package.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">impute_name</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="n">imputer</span><span class="p">,</span> <span class="n">impute_name</span><span class="o">=</span><span class="n">impute_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Similar to <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.normalize" title="datasci.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method, the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.impute" title="datasci.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a> method updates the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> after performing the normalization operation.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -511,7 +511,7 @@ of the <code class="docutils literal notranslate"><span class="pre">selector</sp
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_results_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature results e.g. weights, ranks,
-etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id1"><span class="problematic" id="id2">results_</span></a>”.</p></li>
+etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id2"><span class="problematic" id="id3">results_</span></a>”.</p></li>
 <li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to</p></li>
 </ul>
 </dd>
@@ -921,7 +921,7 @@ indicating plot properties.</p>
 <p>This module contains user-defined and general purpose helper functions use by the DataSci package.</p>
 <dl class="py function">
 <dt id="datasci.core.helper.batch_jobs_">
-<code class="sig-prename descclassname"><span class="pre">datasci.core.helper.</span></code><code class="sig-name descname"><span class="pre">batch_jobs_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">datasci.core.helper.</span></code><code class="sig-name descname"><span class="pre">batch_jobs_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_frequency</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cpus_per_worker</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gpus_per_worker</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
 which defines the worker, and a list of arguments for the jobs.</p>
 <dl class="field-list simple">
@@ -929,10 +929,13 @@ which defines the worker, and a list of arguments for the jobs.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>function_handle</strong> – Handle of the function or job</p></li>
 <li><p><strong>of arguments</strong> (<em>list</em>) – It is a list of argument list (see example below).</p></li>
-<li><p><strong>max_processes</strong> (<em>int</em>) – Defines the maximum number of jobs to run in parallel. It is intended to be used
-in resource constrained situation; lower the number of process if you are getting errors/exceptions</p></li>
-<li><p><strong>verbose_frequency</strong> (<em>int</em>) – This parameter controls the frequency of progress outputs to console; an output is
+<li><p><strong>verbose_frequency</strong> (<em>int</em>) – this parameter controls the frequency of progress outputs for the ray workers to console; an output is
 printed to console after every verbose_frequency number of processes complete execution. (default: 10)</p></li>
+<li><p><strong>num_cpus_per_worker</strong> (<em>float</em>) – Number of CPUs each worker needs. This can be a fraction, check
+<a class="reference external" href="https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources">ray specifying required resources</a> for more details. (default: 1.)</p></li>
+<li><p><strong>num_gpus_per_worker</strong> (<em>float</em>) – <p>Number of GPUs each worker needs. This can be fraction, check
+<a class="reference external" href="https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources">ray specifying required resources</a> for more details. (default: 0.)</p>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -959,9 +962,10 @@ Note:
 <span class="gp">... </span>    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 <span class="gp">... </span>    <span class="n">list_of_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">process_refs</span> <span class="o">=</span> <span class="n">batch_jobs_</span><span class="p">(</span><span class="n">job_handle</span><span class="p">,</span> <span class="n">list_of_args</span><span class="p">,</span> <span class="n">max_processes</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">verbose_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">process_refs</span> <span class="o">=</span> <span class="n">batch_jobs_</span><span class="p">(</span><span class="n">job_handle</span><span class="p">,</span> <span class="n">list_of_args</span><span class="p">,</span> <span class="n">verbose_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_cpus_per_worker</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">process_refs</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">process</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>

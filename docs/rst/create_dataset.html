@@ -97,7 +97,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating a DataSet</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating a DataSet</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#some-problems-you-may-encounter">Some Problems You May Encounter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solutions">Solutions</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
 </ul>
 </li>
@@ -175,6 +179,161 @@
             
   <div class="section" id="creating-a-dataset">
 <h1>Creating a DataSet<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h1>
+<p>There are number of options available to create a new <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> file:</p>
+<ol class="arabic">
+<li><dl>
+<dt>By utilizing the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet's</span></code></a> <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__</span></code> method:</dt><dd><p>The <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> , <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>, and <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a> variables in <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object are <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas.DataFrame</a>.
+So, we should ensure that either these variables are read as Pandas.DataFrame or should be converted into one before we can create the dataset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1">#load the data matrix as a Pandas.DataFrame from a csv file</span>
+<span class="n">path_to_data</span> <span class="o">=</span> <span class="s1">&#39;path/to/data_matrix.csv&#39;</span>
+<span class="n">data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">)</span>
+
+<span class="c1">#do the same thing for metadata and vardata</span>
+<span class="n">path_to_metadata</span> <span class="o">=</span> <span class="s1">&#39;path/to/metadata.csv&#39;</span>
+<span class="n">metadata_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path_to_metadata</span><span class="p">)</span>
+<span class="n">path_to_vardata</span> <span class="o">=</span> <span class="s1">&#39;path/to/vardata.csv&#39;</span>
+<span class="n">vardata_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path_to_vardata</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we can add some more details to the object such as the dataset name and description</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;first_dataset&#39;</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;The dataset was created with </span><span class="se">\n</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">       1. data file = </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">       2. metadata file = </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">       3. vardata file = </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">The data matrix had been previously element-wise log-normalized.&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">,</span>
+    <span class="n">path_to_metadata</span><span class="p">,</span> <span class="n">path_to_vardata</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s create and save the dataset object</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data_df</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata_df</span><span class="p">,</span>
+        <span class="n">vardata</span><span class="o">=</span><span class="n">vardata_df</span><span class="p">)</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/dst/dir&#39;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.ds&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Another example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DS</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Iris&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Converting a <a class="reference external" href="https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/io/CCDataSet.py">CCDataSet</a> object to <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object</dt><dd><p>We can utilize <a class="reference internal" href="datasci.core.html#datasci.core.dataset.from_ccd" title="datasci.core.dataset.from_ccd"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_ccd</span></code></a> method to convert a <code class="docutils literal notranslate"><span class="pre">CCDataSet</span></code> object to a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">from_ccd</span>
+<span class="n">ccd_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/gse_730732.h5&#39;</span> <span class="c1">#this is the ccd file!</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">from_ccd</span><span class="p">(</span><span class="n">ccd_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="section" id="some-problems-you-may-encounter">
+<h2>Some Problems You May Encounter<a class="headerlink" href="#some-problems-you-may-encounter" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes there may be issues with datatypes in the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>, so it may be necessary to apply reformat method to proper datatypes.
+Let’s check the <cite>shedding</cite> column in gse_730732 dataset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+<span class="go">True     1764</span>
+<span class="go">False    1122</span>
+<span class="go">Name: shedding, dtype: int64</span>
+</pre></div>
+</div>
+<p>Now, let’s find indices where the column has <code class="docutils literal notranslate"><span class="pre">True</span></code> values and check the count</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num Shedders: &quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+<span class="go">Num Shedders: 0</span>
+</pre></div>
+</div>
+<p>This is an incorrect behavior and this  happens because the elements and datatype of <cite>shedding</cite> attribute are <code class="docutils literal notranslate"><span class="pre">string</span></code> and <code class="docutils literal notranslate"><span class="pre">Object</span></code> respectively.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+<span class="go">array([&#39;True&#39;, &#39;False&#39;], dtype=object)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="solutions">
+<h2>Solutions<a class="headerlink" href="#solutions" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><dl>
+<dt>Use <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.reformat_metadata" title="datasci.core.dataset.DataSet.reformat_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reformat_metadata</span></code></a> method:</dt><dd><p>Try the inbuild method first to see if datatypes are inferred automatically.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">reformat_metadata</span><span class="p">(</span><span class="n">convert_dtypes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num Shedders: &quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+<span class="go">Num Shedders: 0</span>
+</pre></div>
+</div>
+<p>But unfortunately in this case, the problem was not resolved. So let’s try the second method.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Change datatypes manually</dt><dd><p>This requires manually checking the datatypes and updating them manually. Some examples are shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;True&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num Shedders: &quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;shedding&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+<span class="go">Num Shedders: 1764</span>
+</pre></div>
+</div>
+<p>Here’s another example of the problem</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_id&#39;</span><span class="p">])</span>
+
+<span class="go">GSM1881744    -21</span>
+<span class="go">GSM1881745      0</span>
+<span class="go">GSM1881746      5</span>
+<span class="go">GSM1881747     12</span>
+<span class="go">GSM1881748     21</span>
+<span class="go">            ...</span>
+<span class="go">GSM1884625    118</span>
+<span class="go">GSM1884626    125</span>
+<span class="go">GSM1884627    132</span>
+<span class="go">GSM1884628    142</span>
+<span class="go">GSM1884629    166</span>
+<span class="go">Name: time_id, Length: 2886, dtype: object</span>
+</pre></div>
+</div>
+<p>But the datatype for the <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> is <code class="docutils literal notranslate"><span class="pre">string</span></code> and any filtering as shown below will throw <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_id&#39;</span><span class="p">]</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="go">TypeError: &#39;&gt;&#39; not supported between instances of &#39;str&#39; and &#39;int&#39;</span>
+</pre></div>
+</div>
+<p>Solution: Change datatypes manually</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s1">&#39;time_id&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_id&#39;</span><span class="p">]</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="go">GSM1881744    False</span>
+<span class="go">GSM1881745    False</span>
+<span class="go">GSM1881746     True</span>
+<span class="go">GSM1881747     True</span>
+<span class="go">GSM1881748     True</span>
+<span class="go">            ...</span>
+<span class="go">GSM1884625     True</span>
+<span class="go">GSM1884626     True</span>
+<span class="go">GSM1884627     True</span>
+<span class="go">GSM1884628     True</span>
+<span class="go">GSM1884629     True</span>
+<span class="go">Name: time_id, Length: 2886, dtype: bool</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ol>
+</div>
 </div>
 
 
