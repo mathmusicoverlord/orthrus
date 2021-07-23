@@ -99,6 +99,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#plotting-backend">Plotting Backend</a></li>
 </ul>
 </li>
@@ -195,12 +196,22 @@ details on how to access this dataset. First we load the dataset:</p>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>One can easily start plotting their without any in depth knowledge of the method. In this example we will
+plot the GSE73072 data using <a class="reference internal" href="datasci.manifold.html#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a></p>
+</div>
 <div class="section" id="plotting-backend">
 <h2>Plotting Backend<a class="headerlink" href="#plotting-backend" title="Permalink to this headline">¶</a></h2>
 <p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
-and <a class="reference external" href="https://plotly.com/python/">Plotly</a>— each of which have their advantages. Pyplot is ideal for generating non-interative plots, such as
+and <a class="reference external" href="https://plotly.com/python/">Plotly</a>. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
-or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below.</p>
+or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below to demonstrate these two
+backends:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize data using pyplot</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
