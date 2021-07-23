@@ -101,7 +101,7 @@ In order to save a plot, one can specify ``save=True`` in the :py:meth:`visualiz
 plots will save to the ``DataSet.path`` directory and with the name ``DataSet.name`` _ ``viz_name`` _ ``DataSet.imputation_method`` _ ``DataSet.normalization_method`` _ ``attr`` _  ``cross_attr`` _ ``dim``
 with the appropriate extension. Alternatively one can specify the keyword argument ``save_name`` without an extension, e.g., ``save_name=gse73072_mds_dim3``.
 
-Plotting Backend
+Using Plotly
 ------------------
 The DataSci package uses two backends for plotting, `Pyplot <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html>`_
 and `Plotly <https://plotly.com/python/>`_. Pyplot is ideal for generating non-interative plots, such as
@@ -123,6 +123,9 @@ backend. Here is one where export the interative plotly figure to an ``.html`` f
 
 Click to view output: `gse73073_mds_viz_example_4.html <../figures/gse73073_mds_viz_example_4.html>`_.
 
+Dash
+^^^^
+
 Just like with Pyplot the user can
 specify any keyword arguments used in Plotly's `scatter <https://plotly.com/python-api-reference/generated/plotly.express.scatter>`_ function
 to customize their plots further. In addition the user can also host their figures on a server, by specify the keyword argument ``use_dash=True``,
@@ -137,3 +140,11 @@ Here is an example where we host our figure on ``localhost:5000``::
     ...             use_dash=True,
     ...             host='127.0.0.1',
     ...             port='5000')
+
+    Dash is running on http://127.0.0.1:5000/
+    * Serving Flask app "datasci.core.helper" (lazy loading)
+    * Environment: production
+      WARNING: This is a development server. Do not use it in a production deployment.
+      Use a production WSGI server instead.
+    * Debug mode: off
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
