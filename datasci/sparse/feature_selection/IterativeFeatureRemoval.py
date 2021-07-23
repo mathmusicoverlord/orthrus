@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 import random
 from calcom.solvers import LPPrimalDualPy
 import copy 
-import sklearn
 from sklearn.metrics import balanced_accuracy_score
-import calcom
+from datasci.core.helper import batch_jobs_
 import ray
 
 class IFR:
@@ -18,7 +17,8 @@ class IFR:
     the data is partitioned into training and validation sets 'repetition' number of times and then for each partition
     one feature set is extracted. So, a total of repetition * num_partitions independent feature sets are extracted 
     and the results are merged to create the output. These independent feature set extractions are batched 
-    and run in parallel using python ray package.
+    and run in parallel using the `ray` package. Each feature extraction is a ray worker, see below to check how to specify 
+    resource requirements for each worker.
     
     For each feature set, the algorithm can halt because of the following conditions:
 
@@ -32,7 +32,15 @@ class IFR:
 
     Parameters:
         classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
-                of a ``fit`` and ``predict`` method.
+                of a ``fit`` and ``predict`` method. Default classifier is datasci.sparse.classifiers.svm .SSVMClassifier, it will
+                be a CPU based classifier if ``num_gpus_per_worker`` is 0, otherwise it will be a GPU classifier.
+
+        scorer (object): Function which scores the prediction labels on training and test partitions. This function
+            should accept two arguments: truth labels and prediction labels. This function should output a score
+            between 0 and 1 which can be thought of as an accuracy measure. See
+            sklearn.metrics.balanced_accuracy_score for an example.
+
+        weights_handle (str) : Name of ``classifier`` attribute containing feature weights. Default is 'weights_'.
 
         repetition (int): Determines the number of times to partition the dataset. (default: 10)
         
@@ -52,8 +60,14 @@ class IFR:
 
         verbosity (int) : Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)
         
-        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used 
-            in resource constrained situation; lower the number of process if you are getting errors/exceptions
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
+            printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
+
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
                 
     Attributes:
         diagnostic_information_ (dict): Holds execution information for each interation of each partition.
@@ -62,23 +76,25 @@ class IFR:
     Examples:
             >>> import datasci.core.dataset as DS
             >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
-            
-            >>> dataset_dirpath = os.path.join(consts.DATA_SET_LOCATION, 'metabolomics', 'urine', 'adult_urine') 
-            >>> file_path = os.path.join(dataset_dirpath, 'DoD-Urine-Adult_skyline-list-for-Eric_20200605_adjusted.ds') 
-            >>> x = DS.load_dataset(file_path)
+            >>> x = DS.load_dataset('path/to/gse_730732.h5')
+            >>> from calcom.solvers import LPPrimalDualPy
+            >>> import calcom
             >>> model = calcom.classifiers.SSVMClassifier()
             >>> model.params['C'] = 1.
-            >>> model.params['method'] = calcom.solvers.LPPrimalDualPy
-            >>> model.params['use_cuda'] = False
+            >>> model.params['method'] = LPPrimalDualPy
+            >>> model.params['use_cuda'] = True
+            >>> weights_handle="results['weight']"
             >>> ifr = IFR.IFR(
                 model,
-                repetition = 500,
+                weights_handle=weights_handle,
+                repetition = 50,
                 nfolds = 4,
                 max_iters = 100,
                 cutoff = .6,
                 jumpratio = 5,
                 max_features_per_iter_ratio = 2,
                 verbosity = 2,
+                num_gpus_per_worker=0.1
                 )
 
             >>> #see feature select method for details
@@ -92,17 +108,35 @@ class IFR:
     See :py:meth:`IFR.fit` to understand the output of `IFR`.
     """
     def __init__(self,
-                classifier,
-                repetition=10,
-                partition_method = 'stratified_k-fold',
-                nfolds = 3,
-                max_iters=5,
-                cutoff=0.75,
-                jumpratio=100.,
-                max_features_per_iter_ratio=0.8,
-                verbosity=0,
-                max_processes=100):
+                classifier = None,
+                scorer = balanced_accuracy_score,
+                weights_handle: str ='weights_',
+                repetition: int=10,
+                partition_method: str = 'stratified_k-fold',
+                nfolds: int = 3,
+                max_iters: int=5,
+                cutoff: float=0.75,
+                jumpratio: float=100.,
+                max_features_per_iter_ratio: float=0.8,
+                verbosity: int=0,
+                verbose_frequency: int=10,
+                num_cpus_per_worker: float=1.,
+                num_gpus_per_worker: float=0.):
 
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+
+        if classifier == None:
+            from datasci.sparse.classifiers.svm import SSVMClassifier
+            if self.num_gpus_per_worker == 0:
+                use_cuda = False
+            elif self.num_gpus_per_worker > 0:
+                use_cuda  = True
+            classifier = SSVMClassifier(C=1, solver=LPPrimalDualPy, use_cuda=use_cuda)
+        
+        self.classifier = classifier
+        self.scorer = scorer
+        self.weights_handle = weights_handle
         self.repetition = repetition   # Number of time the data is randomly partitioned.
         self.partition_method =  partition_method # Passed to calcom.utils.generate_partitions
         self.nfolds = nfolds   # Passed to calcom.utils.generate_partitions
@@ -111,21 +145,14 @@ class IFR:
         self.jumpratio = jumpratio # Relative drop needed to detect numerically zero weights in SSVM.
         self.max_features_per_iter_ratio = max_features_per_iter_ratio   # fraction of training data samples as cutoff for maximum features extracted per iteration 
         self.verbosity = verbosity    # Verbosity of print statements; make positive to see detail.
+        self.verbose_frequency = verbose_frequency
+
+
         self.diagnostic_information_ = {}
         self._diagnostic_information_keys = ['train_bsrs', 'validation_bsrs', 'sorted_abs_weights', 'weight_ratios',
                                             'features', 'true_feature_count', 'cap_breached']
         self._initialize_diagnostic_dictionary(self.diagnostic_information_)
         self.diagnostic_information_['exit_reasons'] = []
-        self.scorer = balanced_accuracy_score
-        
-        if classifier == None:
-            classifier = calcom.classifiers.SSVMClassifier()
-            classifier.params['C'] = 1.
-            classifier.params['method'] = LPPrimalDualPy
-            classifier.params['use_cuda'] = False
-        
-        self.classifier = classifier
-        self.max_processes = max_processes
         super(IFR, self).__init__()
     #
 
@@ -217,7 +244,6 @@ class IFR:
         import calcom
         import numpy as np
 
-        ray.init()
         m,n = np.shape(data)
 
         if self.verbosity>0:
@@ -239,13 +265,8 @@ class IFR:
         self._initialize_results(n)
 
         n_data_partition = 0
-        processes = []
+        list_of_arguments = []
         # start processing
-        total_tasks = self.repetition * self.nfolds
-        num_running = 0
-        num_finished = 0
-
-        all_finished_processes = []
         for n_rep in range(self.repetition):
 
             partitions = calcom.utils.generate_partitions(labels, method=self.partition_method, nfolds=self.nfolds)
@@ -260,25 +281,20 @@ class IFR:
 
                 validation_data = data[validation_idx, :]
                 validation_labels = labels[validation_idx]
+                
+                arguments = [self,
+                            train_data,
+                            validation_data,
+                            train_labels,
+                            validation_labels]
 
-                if num_running == self.max_processes:
-                    finished_processes, processes = ray.wait(processes)
-                    num_running -=len(finished_processes)
-                    num_finished +=len(finished_processes)
-                    all_finished_processes.extend(finished_processes)
+                list_of_arguments.append(arguments)
+
         
-                processes.append(self.select_features_for_data_partition.remote(self, train_data, validation_data, train_labels, validation_labels))
-                num_running+=1
-        #wait for all processes to finish
-        finished_processes, processes = ray.wait(processes, num_returns=len(processes))
+        finished_processes = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
+                                        num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker)
 
-        num_running -=len(finished_processes)
-        num_finished +=len(finished_processes)
-        all_finished_processes.extend(finished_processes)
-
-        assert num_finished == total_tasks, 'All processes were not processed. %d processes are unaccounted for.' % (total_tasks - num_finished)
-        assert num_running == 0, '%d processes still running' % num_running
-        for process in all_finished_processes:
+        for process in finished_processes:
             results = ray.get(process)
             # update the feature set dictionary based on the features collected for current fold
             list_of_features_for_curr_fold = results['list_of_features']
@@ -305,7 +321,7 @@ class IFR:
         ray.shutdown()
         return self.results
 
-    @ray.remote(num_gpus=0.1)
+    @ray.remote
     def select_features_for_data_partition(self, train_data, validation_data, train_labels, validation_labels):
         _, n = train_data.shape
         list_of_features_for_curr_fold = np.array([], dtype=np.int64)
@@ -355,7 +371,7 @@ class IFR:
                 exit_reason = "exception_in_ssvm_fitting"
                 break
             
-            weight = model.results['weight']
+            weight = eval("model" + "." + self.weights_handle)
 
             #calculate BSR for training data
             pred_train = model.predict(tr_d)
