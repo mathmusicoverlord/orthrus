@@ -18,10 +18,19 @@ details on how to access this dataset. First we load the dataset::
                              "test_data/GSE73072/Data/GSE73072.ds")
     ds = load_dataset(file_path)
 
+Basic Usage
+-----------
+One can easily start plotting their without any in depth knowledge of the method. In this example we will
+plot the GSE73072 data using :py:class:`Multi-dimensional Scaling <datasci.manifold.mds.MDS>`
+
 Plotting Backend
 ------------------
 The DataSci package uses two backends for plotting, `Pyplot <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html>`_
-and `Plotly <https://plotly.com/python/>`_— each of which have their advantages. Pyplot is ideal for generating non-interative plots, such as
+and `Plotly <https://plotly.com/python/>`_. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
-or hosted on server with use of `dash <https://plotly.com/dash/>`_. We provide a few examples below.
+or hosted on server with use of `dash <https://plotly.com/dash/>`_. We provide a few examples below to demonstrate these two
+backends::
+
+    # visualize data using pyplot
+    ds.visualize(attr=)
 
