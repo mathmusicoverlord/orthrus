@@ -20,8 +20,78 @@ details on how to access this dataset. First we load the dataset::
 
 Basic Usage
 -----------
-One can easily start plotting their without any in depth knowledge of the method. In this example we will
-plot the GSE73072 data using :py:class:`Multi-dimensional Scaling <datasci.manifold.mds.MDS>`
+One can easily start plotting their data without any in-depth knowledge of the method. In this example we will
+plot the GSE73072 data in 2D using :py:class:`Multi-dimensional Scaling <datasci.manifold.mds.MDS>` and coloring
+the plot by the ``virus`` attribute::
+
+    # imports
+    from datasci.manifold.mds import MDS
+
+    # visualize the data with MDS
+    mds = MDS(n_components=2)
+    ds.visualize(embedding=mds,
+                 attr='virus'.
+                 alpha=.8)
+
+
+.. figure:: ../../../figures/gse73073_mds_viz_example_1.png
+   :width: 800px
+   :align: center
+   :alt: alternate text
+   :figclass: align-center
+
+The ``alpha`` parameter here denotes the transparency of the markers, and is useful when there
+is overlap of the colored classes.
+
+Customizing Plots
+-----------------
+
+By default the :py:meth:`visualize() <datasci.core.dataset.DataSet.visualize>`
+method uses `Pyplot <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html>`_ as a backend and the
+`seaborn <https://seaborn.pydata.org/tutorial/color_palettes.html>`_ palettes for coloring. For example we can
+specify ``palette='bright'`` and ``mrkr_list=['o']`` to use the bright seaborn color palette and circle Pyplot
+markers::
+
+    # plot with bright palette and circle markers 
+    ds.visualize(embedding=mds,
+                 palette='bright',
+                 mrkr_list=['o'],
+                 alpha=.8,
+                 attr='virus')
+
+.. figure:: ../../../figures/gse73073_mds_viz_example_2.png
+   :width: 800px
+   :align: center
+   :alt: alternate text
+   :figclass: align-center
+
+In fact any keyword arguments that can be passed to
+`matplotlib.axes.Axes.update() <https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html>`_ (``dim=2``) and
+`mpl_toolkits.mplot3d.axes3d.Axes3D.update() <https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html>`_ (``dim=3``) can also be
+passed to the :py:meth:`visualize() <datasci.core.dataset.DataSet.visualize>` method. This allows for a great deal of plot customization in the case that
+the default arguments are not sufficient. Here is an example where we restrict the samples to only ``H1N1`` and ``H3N2`` virus types, want to color by time point in hours,
+use different markers for virus types, and embed into 3D rather than 2D::
+
+    # restrict samples top H1N1 and H3N2
+    sample_ids = ds.metadata['virus'].isin(['H1N1', 'H3N2'])
+
+    # represent time_point_hr as a continuous variable
+    ds.metadata['time_point_hr'] = ds.metadata['time_point_hr'].astype(float)
+
+    # visualize the data with MDS in 3D
+    mds = MDS(n_components=3)
+    ds.visualize(embedding=mds,
+                 sample_ids=sample_ids,
+                 attr='time_point_hr',
+                 cross_attr='virus',
+                 palette="magma",
+                 subtitle='')
+
+.. figure:: ../../../figures/gse73073_mds_viz_example_3.png
+   :width: 800px
+   :align: center
+   :alt: alternate text
+   :figclass: align-center
 
 Plotting Backend
 ------------------

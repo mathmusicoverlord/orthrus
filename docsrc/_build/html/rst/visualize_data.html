@@ -100,6 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#customizing-plots">Customizing Plots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#plotting-backend">Plotting Backend</a></li>
 </ul>
 </li>
@@ -198,8 +199,68 @@ details on how to access this dataset. First we load the dataset:</p>
 </div>
 <div class="section" id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
-<p>One can easily start plotting their without any in depth knowledge of the method. In this example we will
-plot the GSE73072 data using <a class="reference internal" href="datasci.manifold.html#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a></p>
+<p>One can easily start plotting their data without any in-depth knowledge of the method. In this example we will
+plot the GSE73072 data in 2D using <a class="reference internal" href="datasci.manifold.html#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a> and coloring
+the plot by the <code class="docutils literal notranslate"><span class="pre">virus</span></code> attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">from</span> <span class="nn">datasci.manifold.mds</span> <span class="kn">import</span> <span class="n">MDS</span>
+
+<span class="c1"># visualize the data with MDS</span>
+<span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
+             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="o">.</span>
+             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../figures/gse73073_mds_viz_example_1.png"><img alt="alternate text" src="../figures/gse73073_mds_viz_example_1.png" style="width: 800px;" /></a>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">alpha</span></code> parameter here denotes the transparency of the markers, and is useful when there
+is overlap of the colored classes.</p>
+</div>
+<div class="section" id="customizing-plots">
+<h2>Customizing Plots<a class="headerlink" href="#customizing-plots" title="Permalink to this headline">¶</a></h2>
+<p>By default the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a>
+method uses <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a> as a backend and the
+<a class="reference external" href="https://seaborn.pydata.org/tutorial/color_palettes.html">seaborn</a> palettes for coloring. For example we can
+specify <code class="docutils literal notranslate"><span class="pre">palette='bright'</span></code> and <code class="docutils literal notranslate"><span class="pre">mrkr_list=['o']</span></code> to use the bright seaborn color palette and circle Pyplot
+markers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot with bright palette and circle markers</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
+             <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bright&#39;</span><span class="p">,</span>
+             <span class="n">mrkr_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">],</span>
+             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../figures/gse73073_mds_viz_example_2.png"><img alt="alternate text" src="../figures/gse73073_mds_viz_example_2.png" style="width: 800px;" /></a>
+</div>
+<p>In fact any keyword arguments that can be passed to
+<a class="reference external" href="https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html">matplotlib.axes.Axes.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=2</span></code>) and
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=3</span></code>) can also be
+passed to the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
+the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types, want to color by time point in hours,
+use different markers for virus types, and embed into 3D rather than 2D:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># restrict samples top H1N1 and H3N2</span>
+<span class="n">sample_ids</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;virus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;H1N1&#39;</span><span class="p">,</span> <span class="s1">&#39;H3N2&#39;</span><span class="p">])</span>
+
+<span class="c1"># represent time_point_hr as a continuous variable</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="c1"># visualize the data with MDS in 3D</span>
+<span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
+             <span class="n">sample_ids</span><span class="o">=</span><span class="n">sample_ids</span><span class="p">,</span>
+             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;time_point_hr&#39;</span><span class="p">,</span>
+             <span class="n">cross_attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>
+             <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">,</span>
+             <span class="n">subtitle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../figures/gse73073_mds_viz_example_3.png"><img alt="alternate text" src="../figures/gse73073_mds_viz_example_3.png" style="width: 800px;" /></a>
+</div>
 </div>
 <div class="section" id="plotting-backend">
 <h2>Plotting Backend<a class="headerlink" href="#plotting-backend" title="Permalink to this headline">¶</a></h2>
