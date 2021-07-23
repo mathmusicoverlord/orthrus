@@ -120,5 +120,4 @@ backend::
                  attr='virus',
                  save_name='gse73073_mds_viz_example_4')
 
-.. raw:: html
-    <iframe src="gse73073_mds_viz_example_4.html" height="345px" width="100%"></iframe>
+Click to view output: `gse73073_mds_viz_example_4.html <../../../figures/gse73073_mds_viz_example_4.html>`_
