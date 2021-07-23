@@ -84,9 +84,14 @@ class MDS(BaseEstimator):
         m, n = X.shape
         if m != n:
             print("Input must be a square symmetric matrix representing distances, using Euclidean distance instead.")
-            D = X[None, :, :] - X[:, None, :]
-            D = tc.square(D)
-            X = tc.sqrt(tc.sum(D, dim=2)).reshape((m, m))
+            #D = X[None, :, :] - X[:, None, :]
+            #D = tc.square(D)
+            #X = tc.sqrt(tc.sum(D, dim=2)).reshape((m, m))
+            D = tc.nn.functional.pdist(X, p=2)
+            triu_indices = tc.triu_indices(row=m, col=m, offset=1)
+            X = tc.zeros([m, m], device=device, dtype=tc.float)
+            X[triu_indices[0], triu_indices[1]] = D
+            X = X + X.transpose(0, 1)
 
         # compute square distances
         X = tc.pow(X, 2)
