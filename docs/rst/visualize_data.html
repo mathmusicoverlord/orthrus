@@ -102,7 +102,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#customizing-plots">Customizing Plots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#saving-plots">Saving Plots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#plotting-backend">Plotting Backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-plotly">Using Plotly</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Dash</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -270,8 +273,8 @@ use different markers for virus types via the <code class="docutils literal notr
 plots will save to the <code class="docutils literal notranslate"><span class="pre">DataSet.path</span></code> directory and with the name <code class="docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">attr</span></code> _  <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> _ <code class="docutils literal notranslate"><span class="pre">dim</span></code>
 with the appropriate extension. Alternatively one can specify the keyword argument <code class="docutils literal notranslate"><span class="pre">save_name</span></code> without an extension, e.g., <code class="docutils literal notranslate"><span class="pre">save_name=gse73072_mds_dim3</span></code>.</p>
 </div>
-<div class="section" id="plotting-backend">
-<h2>Plotting Backend<a class="headerlink" href="#plotting-backend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-plotly">
+<h2>Using Plotly<a class="headerlink" href="#using-plotly" title="Permalink to this headline">¶</a></h2>
 <p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
 and <a class="reference external" href="https://plotly.com/python/">Plotly</a>. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
@@ -291,6 +294,8 @@ backend. Here is one where export the interative plotly figure to an <code class
 </pre></div>
 </div>
 <p>Click to view output: <a class="reference external" href="../figures/gse73073_mds_viz_example_4.html">gse73073_mds_viz_example_4.html</a>.</p>
+<div class="section" id="id2">
+<h3>Dash<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>Just like with Pyplot the user can
 specify any keyword arguments used in Plotly’s <a class="reference external" href="https://plotly.com/python-api-reference/generated/plotly.express.scatter">scatter</a> function
 to customize their plots further. In addition the user can also host their figures on a server, by specify the keyword argument <code class="docutils literal notranslate"><span class="pre">use_dash=True</span></code>,
@@ -304,7 +309,16 @@ Here is an example where we host our figure on <code class="docutils literal not
 <span class="gp">... </span>            <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">port</span><span class="o">=</span><span class="s1">&#39;5000&#39;</span><span class="p">)</span>
+
+<span class="go">Dash is running on http://127.0.0.1:5000/</span>
+<span class="go">* Serving Flask app &quot;datasci.core.helper&quot; (lazy loading)</span>
+<span class="go">* Environment: production</span>
+<span class="go">  WARNING: This is a development server. Do not use it in a production deployment.</span>
+<span class="go">  Use a production WSGI server instead.</span>
+<span class="go">* Debug mode: off</span>
+<span class="go">* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)</span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>
