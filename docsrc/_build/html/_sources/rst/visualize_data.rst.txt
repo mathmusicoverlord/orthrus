@@ -120,4 +120,4 @@ backend::
                  attr='virus',
                  save_name='gse73073_mds_viz_example_4')
 
-Click to view output: `gse73073_mds_viz_example_4.html <../../../figures/gse73073_mds_viz_example_4.html>`_
+Click to view output: `gse73073_mds_viz_example_4.html <./figures/gse73073_mds_viz_example_4.html>`_
