@@ -101,6 +101,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#customizing-plots">Customizing Plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saving-plots">Saving Plots</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#plotting-backend">Plotting Backend</a></li>
 </ul>
 </li>
@@ -240,9 +241,9 @@ markers:</p>
 <a class="reference external" href="https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html">matplotlib.axes.Axes.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=2</span></code>) and
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=3</span></code>) can also be
 passed to the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
-the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types, want to color by time point in hours,
-use different markers for virus types, and embed into 3D rather than 2D:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># restrict samples top H1N1 and H3N2</span>
+the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types via the keyword argument <code class="docutils literal notranslate"><span class="pre">sample_ids</span></code>, color the samples by time point in hours,
+use different markers for virus types via the <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> argument, and embed into 3D rather than 2D via the <code class="docutils literal notranslate"><span class="pre">dim</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># restrict the samples to H1N1 and H3N2</span>
 <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;virus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;H1N1&#39;</span><span class="p">,</span> <span class="s1">&#39;H3N2&#39;</span><span class="p">])</span>
 
 <span class="c1"># represent time_point_hr as a continuous variable</span>
@@ -261,16 +262,31 @@ use different markers for virus types, and embed into 3D rather than 2D:</p>
 <div class="align-center figure">
 <a class="reference internal image-reference" href="../figures/gse73073_mds_viz_example_3.png"><img alt="alternate text" src="../figures/gse73073_mds_viz_example_3.png" style="width: 800px;" /></a>
 </div>
+<p>Similarly we can restrict the features to use in the visualization by specifying the <code class="docutils literal notranslate"><span class="pre">feature_ids</span></code> keyword argument.</p>
+</div>
+<div class="section" id="saving-plots">
+<h2>Saving Plots<a class="headerlink" href="#saving-plots" title="Permalink to this headline">¶</a></h2>
+<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. By default
+plots will save to the <code class="docutils literal notranslate"><span class="pre">DataSet.path</span></code> directory and with the name <code class="docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">attr</span></code> _  <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> _ <code class="docutils literal notranslate"><span class="pre">dim</span></code>
+with the appropriate extension. Alternatively one can specify the keyword argument <code class="docutils literal notranslate"><span class="pre">save_name</span></code> without an extension, e.g., <code class="docutils literal notranslate"><span class="pre">save_name=gse73072_mds_dim3</span></code>.</p>
 </div>
 <div class="section" id="plotting-backend">
 <h2>Plotting Backend<a class="headerlink" href="#plotting-backend" title="Permalink to this headline">¶</a></h2>
 <p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
 and <a class="reference external" href="https://plotly.com/python/">Plotly</a>. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
-or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below to demonstrate these two
-backends:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize data using pyplot</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="p">)</span>
+or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below to demonstrate the Plotly
+backend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set figure directory</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+ <span class="s2">&quot;docsrc/_build/html/figures&quot;</span><span class="p">)</span>
+
+<span class="c1"># visualize data using plotly</span>
+<span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
+             <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;plotly&#39;</span><span class="p">,</span>
+             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">,</span>
+             <span class="n">save_name</span><span class="o">=</span><span class="s1">&#39;gse73073_mds_viz_example_4&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
