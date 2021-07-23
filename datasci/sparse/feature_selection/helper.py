@@ -12,11 +12,12 @@ def reduce_feature_set_size(ds,
                             ranking_method_args: dict,
                             partitioner=None, 
                             test_sample_ids=None,
-                            start = 5, 
-                            end = 100, 
-                            jump = 5, 
-                            max_processes=10,
-                            verbose_frequency=10,
+                            start : int = 5, 
+                            end : int = 100, 
+                            jump : int = 5, 
+                            verbose_frequency : int=10, 
+                            num_cpus_per_worker : float=1., 
+                            num_gpus_per_worker : float=0.,
                             **kwargs):
     """
     This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
@@ -78,11 +79,14 @@ def reduce_feature_set_size(ds,
         
         jump (int) : gap between each sampled point in the grid (default: 5)
 
-        max_processes (int) : this method uses ray package to create parallel process, this parameter defines the max
-            number of process to run (default: 10)
-
-        verbose_frequency (int) : this parameter controls the frequency of progress outputs to console; an output is 
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+        
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
+
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
     
@@ -100,14 +104,14 @@ def reduce_feature_set_size(ds,
             
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
-                verbosity = 2,
-                nfolds = 4,
-                repetition = 500,
-                cutoff = .6,
-                jumpratio = 5,
-                max_iters = 100,
-                max_features_per_iter_ratio = 2
-                )
+            ...         verbosity = 2,
+            ...         nfolds = 4,
+            ...         repetition = 500,
+            ...         cutoff = .6,
+            ...         jumpratio = 5,
+            ...         max_iters = 100,
+            ...         max_features_per_iter_ratio = 2
+            ...         )
             >>> result = x.feature_select(ifr,
                         attrname,
                         selector_name='IFR',
@@ -138,8 +142,8 @@ def reduce_feature_set_size(ds,
                                     start = 5, 
                                     end = 100, 
                                     jump = 1,
-                                    max_processes=10,
-                                    verbose_frequency=10)
+                                    verbose_frequency=10,
+                                    num_cpus_per_worker=2.)
 
             >>> print(reduced_feature_results)
     """
@@ -168,7 +172,8 @@ def reduce_feature_set_size(ds,
                         kwargs]
         list_of_arguments.append(arguments)
 
-    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, max_processes=max_processes, verbose_frequency=verbose_frequency)
+    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
     results = np.zeros((len(list_of_arguments), 2))
 
     for i, process in enumerate(finished_processes):
@@ -204,13 +209,15 @@ def sliding_window_classification_on_ranked_features(ds,
                             test_sample_ids=None,
                             window_size = 50, 
                             stride = 5,
-                            verbose_limit=10,
-                            max_processes = 10,
+                            verbose_frequency : int=10, 
+                            num_cpus_per_worker : float=1., 
+                            num_gpus_per_worker : float=0.,
                             **kwargs):
     """
     This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
-    a sliding window classification experiment for various feature sets, defined by window size and stride. The result contains
-    score on various feature sets. Different training and test data may be used and the results change accordingly. The following choices are avaible:
+    classification experiments for various feature sets, which are created by a sliding window approach defined by window size and stride. 
+    The result contains score on various feature sets. Different training and test data may be used and the results change accordingly. 
+    The following choices are avaible:
     
     if test_sample_ids is None and partitioner is None:
         
@@ -260,15 +267,18 @@ def sliding_window_classification_on_ranked_features(ds,
             ['human1', 'human3'], etc..., can also be pandas series or numpy array. (default = None, check the method 
             description above to see how this affects the results)
         
-        window_size = 50, 
+        window_size (int) : The number of features to contain in each window. Default is 50. 
 
-        stride = 1,
+        stride (int) : Controls the stride of the windows. Default is 1.
 
-        max_processes (int) : this method uses ray package to create parallel process, this parameter defines the max
-            number of process to run (default: 10)
-
-        verbose_frequency (int) : this parameter controls the frequency of progress outputs to console; an output is 
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+        
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
+
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
         (ndarray of shape (num_windows, 2)):  The first column contains the starting position of the window,
@@ -319,7 +329,7 @@ def sliding_window_classification_on_ranked_features(ds,
                                     window_size = 50, 
                                     stride = 5,
                                     verbose_limit=10,
-                                    max_processes = 10)
+                                    num_cpus_per_worker=2.0)
 
             >>> print(sliding_window_results)
     """
@@ -345,7 +355,8 @@ def sliding_window_classification_on_ranked_features(ds,
                         kwargs]
         list_of_arguments.append(arguments)
 
-    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, max_processes=max_processes, verbose_limit=verbose_limit)
+    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
     results = np.zeros((len(list_of_arguments), 2))
     for i, process in enumerate(finished_processes):
         score, _ , min_feature_index = ray.get(process)
@@ -619,3 +630,61 @@ def rank_features_within_attribute_class(features_df,
             
         features_df.loc[features, new_feature_attribute_name] = mean_of_abs_weights
 
+def get_batch_correction_matric_for_ranked_features(ds, 
+                            features_dataframe, 
+                            attr:str,
+                            ranking_method_handle,
+                            ranking_method_args: dict,
+                            batch_correction_metric_handle,
+                            batch_correction_metric_args: dict,
+                            sample_ids: None,
+                            verbose_frequency : int=10, 
+                            num_cpus_per_worker : float=1., 
+                            num_gpus_per_worker : float=0.,):
+    
+    ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
+
+    if sample_ids is None:
+        sample_ids = ds.data.index
+
+    n_attrs = np.arange(1, ranked_features.shape[0])
+    features = ds.vardata.index.values
+    print('Starting batch correction metric computation. There are %d processes to execute.'%n_attrs.shape[0])
+    list_of_arguments = []
+    #for each subset of top features
+    for i, n  in enumerate(n_attrs):
+        feature_ids = np.delete(features, ranked_features[:n])
+        arguments = [ds,
+                    sample_ids,
+                    feature_ids,
+                    attr, 
+                    batch_correction_metric_args]
+        list_of_arguments.append(arguments)
+
+    finished_processes = batch_jobs_(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
+    results = np.zeros((len(list_of_arguments), 2))
+    n_features = features.shape[0]
+    for i, process in enumerate(finished_processes):
+        n, _ , _, rejection_rate = ray.get(process)
+        results[i, 0] = n_features - n
+        results[i, 1] = rejection_rate
+    
+    ray.shutdown()
+    
+    #sort results based on the first column: number of ranked features
+    results = results[results[:,0].argsort()]
+
+    return results
+
+def  get_top_95_features(file_path, attr, cutoff_fraction=0.05):
+    import datasci.core.helper as helper
+    result = helper.load_object(file_path)
+    ranking_method_args = {'attr': attr, 'order': 'desc'}
+    ranked_feature_ids = rank_features_by_attribute(result['f_results'], ranking_method_args)
+
+    features = result['f_results'].loc[ranked_feature_ids]
+    max_val = features[attr].max()
+    cutoff = max_val * cutoff_fraction
+    features_c = features.loc[features[attr] > cutoff]
+    return features_c
