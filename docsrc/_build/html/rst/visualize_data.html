@@ -98,7 +98,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualizing Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plotting-backend">Plotting Backend</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
@@ -175,6 +178,30 @@
             
   <div class="section" id="visualizing-data">
 <h1>Visualizing Data<a class="headerlink" href="#visualizing-data" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will go over some of the finer points of using the
+<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method
+of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. For all
+of these examples we will use the GSE73072 dataset, as it contains enough
+complexity to demostrate the utitlity of the method, see the
+<a class="reference external" href="what_is_the_dataset.html">What is the DataSet class?</a> tutorial for
+details on how to access this dataset. First we load the dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="c1"># load the data</span>
+<span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="plotting-backend">
+<h2>Plotting Backend<a class="headerlink" href="#plotting-backend" title="Permalink to this headline">¶</a></h2>
+<p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
+and <a class="reference external" href="https://plotly.com/python/">Plotly</a>— each of which have their advantages. Pyplot is ideal for generating non-interative plots, such as
+figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
+or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below.</p>
+</div>
 </div>
 
 
