@@ -514,7 +514,7 @@ def scatter_plotly(df: pd.DataFrame,
                          color=grp_colors,
                          labels={str(col0): xlabel,
                                  str(col1): ylabel},
-                         **kwargs)
+                         **{k: kwargs[k] for k in plotly.express.scatter.__code__.co_varnames if k in kwargs})
 
     elif dim == 3:
         col2 = df.columns[2]
@@ -527,7 +527,7 @@ def scatter_plotly(df: pd.DataFrame,
                             labels={str(col0): xlabel,
                                     str(col1): ylabel,
                                     str(col2): zlabel},
-                            **kwargs)
+                            **{k: kwargs[k] for k in plotly.express.scatter.__code__.co_varnames if k in kwargs})
     else:
         raise ValueError("Embedding dimension must be 2 or 3!")
 
