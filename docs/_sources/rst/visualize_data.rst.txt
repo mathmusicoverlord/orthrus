@@ -121,4 +121,4 @@ backend::
                  save_name='gse73073_mds_viz_example_4')
 
 .. raw:: html
-   :file: ../../../figures/gse73073_mds_viz_example_4.html
+    <iframe src="gse73073_mds_viz_example_4.html" height="345px" width="100%"></iframe>
