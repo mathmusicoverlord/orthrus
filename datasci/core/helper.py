@@ -901,7 +901,11 @@ def save_object(object, file_path):
         pickle.dump(object, file=f)
 
 
-def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_frequency=10):
+def batch_jobs_(function_handle, 
+                list_of_arguments, 
+                verbose_frequency : int=10, 
+                num_cpus_per_worker : float=1., 
+                num_gpus_per_worker : float=0.):
 
     """
     This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
@@ -912,11 +916,14 @@ def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_fr
 
         list of arguments (list of list): It is a list of argument list (see example below).
 
-        max_processes (int) : Defines the maximum number of jobs to run in parallel. It is intended to be used
-            in resource constrained situation; lower the number of process if you are getting errors/exceptions
-
-        verbose_frequency (int) : This parameter controls the frequency of progress outputs to console; an output is
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+        
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
+
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
         a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
@@ -938,18 +945,43 @@ def batch_jobs_(function_handle, list_of_arguments, max_processes=10, verbose_fr
         ...     b = np.random.randint(200)
         ...     args = [a, b]
         ...     list_of_args.append(args)
-        >>> process_refs = batch_jobs_(job_handle, list_of_args, max_processes=50, verbose_frequency=10)
+        >>> process_refs = batch_jobs_(job_handle, list_of_args, verbose_frequency=10, num_cpus_per_worker=0.5)
         >>> for process in process_refs:
         ...     print(ray.get(process))
+        >>> ray.shutdown()
     """
     import ray
     ray.init(ignore_reinit_error=True)
+
+    #calculate the max number of processes to run at one time
+    import multiprocessing
+    from math import floor
+    num_cpus = ray.available_resources()['CPU']
+    max_cpu_workers = floor(num_cpus / num_cpus_per_worker)
+
+    try:
+        num_gpus = ray.available_resources()['GPU']
+    except: 
+        num_gpus = 0
+
+    if num_gpus_per_worker!=0:
+        max_gpu_workers = floor(num_gpus / num_gpus_per_worker)
+    else:
+        max_gpu_workers = np.inf
+    
+    max_processes = max_cpu_workers if max_cpu_workers < max_gpu_workers else max_gpu_workers
     total_processes = len(list_of_arguments)
     num_running=0
     num_finished=0
     processes = []
     all_finished_processes = []
     i = 1
+
+    #change resource requirements of the worker
+    #function_handle.options(num_cpus=num_cpus_per_worker, num_gpus=num_gpus_per_worker)
+    #options call is not working, setting them manually
+    function_handle._num_cpus = num_cpus_per_worker
+    function_handle._num_gpus = num_gpus_per_worker
     for arguments in list_of_arguments:
         if num_finished >= i * verbose_frequency:
             print('%d of %d processes finished'%(num_finished, total_processes))
