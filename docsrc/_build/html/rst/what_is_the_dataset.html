@@ -214,6 +214,7 @@ and the columns are labeled via the <code class="docutils literal notranslate"><
 <span class="go">..            ...          ...           ...          ...</span>
 <span class="go">145           6.7          3.0           5.2          2.3</span>
 <span class="go">146           6.3          2.5           5.0          1.9</span>
+
 <span class="go">147           6.5          3.0           5.2          2.0</span>
 
 <span class="go">[150 rows x 4 columns]</span>
@@ -268,7 +269,7 @@ descriptive data for each feature, e.g., location on a chromosome of a gene (gen
 <p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> instance.
 Note: In order to run the code above you must first <code class="docutils literal notranslate"><span class="pre">export</span></code> your DataSci repository path, e.g., <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DATASCI_PATH=/path/to/DataSci/</span></code>, and run the script
 <a class="reference external" href="../../../../test_data/GSE73072/Scripts/generate_dataset.py">generate_dataset.py</a> located in the <a class="reference external" href="../../../../test_data/GSE73072">GSE73072 project directory</a>.
-If you are a part of the CSU team and want access to the full GSE73072 <code class="docutils literal notranslate"><span class="pre">DataSet</span></code>, roughly ~20000 genes, download the DataSet object by accessing <code class="docutils literal notranslate"><span class="pre">/data4/kehoe/workspace/datasets/GSE73072.ds</span></code>
+If you are a part of the CSU team and want access to the full GSE73072 <code class="docutils literal notranslate"><span class="pre">DataSet</span></code>, roughly 20000 genes, download the DataSet object by accessing <code class="docutils literal notranslate"><span class="pre">/data4/kehoe/workspace/datasets/GSE73072.ds</span></code>
 on katrina’s racecar, or download it by accessing <a class="reference external" href="https://drive.google.com/drive/folders/1NcJ3-W2XF0rwsI4L_GA3mvfCL8Dg3NT8?usp=sharing">this folder</a> on google drive.</p>
 </div>
 <div class="section" id="basic-usage">
@@ -302,7 +303,7 @@ data matrix, and plot generation. See the example below:</p>
 </pre></div>
 </div>
 <div class="align-center figure" id="id1">
-<a class="reference internal image-reference" href="figures/iris_viz_example.png"><img alt="alternate text" src="figures/iris_viz_example.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../figures/iris_viz_example.png"><img alt="alternate text" src="../figures/iris_viz_example.png" style="width: 800px;" /></a>
 <p class="caption"><span class="caption-text">2D PCA embedding of the Iris dataset</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
 <p>Visit the <a class="reference external" href="visualize_data.html">Visualizing Data</a> tutorial for more examples related to data visualization.</p>
@@ -312,7 +313,10 @@ data matrix, and plot generation. See the example below:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="create_dataset.html">Creating a DataSet</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualize_data.html">Visualizing Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualize_data.html">Visualizing Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="visualize_data.html#plotting-backend">Plotting Backend</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
