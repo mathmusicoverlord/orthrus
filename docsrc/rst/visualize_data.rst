@@ -69,10 +69,10 @@ In fact any keyword arguments that can be passed to
 `matplotlib.axes.Axes.update() <https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html>`_ (``dim=2``) and
 `mpl_toolkits.mplot3d.axes3d.Axes3D.update() <https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html>`_ (``dim=3``) can also be
 passed to the :py:meth:`visualize() <datasci.core.dataset.DataSet.visualize>` method. This allows for a great deal of plot customization in the case that
-the default arguments are not sufficient. Here is an example where we restrict the samples to only ``H1N1`` and ``H3N2`` virus types, want to color by time point in hours,
-use different markers for virus types, and embed into 3D rather than 2D::
+the default arguments are not sufficient. Here is an example where we restrict the samples to only ``H1N1`` and ``H3N2`` virus types via the keyword argument ``sample_ids``, color the samples by time point in hours,
+use different markers for virus types via the ``cross_attr`` argument, and embed into 3D rather than 2D via the ``dim`` argument::
 
-    # restrict samples top H1N1 and H3N2
+    # restrict the samples to H1N1 and H3N2
     sample_ids = ds.metadata['virus'].isin(['H1N1', 'H3N2'])
 
     # represent time_point_hr as a continuous variable
@@ -93,14 +93,32 @@ use different markers for virus types, and embed into 3D rather than 2D::
    :alt: alternate text
    :figclass: align-center
 
+Similarly we can restrict the features to use in the visualization by specifying the ``feature_ids`` keyword argument.
+
+Saving Plots
+------------
+In order to save a plot, one can specify ``save=True`` in the :py:meth:`visualize() <datasci.core.dataset.DataSet.visualize>` method. By default
+plots will save to the ``DataSet.path`` directory and with the name ``DataSet.name`` _ ``viz_name`` _ ``DataSet.imputation_method`` _ ``DataSet.normalization_method`` _ ``attr`` _  ``cross_attr`` _ ``dim``
+with the appropriate extension. Alternatively one can specify the keyword argument ``save_name`` without an extension, e.g., ``save_name=gse73072_mds_dim3``.
+
 Plotting Backend
 ------------------
 The DataSci package uses two backends for plotting, `Pyplot <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html>`_
 and `Plotly <https://plotly.com/python/>`_. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
-or hosted on server with use of `dash <https://plotly.com/dash/>`_. We provide a few examples below to demonstrate these two
-backends::
+or hosted on server with use of `dash <https://plotly.com/dash/>`_. We provide a few examples below to demonstrate the Plotly 
+backend::
 
-    # visualize data using pyplot
-    ds.visualize(attr=)
+    # set figure directory
+    ds.path = os.path.join(os.environ["DATASCI_PATH"],
+     "docsrc/_build/html/figures")
 
+    # visualize data using plotly
+    mds = MDS(n_components=2)
+    ds.visualize(embedding=mds,
+                 backend='plotly',
+                 attr='virus',
+                 save_name='gse73073_mds_viz_example_4')
+
+.. raw:: html
+   :file: ../../../figures/gse73073_mds_viz_example_4.html
