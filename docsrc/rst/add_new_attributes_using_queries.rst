@@ -50,7 +50,7 @@ Finally, we can use this new attribute for visualization using MDS.
     >>> sample_ids = ds.metadata[new_attribute_name].isin('controls', 'shedders')
     >>> ds.visualize(embedding=mds, attr=new_attribute_name, sample_ids=sample_ids)
 
-.. figure:: ../../figures/add_new_queries_gse73072_visualization.png
+.. figure:: ../../../figures/add_new_queries_gse73072_visualization.png
     :width: 800px
     :align: center
     :alt: 2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)
