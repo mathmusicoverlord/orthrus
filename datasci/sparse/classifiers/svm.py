@@ -277,7 +277,8 @@ class L1SVM(BaseEstimator, ClassifierMixin):
         self.solver_ = LPNewton(verbosity=verbosity,
                                 delta=delta,
                                 imax=imax,
-                                tol=tol)
+                                tol=tol,
+                                device=device)
 
         # set attributes
         self.classes_ = None
