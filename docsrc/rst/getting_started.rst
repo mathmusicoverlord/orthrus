@@ -2,7 +2,7 @@ Getting Started
 ===============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    what_is_the_dataset
    create_dataset

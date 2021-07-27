@@ -32,6 +32,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
@@ -185,7 +186,7 @@
 <p>This module contains classes implementing manifold learning algorithms.</p>
 <dl class="py class">
 <dt id="datasci.manifold.mds.MDS">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">datasci.manifold.mds.</span></code><code class="sig-name descname"><span class="pre">MDS</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datasci.manifold.mds.</code><code class="sig-name descname">MDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prev_embedding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>This class compute the Multidimensional Scaling (MDS) embedding of an <span class="math notranslate nohighlight">\(\text{n_samples}\times\text{n_samples}\)</span>
 distance matrix <span class="math notranslate nohighlight">\(X\)</span> for <code class="docutils literal notranslate"><span class="pre">n_components</span></code>. So that the data is embedding into Euclidean space with dimension
@@ -214,7 +215,7 @@ between frames.</p></li>
 </dl>
 <dl class="py attribute">
 <dt id="datasci.manifold.mds.MDS.eigenvalues_">
-<code class="sig-name descname"><span class="pre">eigenvalues_</span></code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvalues_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eigenvalues_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvalues_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The eigenvalues corresponding to the MDS embedding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -225,7 +226,7 @@ between frames.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.manifold.mds.MDS.eigenvectors_">
-<code class="sig-name descname"><span class="pre">eigenvectors_</span></code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvectors_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eigenvectors_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvectors_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The eigenvectors corresponding to the MDS embedding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -236,7 +237,7 @@ between frames.</p></li>
 
 <dl class="py attribute">
 <dt id="datasci.manifold.mds.MDS.embedding_">
-<code class="sig-name descname"><span class="pre">embedding_</span></code><a class="headerlink" href="#datasci.manifold.mds.MDS.embedding_" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">embedding_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.embedding_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The embedding given by MDS with n_components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -247,7 +248,7 @@ between frames.</p></li>
 
 <dl class="py method">
 <dt id="datasci.manifold.mds.MDS.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the position of the points in the embedding space. Stores the eigenvalues and eigenvectors into
 <a class="reference internal" href="#datasci.manifold.mds.MDS.eigenvalues_" title="datasci.manifold.mds.MDS.eigenvalues_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvalues_</span></code></a> and <a class="reference internal" href="#datasci.manifold.mds.MDS.eigenvectors_" title="datasci.manifold.mds.MDS.eigenvectors_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvectors_</span></code></a> respectively. Stores the embedding into
 <a class="reference internal" href="#datasci.manifold.mds.MDS.embedding_" title="datasci.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a></p>
@@ -271,7 +272,7 @@ will be used between samples.</p></li>
 
 <dl class="py method">
 <dt id="datasci.manifold.mds.MDS.fit_transform">
-<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits the MDS model to the data via <a class="reference internal" href="#datasci.manifold.mds.MDS.fit" title="datasci.manifold.mds.MDS.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MDS.fit()</span></code></a>, returns the embedding stored in <a class="reference internal" href="#datasci.manifold.mds.MDS.embedding_" title="datasci.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
