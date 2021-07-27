@@ -50,8 +50,8 @@ PARTITIONER_NAME = '5-fold'
 # set classifier
 CLASSIFIER = L1SVM(device='any', kernel_args=dict(metric='rbf', gamma=.0625))
 CLASSIFIER_NAME = 'L1SVM_RBF'
-CLASSIFIER_FWEIGHTS_HANDLE=None,
-CLASSIFIER_SWEIGHTS_HANDLE='w_',
+CLASSIFIER_FWEIGHTS_HANDLE = None
+CLASSIFIER_SWEIGHTS_HANDLE = 'w_'
 
 
 ## specific script args
