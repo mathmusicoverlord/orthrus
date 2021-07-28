@@ -96,7 +96,7 @@ if __name__ == "__main__":
     run_params = signature(script.run).parameters.keys()
 
     # ray initiate ray
-    ray.init(local_mode=True
+    ray.init(#local_mode=True
              )
 
     # generate all possible combination of arguments for script
