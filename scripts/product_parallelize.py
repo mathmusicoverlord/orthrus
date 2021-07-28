@@ -1,5 +1,5 @@
 """
-This script takes a generic script and parallelizes by taking the cartesian product of experimental parameter choices.
+This script takes a generic script and parallelizes by taking the cartesian product of experimental parameter options.
 This ideal in the case of a combinatorial experiment, e.g.,
 
 param1 = iter(['a', 'b', 'c'])
@@ -8,17 +8,9 @@ param2 = iter([1, 2])
 exp1: (param1='a', param2=1), exp2:  (param1='a', param2=2), exp3: (param1='b', param2=1), etc...
 
 In order to paralellize over a parameter the parameter must be an iterator, i.e., it has a __next__ method, this is not
-to be confused with an Iterable which has the potential to become an iterator.
+to be confused with an Iterable which has the potential to become and iterator.
 
-An example of running product_parallelize.py is as follows:
 
-python product_parallelize.py classify.py --exp_params /hdd/DataSci/test_data/Iris/Experiments/classify_setosa_versicolor_svm/classify_setosa_versicolor_svm_params.py
-
-The results will be saved, per the "save" function provided in your script, for each combination of parameters. The standard
-save name will be appended with an integer indicating the parallel run, e.g., save_name_0.blah, save_name_1.blah, etc...
-
-A lookup table with the parameter values is saved as a .csv in the experiments results directory,
-row i corresponds to the save_name_i.blah.
 """
 
 # imports
@@ -33,7 +25,6 @@ from copy import deepcopy
 from datasci.core.helper import batch_jobs_
 from datasci.core.helper import module_from_path
 import csv
-
 
 # functions
 def generate_iterable_for_ray(script):
@@ -51,8 +42,7 @@ def generate_iterable_for_ray(script):
             value_remote = [ray.put(value)]
             value_no_remote = [value]
         else:
-            value_no_remote = deepcopy(value)
-            value_remote = deepcopy(value)
+            value_remote = value_no_remote = value
 
         options.append(value_remote)
         options_no_remote.append(value_no_remote)
@@ -61,40 +51,34 @@ def generate_iterable_for_ray(script):
     combos = itertools.product(*options)
     combos_no_remote = itertools.product(*options_no_remote)
 
-    return [i for i in combos], [i for i in combos_no_remote]
+    return [i for i in combos], [i for i in combos_no_remote],
+
+
+def compute_measure_futures(futures):
+    print("Running parallel scripts...")
+    bar = tqdm(total=len(futures))
+    was_ready = []
+    total = 0
+    # get futures
+    while True:
+        ready, not_ready = ray.wait(futures)
+        delta_ready = list(set(ready).difference(set(was_ready)))
+        if len(delta_ready) > 0:
+            bar.update(len(delta_ready))
+            total = total + len(delta_ready)
+        if total == bar.total:
+            break
+        was_ready = ready
+    bar.close()
+
+    return
 
 
 # main body
 if __name__ == "__main__":
 
-    # imports for arguments
-    import argparse
-    import os
-
-    # command line arguments
-    parser = argparse.ArgumentParser("product-parallelize")
-
-    parser.add_argument('--sequential_mode',
-                        dest='sequential_mode',
-                        default=False,
-                        action='store_true',
-                        help='Flag indicating whether or not to run the scripts in parallel or sequentially.')
-
-    parser.add_argument('--cpus_per_worker',
-                        type=int,
-                        default=1,
-                        help='Number of CPU cores to be assigned to each worker.')
-
-    parser.add_argument('--gpus_per_worker',
-                        type=int,
-                        default=0,
-                        help='Number of GPUS to be assigned to each worker.')
-
-    args = parser.parse_known_args()
-
     # trick the python script to use the correct arguments
-    product_args = args[0]
-    sys.argv = args[1]
+    sys.argv = sys.argv[1:]
 
     # grab the script with its parameters
     script = module_from_path("script", sys.argv[0])
@@ -104,7 +88,8 @@ if __name__ == "__main__":
     run_params = signature(script.run).parameters.keys()
 
     # ray initiate ray
-    ray.init(local_mode=product_args.sequential_mode)
+    ray.init(local_mode=True
+             )
 
     # generate all possible combination of arguments for script
     combos, combos_no_remote = generate_iterable_for_ray(script)
@@ -131,9 +116,10 @@ if __name__ == "__main__":
     run_args = [[deepcopy(sys.argv), script_path, *option] for option in combos]
     futures = batch_jobs_(run,
                           run_args,
-                          num_cpus_per_worker=product_args.cpus_per_worker,
-                          num_gpus_per_worker=product_args.gpus_per_worker,
                           )
+
+    # compute the options
+    #compute_measure_futures(futures)
 
     # store the results
     results = ray.get(futures)
