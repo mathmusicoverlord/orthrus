@@ -13,8 +13,8 @@ parser = argparse.ArgumentParser("generic-classification")
 parser.add_argument('--exp_params',
                     type=str,
                     default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
-                                         'classify_setosa_versicolor_svm',
-                                         'classify_setosa_versicolor_svm_params.py'),
+                                         'setosa_versicolor_classify_species_svm',
+                                         'setosa_versicolor_classify_species_svm_params.py'),
                     help='File path of containing the experimental parameters. Default is the Iris experiment.')
 
 parser.add_argument('--score',
@@ -53,7 +53,6 @@ partitioner = script_args.get('PARTITIONER', default_val(exp_params, 'PARTITIONE
 partitioner_name = script_args.get('PARTITIONER_NAME', default_val(exp_params, 'PARTITIONER_NAME'))
 results_file_name = script_args.get('RESULTS_FILE_NAME',
                                     default_val(exp_params, 'CLASSIFICATION_RESULTS_FILE_NAME'))
-training_transform = script_args.get('TRAINING_TRANSFORM', default_val(exp_params, 'CLASSIFY_TRAINING_TRANSFORM'))
 
 # set scorer
 scorer_name = args.score
@@ -80,9 +79,7 @@ def run(ds,
         scorer_name,
         scorer_args,
         f_weights_handle,
-        s_weights_handle,
-        training_transform,
-        ):
+        s_weights_handle):
 
     # classify data
     classification_results = ds.classify(classifier=classifier,
@@ -96,9 +93,7 @@ def run(ds,
                                          scorer_name=scorer_name,
                                          scorer_args=scorer_args,
                                          f_weights_handle=f_weights_handle,
-                                         s_weights_handle=s_weights_handle,
-                                         training_transform=training_transform,
-                                         )
+                                         s_weights_handle=s_weights_handle)
 
     return classification_results
 
@@ -142,7 +137,6 @@ if __name__ == '__main__':
                                  scorer_name=pop(scorer_name),
                                  scorer_args=pop(scorer_args),
                                  f_weights_handle=pop(f_weights_handle),
-                                 s_weights_handle=pop(s_weights_handle),
-                                 training_transform=pop(training_transform))
+                                 s_weights_handle=pop(s_weights_handle))
     # save the results
     save(classification_results)
