@@ -1,5 +1,5 @@
 """
-This script takes a generic script and parallelizes by taking the cartesian product of experimental parameter options.
+This script takes a generic script and parallelizes by taking the cartesian product of experimental parameter choices.
 This ideal in the case of a combinatorial experiment, e.g.,
 
 param1 = iter(['a', 'b', 'c'])
@@ -8,9 +8,17 @@ param2 = iter([1, 2])
 exp1: (param1='a', param2=1), exp2:  (param1='a', param2=2), exp3: (param1='b', param2=1), etc...
 
 In order to paralellize over a parameter the parameter must be an iterator, i.e., it has a __next__ method, this is not
-to be confused with an Iterable which has the potential to become and iterator.
+to be confused with an Iterable which has the potential to become an iterator.
 
+An example of running product_parallelize.py is as follows:
 
+python product_parallelize.py classify.py --exp_params /hdd/DataSci/test_data/Iris/Experiments/setosa_versicolor_classify_species_svm/setosa_versicolor_classify_species_svm_params.py
+
+The results will be saved, per the "save" function provided in your script, for each combination of parameters. The standard
+save name will be appended with an integer indicating the parallel run, e.g., save_name_0.blah, save_name_1.blah, etc...
+
+A lookup table with the parameter values is saved as a .csv in the experiments results directory,
+row i corresponds to the save_name_i.blah.
 """
 
 # imports
