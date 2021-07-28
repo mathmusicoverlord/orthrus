@@ -903,7 +903,7 @@ def save_object(object, file_path):
 
 def batch_jobs_(function_handle, 
                 list_of_arguments, 
-                verbose_frequency : int=10, 
+                verbose_frequency : int=10,
                 num_cpus_per_worker : float=1., 
                 num_gpus_per_worker : float=0.):
 
@@ -1006,3 +1006,23 @@ def batch_jobs_(function_handle,
                                         % (total_processes - num_finished)
     assert num_running == 0, '%d processes still running' % num_running
     return all_finished_processes
+
+
+def pop_first_element(x):
+    """
+    Pops and returns the first element from an iterator.
+    If the object is not an iterator the object itself is returned.
+
+    Args:
+        x (object): object to be popped.
+
+    Returns:
+        object: An element in x or x itself.
+    """
+
+    try:
+        x = x.__next__()
+    except:
+        pass
+
+    return x
