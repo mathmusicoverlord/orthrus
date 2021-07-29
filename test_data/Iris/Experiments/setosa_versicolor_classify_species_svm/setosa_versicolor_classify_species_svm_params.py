@@ -10,7 +10,7 @@ from datasci.core.dataset import load_dataset
 from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
 from datasci.sparse.classifiers.svm import L1SVM
 from calcom.solvers import	LPPrimalDualPy
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import KFold
 from ray import tune
 import numpy as np
@@ -43,18 +43,21 @@ FEATURE_IDS = None
 # classification attribute
 CLASS_ATTR = 'species'
 
-# set partitioner
-PARTITIONER = KFold(n_splits=5, shuffle=True, random_state=0)
-PARTITIONER_NAME = '5-fold'
+## specific script args
+
+# classify.py args
+CLASSIFY_ARGS = dict(PARTITIONER=iter([KFold(n_splits=5, shuffle=True, random_state=0),
+                                       ShuffleSplit(n_splits=1, train_size=.8)]
+                                      ),
+                     CLASSIFIER=SSVM(C=1, use_cuda=True, solver=LPPrimalDualPy),
+                     CLASSIFIER_NAME='SSVM',
+                     CLASSIFIER_F_WEIGHTS_HANDLE='weights_',
+                     CLASSIFIER_S_WEIGHTS_HANDLE=None,
+                     )
+
 
 # set classifier
-CLASSIFIER = L1SVM(device='any', kernel_args=dict(metric='rbf', gamma=.0625))
-CLASSIFIER_NAME = 'L1SVM_RBF'
-CLASSIFIER_FWEIGHTS_HANDLE = None
-CLASSIFIER_SWEIGHTS_HANDLE = 'w_'
 
-
-## specific script args
 
 # tune_classifier.py args
 TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
