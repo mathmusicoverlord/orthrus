@@ -192,3 +192,86 @@ We now run the experiment::
     Test BSR: 61.78% +/- 11.69%
     Max. Test BSR: 81.75%
     Min. Test BSR: 51.25%
+
+We can also save the results for later::
+
+    >>> # imports
+    >>> from datasci.core.helper import save_object
+    
+    
+    >>> # save the results
+    >>> save_object(classification_results, "/path/to/classification/results.pickle")
+
+In this particular classification problem we are seeing sub-optimal results. We may benefit from performing
+first a feature selection experiment, see `Feature Selection <feature_selection.html>`_ for a few tutorials on
+these types of experiments.
+
+Multi-class classification
+--------------------------
+
+In this example we will use the 
+`Random Forest Classifier <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html>`_
+to classify the 3 species in the Iris dataset. First load the Iris dataset according to the first example. Then set the
+classifier and partitioner. In this example we'll do a simple train/test split and use a 
+`confusion matrix <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html>`_ to evaluate the
+classification results::
+
+    >>> # imports
+    >>> from sklearn.metrics import confusion_matrix
+    >>> from sklearn.model_selection import StratifiedShuffleSplit  # for class balancing
+    >>> from sklearn.ensemble import RandomForestClassifier as RF
+
+    >>> # define the partitioner
+    >>> train_test_part = StratifiedShuffleSplit(random_state=0,
+    ...                                          train_size=.6,
+    ...                                          n_splits=1,
+    ...                                          )
+
+    >>> # define the classifier
+    >>> rf = RF(class_weight="balanced_subsample",
+    ...         n_jobs=-1,  # use multi-threading across trees
+    ...         )
+
+Now we run the classification experiment::
+
+    >>> # run the classification experiment
+    >>> classification_results = ds.classify(classifier=rf,
+    ...                                      classifier_name='Random_Forest',
+    ...                                      attr='species',
+    ...                                      partitioner=train_test_part,
+    ...                                      partitioner_name='60_Train_40_Test',
+    ...                                      scorer=confusion_matrix,
+    ...                                      scorer_name='Confusion_Mat',
+    ...                                      scorer_args=dict(labels=['setosa',
+    ...                                                               'virginica',
+    ...                                                               'versicolor'],
+    ...                                                       ),
+    ...                                      f_weights_handle='feature_importances_',
+    ...                                      groups='species',
+    ...                                      )
+
+    Random_Forest, Split 1 of 1, Scores: 
+    =====================================
+    Training Confusion_Mat:
+    [[30  0  0]
+    [ 0 30  0]
+    [ 0  0 30]]
+    -------------------------------------
+    Test Confusion_Mat:
+    [[20  0  0]
+    [ 0 19  1]
+    [ 0  1 19]]
+
+Note: In order to understand the rows and columns of the confusion matrix, we must pass the 
+species labels in the ``labels`` keyword argument to the ``scorer``, which we do in the 
+dictionary ``scorer_args``. We can measure the feature importance by viewing the impurity-based weights
+returned by the Random Forest model::
+
+    >>> # view the feature_importances
+    >>> print(classification_results['f_weights'])
+
+                 species_60_Train_40_Test_Random_Forest_f_weights_0   species_60_Train_40_Test_Random_Forest_f_rank_0
+    sepal_length                                           0.104920                                                 3
+    sepal_width                                            0.029557                                                 2
+    petal_length                                           0.408352                                                 0
+    petal_width                                            0.457171                                                 1
