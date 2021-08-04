@@ -10,6 +10,7 @@ import pickle
 from copy import deepcopy
 from numpy.core import ndarray
 from pandas.core.frame import DataFrame
+from sklearn.preprocessing import FunctionTransformer
 from pandas.core.frame import Series
 from datasci.core.helper import scatter_pyplot
 from datasci.core.helper import scatter_plotly
@@ -958,6 +959,7 @@ class DataSet:
                  inplace: bool = False,
                  f_rnk_func=None,
                  s_rnk_func=None,
+                 training_transform=None,
                  experiment_name=None,
                  verbose: bool = True,
                  **kwargs):
@@ -1027,6 +1029,11 @@ class DataSet:
             s_rnk_func (object): Function to be applied to sample weights for sample ranking. Default is None, and the
                 samples will be ranked in from least to greatest.
 
+            training_transform (object): Transformer to be fit on training partitions and applied to both training
+                and test data. For example fit a StandardScalar transform to the training data and apply the learned
+                affine transform to the training and test data. This is useful for on the fly normalization.
+                The default is None.
+
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
                 :py:attr:`DataSet.experiments`. Default is ``attr`` + ``classifier_name`` + ``partitioner_name`` + ``scorer_name``.
 
@@ -1073,6 +1080,9 @@ class DataSet:
             >>> # share the results
             >>> ds.save('./test_data/GSE161731_ssvm_results.ds')
         """
+        # set defaults
+        if training_transform is None:
+            training_transform = FunctionTransformer(lambda x: x)
 
         if classifier_name is None:
             classifier_name = classifier.__str__().split('(')[0]
@@ -1139,9 +1149,9 @@ class DataSet:
         except AttributeError:
             n_splits = len(splits)
         for i, (train_index, test_index) in enumerate(splits):
-            X_train = X[train_index, :]
+            X_train = training_transform.fit_transform(X[train_index, :])
             if not (test_index is None):
-                X_test = X[test_index, :]
+                X_test = training_transform.transform(X[test_index, :])
             y_train = y[train_index]
             if not (test_index is None):
                 y_true = y[test_index]
@@ -1283,6 +1293,7 @@ class DataSet:
                  f_results_handle: str = 'results_',
                  append_to_meta: bool = True,
                  inplace: bool = False,
+                 training_transform=None,
                  experiment_name=None,
                  ):
         """
@@ -1314,10 +1325,15 @@ class DataSet:
                 etc.The attribute should be array-like with rows corresponding to the features. Default is "results_".
 
             append_to_meta (bool): If ``True``, the feature selection results will be appended to
-            :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
+                :py:attr:`DataSet.metadata` and :py:attr:`DataSet.vardata`. Default is ``False``.
 
             inplace (bool): If True the feature selection results will be stored to :py:attr:`DataSet.experiments`.
                 If ``False`` the feature selection results will be returned to the user. Default is ``False``
+
+            training_transform (object): Transformer to be fit on training partitions and applied to both training
+                and test data. For example fit a StandardScalar transform to the training data and apply the learned
+                affine transform to the training and test data. This is useful for on the fly normalization.
+                The default is None.
 
             experiment_name (string): Common name of experiment to use when ``inplace=True`` and storing results into
                 :py:attr:`DataSet.experiments`. Default is ``attr``+ ``selector_name``.
@@ -1357,6 +1373,9 @@ class DataSet:
             ...             inplace=True,
             ...             experiment_name='covid_vs_healthy_SSVM_kFFS')
         """
+        # set defaults
+        if training_transform is None:
+            training_transform = FunctionTransformer(lambda x: x)
 
         if selector_name is None:
             selector_name = selector.__str__().split('(')[0]
@@ -1378,7 +1397,7 @@ class DataSet:
 
         # fit the feature selector (going meta y'all)
         if cross_attr is None:
-            fit(X, y)
+            fit(training_transform.fit_transform(X), y)
         else:
             groups = ds.metadata[cross_attr].values
             fit(X, y, groups)
