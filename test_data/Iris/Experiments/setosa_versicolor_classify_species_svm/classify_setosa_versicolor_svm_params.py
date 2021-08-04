@@ -1,5 +1,5 @@
 """
-This file contains the experimental constants for the experiment setosa_versicolor_classify_species_svm.
+This file contains the experimental constants for the experiment classify_setosa_versicolor_svm.
 All experimental parameters to be exported are denoted by UPPERCASE names as a convention.
 """
 
@@ -16,7 +16,7 @@ from ray import tune
 import numpy as np
 
 # set experiment name
-EXP_NAME = 'setosa_versicolor_classify_species_svm'
+EXP_NAME = 'classify_setosa_versicolor_svm'
 
 # set working directories
 PROJ_DIR = os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris') # <--- put your absolute path
@@ -46,33 +46,12 @@ CLASS_ATTR = 'species'
 ## specific script args
 
 # classify.py args
-CLASSIFY_ARGS = dict(PARTITIONER=iter([KFold(n_splits=5, shuffle=True, random_state=0),
-                                       ShuffleSplit(n_splits=1, train_size=.8)]
-                                      ),
+CLASSIFY_ARGS = dict(PARTITIONER=ShuffleSplit(n_splits=1, train_size=.8),
                      CLASSIFIER=SSVM(C=1, use_cuda=True, solver=LPPrimalDualPy),
                      CLASSIFIER_NAME='SSVM',
                      CLASSIFIER_F_WEIGHTS_HANDLE='weights_',
                      CLASSIFIER_S_WEIGHTS_HANDLE=None,
                      )
 
-
-# set classifier
-
-
-# tune_classifier.py args
-TUNE_CLASSIFIER_ARGS = dict(CLASSIFIER=L1SVM(),
-                            CLASSIFIER_NAME='l1SVM_RBF',
-                            CLASSIFIER_FWEIGHTS_HANDLE=None,
-                            CLASSIFIER_SWEIGHTS_HANDLE='w_',
-                            TUNING_PARAMS=dict(imax=100,
-                                               verbosity=0,
-                                               nu=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                               delta=tune.grid_search(((10.0) ** np.arange(-3, 4)).tolist()),
-                                               kernel_args=dict(metric='rbf',
-                                                                gamma=tune.grid_search(((2.0) ** np.arange(-12, 13)).tolist()),
-                                                                )
-                                               )                       
-                            )
-
-# other parameters
+# visualize.py args
 VISUALIZE_ARGS = dict()
