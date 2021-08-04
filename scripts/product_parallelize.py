@@ -12,7 +12,7 @@ to be confused with an Iterable which has the potential to become an iterator.
 
 An example of running product_parallelize.py is as follows:
 
-python product_parallelize.py classify.py --exp_params /hdd/DataSci/test_data/Iris/Experiments/setosa_versicolor_classify_species_svm/classify_setosa_versicolor_svm_params.py
+python product_parallelize.py classify.py --exp_params /hdd/DataSci/test_data/Iris/Experiments/classify_setosa_versicolor_svm/classify_setosa_versicolor_svm_params.py
 
 The results will be saved, per the "save" function provided in your script, for each combination of parameters. The standard
 save name will be appended with an integer indicating the parallel run, e.g., save_name_0.blah, save_name_1.blah, etc...
