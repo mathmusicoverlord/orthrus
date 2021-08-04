@@ -142,6 +142,7 @@ if __name__ == '__main__':
                                  scorer_name=pop(scorer_name),
                                  scorer_args=pop(scorer_args),
                                  f_weights_handle=pop(f_weights_handle),
-                                 s_weights_handle=pop(s_weights_handle))
+                                 s_weights_handle=pop(s_weights_handle),
+                                 training_transform=pop(training_transform))
     # save the results
     save(classification_results)
