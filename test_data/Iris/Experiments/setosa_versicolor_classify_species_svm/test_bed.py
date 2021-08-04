@@ -1,5 +1,5 @@
 """
-This file contains the experimental constants for the experiment setosa_versicolor_classify_species_svm.
+This file contains the experimental constants for the experiment test_bed.
 All experimental parameters to be exported are denoted by UPPERCASE names as a convention.
 """
 
@@ -16,7 +16,7 @@ from ray import tune
 import numpy as np
 
 # set experiment name
-EXP_NAME = 'setosa_versicolor_classify_species_svm'
+EXP_NAME = 'test_bed'
 
 # set working directories
 PROJ_DIR = os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris') # <--- put your absolute path

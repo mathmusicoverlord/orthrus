@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_params',
                         type=str,
                         default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
-                                             'classify_setosa_versicolor_svm',
+                                             'setosa_versicolor_classify_species_svm',
                                              'classify_setosa_versicolor_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
 

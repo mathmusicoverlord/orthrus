@@ -14,7 +14,7 @@ parser.add_argument('--exp_params',
                     type=str,
                     default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
                                          'setosa_versicolor_classify_species_svm',
-                                         'setosa_versicolor_classify_species_svm_params.py'),
+                                         'classify_setosa_versicolor_svm_params.py'),
                     help='File path of containing the experimental parameters. Default is the Iris experiment.')
 
 parser.add_argument('--score',
