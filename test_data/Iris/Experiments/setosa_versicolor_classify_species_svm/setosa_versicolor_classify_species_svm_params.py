@@ -9,7 +9,7 @@ import os
 from datasci.core.dataset import load_dataset
 from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
 from datasci.sparse.classifiers.svm import L1SVM
-from calcom.solvers import	LPPrimalDualPy
+from calcom.solvers import LPPrimalDualPy
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import KFold
 from ray import tune
