@@ -53,6 +53,7 @@ partitioner = script_args.get('PARTITIONER', default_val(exp_params, 'PARTITIONE
 partitioner_name = script_args.get('PARTITIONER_NAME', default_val(exp_params, 'PARTITIONER_NAME'))
 results_file_name = script_args.get('RESULTS_FILE_NAME',
                                     default_val(exp_params, 'CLASSIFICATION_RESULTS_FILE_NAME'))
+training_transform = script_args.get('TRAINING_TRANSFORM', default_val(exp_params, 'CLASSIFY_TRAINING_TRANSFORM'))
 
 # set scorer
 scorer_name = args.score
@@ -79,7 +80,9 @@ def run(ds,
         scorer_name,
         scorer_args,
         f_weights_handle,
-        s_weights_handle):
+        s_weights_handle,
+        training_transform,
+        ):
 
     # classify data
     classification_results = ds.classify(classifier=classifier,
@@ -93,7 +96,9 @@ def run(ds,
                                          scorer_name=scorer_name,
                                          scorer_args=scorer_args,
                                          f_weights_handle=f_weights_handle,
-                                         s_weights_handle=s_weights_handle)
+                                         s_weights_handle=s_weights_handle,
+                                         training_transform=training_transform,
+                                         )
 
     return classification_results
 
