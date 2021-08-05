@@ -14,7 +14,7 @@ def reduce_feature_set_size(ds,
                             test_sample_ids=None,
                             start : int = 5, 
                             end : int = 100, 
-                            jump : int = 5, 
+                            step : int = 5, 
                             verbose_frequency : int=10, 
                             num_cpus_per_worker : float=1., 
                             num_gpus_per_worker : float=0.,
@@ -77,7 +77,7 @@ def reduce_feature_set_size(ds,
         
         end (int) :  end point of the grid search. Use -1 to set end as the size of features (default: 100)
         
-        jump (int) : gap between each sampled point in the grid (default: 5)
+        step (int) : gap between each sampled point in the grid (default: 5)
 
         verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
@@ -141,7 +141,7 @@ def reduce_feature_set_size(ds,
                                     patitioner=partitioner,
                                     start = 5, 
                                     end = 100, 
-                                    jump = 1,
+                                    step = 1,
                                     verbose_frequency=10,
                                     num_cpus_per_worker=2.)
 
@@ -149,11 +149,11 @@ def reduce_feature_set_size(ds,
     """
     ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
 
-    #create subset of features, from "start" to "end" in increments of "jump"
+    #create subset of features, from "start" to "end" in increments of "step"
     if end == -1:
         end = ranked_features.shape[0] + 1
 
-    n_attrs = np.arange(start, end+ 1, jump)
+    n_attrs = np.arange(start, end+ 1, step)
 
     list_of_arguments = []
     #for each subset of top features
