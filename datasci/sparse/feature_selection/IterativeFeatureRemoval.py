@@ -22,7 +22,7 @@ class IFR:
     
     For each feature set, the algorithm can halt because of the following conditions:
 
-        1. BSR on validation partition is below cutoff
+        1. Score on validation partition is below cutoff 
         2. Jump does not occur in the array of sorted absolute weights
         3. Jump occurs but the weight at the jump is too small ( < 10e-6)
         4. Number of features selected for the current iteration is greater than max_features_per_iter_ratio * num_samples in training partition. This condition prevents overfitting.
@@ -50,7 +50,7 @@ class IFR:
 
         max_iters (int): Determines the maximum number of iterations of IFR on one data partition(default: 5)
         
-        cutoff (float): Threshold for the validation BSR (balanced success rate) to halt the process. (default: 0.75)
+        cutoff (float): Threshold for the validation score to halt the process. (default: 0.75)
 
         jumpratio (float): The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)
 
@@ -70,7 +70,34 @@ class IFR:
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
                 
     Attributes:
-        diagnostic_information_ (dict): Holds execution information for each interation of each partition.
+        diagnostic_information_ (dict): Holds execution the following information for each interation of each partition.
+            'train_scores' (list) : Each element is a list of training scores for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition. 
+
+            'validation_scores' (list): Each element is a list of test scores for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition.  
+
+            'sorted_abs_weights (list)': Each element is a list of sorted absolute weights for the classifier for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition.   
+
+            'weight_ratios' (list)': Each element is a list of weight ratios for the classifier for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition.   
+
+            'features' (list)': Each element is a list of selected feature ids for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition.   
+
+            'true_feature_count' (list): Each element is a list of true number of features that IFR determined were to be selected for the feature selection on one data partatition, 
+                                    the number of elements in this inner list is the number of iterations IFR ran for, for this particular data partition. 
+
+            'exit_reasons' (list): Each element contains the reason for why the IFR stopped for the feature selection on one data partatition. These are one of the following reasons:
+                1. exception_in_model_fitting
+                2. validation_score_cutoff: Score on validation partition is below cutoff 
+                3. jump_failed: Jump does not occur in the array of sorted absolute weights
+                4. small_weight_at_jump: Jump occurs but the weight at the jump is too small ( < 10e-6)
+                5. max_features_per_iter_breached: Number of features selected for the current iteration is greater than max_features_per_iter_ratio * num_samples in training partition. This condition prevents overfitting.
+                6. max_iters: max_iters number of iterations complete successfully
+
+
 
 
     Examples:
@@ -141,7 +168,7 @@ class IFR:
         self.partition_method =  partition_method # Passed to calcom.utils.generate_partitions
         self.nfolds = nfolds   # Passed to calcom.utils.generate_partitions
         self.max_iters = max_iters    # Max iterations for IFR on one data partition
-        self.cutoff = cutoff    # validation BSR threshold
+        self.cutoff = cutoff    # validation score threshold
         self.jumpratio = jumpratio # Relative drop needed to detect numerically zero weights in SSVM.
         self.max_features_per_iter_ratio = max_features_per_iter_ratio   # fraction of training data samples as cutoff for maximum features extracted per iteration 
         self.verbosity = verbosity    # Verbosity of print statements; make positive to see detail.
@@ -149,8 +176,8 @@ class IFR:
 
 
         self.diagnostic_information_ = {}
-        self._diagnostic_information_keys = ['train_bsrs', 'validation_bsrs', 'sorted_abs_weights', 'weight_ratios',
-                                            'features', 'true_feature_count', 'cap_breached']
+        self._diagnostic_information_keys = ['train_scores', 'validation_scores', 'sorted_abs_weights', 'weight_ratios',
+                                            'features', 'true_feature_count']
         self._initialize_diagnostic_dictionary(self.diagnostic_information_)
         self.diagnostic_information_['exit_reasons'] = []
         super(IFR, self).__init__()
@@ -160,16 +187,15 @@ class IFR:
         for key in self._diagnostic_information_keys:
             diag_dict[key] = []
        
-    def _add_diagnostic_info_for_current_iteration(self, diag_dict, train_bsr, validation_bsr,
-        sorted_abs_weights, weight_ratios, features, true_feature_count, cap_breached):
+    def _add_diagnostic_info_for_current_iteration(self, diag_dict, train_score, validation_score,
+        sorted_abs_weights, weight_ratios, features, true_feature_count):
 
-        diag_dict.get('train_bsrs', []).append(train_bsr)
-        diag_dict.get('validation_bsrs', []).append(validation_bsr)
+        diag_dict.get('train_scores', []).append(train_score)
+        diag_dict.get('validation_scores', []).append(validation_score)
         diag_dict.get('sorted_abs_weights', []).append(sorted_abs_weights)
         diag_dict.get('weight_ratios', []).append(weight_ratios)
         diag_dict.get('features', []).append(features)
         diag_dict.get('true_feature_count', []).append(true_feature_count)
-        diag_dict.get('cap_breached', []).append(cap_breached)
 
 
     def _sanity_check_diagnostics(self, diag_dict, n_iters):
@@ -343,7 +369,7 @@ class IFR:
                 print("=====================================================")
                 print("beginning of inner loop iteration ", i+1)
                 print("Number of features selected for this fold: %i of %i"%(len(list_of_features_for_curr_fold), n))
-                print("Checking BSR of complementary problem... ",end="")
+                print("Checking score of complementary problem... ",end="")
             #
 
             #create a copy of the classifier
@@ -366,47 +392,45 @@ class IFR:
                     None,
                     None,
                     None,
-                    None,
                     None)
-                exit_reason = "exception_in_ssvm_fitting"
+                exit_reason = "exception_in_model_fitting"
                 break
             
             weight = eval("model" + "." + self.weights_handle)
 
-            #calculate BSR for training data
+            #calculate score for training data
             pred_train = model.predict(tr_d)
-            bsrval_train = self.scorer(train_labels, pred_train)
+            score_train = self.scorer(train_labels, pred_train)
             if self.verbosity>1:
                 print('')
-                print("Training BSR %.3f. "%bsrval_train)
+                print("Training Score %.3f. "%score_train)
                 print("")
 
-            #calculate BSR for validation data
+            #calculate score for validation data
             pred_validation = model.predict(te_d)
-            bsrval_validation = self.scorer(validation_labels, pred_validation)
+            score_validation = self.scorer(validation_labels, pred_validation)
 
             if self.verbosity>1:
-                print("Validation BSR %.3f. "%bsrval_validation)
+                print("Validation Score %.3f. "%score_validation)
                 print("")
 
-            #Check if BSR is above cutoff
-            if (bsrval_validation < self.cutoff):
+            #Check if score is above cutoff
+            if (score_validation < self.cutoff):
                 if self.verbosity>1:
-                    print("BSR below cutoff, exiting inner loop.")
+                    print("Validation score below cutoff, exiting inner loop.")
 
                 #save the diagnostic information for this iteration
-                #in this case we only have train and validation bsr
+                #in this case we only have train and validation score
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                    bsrval_train,
-                    bsrval_validation,
-                    None,
+                    score_train,
+                    score_validation,
                     None,
                     None,
                     None,
                     None)
 
-                #break out of current loop if bsr is below cutoff
-                exit_reason = "validation_bsr_cutoff"
+                #break out of current loop if score is below cutoff
+                exit_reason = "validation_score_cutoff"
                 break
 
             ##########
@@ -433,11 +457,10 @@ class IFR:
                 #we still do not have the selected feature count and features
 
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                    bsrval_train,
-                    bsrval_validation,
+                    score_train,
+                    score_validation,
                     sorted_abs_weights,
                     weight_ratios,
-                    None,
                     None,
                     None)
                 exit_reason = "jump_failed"
@@ -456,8 +479,8 @@ class IFR:
             if sorted_abs_weights[count] < 1e-6:
 
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                    bsrval_train,
-                    bsrval_validation,
+                    score_train,
+                    score_validation,
                     sorted_abs_weights,
                     weight_ratios,
                     None,
@@ -470,16 +493,14 @@ class IFR:
                 break
 
             count += 1
-            cap_breached = False
             #check if the number of selected features is greater than the cap
             if count > int(self.max_features_per_iter_ratio * train_data.shape[0]):
 
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                    bsrval_train,
-                    bsrval_validation,
+                    score_train,
+                    score_validation,
                     sorted_abs_weights,
                     weight_ratios,
-                    None,
                     None,
                     None)
                 exit_reason = "max_features_per_iter_breached"
@@ -511,13 +532,12 @@ class IFR:
             #save the diagnostic information for this iteration
             #here we have all the information we need
             self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
-                bsrval_train,
-                bsrval_validation,
+                score_train,
+                score_validation,
                 sorted_abs_weights,
                 weight_ratios,
                 active_idxs[selected],
-                count,
-                cap_breached)
+                count)
 
             if self.verbosity>1:
                 print('Removing %i features from training and validation matrices.'%len(selected))
@@ -536,34 +556,34 @@ class IFR:
         return results 
 
 
-    def plot_basic_diagnostic_stats(self, validation_bsr_iteration_idx = None, n_random_exp = -1):
+    def plot_basic_diagnostic_stats(self, validation_score_iteration_idx = None, n_random_exp = -1):
         exit_reasons = self.diagnostic_information_['exit_reasons']
         #self.diagnostic_information_.pop('exit_reasons')
 
         fig, axs = plt.subplots(figsize=(12, 4), nrows = 2, ncols = 3)
-        n_elements = len(self.diagnostic_information_['validation_bsrs'])
+        n_elements = len(self.diagnostic_information_['validation_scores'])
         idx = np.arange(n_elements)
         random.shuffle(idx)
 
         if n_random_exp != -1 and n_random_exp < idx.shape[0]:
             idx = idx[:n_random_exp]
 
-        axs[0][0].set_title('validation BSR')
+        axs[0][0].set_title('validation score')
         axs[0][0].set_ylim(0, 1.1)
         axs[0][1].set_title('Features Selected')
         max_iters = 0
         for j in idx:    
-            num_iters = len(self.diagnostic_information_['validation_bsrs'][j])
+            num_iters = len(self.diagnostic_information_['validation_scores'][j])
             if num_iters == 1:
-                axs[0][0].plot(0, self.diagnostic_information_['validation_bsrs'][j], marker='.', alpha = 0.5)
+                axs[0][0].plot(0, self.diagnostic_information_['validation_scores'][j], marker='.', alpha = 0.5)
             else:
-                axs[0][0].plot(self.diagnostic_information_['validation_bsrs'][j], alpha = 0.5)
-            #axs[i, 0].plot(0, dict['cutoff'], len(dict['validation_bsr']), dict['cutoff'])
+                axs[0][0].plot(self.diagnostic_information_['validation_scores'][j], alpha = 0.5)
+            #axs[i, 0].plot(0, dict['cutoff'], len(dict['validation_score']), dict['cutoff'])
             if max_iters < num_iters:
                 max_iters = num_iters
 
             axs[0][1].plot(self.diagnostic_information_['true_feature_count'][j], alpha = 0.5)
-            #axs[i, 1].plot(0, dict['max_features_per_iter_ratio'], len(dict['validation_bsr']), dict['max_features_per_iter_ratio'])
+            #axs[i, 1].plot(0, dict['max_features_per_iter_ratio'], len(dict['validation_score']), dict['max_features_per_iter_ratio'])
 
         axs[0][0].set_xlim(-.9, max_iters + 1)
         exit_r = np.array(exit_reasons)
@@ -581,17 +601,17 @@ class IFR:
         axs[1][0].set_ylabel('Frequency')
         axs[1][0].set_xlabel('# Iterations per fold')
 
-        #second plot show the histogram of validation bsrs
-        if validation_bsr_iteration_idx == None:
-            validation_bsrs = [item for sublist in self.diagnostic_information_['validation_bsrs'] for item in sublist]
-            label = 'Validation BSRS over all iterations and folds'
+        #second plot show the histogram of validation scores
+        if validation_score_iteration_idx == None:
+            validation_scores = [item for sublist in self.diagnostic_information_['validation_scores'] for item in sublist]
+            label = 'Validation Scores over all iterations and folds'
         else:
-            validation_bsrs = []
-            for sublist in self.diagnostic_information_['validation_bsrs']:
-                if len(sublist) >= validation_bsr_iteration_idx:
-                    validation_bsrs = validation_bsrs.append(sublist[validation_bsr_iteration_idx])
-            label = 'Validation BSRS over iteration# %d of all folds'%validation_bsr_iteration_idx
-        axs[1][1].hist(validation_bsrs)
+            validation_scores = []
+            for sublist in self.diagnostic_information_['validation_scores']:
+                if len(sublist) >= validation_score_iteration_idx:
+                    validation_scores = validation_scores.append(sublist[validation_score_iteration_idx])
+            label = 'Validation Scores over iteration# %d of all folds'%validation_score_iteration_idx
+        axs[1][1].hist(validation_scores)
         axs[1][1].set_ylabel('Frequency')
         axs[1][1].set_xlabel(label)
 
