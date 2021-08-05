@@ -963,9 +963,7 @@ def batch_jobs_(function_handle,
 
     Return:
         a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
-        Note:
-        1. The order of elements in return does not match the order of elements in arguments.
-        2. This method calls ray.init() but doesn't call ray.shutdown() to preseve object references. It must be done
+        Note: This method calls ray.init() but doesn't call ray.shutdown() to preseve object references. It must be done
            after the object references have been used
 
     Example:
@@ -1010,7 +1008,7 @@ def batch_jobs_(function_handle,
     num_running=0
     num_finished=0
     processes = []
-    all_finished_processes = []
+    all_processes = []
     i = 1
 
     #change resource requirements of the worker
@@ -1026,9 +1024,10 @@ def batch_jobs_(function_handle,
             finished_processes, processes = ray.wait(processes)
             num_running -=len(finished_processes)
             num_finished +=len(finished_processes)
-            all_finished_processes.extend(finished_processes)
 
-        processes.append(function_handle.remote(*arguments))
+        future = function_handle.remote(*arguments)
+        processes.append(future)
+        all_processes.append(future)
         num_running+=1
 
     #wait for all remaining processes to finish
@@ -1036,12 +1035,11 @@ def batch_jobs_(function_handle,
     num_running -=len(finished_processes)
     num_finished +=len(finished_processes)
     print('%d of %d processes finished'%(num_finished, total_processes))
-    all_finished_processes.extend(finished_processes)
 
     assert num_finished == total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
                                         % (total_processes - num_finished)
     assert num_running == 0, '%d processes still running' % num_running
-    return all_finished_processes
+    return all_processes
 
 
 def pop_first_element(x):
