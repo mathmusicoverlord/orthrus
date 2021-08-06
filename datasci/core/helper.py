@@ -5,6 +5,7 @@ This module contains user-defined and general purpose helper functions use by th
 from inspect import ismethod
 import numpy as np
 import pandas as pd
+import os
 import pickle
 from flask import request
 
@@ -899,6 +900,41 @@ def save_object(object, file_path):
     # pickle class instance
     with open(file_path, 'wb') as f:
         pickle.dump(object, file=f)
+
+def generate_save_path(file_path: str, overwrite: bool = False):
+    """
+    This function takes a file path, checks if the file exists, and then
+    appends an integer in parentheses to the file name depending on the
+    number of copies. This mimics the Linux functionality of making copies.
+    If overwrite is True, then the function just returns the original path.
+
+    Args:
+        file_path (str): The file path to be checked.
+
+        overwrite (bool): Flag indicating whether or not to overwrite the file.
+
+    Returns:
+        str : The modified file path.
+    """
+    # convert save_path to correct format
+    file_path = os.path.abspath(file_path)
+
+    if not overwrite:
+        # check if file exists
+        exists = os.path.isfile(file_path)
+        i = 0
+
+        # find copy number
+        while exists:
+            i += 1
+            path_comps = file_path.split('.')
+            end_str = path_comps[-2]
+            end_str = ''.join([end_str, '(', str(i), ')'])
+            path_comps[-2] = end_str
+            file_path = os.path.abspath('.'.join(path_comps))
+            exists = os.path.isfile(file_path)
+
+    return file_path
 
 
 def batch_jobs_(function_handle, 
