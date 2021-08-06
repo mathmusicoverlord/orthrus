@@ -1,5 +1,6 @@
 """
-This module contains the main DataSet class used for all preprocessing, visualization, and classification.
+This module contains the main DataSet class used for all preprocessing, visualization, feature selection,
+and classification.
 """
 
 # imports
