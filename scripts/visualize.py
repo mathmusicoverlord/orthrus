@@ -93,6 +93,20 @@ if __name__ == '__main__':
         backend = 'plotly'
         backend_args = dict(figsize=(1500, 1000))
 
+    # custom xlabel and ylabel for PCA
+    if args.embedding == 'pca':
+        xlabel = 'PC 1'
+        if dim > 1:
+            ylabel = 'PC 2'
+            if dim > 2:
+                zlabel = 'PC 3'
+            else:
+                zlabel = None
+        else:
+            ylabel = None
+    else:
+        xlabel = ylabel = zlabel = None
+
     # set save name
     if save_name is None:
         if cross_attr is None:
