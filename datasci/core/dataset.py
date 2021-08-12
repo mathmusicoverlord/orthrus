@@ -15,7 +15,6 @@ from sklearn.preprocessing import FunctionTransformer
 from pandas.core.frame import Series
 from datasci.core.helper import scatter_pyplot
 from datasci.core.helper import scatter_plotly
-from datasci.core.helper import generate_save_path
 
 # classes
 class DataSet:
@@ -80,10 +79,6 @@ class DataSet:
             used on the data. Default is the empty string.
 
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
-
-        n_samples (int): The number of samples in the dataset.
-
-        n_features (int): The number of features in the dataset.
 
         experiments (dict): Holds experimental results. e.g. from :py:meth:`DataSet.classify`.
 
@@ -188,7 +183,7 @@ class DataSet:
         self.vardata.columns = self.vardata.columns.astype(str)
 
     @property
-    def n_samples(self) -> int:
+    def n_samples(self):
         """
         The number of samples in the dataset.
 
@@ -198,7 +193,7 @@ class DataSet:
         return self.data.shape[0]
 
     @property
-    def n_features(self) -> int:
+    def n_features(self):
         """
         The number of features in the dataset.
 
@@ -922,7 +917,7 @@ class DataSet:
                     print('-' * len(header))
                     print('\n')
 
-    def save(self, file_path: str = None, overwrite: bool = False):
+    def save(self, file_path: str = None):
         """
         This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
         as :py:attr:`DataSet.path`/:py:attr:`DataSet.name`.ds where the spaces in :py:attr:`DataSet.name` are replaced
@@ -930,8 +925,6 @@ class DataSet:
 
         Args:
             file_path (str): Path of the file to save the instance of DataSet to. Default is None.
-
-            overwrite (bool): If True and the file_path already exists, then the associated file will be overwritten.
 
         Returns:
             inplace method.
@@ -948,7 +941,6 @@ class DataSet:
         # check path
         if file_path is None:
             file_path = self.path + '/' + self.name.replace(" ", "_") + '.ds'
-        file_path = generate_save_path(file_path, overwrite)
 
         # pickle class instance
         with open(file_path, 'wb') as f:
