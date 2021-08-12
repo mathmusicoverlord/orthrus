@@ -95,17 +95,7 @@ if __name__ == '__main__':
 
     # custom xlabel and ylabel for PCA
     if args.embedding == 'pca':
-        xlabel = 'PC 1'
-        if dim > 1:
-            ylabel = 'PC 2'
-            if dim > 2:
-                zlabel = 'PC 3'
-            else:
-                zlabel = None
-        else:
-            ylabel = None
-    else:
-        xlabel = ylabel = zlabel = None
+        embedding.__str__ = lambda : 'PC()'
 
     # set save name
     if save_name is None:
