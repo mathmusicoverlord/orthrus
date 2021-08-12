@@ -182,6 +182,27 @@ class DataSet:
         self.metadata.columns = self.metadata.columns.astype(str)
         self.vardata.columns = self.vardata.columns.astype(str)
 
+    @property
+    def n_samples(self):
+        """
+        The number of samples in the dataset.
+
+        Returns: The number of samples in the dataset.
+        """
+
+        return self.data.shape[0]
+
+    @property
+    def n_features(self):
+        """
+        The number of features in the dataset.
+
+        Returns: The number of features in the dataset.
+        """
+
+        return self.data.shape[1]
+
+
     def visualize(self, embedding,
                   attr: str,
                   cross_attr: str = None,
