@@ -183,7 +183,7 @@ class DataSet:
         self.vardata.columns = self.vardata.columns.astype(str)
 
     @property
-    def n_samples(self):
+    def n_samples(self) -> int:
         """
         The number of samples in the dataset.
 
@@ -193,7 +193,7 @@ class DataSet:
         return self.data.shape[0]
 
     @property
-    def n_features(self):
+    def n_features(self) -> int:
         """
         The number of features in the dataset.
 
