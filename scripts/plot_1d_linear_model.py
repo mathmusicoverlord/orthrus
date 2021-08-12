@@ -60,6 +60,7 @@ if __name__ == '__main__':
     classifier_name = script_args.get('CLASSIFIER_NAME', default_val(exp_params, 'CLASSIFIER_NAME'))
     weights_handle = script_args.get('WEIGHTS_HANDLE', default_val(exp_params, 'CLASSIFIER_FWEIGHTS_HANDLE'))
     bias_handle = script_args.get('BIAS_HANDLE', default_val(exp_params, 'CLASSIFIER_BIAS_HANDLE'))
+    title = script_args.get('TITLE', default_val(exp_params, 'CLASSIFY_TITLE'))
 
     # get number of features
     n_features = len(feature_ids)
@@ -107,6 +108,7 @@ if __name__ == '__main__':
                              mrkr_list=mrkr_list,
                              s=200,
                              linewidths=0,
+                             title=title,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
                              save=True,
                              save_name='_'.join([ds.name, exp_name, 'classifier', str(i), 'features', str(n_features), classifier_name,
@@ -127,6 +129,7 @@ if __name__ == '__main__':
                              mrkr_list=mrkr_list,
                              s=200,
                              linewidths=0,
+                             title=title,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
                              save=True,
                              save_name='_'.join([ds.name, exp_name, 'classifier', str(i), 'features', str(n_features), classifier_name,
@@ -145,6 +148,7 @@ if __name__ == '__main__':
                              mrkr_list=mrkr_list,
                              opacity=.7,
                              figsize=(1500, 1000),
+                             title=title,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
                              save=True,
                              save_name='_'.join(
@@ -164,6 +168,7 @@ if __name__ == '__main__':
                              mrkr_list=mrkr_list,
                              opacity=.7,
                              figsize=(1500, 1000),
+                             title=title,
                              subtitle="Test Score = " + str(test_score * 100) + "%,    # features = " + str(n_features),
                              save=True,
                              save_name='_'.join(
