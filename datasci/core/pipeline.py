@@ -15,7 +15,7 @@ class Process(ABC):
     def __init__(self,
                  process:object,
                  process_name:str = None,
-                 parallel:bool = True
+                 parallel:bool = False
                  ):
 
         # set parameters
@@ -128,17 +128,32 @@ class Partition(Process):
         # run the supers run_ method
         ds_new = super(Partition, self).run_(ds, **kwargs)
 
+        # check for validation in existing labels
+        tvt_labels = kwargs.get('tvt_labels', None)
+
+        if tvt_labels is None:
+            tvt_labels = pd.Series(index=ds_new.metadata.index, data=['Train']*ds_new.n_samples)
+
+        if (tvt_labels == 'Valid').any():
+            raise ValueError("Labels already contain training, validation, and test!")
+
+        # initialize parition result
+        result =  dict()
+
         # generate the split method
         split = eval("self.process." + self.split_handle)
+
+        # grab training labels
+        train_samples = tvt_labels[tvt_labels == 'Train'].index
 
         # generate labels
         if self.split_attr is None:
             label_dict = {}
         else:
-            label_dict = dict(y=ds_new.metadata[self.split_attr])
+            label_dict = dict(y=ds_new.metadata.loc[train_samples, self.split_attr])
 
         if self.split_group is not None:
-            label_dict['groups'] = self.split_group
+            label_dict['groups'] = ds_new.metadata.loc[train_samples, self.split_group]
 
         # partition the dataset
         parts = split(ds_new.data, **label_dict, **self.split_args)
@@ -148,17 +163,60 @@ class Partition(Process):
         for i, (train_idx, test_idx) in enumerate(parts):
 
             # create new column for split
-            col_name = 'batch_' + str(i)
-            train_test_labels[col_name] = ''
+            col_name = i
+            train_test_labels[col_name] = 'Test'
 
             # fill in training and test
-            train_test_labels.iloc[train_idx, i] = 'Train'
-            train_test_labels.iloc[test_idx, i] = 'Test'
+            train_test_labels.loc[train_samples[train_idx], i] = 'Train'
+            train_test_labels.loc[train_samples[test_idx], i] = 'Valid'
+
+        # check rename valid to test if there are no test left
+        if (train_test_labels != 'Test').all().all():
+            train_test_labels.replace('Valid', 'Test', inplace=True)
 
         # store the result
-        return train_test_labels
+        result['tvt_labels'] = train_test_labels
 
-    def save_result(self,
+        # return to run method
+        return result
+
+    def run(self, ds:DataSet, batch_args:dict = None, append_labels=True):
+
+        # run the super first
+        super(Partition, self).run(ds, batch_args)
+
+        # collect super results
+        results = dict()
+
+        # split into batches
+        for batch in self.results_:
+            labels = self.results_[batch]['tvt_labels']
+            labels.columns = ['_'.join([str(batch), str(col)])  for col in labels]
+            try:
+                orig_name = batch_args[batch]['tvt_labels'].name
+            except (TypeError, KeyError):
+                orig_name = ''
+            labels = labels.to_dict('series')
+            labels = {k: dict(tvt_labels=v.rename('_'.join([orig_name, self.process_name, str(i)]).lstrip('_'))) for i, (k,v) in enumerate(labels.items())}
+            results.update(labels)
+
+        # append original labels
+        if append_labels and (batch_args is not None):
+            results.update({k: dict(tvt_labels=v['tvt_labels']) for (k,v) in batch_args.items()})
+            try:
+                del results['batch']
+            except KeyError:
+                pass
+
+        # update results
+        self.results_ = results
+
+
+
+
+
+
+    def save_results(self,
                     save_path: str,
                     overwrite: bool = False):
 
