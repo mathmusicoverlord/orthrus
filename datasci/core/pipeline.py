@@ -8,6 +8,7 @@ import pandas as pd
 from datasci.core.dataset import DataSet
 from datasci.core.helper import generate_save_path
 from datasci.core.helper import save_object
+import ray
 
 
 class Process(ABC):
@@ -15,13 +16,15 @@ class Process(ABC):
     def __init__(self,
                  process:object,
                  process_name:str = None,
-                 parallel:bool = False
+                 parallel:bool = False,
+                 verbosity: int = 0,
                  ):
 
         # set parameters
         self.process = process
         self._process_name = process_name
         self.parallel = parallel
+        self.verbosity = verbosity
 
         # set attributes
         self.run_status_ = -1
@@ -46,7 +49,7 @@ class Process(ABC):
 
         return ds_new
 
-    def run(self, ds:DataSet, batch_args:dict = None):
+    def prerun(self, ds:DataSet, batch_args:dict = None):
 
         if batch_args is None:
             self.results_ = dict(batch=self.run_(ds))
@@ -61,10 +64,12 @@ class Process(ABC):
             for batch in batch_args:
                 self.results_[batch] = self.run_(ds, **batch_args[batch])
 
+        return ds, self.results_
+
     def run_par_(self, ds:DataSet, batch_args: dict):
 
         # define a remote run_ method
-        run_ = ray.remote(self.run_)
+        run_ = ray.remote(lambda *args, **kwargs: self.run_(*args, **kwargs))
 
         # store dataset in the object store
         if ds.__class__ == ray._raylet.ObjectRef:
@@ -104,6 +109,8 @@ class Partition(Process):
     def __init__(self,
                  process: object,
                  process_name: str = None,
+                 parallel: bool = False,
+                 verbosity: int = 0,
                  split_attr: str = None,
                  split_group: str = None,
                  split_handle: str = 'split',
@@ -113,6 +120,8 @@ class Partition(Process):
         # init with Process class
         super(Partition, self).__init__(process=process,
                                         process_name=process_name,
+                                        parallel=parallel,
+                                        verbosity=verbosity,
                                         )
 
         # set parameters
@@ -140,6 +149,9 @@ class Partition(Process):
         # initialize parition result
         result =  dict()
 
+        # grab verbosity
+        verbosity = self.verbosity
+
         # generate the split method
         split = eval("self.process." + self.split_handle)
 
@@ -156,7 +168,10 @@ class Partition(Process):
             label_dict['groups'] = ds_new.metadata.loc[train_samples, self.split_group]
 
         # partition the dataset
-        parts = split(ds_new.data, **label_dict, **self.split_args)
+        if verbosity > 0:
+            print(r"Generating %s splits..." % (self.process_name))
+
+        parts = split(ds_new.data.loc[train_samples], **label_dict, **self.split_args)
 
         # record training and test labels
         train_test_labels = pd.DataFrame(index=ds_new.metadata.index)
@@ -183,7 +198,7 @@ class Partition(Process):
     def run(self, ds:DataSet, batch_args:dict = None, append_labels=True):
 
         # run the super first
-        super(Partition, self).run(ds, batch_args)
+        super(Partition, self).prerun(ds, batch_args)
 
         # collect super results
         results = dict()
@@ -191,6 +206,7 @@ class Partition(Process):
         # split into batches
         for batch in self.results_:
             labels = self.results_[batch]['tvt_labels']
+
             labels.columns = ['_'.join([str(batch), str(col)])  for col in labels]
             try:
                 orig_name = batch_args[batch]['tvt_labels'].name
@@ -211,10 +227,7 @@ class Partition(Process):
         # update results
         self.results_ = results
 
-
-
-
-
+        return ds, self.results_
 
     def save_results(self,
                     save_path: str,
@@ -223,8 +236,11 @@ class Partition(Process):
         # generate new save path in case you don't want to overwrite
         save_path = generate_save_path(save_path, overwrite)
 
+        # generate dataframe to save labels
+        results = pd.DataFrame.from_dict({v['tvt_labels'].name :v['tvt_labels'] for (k,v) in self.results_.items()})
+
         # save labels as .csv
-        self.results_.to_csv(save_path)
+        results.to_csv(save_path)
 
 
 
