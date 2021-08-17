@@ -925,14 +925,16 @@ def generate_save_path(file_path: str, overwrite: bool = False):
         i = 0
 
         # find copy number
-        while exists:
-            i += 1
+        if exists:
             path_comps = file_path.split('.')
             end_str = path_comps[-2]
-            end_str = ''.join([end_str, '(', str(i), ')'])
-            path_comps[-2] = end_str
-            file_path = os.path.abspath('.'.join(path_comps))
-            exists = os.path.isfile(file_path)
+            while exists:
+                i += 1
+                end_str_new = ''.join([end_str, '(', str(i), ')'])
+                path_comps[-2] = end_str_new
+                file_path_new = os.path.abspath('.'.join(path_comps))
+                exists = os.path.isfile(file_path_new)
+            file_path = file_path_new
 
     return file_path
 
