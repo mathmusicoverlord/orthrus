@@ -8,6 +8,8 @@ import pandas as pd
 from datasci.core.dataset import DataSet
 from datasci.core.helper import generate_save_path
 from datasci.core.helper import save_object
+import warnings
+from copy import deepcopy
 import ray
 
 
@@ -39,7 +41,7 @@ class Process(ABC):
 
         return self._process_name
 
-    def run_(self, ds:DataSet, **kwargs):
+    def preprocess_(self, ds:DataSet, **kwargs):
 
         ## prep for subclasses run_ method ##
 
@@ -49,7 +51,11 @@ class Process(ABC):
 
         return ds_new
 
-    def prerun(self, ds:DataSet, batch_args:dict = None):
+    @abstractmethod
+    def run_(self, ds:DataSet, **kwargs):
+        pass
+
+    def run(self, ds:DataSet, batch_args:dict = None):
 
         if batch_args is None:
             self.results_ = dict(batch=self.run_(ds))
@@ -62,7 +68,11 @@ class Process(ABC):
             # intialize results
             self.results_ = dict()
             for batch in batch_args:
+                if self.verbosity > 0:
+                    print(batch + ':')
                 self.results_[batch] = self.run_(ds, **batch_args[batch])
+                if self.verbosity > 0:
+                    print()
 
         return ds, self.results_
 
@@ -102,8 +112,6 @@ class Process(ABC):
         save_object(self, save_path)
 
 
-
-
 class Partition(Process):
 
     def __init__(self,
@@ -130,12 +138,10 @@ class Partition(Process):
         self.split_args = split_args
         self.split_handle = split_handle
 
-        # set attributes
-
     def run_(self, ds:DataSet, **kwargs):
 
-        # run the supers run_ method
-        ds_new = super(Partition, self).run_(ds, **kwargs)
+        # run the supers preprocess_ method
+        ds_new = self.preprocess_(ds, **kwargs)
 
         # check for validation in existing labels
         tvt_labels = kwargs.get('tvt_labels', None)
@@ -147,7 +153,7 @@ class Partition(Process):
             raise ValueError("Labels already contain training, validation, and test!")
 
         # initialize parition result
-        result =  dict()
+        result = dict()
 
         # grab verbosity
         verbosity = self.verbosity
@@ -198,7 +204,7 @@ class Partition(Process):
     def run(self, ds:DataSet, batch_args:dict = None, append_labels=True):
 
         # run the super first
-        super(Partition, self).prerun(ds, batch_args)
+        super(Partition, self).run(ds, batch_args)
 
         # collect super results
         results = dict()
@@ -241,6 +247,108 @@ class Partition(Process):
 
         # save labels as .csv
         results.to_csv(save_path)
+
+
+class Transform(Process):
+
+    def __init__(self,
+                 process: object,
+                 process_name: str = None,
+                 parallel: bool = False,
+                 verbosity: int = 0,
+                 by_coordinate: bool = False,
+                 fit_handle: str = 'fit',
+                 transform_handle: str = 'transform',
+                 fit_transform_handle: str = 'fit_transform',
+                 supervised_attr: str = None,
+                 transform_args: dict = {}):
+
+
+        # init with Process class
+        super(Transform, self).__init__(process=process,
+                                        process_name=process_name,
+                                        parallel=parallel,
+                                        verbosity=verbosity,
+                                        )
+
+        # set private parameters
+        self._fit_handle = fit_handle
+        self._transform_handle = transform_handle
+        self._fit_transform_handle = fit_transform_handle
+
+        # set public parameters
+        self.by_coordinate = by_coordinate
+        self.supervised_attr = supervised_attr
+        self.transform_args = transform_args
+
+        # check appropriate parameters
+        if self._fit_handle is None or self._transform_handle is None:
+            if self._fit_transform_handle is None:
+                raise ValueError("Transform must have either both a fit method and a transform method or just a fit_transform method!")
+            else:
+                warnings.warn("Transform will use its fit_transform method to fit."
+                              " Make sure that its fit_transform method fits"
+                              " the transformation inplace!")
+
+    def run_(self, ds:DataSet, **kwargs):
+
+        # run the super's preprocess_ method
+        ds_new = self.preprocess_(ds, **kwargs)
+
+        # initalize output
+        result = dict()
+
+        # grab training labels
+        tvt_labels = kwargs.get('tvt_labels', None)
+        if tvt_labels is None or self._transform_handle is None:
+            training_ids = ds_new.index
+        else:
+            training_ids = (tvt_labels == 'Train')
+
+        #  fit the transform
+        if self.supervised_attr is not None:
+            y = ds.metadata.loc[training_ids, self.supervised_attr]
+            self.transform_args['y'] = y
+
+        if (self._fit_handle is not None) and (self._transform_handle is not None):
+            if self.verbosity > 0:
+                print(r"Fitting %s..." % (self.process_name,))
+            process = deepcopy(self.process)
+            process = eval("process." + self._fit_handle)(ds.data.loc[training_ids], **self.transform_args)
+        else:
+            process = None
+
+        # define transform object for a dataset
+        def transform(ds:DataSet):
+            if process is None:
+                if self.verbosity > 0:
+                    print(r"Fitting %s..." % (self.process_name,))
+                data_new = eval("process." + self._fit_transform_handle)(ds.data, **self.transform_args)
+            else:
+                data_new = eval("process." + self._transform_handle)(ds.data)
+            if self.by_coordinate:
+                try:
+                    data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
+                    ds_new = deepcopy(ds)
+                    ds_new.data = data_new
+                except ValueError:
+                    raise ValueError("Transform changes the dimension of the data and therefore cannot be a coordinate-by-coordinate transformation!")
+            else:
+                data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=['_'.join([self.process_name, str(i)]) for i in range(data_new.shape[1])])
+                ds_new = DataSet(data=data_new, metadata=ds.metadata)
+
+            return ds_new
+
+        # store resulting transform
+        result['transform'] = transform
+
+        return result
+
+
+    def save_results(self, save_path: str, overwrite: bool = False):
+        pass
+
+
 
 
 
