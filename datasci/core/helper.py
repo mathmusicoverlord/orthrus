@@ -878,22 +878,20 @@ def load_object(file_path: str, block=True):
     if block:
         # open file and unpickle
         with open(file_path, 'rb') as f:
-            # # try to unpickle
-            # try:
-            #     return pickle.load(f)
-            # except AttributeError:
-            #     return dill.load(f)
-            return dill.load(f)
+            # try to unpickle
+            try:
+                return pickle.load(f)
+            except AttributeError:
+                return dill.load(f)
     else:
         try:
             # open file and unpickle
             with open(file_path, 'rb') as f:
-            #     # try to unpickle
-            #     try:
-            #         return pickle.load(f)
-            #     except AttributeError:
-            #         return dill.load(f)
-                return dill.load(f)
+                # try to unpickle
+                try:
+                    return pickle.load(f)
+                except AttributeError:
+                    return dill.load(f)
         except FileNotFoundError:
             return None
 
@@ -918,13 +916,12 @@ def save_object(object, file_path: str, overwrite: bool =False):
 
     # open file
     with open(file_path, 'wb') as f:
-        # try:
-        #     # pickle class instance
-        #     pickle.dump(object, file=f)
-        # except Exception:
-        #     # dill instead
-        #     dill.dump(object, file=f)
-        dill.dump(object, file=f)
+        try:
+            # pickle class instance
+            pickle.dump(object, file=f)
+        except AttributeError:
+            # dill instead
+            dill.dump(object, file=f)
 
 def generate_save_path(file_path: str, overwrite: bool = False):
     """
