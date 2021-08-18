@@ -310,11 +310,14 @@ class Transform(Process):
             y = ds.metadata.loc[training_ids, self.supervised_attr]
             self.transform_args['y'] = y
 
-        if (self._fit_handle is not None) and (self._transform_handle is not None):
+        if self._transform_handle is not None:
             if self.verbosity > 0:
                 print(r"Fitting %s..." % (self.process_name,))
             process = deepcopy(self.process)
-            process = eval("process." + self._fit_handle)(ds.data.loc[training_ids], **self.transform_args)
+            if self._fit_handle is not None:
+                process = eval("process." + self._fit_handle)(ds.data.loc[training_ids], **self.transform_args)
+            else:
+                eval("process." + self._fit_transform_handle)(ds.data.loc[training_ids], **self.transform_args)
         else:
             process = None
 
