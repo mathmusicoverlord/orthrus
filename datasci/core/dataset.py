@@ -15,6 +15,7 @@ from sklearn.preprocessing import FunctionTransformer
 from pandas.core.frame import Series
 from datasci.core.helper import scatter_pyplot
 from datasci.core.helper import scatter_plotly
+from datasci.core.helper import generate_save_path
 
 # classes
 class DataSet:
@@ -917,7 +918,7 @@ class DataSet:
                     print('-' * len(header))
                     print('\n')
 
-    def save(self, file_path: str = None):
+    def save(self, file_path: str = None, overwrite: bool = False):
         """
         This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
         as :py:attr:`DataSet.path`/:py:attr:`DataSet.name`.ds where the spaces in :py:attr:`DataSet.name` are replaced
@@ -925,6 +926,8 @@ class DataSet:
 
         Args:
             file_path (str): Path of the file to save the instance of DataSet to. Default is None.
+
+            overwrite (bool): If True and the file_path already exists, then the associated file will be overwritten.
 
         Returns:
             inplace method.
@@ -941,6 +944,7 @@ class DataSet:
         # check path
         if file_path is None:
             file_path = self.path + '/' + self.name.replace(" ", "_") + '.ds'
+        file_path = generate_save_path(file_path, overwrite)
 
         # pickle class instance
         with open(file_path, 'wb') as f:
