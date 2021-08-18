@@ -81,6 +81,10 @@ class DataSet:
 
         imputation_method (str): Label indicating the imputation used on the data. Default is the empty string.
 
+        n_samples (int): The number of samples in the dataset.
+
+        n_features (int): The number of features in the dataset.
+
         experiments (dict): Holds experimental results. e.g. from :py:meth:`DataSet.classify`.
 
 
