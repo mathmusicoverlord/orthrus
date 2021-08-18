@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import os
 import pickle
+import dill
 from flask import request
 
 
@@ -877,29 +878,50 @@ def load_object(file_path: str, block=True):
     if block:
         # open file and unpickle
         with open(file_path, 'rb') as f:
-            return pickle.load(f)
+            # try to unpickle
+            try:
+                return pickle.load(f)
+            except AttributeError:
+                return dill.load(f)
     else:
         try:
             # open file and unpickle
             with open(file_path, 'rb') as f:
-                return pickle.load(f)
+                # try to unpickle
+                try:
+                    return pickle.load(f)
+                except AttributeError:
+                    return dill.load(f)
         except FileNotFoundError:
             return None
 
-def save_object(object, file_path):
+def save_object(object, file_path: str, overwrite: bool =False):
     """
     This method saves an an object in pickle format at the specified path.
 
     Args:
+        object (object): Object to save to disk.
+
         file_path (str): Path of the file to save the instance to.
+
+        overwrite (bool): If True and the file_path already exists, then the associated file will be overwritten.
 
     Returns:
         inplace method.
 
     """
-    # pickle class instance
+
+    # check if file path exists already
+    file_path = generate_save_path(file_path, overwrite)
+
+    # open file
     with open(file_path, 'wb') as f:
-        pickle.dump(object, file=f)
+        try:
+            # pickle class instance
+            pickle.dump(object, file=f)
+        except AttributeError:
+            # dill instead
+            dill.dump(object, file=f)
 
 def generate_save_path(file_path: str, overwrite: bool = False):
     """
