@@ -489,7 +489,7 @@ class Classify(Fit):
         process = self._fit(ds_new, **kwargs)
 
         # store resulting transform
-        pred, pred_label = self._generate_labels_or_scores(process)
+        pred, pred_label = self._generate_labels_or_scores(process, ds_new)
         result[pred_label] = pred
 
         return result
