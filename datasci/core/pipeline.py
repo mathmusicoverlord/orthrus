@@ -243,6 +243,10 @@ class Partition(Process):
 
         return ds, self.results_
 
+    def compress_results(self):
+        assert self.results_ is not None, "The Partition process has not been run yet!"
+        return pd.DataFrame.from_dict({v['tvt_labels'].name :v['tvt_labels'] for (k,v) in self.results_.items()})
+
     def save_results(self,
                     save_path: str,
                     overwrite: bool = False):
@@ -251,7 +255,7 @@ class Partition(Process):
         save_path = generate_save_path(save_path, overwrite)
 
         # generate dataframe to save labels
-        results = pd.DataFrame.from_dict({v['tvt_labels'].name :v['tvt_labels'] for (k,v) in self.results_.items()})
+        results = self.compress_results()
 
         # save labels as .csv
         results.to_csv(save_path)
@@ -422,12 +426,11 @@ class Transform(Fit):
 
     def transform(self, ds: DataSet):
 
+        assert self.results_ is not None, "Transform must call its run method on a dataset before it can transform a new dataset!"
+
         # transform the incoming data according to transforms
-        try:
-            out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
-            return out
-        except TypeError:
-            raise RuntimeError("Transform must call its run method on a dataset before it can transform a new dataset!")
+        out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
+        return out
 
     def save_results(self, save_path: str, overwrite: bool = False):
 
@@ -472,10 +475,31 @@ class Classify(Fit):
         # check appropriate parameters
         if self._fit_handle is None or self._predict_handle is None:
             raise ValueError("Classify process must have both a fit method and a predict method!")
+    def compress_results(self):
 
+        assert self.results_ is not None, "The Classify process has not been run yet!"
+
+        result_type = list(list(self.results_.values())[0].keys())[0]
+
+        # tuple comprehend the results based on type
+        if result_type == "class_labels":
+            results = tuple(v[result_type].rename(k) for (k, v) in self.results_.items())
+            results = pd.concat(results, axis=1)
+            results.columns.name = self.process_name + " labels"
+        elif result_type == "class_scores":
+            results = tuple(v[result_type].rename(columns={col: '_'.join([k, col]) for col in v[result_type].columns}) for (k, v) in self.results_.items())
+            results = pd.concat(results, axis=1)
+
+            return results
 
     def save_results(self, save_path: str, overwrite: bool = False):
-        pass
+
+        # check type of result
+        results = self.compress_results()
+
+        # save the results as .csv
+        save_path = generate_save_path(save_path, overwrite)
+        results.to_csv(save_path)
 
     def _run(self, ds: DataSet, **kwargs):
 
@@ -505,7 +529,7 @@ class Classify(Fit):
         try:
             predictions.shape[1]
             pred = pd.DataFrame(data=predictions, index=ds.metadata.index, columns=eval("process." + self._classes_handle))
-            pred.name = self.process_name + " scores"
+            pred.columns.name = self.process_name + " scores"
             pred_label = 'class_scores'
         except IndexError:
             pred = pd.Series(name=self.process_name + " labels", data=predictions, index=ds.metadata.index)
