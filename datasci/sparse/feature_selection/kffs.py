@@ -3,6 +3,7 @@ import torch as tc
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.model_selection import KFold
 from copy import deepcopy
 
@@ -62,6 +63,9 @@ class KFFS(BaseEstimator):
             inplace method. Results are stored in :py:attr:`KFFS.classifiers_`, :py:attr:`KFFS.ranks_`, and :py:attr:`KFFS.results_`.
         '''
 
+        # check X, y
+        X, y = check_X_y(X, y)
+
         # restrict to training samples
         if self.training_ids is not None:
             X_r = X[self.training_ids, :]
@@ -119,6 +123,21 @@ class KFFS(BaseEstimator):
         index = self.results_.index[(-occurences).argsort().values]
         self.results_.loc[index, 'top_' + str(threshold) + '_rank'] = np.arange(0, len(occurences))
         self.ranks_ = self.results_['top_' + str(threshold) + '_rank'].values
+
+    def transform(self, X, n_top_features=10):
+
+        # check X
+        X = check_array(X)
+
+        # Check is fit had been called
+        check_is_fitted(self)
+
+        # calculate top ids
+        ids = self.ranks_ >= n_top_features
+
+        return X[:, ids]
+
+
 
 
 
