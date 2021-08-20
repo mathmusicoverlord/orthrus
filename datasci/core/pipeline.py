@@ -908,23 +908,27 @@ class Score(Process):
         y_pred = deepcopy(y_pred.loc[y_true.index])
         tvt_labels = deepcopy(tvt_labels.loc[y_true.index])
 
+        # make a deep copy of the score_args
+        score_args = deepcopy(self.score_args)
+
         # check for labels
-        labels = self.score_args.get('labels', None)
-        if labels is None:
-            labels = y_true.unique().tolist()
-            try:
-                scorer([], [], labels=None)
-                self.score_args['labels'] = labels
-            except TypeError:
-                pass
+        if 'class' in pred_type:
+            labels = score_args.get('labels', None)
+            if labels is None:
+                labels = np.unique(y_true.values.reshape(-1,)).tolist()
+                try:
+                    self.process([], [], labels=None)
+                    score_args['labels'] = labels
+                except TypeError:
+                    pass
 
         # check for using sample_weights in scorer
         try:
             # it works
-            scorer([], [], sample_weight=None)
+            self.process([], [], sample_weight=None)
 
             # grab the weights from score_args if possible
-            sample_weight = self.score_args.get('sample_weight', None)
+            sample_weight = score_args.get('sample_weight', None)
 
             # check if the sample_weight_attr exists in Score parameters
             if self._sample_weight_attr is not None:
@@ -934,7 +938,7 @@ class Score(Process):
                         " with the weights implied by sample_weight_attr!" % (self.__class__.__name__,))
 
                     # pop from original args
-                    self.score_args.pop('sample_weight')
+                    score_args.pop('sample_weight')
                 sample_weight = ds.metadata[self._sample_weight_attr]
             else:
                 # check if sample weight is None
@@ -947,10 +951,10 @@ class Score(Process):
                                          " in your dataset!")
                     else:
                         # make into series
-                        sample_weight = Series(index=ds.metadata.index, data=sample_weight).loc[ds_new.index]
+                        sample_weight = Series(index=ds.metadata.index, data=sample_weight).loc[ds_new.metadata.index]
 
                     # pop from original args
-                    self.score_args.pop('sample_weight')
+                    score_args.pop('sample_weight')
 
         except TypeError:
             sample_weight = None
@@ -967,10 +971,10 @@ class Score(Process):
 
             # generate sample weights on slice
             if sample_weight is not None:
-                self.score_args['sample_weight'] = sample_weight.loc[ids].values
+                score_args['sample_weight'] = sample_weight.loc[ids].values
 
             # compute score
-            score = scorer(y_true, y_pred, **self.score_args)
+            score = scorer(y_true.loc[ids], y_pred.loc[ids], **score_args)
 
             # check type of score an retype scores as needed
             if i == 0:
@@ -986,6 +990,8 @@ class Score(Process):
         # update result
         pred_type_prefix = pred_type.split('_')[0]
         result['_'.join([pred_type_prefix, 'pred_scores'])] = scores
+
+        return result
 
 
     def _process_classification_labels(self, score_process: Callable):
@@ -1087,3 +1093,4 @@ class Score(Process):
             return class_labels_scorer
 
     def _process_regression_results(self):
+        pass
