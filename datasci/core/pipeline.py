@@ -4,6 +4,7 @@ This module contains the classes and functions associated with pipeline componen
 
 from abc import ABC, abstractmethod
 from typing import Union, Callable
+import inspect
 import os
 import pandas as pd
 from numpy import ndarray
@@ -16,7 +17,12 @@ import warnings
 from copy import deepcopy
 import ray
 
+
 # module functions
+def _valid_args(func: Callable):
+
+    return list(inspect.signature(func).parameters.keys())
+
 def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
     # initalize out
@@ -846,7 +852,7 @@ class Score(Process):
                  parallel: bool = False,
                  verbosity: int = 0,
                  score_args: dict = {},
-                 apply_to: str = 'class_labels',
+                 pred_type: str = 'class_labels',
                  sample_weight_attr: str = None,
                  infer_class_labels_on_output=True,
                  ):
@@ -859,7 +865,7 @@ class Score(Process):
                                     )
         # parameters
         self.process = process
-        self.pred_type = apply_to
+        self.pred_type = pred_type
         self.pred_attr = pred_attr
         self.score_args = score_args
 
@@ -916,16 +922,11 @@ class Score(Process):
             labels = score_args.get('labels', None)
             if labels is None:
                 labels = np.unique(y_true.values.reshape(-1,)).tolist()
-                try:
-                    self.process([], [], labels=None)
+                if 'labels' in _valid_args(self.process):
                     score_args['labels'] = labels
-                except TypeError:
-                    pass
 
         # check for using sample_weights in scorer
-        try:
-            # it works
-            self.process([], [], sample_weight=None)
+        if 'sample_weight' in _valid_args(self.process):
 
             # grab the weights from score_args if possible
             sample_weight = score_args.get('sample_weight', None)
@@ -955,8 +956,7 @@ class Score(Process):
 
                     # pop from original args
                     score_args.pop('sample_weight')
-
-        except TypeError:
+        else:
             sample_weight = None
 
 
@@ -1004,40 +1004,8 @@ class Score(Process):
                 # grab labels
                 labels = kwargs.get('labels', [])
 
-                # check if score is array-like
-                if isinstance(score, (list, tuple, ndarray)):
-
-                    score = np.array(score)  # convert to ndarray for consistency
-
-                    # handle 1-d case
-                    if len(score.shape) in [1, 2]:
-
-                        # check length of output compared to labels
-                        if score.shape[0] == len(labels):
-
-                            # apply labels?
-                            if self._infer_class_labels_on_output:
-                                index = labels
-                            else:
-                                index = None
-                        else:
-                            index = None
-
-                        if len(score.shape) == 2:
-                            if score.shape[1] == len(labels):
-                                # apply labels?
-                                if self._infer_class_labels_on_output:
-                                    columns = labels
-                                else:
-                                    columns = None
-                            else:
-                                columns = None
-
-                            # create dataframe of score
-                            score = DataFrame(data=score, index=index, columns=columns)
-                        else:
-                            # create series of score
-                            score = Series(data=score, index=index)
+                # format the score with labels
+                score = self._format_ndarray_output_with_labels(score, labels)
 
                 return score
 
@@ -1045,52 +1013,64 @@ class Score(Process):
 
     def _process_classification_scores(self, score_process: Callable):
 
-            def class_labels_scorer(*args, **kwargs):
+            def class_scores_scorer(y_true, y_pred, **kwargs):
+
+                # change shape of y_true to mimic scores (one-hot-encoding)
+                y_true_reformated = DataFrame(index=y_true.index,
+                                              data=[(y_true == col).astype(int).values for col in y_pred.columns],
+                                              columns=y_pred.columns)
 
                 # apply plain scorer
-                score = score_process(*args, **kwargs)
+                score = score_process(y_true_reformated.values, y_pred.values, **kwargs)
 
                 # grab labels
                 labels = kwargs.get('labels', [])
 
-                # check if score is array-like
-                if isinstance(score, (list, tuple, ndarray)):
-
-                    score = np.array(score)  # convert to ndarray for consistency
-
-                    # handle 1-d case
-                    if len(score.shape) in [1, 2]:
-
-                        # check length of output compared to labels
-                        if score.shape[0] == len(labels):
-
-                            # apply labels?
-                            if self._infer_class_labels_on_output:
-                                index = labels
-                            else:
-                                index = None
-                        else:
-                            index = None
-
-                        if len(score.shape) == 2:
-                            if score.shape[1] == len(labels):
-                                # apply labels?
-                                if self._infer_class_labels_on_output:
-                                    columns = labels
-                                else:
-                                    columns = None
-                            else:
-                                columns = None
-
-                            # create dataframe of score
-                            score = DataFrame(data=score, index=index, columns=columns)
-                        else:
-                            # create series of score
-                            score = Series(data=score, index=index)
+                # format the score with labels
+                score = self._format_ndarray_output_with_labels(score, labels)
 
                 return score
 
-            return class_labels_scorer
+            return class_scores_scorer
 
     def _process_regression_results(self):
         pass
+
+    def _format_ndarray_output_with_labels(self, score, labels):
+
+        # check if score is array-like
+        if isinstance(score, (list, tuple, ndarray)):
+
+            score = np.array(score)  # convert to ndarray for consistency
+
+            # handle 1-d case
+            if len(score.shape) in [1, 2]:
+
+                # check length of output compared to labels
+                if score.shape[0] == len(labels):
+
+                    # apply labels?
+                    if self._infer_class_labels_on_output:
+                        index = labels
+                    else:
+                        index = None
+                else:
+                    index = None
+
+                if len(score.shape) == 2:
+                    if score.shape[1] == len(labels):
+                        # apply labels?
+                        if self._infer_class_labels_on_output:
+                            columns = labels
+                        else:
+                            columns = None
+                    else:
+                        columns = None
+
+                    # create dataframe of score
+                    score = DataFrame(data=score, index=index, columns=columns)
+                else:
+                    # create series of score
+                    score = Series(data=score, index=index)
+
+        return score
