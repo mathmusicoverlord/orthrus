@@ -855,6 +855,7 @@ class Score(Process):
                  pred_type: str = 'class_labels',
                  sample_weight_attr: str = None,
                  infer_class_labels_on_output=True,
+                 classes: list = None,
                  ):
 
         # init with Process class
@@ -870,6 +871,7 @@ class Score(Process):
         self.score_args = score_args
 
         # private attributes
+        self._classes = classes
         self._sample_weight_attr = sample_weight_attr
         self._infer_class_labels_on_output = infer_class_labels_on_output
 
@@ -919,11 +921,24 @@ class Score(Process):
 
         # check for labels
         if 'class' in pred_type:
+            # get labels arg from scorer arguments
             labels = score_args.get('labels', None)
-            if labels is None:
-                labels = np.unique(y_true.values.reshape(-1,)).tolist()
-                if 'labels' in _valid_args(self.process):
-                    score_args['labels'] = labels
+
+            # if _classes is provided then use this for sort order and restricting
+            if self._classes is not None:
+                score_args['labels'] = self._classes
+                if labels is not None:
+                    # Let the user know we are ignoring their input here
+                    warnings.warn("Both %s._classes and labels in score_args is given! %s will use %s._classes"
+                                  " inplace of labels for sorting and restricting score output." % (self.__class__.__name__,
+                                                                                                    self.__class__.__name__,
+                                                                                                    self.__class__.__name__))
+            else:
+                # set default value here
+                if labels is None:
+                    labels = np.unique(y_true.values.reshape(-1,)).tolist()
+                    if 'labels' in _valid_args(self.process):
+                        score_args['labels'] = labels
 
         # check for using sample_weights in scorer
         if 'sample_weight' in _valid_args(self.process):
@@ -1019,12 +1034,18 @@ class Score(Process):
                 y_true_reformated = DataFrame(index=y_true.index,
                                               data=np.array([(y_true == col).astype(int).values.reshape(-1,) for col in y_pred.columns]).transpose(),
                                               columns=y_pred.columns)
-
-                # apply plain scorer
-                score = score_process(y_true_reformated.values, y_pred.values, **kwargs)
-
                 # grab labels
                 labels = kwargs.get('labels', [])
+
+                if 'labels' in _valid_args(score_process) or labels == []:
+                    # apply plain scorer
+                    score = score_process(y_true_reformated.values, y_pred.values, **kwargs)
+                else:
+                    new_args = deepcopy(kwargs)
+                    new_args.pop('labels')
+                    y_true_reformated = y_true_reformated[labels]
+                    y_pred = y_pred[labels]
+                    score = score_process(y_true_reformated.values, y_pred.values, **new_args)
 
                 # format the score with labels
                 score = self._format_ndarray_output_with_labels(score, labels)
