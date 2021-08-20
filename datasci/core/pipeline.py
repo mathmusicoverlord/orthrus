@@ -17,7 +17,7 @@ from copy import deepcopy
 import ray
 
 # module functions
-def _compress_dict_dict_pandas(kv: dict, inner_key: str, which:str = 'series', **kwargs) -> DataFrame:
+def _compress_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
     # initalize out
     out = DataFrame()
@@ -28,11 +28,13 @@ def _compress_dict_dict_pandas(kv: dict, inner_key: str, which:str = 'series', *
     col_prefix = kwargs.get('col_prefix', None)
     col_prefix = '' if col_prefix is None else col_prefix + '_'
 
-    # tuple comprehend the results based on type
-    if which == "series":
-        out = tuple(v[inner_key].rename(col_prefix + k + col_suffix) for (k, v) in kv.items())
+    # infer Series or DataFrame
+    pd_object = list(kv.values())[0][inner_key]
 
-    elif which == "dataframe":
+    # tuple comprehend the results based on type
+    if type(pd_object) == Series:
+        out = tuple(v[inner_key].rename(col_prefix + k + col_suffix) for (k, v) in kv.items())
+    elif type(pd_object) == DataFrame:
         out = tuple(v[inner_key].rename(columns={col: col_prefix + '_'.join([k, col]) + col_suffix for col in v[inner_key].columns})
                     for (k, v) in kv.items())
 
@@ -42,8 +44,8 @@ def _compress_dict_dict_pandas(kv: dict, inner_key: str, which:str = 'series', *
 
     return out
 
-# module classes
 
+# module classes
 class Process(ABC):
 
     def __init__(self,
@@ -390,7 +392,6 @@ class Partition(Process):
         # compress the dict of dict of series to dataframe
         results = _compress_dict_dict_pandas(kv=self.results_,
                                              inner_key="tvt_labels",
-                                             which='series',
                                              columns_name=self.process_name + " splits",
                                              col_suffix="split")
         return results
@@ -463,7 +464,8 @@ class Transform(Fit):
                  transform_handle: str = 'transform',
                  fit_transform_handle: str = 'fit_transform',
                  supervised_attr: str = None,
-                 fit_args: dict = {}):
+                 fit_args: dict = {},
+                 transform_args: dict = {}):
 
 
         # init with Process class
@@ -478,6 +480,7 @@ class Transform(Fit):
 
         # set parameters
         self.retain_f_ids = retain_f_ids
+        self.transform_args = transform_args
 
         # set private attributes
         self._transform_handle = transform_handle
@@ -486,11 +489,11 @@ class Transform(Fit):
         # check appropriate parameters
         if self._fit_handle is None or self._transform_handle is None:
             if self._fit_transform_handle is None:
-                raise ValueError("Transform process must have either both a fit method and a transform method or just a fit_transform method!")
+                raise ValueError("%s process must have either both a fit method and a transform method or just a fit_transform method!" % (self.__class__.__name__,))
             else:
-                warnings.warn("Transform will use its fit_transform method to fit."
+                warnings.warn("%s will use its fit_transform method to fit."
                               " Make sure that its fit_transform method fits"
-                              " the transformation inplace!")
+                              " the transformation inplace!" % (self.__class__.__name__,))
 
     def _fit_transform(self, ds: DataSet, **kwargs):
 
@@ -519,16 +522,16 @@ class Transform(Fit):
         ds_new = self._preprocess(ds, **kwargs)
 
         # attempt to fit
-        if self._transform_handle is not None:
-            if self._fit_handle is not None:
-                process = self._fit(ds_new, **kwargs)
-            else:
-                process, _ = self._fit_transform(ds_new, **kwargs)
+        if self._fit_handle is not None:
+            process = self._fit(ds_new, **kwargs)
         else:
-            process = None
+            process, _ = self._fit_transform(ds_new, **kwargs)
 
         # store resulting transform
         result['transform'] = self._generate_transform(process)
+
+        # store the resulting transformer
+        result['transformer'] = process
 
         return result
 
@@ -536,12 +539,12 @@ class Transform(Fit):
 
         # define transform
         def transform(ds: DataSet):
-            if process is None:
+            if self._transform_handle is None:
                 _, data_new = self._fit_transform(ds)
             else:
                 if self.verbosity > 0:
                     print(r"Transforming the data using %s..." % (self.process_name,))
-                data_new = eval("process." + self._transform_handle)(ds.data)
+                data_new = eval("process." + self._transform_handle)(ds.data, **self.transform_args)
             if self.retain_f_ids:
                 try:
                     data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
@@ -575,77 +578,55 @@ class Feature_Select(Transform):
                  process_name: str = None,
                  parallel: bool = False,
                  verbosity: int = 0,
-                 retain_f_ids: bool = False,
                  fit_handle: str = 'fit',
                  transform_handle: str = 'transform',
-                 fit_transform_handle: str = 'fit_transform',
                  supervised_attr: str = None,
-                 fit_args: dict = {}):
+                 fit_args: dict = {},
+                 transform_args: dict = {},
+                 f_ranks_handle: str = None):
 
 
         # init with Process class
-        super(Transform, self).__init__(process=process,
-                                        process_name=process_name,
-                                        parallel=parallel,
-                                        verbosity=verbosity,
-                                        supervised_attr=supervised_attr,
-                                        fit_handle=fit_handle,
-                                        fit_args=fit_args,
-                                        )
+        super(Feature_Select, self).__init__(process=process,
+                                             process_name=process_name,
+                                             parallel=parallel,
+                                             verbosity=verbosity,
+                                             supervised_attr=supervised_attr,
+                                             fit_handle=fit_handle,
+                                             fit_args=fit_args,
+                                             transform_args=transform_args,
+                                             transform_handle=transform_handle,
+                                             )
 
-        # set parameters
-        self.retain_f_ids = retain_f_ids
+        # remove unnecessary attribute
+        del self.retain_f_ids
 
-        # set private attributes
-        self._transform_handle = transform_handle
-        self._fit_transform_handle = fit_transform_handle
+        # enforce there to be both a fit and a transform method
+        assert self._fit_handle is not None and self._transform_handle is not None, \
+            "Feature_Select process must have both a fit method for discovering" \
+            " features and a transform method to restrict features."
 
-        # check appropriate parameters
-        if self._fit_handle is None or self._transform_handle is None:
-            if self._fit_transform_handle is None:
-                raise ValueError("Transform process must have either both a fit method and a transform method or just a fit_transform method!")
-            else:
-                warnings.warn("Transform will use its fit_transform method to fit."
-                              " Make sure that its fit_transform method fits"
-                              " the transformation inplace!")
+        # private attributes
+        self._f_ranks_handle = f_ranks_handle
 
-    def _fit_transform(self, ds: DataSet, **kwargs):
+    def _preprocess(self, ds:DataSet, **kwargs):
+        return ds  # avoid double preprocessing from Transform
 
-        # extract training ids
-        training_ids = self._extract_training_ids(ds, **kwargs)
+    def _run(self, ds: DataSet, **kwargs):
 
-        #  add supervised labels to fit args
-        if self.supervised_attr is not None:
-            y = ds.metadata.loc[training_ids, self.supervised_attr]
-            self.fit_args['y'] = y
+        # preprocess data with the super
+        ds_new = super(Feature_Select, self)._preprocess(ds, **kwargs)
 
-        # fit the process
-        if self.verbosity > 0:
-            print(r"Fitting %s and then transforming data..." % (self.process_name,))
-        process = deepcopy(self.process)
-        data = eval("process." + self._fit_transform_handle)(ds.data.loc[training_ids], **self.fit_args)
+        # run the super method
+        result = super(Feature_Select, self)._run(ds_new, **kwargs)
 
-        return process, data
+        # change name of transformer to selector
+        process = result['transformer']
+        result['selector'] = process
+        del result['transformer']
 
-    def _run(self, ds:DataSet, **kwargs):
-
-        # initalize output
-        result = dict()
-
-        # run the super's _preprocess method
-        ds_new = self._preprocess(ds, **kwargs)
-
-        # attempt to fit
-        if self._transform_handle is not None:
-            if self._fit_handle is not None:
-                process = self._fit(ds_new, **kwargs)
-            else:
-                process, _ = self._fit_transform(ds_new, **kwargs)
-        else:
-            process = None
-
-        # store resulting transform
-        result['transform'] = self._generate_transform(process)
+        # append feature ranks
+        result.update(self._generate_f_ranks(process, ds_new))
 
         return result
 
@@ -653,28 +634,53 @@ class Feature_Select(Transform):
 
         # define transform
         def transform(ds: DataSet):
-            if process is None:
-                _, data_new = self._fit_transform(ds)
-            else:
-                if self.verbosity > 0:
-                    print(r"Transforming the data using %s..." % (self.process_name,))
-                data_new = eval("process." + self._transform_handle)(ds.data)
-            if self.retain_f_ids:
-                try:
-                    data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
-                    ds_new = deepcopy(ds)
-                    ds_new.data = data_new
-                except ValueError:
-                    raise ValueError("Transform changes the dimension of the data and therefore cannot retain the original feature ids in the new dataset!")
-            else:
-                data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=['_'.join([self.process_name, str(i)]) for i in range(data_new.shape[1])])
-
-                # check if features are the same after transformation and use original feature ids for columns
-                ds_new = DataSet(data=data_new, metadata=ds.metadata)
+            if self.verbosity > 0:
+                print(r"Restricting features in the data using %s..." % (self.process_name,))
+            select = eval("process." + self._transform_handle)
+            feature_ids = select(ds.data.columns.to_numpy().reshape(1, -1), **self.transform_args)
+            ds_new = ds.slice_dataset(feature_ids=feature_ids)
 
             return ds_new
 
         return transform
+
+    def _generate_f_ranks(self, process: object, ds: DataSet):
+
+        # initialize out
+        out = {}
+
+        # check for f_ranks attribute
+        if self._f_ranks_handle is not None:
+            f_ranks = eval("process." + self._f_ranks_handle)
+            if type(f_ranks) == DataFrame:
+                f_ranks.rename(index=dict(zip(f_ranks.index.tolist(), ds.vardata.index.tolist())))
+                f_ranks.columns.name = self.process_name + " f_ranks"
+            else:
+                f_ranks = np.array(f_ranks)  # convert to ndarray
+
+                # check shape
+                if len(f_ranks.shape) == 1:
+                    f_ranks = Series(index=ds.vardata.index,
+                                     data=f_ranks,
+                                     name=self.process_name + " f_ranks")
+                else:
+                    f_ranks = DataFrame(index=ds.vardata.index,
+                                        data=f_ranks)
+                    f_ranks.columns.name = self.process_name + " f_ranks"
+
+            # update output
+            out.update({'f_ranks': f_ranks})
+
+        return out
+
+    def _compress_f_ranks(self):
+
+        # compress the dict of dict of dataframe to dataframe
+        results = _compress_dict_dict_pandas(kv=self.results_,
+                                             inner_key="f_ranks",
+                                             columns_name=self.process_name + " f_ranks",
+                                             col_suffix="f_ranks")
+        return results
 
     def transform(self, ds: DataSet):
 
@@ -683,11 +689,6 @@ class Feature_Select(Transform):
         # transform the incoming data according to transforms
         out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
         return out
-
-    def save_results(self, save_path: str, overwrite: bool = False):
-
-        # call save_object on results
-        save_object(self.results_, save_path, overwrite)
 
 
 class Classify(Fit):
@@ -737,7 +738,6 @@ class Classify(Fit):
         # compress the dict of dict of series to dataframe
         results = _compress_dict_dict_pandas(kv=self.results_,
                                              inner_key="class_labels",
-                                             which='series',
                                              columns_name=self.process_name + " labels",
                                              col_suffix='_'.join([self.process_name, "labels"]))
         return results
@@ -757,7 +757,6 @@ class Classify(Fit):
         # compress the dict of dict of series to dataframe
         results = _compress_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_weights",
-                                             which='series',
                                              columns_name=self.process_name + " f_weights",
                                              col_suffix="f_weights")
 
@@ -768,7 +767,6 @@ class Classify(Fit):
         # compress the dict of dict of series to dataframe
         results = _compress_dict_dict_pandas(kv=self.results_,
                                              inner_key="s_weights",
-                                             which='series',
                                              columns_name=self.process_name + " s_weights",
                                              col_suffix="s_weights")
 
@@ -804,12 +802,11 @@ class Classify(Fit):
         predictions = eval("process." + self._predict_handle)(ds.data)
 
         # format output as series if labels
-        try:
-            predictions.shape[1]
+        if len(predictions.shape) == 2:
             pred = pd.DataFrame(data=predictions, index=ds.metadata.index, columns=eval("process." + self._classes_handle))
             pred.columns.name = self.process_name + " scores"
             pred_label = 'class_scores'
-        except IndexError:
+        else:
             pred = pd.Series(name=self.process_name + " labels", data=predictions, index=ds.metadata.index)
             pred_label = 'class_labels'
 
