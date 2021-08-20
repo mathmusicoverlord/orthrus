@@ -124,6 +124,8 @@ class KFFS(BaseEstimator):
         self.results_.loc[index, 'top_' + str(threshold) + '_rank'] = np.arange(0, len(occurences))
         self.ranks_ = self.results_['top_' + str(threshold) + '_rank'].values
 
+        return self
+
     def transform(self, X, n_top_features=10):
 
         # check X
