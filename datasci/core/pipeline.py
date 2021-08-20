@@ -1017,7 +1017,7 @@ class Score(Process):
 
                 # change shape of y_true to mimic scores (one-hot-encoding)
                 y_true_reformated = DataFrame(index=y_true.index,
-                                              data=[(y_true == col).astype(int).values for col in y_pred.columns],
+                                              data=np.array([(y_true == col).astype(int).values.reshape(-1,) for col in y_pred.columns]).transpose(),
                                               columns=y_pred.columns)
 
                 # apply plain scorer
