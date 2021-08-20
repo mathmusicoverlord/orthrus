@@ -841,13 +841,14 @@ class Score(Process):
 
     def __init__(self,
                  process: Callable,
-                 class_attr: str,
+                 pred_attr: Union[str, list],
                  process_name: str = None,
                  parallel: bool = False,
                  verbosity: int = 0,
                  score_args: dict = {},
-                 class_type: str = 'labels',
-                 infer_labels_on_output=True,
+                 apply_to: str = 'class_labels',
+                 sample_weight_attr: str = None,
+                 infer_class_labels_on_output=True,
                  ):
 
         # init with Process class
@@ -858,12 +859,13 @@ class Score(Process):
                                     )
         # parameters
         self.process = process
-        self.class_type = class_type
-        self.class_attr = class_attr
+        self.pred_type = apply_to
+        self.pred_attr = pred_attr
         self.score_args = score_args
 
         # private attributes
-        self._infer_labels_on_output = infer_labels_on_output
+        self._sample_weight_attr = sample_weight_attr
+        self._infer_class_labels_on_output = infer_class_labels_on_output
 
     def _run(self, ds: DataSet, **kwargs):
 
@@ -875,12 +877,32 @@ class Score(Process):
         score_rows = tvt_labels.unique()
 
         # grab classification labels/scores
-        class_result_key = '_'.join(['class', self.class_type])
-        y_pred = kwargs.get(class_result_key, None)
-        assert y_pred is not None, "%s process requires classification labels or scores in order to compute metrics!" % (self.__class__.__name__,)
+        pred_type = self.pred_type
+        y_pred = kwargs.get(pred_type, None)
+        assert y_pred is not None, "%s process requires predictions in order to compute metrics!" % (self.__class__.__name__,)
+
+        # initialize result
+        result = dict()
+
+        # decorate scoring object based on task
+        if pred_type == "class_labels":
+            scorer = self._process_classification_labels(self.process)
+        elif pred_type == "class_scores":
+            scorer = self._process_classification_scores(self.process)
+        elif pred_type == "reg_values":
+            scorer = self._process_regression_values(self.process)
+        else:
+            raise NotImplementedError("%s currently can not handle scoring %s, check your pred_type attribute!" % (self.__class__.__name__, self.pred_type))
+
+        # initialize output
+        scores = pd.Series(index=score_rows, name=self.process_name)
 
         # grab true labels
-        y_true = pd.Series(index=ds_new.metadata.index, data=ds_new.metadata[self.class_attr])
+        if type(self.pred_attr) == str:
+            pred_attr = [self.pred_attr]
+        else:
+            pred_attr = self.pred_attr
+        y_true = pd.DataFrame(index=ds_new.metadata.index, data=ds_new.metadata[pred_attr].values, columns=pred_attr)
 
         # restrict class labels/scores and tvt_labels to y_true
         y_pred = deepcopy(y_pred.loc[y_true.index])
@@ -890,59 +912,178 @@ class Score(Process):
         labels = self.score_args.get('labels', None)
         if labels is None:
             labels = y_true.unique().tolist()
-            self.score_args['labels'] = labels
+            try:
+                scorer([], [], labels=None)
+                self.score_args['labels'] = labels
+            except TypeError:
+                pass
 
-        # initalize output
-        result = pd.Series(index=score_rows, name=self.process_name)
+        # check for using sample_weights in scorer
+        try:
+            # it works
+            scorer([], [], sample_weight=None)
+
+            # grab the weights from score_args if possible
+            sample_weight = self.score_args.get('sample_weight', None)
+
+            # check if the sample_weight_attr exists in Score parameters
+            if self._sample_weight_attr is not None:
+                if sample_weight is not None:
+                    warnings.warn(
+                        "Both sample_weight_attr and sample_weights were provided, %s is overriding sample_weights"
+                        " with the weights implied by sample_weight_attr!" % (self.__class__.__name__,))
+
+                    # pop from original args
+                    self.score_args.pop('sample_weight')
+                sample_weight = ds.metadata[self._sample_weight_attr]
+            else:
+                # check if sample weight is None
+                if sample_weight is None:
+                    sample_weight = Series(index=ds_new.metadata.index, data=[1.0]*ds_new.n_samples)
+                else:
+                    # check for the correct length
+                    if len(sample_weight) != ds.n_samples:
+                        raise ValueError("The number of entries in sample_weight must equal the number of samples"
+                                         " in your dataset!")
+                    else:
+                        # make into series
+                        sample_weight = Series(index=ds.metadata.index, data=sample_weight).loc[ds_new.index]
+
+                    # pop from original args
+                    self.score_args.pop('sample_weight')
+
+        except TypeError:
+            sample_weight = None
+
 
         # compute scores
         if self.verbosity > 0:
-            print("Scoring classification with %s..." % (self.process_name,))
-        for tvt in score_rows:
+            print("Scoring predictions with %s..." % (self.process_name,))
+
+        for i, tvt in enumerate(score_rows):
+
+            # compute appropriate indices
+            ids = (tvt_labels == tvt)
+
+            # generate sample weights on slice
+            if sample_weight is not None:
+                self.score_args['sample_weight'] = sample_weight.loc[ids].values
 
             # compute score
-            ids = (tvt_labels == tvt)
+            score = scorer(y_true, y_pred, **self.score_args)
+
+            # check type of score an retype scores as needed
+            if i == 0:
+                if not (type(score) in [int, float, str]):
+                    scores = scores.astype(object)
+
+            # try to store the score (fingers crossed!)
             try:
-                score = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
-                labels_applied = True
-            except TypeError:
-                self.score_args.pop('labels')
-                score = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
-                labels_applied = False
+                scores.loc[tvt] = score
+            except ValueError:
+                scores[tvt] = score
 
-            # check if score is array-like
-            if isinstance(score, (list, tuple, ndarray)):
-                score = np.array(score)  # convert to ndarray for consistency
+        # update result
+        pred_type_prefix = pred_type.split('_')[0]
+        result['_'.join([pred_type_prefix, 'pred_scores'])] = scores
 
-                # handle 1-d case
-                if len(score.shape) in [1, 2]:
 
-                    # check length of output compared to labels
-                    if score.shape[0] == len(labels):
-                        # apply labels?
-                        if self._infer_labels_on_output and labels_applied:
-                            index = labels
+    def _process_classification_labels(self, score_process: Callable):
+
+            def class_labels_scorer(y_true, y_pred, **kwargs):
+
+                # apply plain scorer
+                score = score_process(y_true.values.reshape(-1,), y_pred.values.reshape(-1,), **kwargs)
+
+                # grab labels
+                labels = kwargs.get('labels', [])
+
+                # check if score is array-like
+                if isinstance(score, (list, tuple, ndarray)):
+
+                    score = np.array(score)  # convert to ndarray for consistency
+
+                    # handle 1-d case
+                    if len(score.shape) in [1, 2]:
+
+                        # check length of output compared to labels
+                        if score.shape[0] == len(labels):
+
+                            # apply labels?
+                            if self._infer_class_labels_on_output:
+                                index = labels
+                            else:
+                                index = None
                         else:
                             index = None
-                    else:
-                        index = None
 
-                    if len(score.shape) == 2:
-                        if score.shape[1] == len(labels):
-                            # apply labels?
-                            if self._infer_labels_on_output and labels_applied:
-                                columns = labels
+                        if len(score.shape) == 2:
+                            if score.shape[1] == len(labels):
+                                # apply labels?
+                                if self._infer_class_labels_on_output:
+                                    columns = labels
+                                else:
+                                    columns = None
                             else:
                                 columns = None
+
+                            # create dataframe of score
+                            score = DataFrame(data=score, index=index, columns=columns)
                         else:
-                            columns = None
+                            # create series of score
+                            score = Series(data=score, index=index)
 
-                        # create dataframe of score
-                        score = DataFrame(data=score, index=index, columns=columns)
-                    else:
-                        # create series of score
-                        score = Series(data=score, index=index)
+                return score
 
-            result.loc[tvt] = score
+            return class_labels_scorer
 
-        return {'class_scores': result}
+    def _process_classification_scores(self, score_process: Callable):
+
+            def class_labels_scorer(*args, **kwargs):
+
+                # apply plain scorer
+                score = score_process(*args, **kwargs)
+
+                # grab labels
+                labels = kwargs.get('labels', [])
+
+                # check if score is array-like
+                if isinstance(score, (list, tuple, ndarray)):
+
+                    score = np.array(score)  # convert to ndarray for consistency
+
+                    # handle 1-d case
+                    if len(score.shape) in [1, 2]:
+
+                        # check length of output compared to labels
+                        if score.shape[0] == len(labels):
+
+                            # apply labels?
+                            if self._infer_class_labels_on_output:
+                                index = labels
+                            else:
+                                index = None
+                        else:
+                            index = None
+
+                        if len(score.shape) == 2:
+                            if score.shape[1] == len(labels):
+                                # apply labels?
+                                if self._infer_class_labels_on_output:
+                                    columns = labels
+                                else:
+                                    columns = None
+                            else:
+                                columns = None
+
+                            # create dataframe of score
+                            score = DataFrame(data=score, index=index, columns=columns)
+                        else:
+                            # create series of score
+                            score = Series(data=score, index=index)
+
+                return score
+
+            return class_labels_scorer
+
+    def _process_regression_results(self):
