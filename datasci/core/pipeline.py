@@ -847,6 +847,7 @@ class Score(Process):
                  verbosity: int = 0,
                  score_args: dict = {},
                  class_type: str = 'labels',
+                 infer_labels_on_output=True,
                  ):
 
         # init with Process class
@@ -860,6 +861,9 @@ class Score(Process):
         self.class_type = class_type
         self.class_attr = class_attr
         self.score_args = score_args
+
+        # private attributes
+        self._infer_labels_on_output = infer_labels_on_output
 
     def _run(self, ds: DataSet, **kwargs):
 
@@ -889,7 +893,7 @@ class Score(Process):
             self.score_args['labels'] = labels
 
         # initalize output
-        result = pd.Series(index=score_rows)
+        result = pd.Series(index=score_rows, name=self.process_name)
 
         # compute scores
         if self.verbosity > 0:
@@ -899,9 +903,46 @@ class Score(Process):
             # compute score
             ids = (tvt_labels == tvt)
             try:
-                result[tvt] = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+                score = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+                labels_applied = True
             except TypeError:
                 self.score_args.pop('labels')
-                result[tvt] = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+                score = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+                labels_applied = False
 
-        return result
+            # check if score is array-like
+            if isinstance(score, (list, tuple, ndarray)):
+                score = np.array(score)  # convert to ndarray for consistency
+
+                # handle 1-d case
+                if len(score.shape) in [1, 2]:
+
+                    # check length of output compared to labels
+                    if score.shape[0] == len(labels):
+                        # apply labels?
+                        if self._infer_labels_on_output and labels_applied:
+                            index = labels
+                        else:
+                            index = None
+                    else:
+                        index = None
+
+                    if len(score.shape) == 2:
+                        if score.shape[1] == len(labels):
+                            # apply labels?
+                            if self._infer_labels_on_output and labels_applied:
+                                columns = labels
+                            else:
+                                columns = None
+                        else:
+                            columns = None
+
+                        # create dataframe of score
+                        score = DataFrame(data=score, index=index, columns=columns)
+                    else:
+                        # create series of score
+                        score = Series(data=score, index=index)
+
+            result.loc[tvt] = score
+
+        return {'class_scores': result}
