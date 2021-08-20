@@ -17,7 +17,7 @@ from copy import deepcopy
 import ray
 
 # module functions
-def _compress_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
+def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
     # initalize out
     out = DataFrame()
@@ -133,7 +133,7 @@ class Process(ABC):
         # collect results
         return dict(zip(batch_args.keys(), ray.get(futures)))
 
-    def compress_results(self, which: Union[list, str] = 'all') -> dict:
+    def collapse_results(self, which: Union[list, str] = 'all') -> dict:
         # check that the process has been run
         assert self.results_ is not None, r"The %s process has not been run yet!" % (self.__class__.__name__,)
 
@@ -147,13 +147,13 @@ class Process(ABC):
         # initialize output
         out = dict()
 
-        # run the associated compression methods
+        # run the associated collapsing methods
         for key in which:
             try:
-                result = eval("self._compress_" + key)()
+                result = eval("self._collapse_" + key)()
                 out.update({key: result})
             except AttributeError:
-                warnings.warn("%s does not contain a compression method for %s! Returning \"uncompressed\" object." % (self.__class__.__name__, key))
+                warnings.warn("%s does not contain a collapsing method for %s! Returning \"uncollapsed\" object." % (self.__class__.__name__, key))
                 result = self._extract_result(key)
 
             # update dictionary
@@ -184,7 +184,7 @@ class Process(ABC):
     def save_results(self,
                      save_path: Union[str, dict] = None,
                      overwrite: bool = False,
-                     compress: bool = True):
+                     collapse: bool = True):
 
         # make sure there is either a save path or multiple
         assert save_path is not None, "You must provide a save path or multiple save paths in a dictionary!"
@@ -198,16 +198,16 @@ class Process(ABC):
         if type(save_path) == str:
             ext = '.' + save_path.split('.')[-1]
             assert ext == '.pickle', "The file extension must be .pickle for saving the results as a whole!"
-            if compress:
-                save_object(self.compress_results(), save_path, overwrite)
+            if collapse:
+                save_object(self.collapse_results(), save_path, overwrite)
             else:
                 save_object(self.results_, save_path, overwrite)
 
         else:
-            assert compress, "Cannot save individual results without compressing the results first, set compress=True!"
+            assert collapse, "Cannot save individual results without collapsing the results first, set collapse=True!"
 
-            # compress the specificed results
-            results = self.compress_results(which=list(save_path.keys()))
+            # collapse the specificed results
+            results = self.collapse_results(which=list(save_path.keys()))
 
             # loop through each result and save
             for key in save_path.keys():
@@ -246,7 +246,7 @@ class Process(ABC):
                     not_implemented_for_ext = False
 
                 if not_implemented_for_ext:
-                    raise AttributeError("The compressed result %s may not be saved as %s!" % (key, ext))
+                    raise AttributeError("The collapsed result %s may not be saved as %s!" % (key, ext))
 
         return
 
@@ -387,10 +387,10 @@ class Partition(Process):
 
         return ds, self.results_
 
-    def _compress_tvt_labels(self):
+    def _collapse_tvt_labels(self):
 
-        # compress the dict of dict of series to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of series to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="tvt_labels",
                                              columns_name=self.process_name + " splits",
                                              col_suffix="split")
@@ -673,10 +673,10 @@ class FeatureSelect(Transform):
 
         return out
 
-    def _compress_f_ranks(self):
+    def _collapse_f_ranks(self):
 
-        # compress the dict of dict of dataframe to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of dataframe to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_ranks",
                                              columns_name=self.process_name + " f_ranks",
                                              col_suffix="f_ranks")
@@ -733,39 +733,39 @@ class Classify(Fit):
         if self._fit_handle is None or self._predict_handle is None:
             raise ValueError("Classify process must have both a fit method and a predict method!")
 
-    def _compress_class_labels(self):
+    def _collapse_class_labels(self):
 
-        # compress the dict of dict of series to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of series to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="class_labels",
                                              columns_name=self.process_name + " labels",
                                              col_suffix='_'.join([self.process_name, "labels"]))
         return results
 
-    def _compress_class_scores(self):
+    def _collapse_class_scores(self):
 
-        # compress the dict of dict of dataframe to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of dataframe to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="class_labels",
                                              which='dataframe',
                                              columns_name=self.process_name + " scores",
                                              col_suffix="scores")
         return results
 
-    def _compress_f_weights(self):
+    def _collapse_f_weights(self):
 
-        # compress the dict of dict of series to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of series to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_weights",
                                              columns_name=self.process_name + " f_weights",
                                              col_suffix="f_weights")
 
         return results
 
-    def _compress_s_weights(self):
+    def _collapse_s_weights(self):
 
-        # compress the dict of dict of series to dataframe
-        results = _compress_dict_dict_pandas(kv=self.results_,
+        # collapse the dict of dict of series to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="s_weights",
                                              columns_name=self.process_name + " s_weights",
                                              col_suffix="s_weights")
