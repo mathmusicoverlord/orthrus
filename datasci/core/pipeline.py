@@ -571,7 +571,7 @@ class Transform(Fit):
         return out
 
 
-class Feature_Select(Transform):
+class FeatureSelect(Transform):
 
     def __init__(self,
                  process: object,
@@ -587,7 +587,7 @@ class Feature_Select(Transform):
 
 
         # init with Process class
-        super(Feature_Select, self).__init__(process=process,
+        super(FeatureSelect, self).__init__(process=process,
                                              process_name=process_name,
                                              parallel=parallel,
                                              verbosity=verbosity,
@@ -615,10 +615,10 @@ class Feature_Select(Transform):
     def _run(self, ds: DataSet, **kwargs):
 
         # preprocess data with the super
-        ds_new = super(Feature_Select, self)._preprocess(ds, **kwargs)
+        ds_new = super(FeatureSelect, self)._preprocess(ds, **kwargs)
 
         # run the super method
-        result = super(Feature_Select, self)._run(ds_new, **kwargs)
+        result = super(FeatureSelect, self)._run(ds_new, **kwargs)
 
         # change name of transformer to selector
         process = result['transformer']
