@@ -5,7 +5,6 @@ This module contains the classes and functions associated with pipeline componen
 from abc import ABC, abstractmethod
 from typing import Union, Callable
 import inspect
-import os
 import pandas as pd
 from numpy import ndarray
 import numpy as np
@@ -22,6 +21,7 @@ import ray
 def _valid_args(func: Callable):
 
     return list(inspect.signature(func).parameters.keys())
+
 
 def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
@@ -41,8 +41,9 @@ def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
     if type(pd_object) == Series:
         out = tuple(v[inner_key].rename(col_prefix + k + col_suffix) for (k, v) in kv.items())
     elif type(pd_object) == DataFrame:
-        out = tuple(v[inner_key].rename(columns={col: col_prefix + '_'.join([k, col]) + col_suffix for col in v[inner_key].columns})
-                    for (k, v) in kv.items())
+        out = tuple(v[inner_key].rename(
+            columns={col: col_prefix + '_'.join([k, col]) + col_suffix for col in v[inner_key].columns}) for (k, v) in
+                    kv.items())
 
     out = pd.concat(out, axis=1)
     out.index.name = kwargs.get('index_name', out.columns.name)
@@ -82,9 +83,9 @@ class Process(ABC):
 
         return self._process_name
 
-    def _preprocess(self, ds:DataSet, **kwargs):
+    def _preprocess(self, ds: DataSet, **kwargs):
 
-        ## prep for subclasses _run method ##
+        # prep for subclasses _run method
 
         # grab transformation object
         transform = kwargs.get('transform', lambda x: x)
@@ -93,10 +94,10 @@ class Process(ABC):
         return ds_new
 
     @abstractmethod
-    def _run(self, ds:DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs):
         pass
 
-    def run(self, ds:DataSet, batch_args:dict = None):
+    def run(self, ds: DataSet, batch_args: dict = None):
 
         if batch_args is None:
             self.results_ = dict(batch=self._run(ds))
@@ -159,7 +160,8 @@ class Process(ABC):
                 result = eval("self._collapse_" + key)()
                 out.update({key: result})
             except AttributeError:
-                warnings.warn("%s does not contain a collapsing method for %s! Returning \"uncollapsed\" object." % (self.__class__.__name__, key))
+                warnings.warn("%s does not contain a collapsing method for %s!"
+                              " Returning \"uncollapsed\" object." % (self.__class__.__name__, key))
                 result = self._extract_result(key)
 
             # update dictionary
@@ -196,7 +198,8 @@ class Process(ABC):
         assert save_path is not None, "You must provide a save path or multiple save paths in a dictionary!"
 
         # make sure the type is correct
-        assert type(save_path) in [str, dict], "save_path must be a string or a dictionary with result keys and string values!"
+        assert type(save_path) in [str, dict], "save_path must be a string or a" \
+                                               " dictionary with result keys and string values!"
 
         # acceptable formats
         formats = ['.csv', '.pickle']
@@ -225,6 +228,7 @@ class Process(ABC):
 
                 # grab extension
                 ext = '.' + ind_save_path.split('.')[-1]
+                not_implemented_for_ext = False
 
                 # check for appropriate extension
                 assert ext in formats, "Saving of file extension %s not yet implemented, use one of the following: %s" \
@@ -279,7 +283,6 @@ class Partition(Process):
                  split_handle: str = 'split',
                  split_args: dict = {}):
 
-
         # init with Process class
         super(Partition, self).__init__(process=process,
                                         process_name=process_name,
@@ -330,7 +333,7 @@ class Partition(Process):
 
         # partition the dataset
         if verbosity > 0:
-            print(r"Generating %s splits..." % (self.process_name))
+            print(r"Generating %s splits..." % (self.process_name,))
 
         parts = split(ds_new.data.loc[train_samples], **label_dict, **self.split_args)
 
@@ -356,7 +359,7 @@ class Partition(Process):
         # return to run method
         return result
 
-    def run(self, ds:DataSet, batch_args: dict = None, append_labels=True):
+    def run(self, ds: DataSet, batch_args: dict = None, append_labels=True):
 
         # run the super first
         super(Partition, self).run(ds, batch_args)
@@ -368,18 +371,20 @@ class Partition(Process):
         for batch in self.results_:
             labels = self.results_[batch]['tvt_labels']
 
-            labels.columns = ['_'.join([str(batch), str(col)])  for col in labels]
+            labels.columns = ['_'.join([str(batch), str(col)]) for col in labels]
             try:
                 orig_name = batch_args[batch]['tvt_labels'].name
             except (TypeError, KeyError):
                 orig_name = ''
             labels = labels.to_dict('series')
-            labels = {k: dict(tvt_labels=v.rename('_'.join([orig_name, self.process_name, str(i)]).lstrip('_'))) for i, (k,v) in enumerate(labels.items())}
+            labels = {k: dict(tvt_labels=v.rename('_'.join([orig_name,
+                                                            self.process_name, str(i)]
+                                                           ).lstrip('_'))) for i, (k, v) in enumerate(labels.items())}
             results.update(labels)
 
         # append original labels
         if append_labels and (batch_args is not None):
-            results.update({k: dict(tvt_labels=v['tvt_labels']) for (k,v) in batch_args.items()})
+            results.update({k: dict(tvt_labels=v['tvt_labels']) for (k, v) in batch_args.items()})
             try:
                 del results['batch']
             except KeyError:
@@ -473,7 +478,6 @@ class Transform(Fit):
                  fit_args: dict = {},
                  transform_args: dict = {}):
 
-
         # init with Process class
         super(Transform, self).__init__(process=process,
                                         process_name=process_name,
@@ -495,7 +499,8 @@ class Transform(Fit):
         # check appropriate parameters
         if self._fit_handle is None or self._transform_handle is None:
             if self._fit_transform_handle is None:
-                raise ValueError("%s process must have either both a fit method and a transform method or just a fit_transform method!" % (self.__class__.__name__,))
+                raise ValueError("%s process must have either both a fit method and a"
+                                 " transform method or just a fit_transform method!" % (self.__class__.__name__,))
             else:
                 warnings.warn("%s will use its fit_transform method to fit."
                               " Make sure that its fit_transform method fits"
@@ -519,7 +524,7 @@ class Transform(Fit):
 
         return process, data
 
-    def _run(self, ds:DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs):
 
         # initalize output
         result = dict()
@@ -557,9 +562,12 @@ class Transform(Fit):
                     ds_new = deepcopy(ds)
                     ds_new.data = data_new
                 except ValueError:
-                    raise ValueError("Transform changes the dimension of the data and therefore cannot retain the original feature ids in the new dataset!")
+                    raise ValueError("Transform changes the dimension of the data and therefore cannot retain"
+                                     " the original feature ids in the new dataset!")
             else:
-                data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=['_'.join([self.process_name, str(i)]) for i in range(data_new.shape[1])])
+                data_new = pd.DataFrame(data=data_new, index=ds.data.index,
+                                        columns=['_'.join([self.process_name, str(i)]) for i in
+                                                 range(data_new.shape[1])])
 
                 # check if features are the same after transformation and use original feature ids for columns
                 ds_new = DataSet(data=data_new, metadata=ds.metadata)
@@ -570,7 +578,8 @@ class Transform(Fit):
 
     def transform(self, ds: DataSet):
 
-        assert self.results_ is not None, "Transform must call its run method on a dataset before it can transform a new dataset!"
+        assert self.results_ is not None, "Transform must call its run method on a dataset" \
+                                          " before it can transform a new dataset!"
 
         # transform the incoming data according to transforms
         out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
@@ -591,18 +600,17 @@ class FeatureSelect(Transform):
                  transform_args: dict = {},
                  f_ranks_handle: str = None):
 
-
         # init with Process class
         super(FeatureSelect, self).__init__(process=process,
-                                             process_name=process_name,
-                                             parallel=parallel,
-                                             verbosity=verbosity,
-                                             supervised_attr=supervised_attr,
-                                             fit_handle=fit_handle,
-                                             fit_args=fit_args,
-                                             transform_args=transform_args,
-                                             transform_handle=transform_handle,
-                                             )
+                                            process_name=process_name,
+                                            parallel=parallel,
+                                            verbosity=verbosity,
+                                            supervised_attr=supervised_attr,
+                                            fit_handle=fit_handle,
+                                            fit_args=fit_args,
+                                            transform_args=transform_args,
+                                            transform_handle=transform_handle,
+                                            )
 
         # remove unnecessary attribute
         del self.retain_f_ids
@@ -615,7 +623,7 @@ class FeatureSelect(Transform):
         # private attributes
         self._f_ranks_handle = f_ranks_handle
 
-    def _preprocess(self, ds:DataSet, **kwargs):
+    def _preprocess(self, ds: DataSet, **kwargs):
         return ds  # avoid double preprocessing from Transform
 
     def _run(self, ds: DataSet, **kwargs):
@@ -690,7 +698,8 @@ class FeatureSelect(Transform):
 
     def transform(self, ds: DataSet):
 
-        assert self.results_ is not None, "Transform must call its run method on a dataset before it can transform a new dataset!"
+        assert self.results_ is not None, "Transform must call its run method on a dataset" \
+                                          " before it can transform a new dataset!"
 
         # transform the incoming data according to transforms
         out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
@@ -727,7 +736,7 @@ class Classify(Fit):
         # set parameters
         self.fit_args = fit_args
         self.predict_args = predict_args
-        self.class_attr = self.supervised_attr # shadows supervised_attr
+        self.class_attr = self.supervised_attr  # shadows supervised_attr
 
         # set private attributes
         self._predict_handle = predict_handle
@@ -808,7 +817,9 @@ class Classify(Fit):
 
         # format output as series if labels
         if len(predictions.shape) == 2:
-            pred = pd.DataFrame(data=predictions, index=ds.metadata.index, columns=eval("process." + self._classes_handle))
+            pred = pd.DataFrame(data=predictions,
+                                index=ds.metadata.index,
+                                columns=eval("process." + self._classes_handle))
             pred.columns.name = self.process_name + " scores"
             pred_label = 'class_scores'
         else:
@@ -837,7 +848,6 @@ class Classify(Fit):
                                   name='_'.join([self.process_name, 's_weights']))
 
             out.update({'s_weights': s_weights})
-
 
         return out
 
@@ -886,7 +896,8 @@ class Score(Process):
         # grab classification labels/scores
         pred_type = self.pred_type
         y_pred = kwargs.get(pred_type, None)
-        assert y_pred is not None, "%s process requires predictions in order to compute metrics!" % (self.__class__.__name__,)
+        assert y_pred is not None, "%s process requires predictions in" \
+                                   " order to compute metrics!" % (self.__class__.__name__,)
 
         # initialize result
         result = dict()
@@ -899,7 +910,8 @@ class Score(Process):
         elif pred_type == "reg_values":
             scorer = self._process_regression_values(self.process)
         else:
-            raise NotImplementedError("%s currently can not handle scoring %s, check your pred_type attribute!" % (self.__class__.__name__, self.pred_type))
+            raise NotImplementedError("%s currently can not handle scoring %s,"
+                                      " check your pred_type attribute!" % (self.__class__.__name__, self.pred_type))
 
         # initialize output
         scores = pd.Series(index=score_rows, name=self.process_name)
@@ -928,10 +940,11 @@ class Score(Process):
                 score_args['labels'] = self._classes
                 if labels is not None:
                     # Let the user know we are ignoring their input here
-                    warnings.warn("Both %s._classes and labels in score_args is given! %s will use %s._classes"
-                                  " inplace of labels for sorting and restricting score output." % (self.__class__.__name__,
-                                                                                                    self.__class__.__name__,
-                                                                                                    self.__class__.__name__))
+                    warnings.warn("Both %s._classes and labels in score_args is given!"
+                                  " %s will use %s._classes inplace of labels for sorting"
+                                  " and restricting score output." % (self.__class__.__name__,
+                                                                      self.__class__.__name__,
+                                                                      self.__class__.__name__))
             else:
                 # set default value here
                 if labels is None:
@@ -973,7 +986,6 @@ class Score(Process):
         else:
             sample_weight = None
 
-
         # compute scores
         if self.verbosity > 0:
             print("Scoring predictions with %s..." % (self.process_name,))
@@ -1007,53 +1019,53 @@ class Score(Process):
 
         return result
 
-
     def _process_classification_labels(self, score_process: Callable):
 
-            def class_labels_scorer(y_true, y_pred, **kwargs):
+        def class_labels_scorer(y_true, y_pred, **kwargs):
 
-                # apply plain scorer
-                score = score_process(y_true.values.reshape(-1,), y_pred.values.reshape(-1,), **kwargs)
+            # apply plain scorer
+            score = score_process(y_true.values.reshape(-1,), y_pred.values.reshape(-1,), **kwargs)
 
-                # grab labels
-                labels = kwargs.get('labels', [])
+            # grab labels
+            labels = kwargs.get('labels', [])
 
-                # format the score with labels
-                score = self._format_ndarray_output_with_labels(score, labels)
+            # format the score with labels
+            score = self._format_ndarray_output_with_labels(score, labels)
 
-                return score
+            return score
 
-            return class_labels_scorer
+        return class_labels_scorer
 
     def _process_classification_scores(self, score_process: Callable):
 
-            def class_scores_scorer(y_true, y_pred, **kwargs):
+        def class_scores_scorer(y_true, y_pred, **kwargs):
 
-                # change shape of y_true to mimic scores (one-hot-encoding)
-                y_true_reformated = DataFrame(index=y_true.index,
-                                              data=np.array([(y_true == col).astype(int).values.reshape(-1,) for col in y_pred.columns]).transpose(),
-                                              columns=y_pred.columns)
-                # grab labels
-                labels = kwargs.get('labels', [])
+            # change shape of y_true to mimic scores (one-hot-encoding)
+            y_true_reformated = DataFrame(index=y_true.index,
+                                          data=np.array([(y_true == col).astype(int).values.reshape(-1,)
+                                                         for col in y_pred.columns]).transpose(),
+                                          columns=y_pred.columns)
+            # grab labels
+            labels = kwargs.get('labels', [])
 
-                if 'labels' in _valid_args(score_process) or labels == []:
-                    # apply plain scorer
-                    score = score_process(y_true_reformated.values, y_pred.values, **kwargs)
-                else:
-                    new_args = deepcopy(kwargs)
-                    new_args.pop('labels')
-                    y_true_reformated = y_true_reformated[labels]
-                    y_pred = y_pred[labels]
-                    score = score_process(y_true_reformated.values, y_pred.values, **new_args)
+            if 'labels' in _valid_args(score_process) or labels == []:
+                # apply plain scorer
+                score = score_process(y_true_reformated.values, y_pred.values, **kwargs)
+            else:
+                new_args = deepcopy(kwargs)
+                new_args.pop('labels')
+                y_true_reformated = y_true_reformated[labels]
+                y_pred = y_pred[labels]
+                score = score_process(y_true_reformated.values, y_pred.values, **new_args)
 
-                # format the score with labels
-                score = self._format_ndarray_output_with_labels(score, labels)
+            # format the score with labels
+            score = self._format_ndarray_output_with_labels(score, labels)
 
-                return score
+            return score
 
-            return class_scores_scorer
+        return class_scores_scorer
 
-    def _process_regression_results(self):
+    def _process_regression_values(self):
         pass
 
     def _collapse_class_pred_scores(self):
@@ -1105,8 +1117,11 @@ class Score(Process):
         return score
 
 
-#TODO: Add Pipeline class which can accept a tuple of processes and compose their results
-#TODO: Add second level of verbosity to Score, print Train, Test, Validation scores along with mean and std when appropriate
-#TODO: Add Regress Class
-#TODO: Add _collapse_reg_pred_scores in Score
+# TODO: Add Pipeline class which can accept a tuple of processes and compose their results
 
+# TODO: Add second level of verbosity to Score, print Train, Test, Validation scores
+#       along with mean and std when appropriate
+
+# TODO: Add Regress Class
+
+# TODO: Add _collapse_reg_pred_scores in Score
