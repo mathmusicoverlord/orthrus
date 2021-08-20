@@ -927,7 +927,7 @@ class Score(Process):
         y_pred = deepcopy(y_pred.loc[y_true.index])
         tvt_labels = deepcopy(tvt_labels.loc[y_true.index])
 
-        # make a deep copy of the score_args
+        # make a deep copy of the score_args (dictionaries are mutable!)
         score_args = deepcopy(self.score_args)
 
         # check for labels
@@ -1065,7 +1065,7 @@ class Score(Process):
 
         return class_scores_scorer
 
-    def _process_regression_values(self):
+    def _process_regression_values(self, score_process: Callable):
         pass
 
     def _collapse_class_pred_scores(self):
