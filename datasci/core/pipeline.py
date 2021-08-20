@@ -1103,3 +1103,10 @@ class Score(Process):
                     score = Series(data=score, index=index)
 
         return score
+
+
+#TODO: Add Pipeline class which can accept a tuple of processes and compose their results
+#TODO: Add second level of verbosity to Score, print Train, Test, Validation scores along with mean and std when appropriate
+#TODO: Add Regress Class
+#TODO: Add _collapse_reg_pred_scores in Score
+
