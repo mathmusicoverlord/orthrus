@@ -3,7 +3,7 @@ This module contains the classes and functions associated with pipeline componen
 """
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, Callable
 import os
 import pandas as pd
 from numpy import ndarray
@@ -837,3 +837,69 @@ class Classify(Fit):
         return out
 
 
+class Score(Process):
+
+    def __init__(self,
+                 process: Callable,
+                 class_attr: str,
+                 process_name: str = None,
+                 parallel: bool = False,
+                 verbosity: int = 0,
+                 score_args: dict = {},
+                 class_type: str = 'labels',
+                 ):
+
+        # init with Process class
+        super(Score, self).__init__(process=process,
+                                    process_name=process_name,
+                                    parallel=parallel,
+                                    verbosity=verbosity,
+                                    )
+        # parameters
+        self.process = process
+        self.class_type = class_type
+        self.class_attr = class_attr
+        self.score_args = score_args
+
+    def _run(self, ds: DataSet, **kwargs):
+
+        # preprocess data
+        ds_new = self._preprocess(ds, **kwargs)
+
+        # grab tvt labels
+        tvt_labels = kwargs.get('tvt_labels', pd.Series(index=ds_new.metadata.index, data=['Train']*ds_new.n_samples))
+        score_rows = tvt_labels.unique()
+
+        # grab classification labels/scores
+        class_result_key = '_'.join(['class', self.class_type])
+        y_pred = kwargs.get(class_result_key, None)
+        assert y_pred is not None, "%s process requires classification labels or scores in order to compute metrics!" % (self.__class__.__name__,)
+
+        # grab true labels
+        y_true = pd.Series(index=ds_new.metadata.index, data=ds_new.metadata[self.class_attr])
+
+        # restrict class labels/scores and tvt_labels to y_true
+        y_pred = deepcopy(y_pred.loc[y_true.index])
+        tvt_labels = deepcopy(tvt_labels.loc[y_true.index])
+
+        # check for labels
+        labels = self.score_args.get('labels', None)
+        if labels is None:
+            labels = y_true.unique().tolist()
+            self.score_args['labels'] = labels
+
+        # initalize output
+        result = pd.Series(index=score_rows)
+
+        # compute scores
+        for tvt in score_rows:
+
+            # compute score
+            ids = (tvt_labels == tvt)
+            try:
+                result[tvt] = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+            except TypeError:
+                self.score_args.pop('labels')
+                result[tvt] = self.process(y_true.loc[ids].values, y_pred.loc[ids].values, **self.score_args)
+
+        return result
