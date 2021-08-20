@@ -752,8 +752,7 @@ class Classify(Fit):
 
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
-                                             inner_key="class_labels",
-                                             which='dataframe',
+                                             inner_key="class_scores",
                                              columns_name=self.process_name + " scores",
                                              col_suffix="scores")
         return results
@@ -1056,6 +1055,15 @@ class Score(Process):
 
     def _process_regression_results(self):
         pass
+
+    def _collapse_class_pred_scores(self):
+
+        # collapse the dict of dict of dataframe to dataframe
+        results = _collapse_dict_dict_pandas(kv=self.results_,
+                                             inner_key="class_pred_scores",
+                                             columns_name=self.process_name + " prediction scores",
+                                             col_suffix=self.process_name + "_scores")
+        return results
 
     def _format_ndarray_output_with_labels(self, score, labels):
 
