@@ -892,6 +892,8 @@ class Score(Process):
         result = pd.Series(index=score_rows)
 
         # compute scores
+        if self.verbosity > 0:
+            print("Scoring classification with %s..." % (self.process_name,))
         for tvt in score_rows:
 
             # compute score
