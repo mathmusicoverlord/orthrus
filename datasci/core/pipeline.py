@@ -570,16 +570,16 @@ class Transform(Fit):
         else:
             process, _ = self._fit_transform(ds_new, **kwargs)
 
-
-
         # store the resulting transformer
         result['transformer'] = process
 
+        # generate its transform and store it
         result['transform'] = self._generate_transform(process)
 
         return result
 
     def _generate_transform(self, process):
+        # check for a transform handle
         if self._transform_handle is not None:
             inner_transform = eval("process." + self._transform_handle)
 
@@ -620,22 +620,6 @@ class Transform(Fit):
         out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
         return out
 
-    # def run(self, ds: DataSet, batch_args: dict = None):
-    #
-    #     # run the super
-    #     super(Transform, self).run(ds, batch_args)
-    #
-    #     # collect transforms
-    #     for batch in self.results_:
-    #         # store resulting transform
-    #         self.results_[batch]['transform'] = _generate_transform(transformer=self.results_[batch]['transformer'],
-    #                                                                 transform_handle=self._transform_handle,
-    #                                                                 transformer_name=self.process_name,
-    #                                                                 transform_args=self.transform_args,
-    #                                                                 retain_f_ids=self.retain_f_ids,
-    #                                                                 verbosity=self.verbosity)
-    #
-    #     return ds, self.results_
 
 class FeatureSelect(Transform):
 
@@ -696,12 +680,13 @@ class FeatureSelect(Transform):
         return result
 
     def _generate_transform(self, process=None):
+        # generate selector
+        select = eval("process." + self._transform_handle)
 
         # define transform
         def transform(ds: DataSet):
             if self.verbosity > 0:
                 print(r"Restricting features in the data using %s..." % (self.process_name,))
-            select = eval("process." + self._transform_handle)
             feature_ids = select(ds.data.columns.to_numpy().reshape(1, -1), **self.transform_args)
             ds_new = ds.slice_dataset(feature_ids=feature_ids)
 
