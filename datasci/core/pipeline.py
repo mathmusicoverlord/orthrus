@@ -3,7 +3,7 @@ This module contains the classes and functions associated with pipeline componen
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Callable
+from typing import Union, Callable, Tuple
 import inspect
 import pandas as pd
 from numpy import ndarray
@@ -50,6 +50,38 @@ def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
     out.columns.name = kwargs.get('columns_name', out.columns.name)
 
     return out
+
+
+def _generate_transform(transformer, transform_handle, transformer_name = None, transform_args={}, retain_f_ids=False, verbosity=0):
+    if transformer_name is None:
+        transformer_name = transformer.__class__.__name__
+    transform = eval("transformer." + transform_handle)
+
+    # define transform
+    def transform(ds: DataSet):
+        if verbosity > 0:
+            print(r"Transforming the data using %s..." % (transformer_name,))
+
+        data_new = transform(ds.data, **transform_args)
+        if retain_f_ids:
+            try:
+                data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
+                ds_new = deepcopy(ds)
+                ds_new.data = data_new
+            except ValueError:
+                raise ValueError("Transform changes the dimension of the data and therefore cannot retain"
+                                 " the original feature ids in the new dataset!")
+        else:
+            data_new = pd.DataFrame(data=data_new, index=ds.data.index,
+                                    columns=['_'.join([transformer_name, str(i)]) for i in
+                                             range(data_new.shape[1])])
+
+            # check if features are the same after transformation and use original feature ids for columns
+            ds_new = DataSet(data=data_new, metadata=ds.metadata)
+
+        return ds_new
+
+    return transform
 
 
 # module classes
@@ -538,15 +570,18 @@ class Transform(Fit):
         else:
             process, _ = self._fit_transform(ds_new, **kwargs)
 
-        # store resulting transform
-        result['transform'] = self._generate_transform(process)
+
 
         # store the resulting transformer
         result['transformer'] = process
 
+        result['transform'] = self._generate_transform(process)
+
         return result
 
-    def _generate_transform(self, process=None):
+    def _generate_transform(self, process):
+        if self._transform_handle is not None:
+            inner_transform = eval("process." + self._transform_handle)
 
         # define transform
         def transform(ds: DataSet):
@@ -555,7 +590,7 @@ class Transform(Fit):
             else:
                 if self.verbosity > 0:
                     print(r"Transforming the data using %s..." % (self.process_name,))
-                data_new = eval("process." + self._transform_handle)(ds.data, **self.transform_args)
+                data_new = inner_transform(ds.data, **self.transform_args)
             if self.retain_f_ids:
                 try:
                     data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
@@ -585,6 +620,22 @@ class Transform(Fit):
         out = {k: v['transform'](ds) for (k, v) in self.results_.items()}
         return out
 
+    # def run(self, ds: DataSet, batch_args: dict = None):
+    #
+    #     # run the super
+    #     super(Transform, self).run(ds, batch_args)
+    #
+    #     # collect transforms
+    #     for batch in self.results_:
+    #         # store resulting transform
+    #         self.results_[batch]['transform'] = _generate_transform(transformer=self.results_[batch]['transformer'],
+    #                                                                 transform_handle=self._transform_handle,
+    #                                                                 transformer_name=self.process_name,
+    #                                                                 transform_args=self.transform_args,
+    #                                                                 retain_f_ids=self.retain_f_ids,
+    #                                                                 verbosity=self.verbosity)
+    #
+    #     return ds, self.results_
 
 class FeatureSelect(Transform):
 
@@ -1116,6 +1167,86 @@ class Score(Process):
 
         return score
 
+
+class Pipeline(Process):
+
+    def __init__(self,
+                 processes: Tuple[Process, ...],
+                 pipeline_name: str = None,
+                 parallel: bool = False,
+                 verbosity: int = 0,
+                 ):
+
+        # init with Process class
+        super(Pipeline, self).__init__(process=None,
+                                       process_name=None,
+                                       parallel=parallel,
+                                       verbosity=verbosity,
+                                       )
+
+        # parameters
+        self.pipeline_name = pipeline_name
+        self.processes = processes
+
+        # private attributes
+        self._current_process = 0
+
+    @property
+    def process_name(self):
+        return self.processes[self._current_process].process_name
+
+    def _run(self, ds: DataSet, **kwargs):
+        pass
+
+    def run(self, ds: DataSet, batch_args: dict = None):
+
+        # make direct reference
+        results = deepcopy(batch_args)
+
+        # maybe it just works?
+        for process in self.processes:
+
+            # print to screen
+            if self.verbosity > 0:
+                print("Starting %dth process %s...\n" % (self._current_process, self.process_name))
+
+            # run process
+            _, next_results = process.run(ds, results)
+
+            # check for None type initial results
+            if results is None:
+                results = {}
+
+            # update current process
+            self._current_process += 1
+
+            # compose transforms and update the rest
+            batches_int = set(next_results.keys()).intersection(set(results.keys()))
+            for batch in batches_int:
+                next_result = next_results.get(batch)
+                result = results.get(batch)
+                transform = result.get('transform', None)
+                next_transform = next_result.get('transform', None)
+                if next_transform is not None:
+                    if transform is None:
+                        result['transform'] = next_transform
+                    else:
+                        result['transform'] = lambda x: next_transform(transform(x))
+                    #next_result.pop('transform')
+
+                #result.update(next_result)
+                for (k, v) in next_result.items():
+                    if k != 'transform':
+                        result[k] = v
+                #next_results.pop(batch)
+
+            for (k, v) in next_results.items():
+                if k not in batches_int:
+                    results[k] = v
+
+        self.results_ = results
+
+        return ds, self.results_
 
 # TODO: Add Pipeline class which can accept a tuple of processes and compose their results
 
