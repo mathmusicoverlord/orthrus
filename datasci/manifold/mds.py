@@ -6,6 +6,7 @@ This module contains classes implementing manifold learning algorithms.
 import torch as tc
 import numpy as np
 from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 class MDS(BaseEstimator):
     """
@@ -66,6 +67,10 @@ class MDS(BaseEstimator):
         Returns:
             MDS: The fit MDS instance.
         """
+
+        # check that X has correct shape
+        X = check_array(X)
+
         # setup rng
         from numpy.random import default_rng
         rg = default_rng(0)
