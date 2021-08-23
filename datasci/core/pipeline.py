@@ -52,36 +52,21 @@ def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
     return out
 
 
-def _generate_transform(transformer, transform_handle, transformer_name = None, transform_args={}, retain_f_ids=False, verbosity=0):
-    if transformer_name is None:
-        transformer_name = transformer.__class__.__name__
-    transform = eval("transformer." + transform_handle)
+def compose(funcs: Tuple[Callable, ...]):
 
-    # define transform
-    def transform(ds: DataSet):
-        if verbosity > 0:
-            print(r"Transforming the data using %s..." % (transformer_name,))
+    # define the composition
+    def f(x: object):
 
-        data_new = transform(ds.data, **transform_args)
-        if retain_f_ids:
-            try:
-                data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
-                ds_new = deepcopy(ds)
-                ds_new.data = data_new
-            except ValueError:
-                raise ValueError("Transform changes the dimension of the data and therefore cannot retain"
-                                 " the original feature ids in the new dataset!")
-        else:
-            data_new = pd.DataFrame(data=data_new, index=ds.data.index,
-                                    columns=['_'.join([transformer_name, str(i)]) for i in
-                                             range(data_new.shape[1])])
+        # set initial output
+        y = deepcopy(x)
 
-            # check if features are the same after transformation and use original feature ids for columns
-            ds_new = DataSet(data=data_new, metadata=ds.metadata)
+        # apply each function iteratively
+        for i, fi in enumerate(funcs):
+            if fi is not None:
+                y = fi(y)
+        return y
 
-        return ds_new
-
-    return transform
+    return f
 
 
 # module classes
@@ -373,6 +358,9 @@ class Partition(Process):
         train_test_labels = pd.DataFrame(index=ds_new.metadata.index)
         for i, (train_idx, test_idx) in enumerate(parts):
 
+            if self.verbosity > 1:
+                print("Generating split %d...." % (i,))
+                
             # create new column for split
             col_name = i
             train_test_labels[col_name] = 'Test'
@@ -587,10 +575,11 @@ class Transform(Fit):
         def transform(ds: DataSet):
             if self._transform_handle is None:
                 _, data_new = self._fit_transform(ds)
+                data_new = np.array(data_new)
             else:
                 if self.verbosity > 0:
                     print(r"Transforming the data using %s..." % (self.process_name,))
-                data_new = inner_transform(ds.data, **self.transform_args)
+                data_new = np.array(inner_transform(ds.data, **self.transform_args))
             if self.retain_f_ids:
                 try:
                     data_new = pd.DataFrame(data=data_new, index=ds.data.index, columns=ds.data.columns)
@@ -1206,28 +1195,40 @@ class Pipeline(Process):
             self._current_process += 1
 
             # compose transforms and update the rest
-            batches_int = set(next_results.keys()).intersection(set(results.keys()))
-            for batch in batches_int:
+            for batch in next_results.keys():
+                # grab next_result on batch
                 next_result = next_results.get(batch)
-                result = results.get(batch)
-                transform = result.get('transform', None)
+
+                # try to extract transform from next_result
                 next_transform = next_result.get('transform', None)
-                if next_transform is not None:
-                    if transform is None:
-                        result['transform'] = next_transform
-                    else:
-                        result['transform'] = lambda x: next_transform(transform(x))
-                    #next_result.pop('transform')
 
-                #result.update(next_result)
-                for (k, v) in next_result.items():
-                    if k != 'transform':
-                        result[k] = v
-                #next_results.pop(batch)
+                # check if batch in the current results
+                if batch in results.keys():
+                    # set current result on batch
+                    result = results.get(batch)
 
-            for (k, v) in next_results.items():
-                if k not in batches_int:
-                    results[k] = v
+                    # check if result has transforms
+                    transforms = result.get('transforms', None)
+
+                    # set default else append
+                    if next_transform is not None:
+                        if transforms is None:
+                            result['transforms'] = (next_transform,)
+                        else:
+                            transforms = list(transforms)
+                            transforms.append(next_transform)
+                            result['transforms'] = tuple(transforms)
+
+                        # set transform to composition
+                        result['transform'] = compose(result['transforms'])
+
+                    # overwrite everything except transform, transformer
+                    for (k, v) in next_result.items():
+                        if k not in ['transform', 'transformer']:
+                            result[k] = v
+                else:
+                    # if not just update the results dict
+                    results[batch] = next_results[batch]
 
         self.results_ = results
 
