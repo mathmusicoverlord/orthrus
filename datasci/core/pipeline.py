@@ -13,7 +13,7 @@ from datasci.core.dataset import DataSet
 from datasci.core.helper import generate_save_path
 from datasci.core.helper import save_object
 import warnings
-from copy import deepcopy
+from copy import copy, deepcopy
 import ray
 
 
@@ -1242,14 +1242,11 @@ class Pipeline(Process):
 
                 else:
                     # inherit from super batch
-                    results[batch] = results[super_batch]
+                    results[batch] = copy(results[super_batch])
                     result = results[batch]
 
                     # update result from next result
                     self._update_result(result, next_result)
-
-
-
 
     def _update_result(self, result: dict , next_result: dict):
 
@@ -1276,9 +1273,6 @@ class Pipeline(Process):
             if k not in ['transform', 'transformer']:
                 result[k] = v
 
-# TODO: Add Pipeline class which can accept a tuple of processes and compose their results
-
-# TODO: Pass transforms to subpartitions coming out of a partition
 
 # TODO: Add second level of verbosity to Score, print Train, Test, Validation scores
 #       along with mean and std when appropriate
