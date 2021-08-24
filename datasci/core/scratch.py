@@ -44,41 +44,48 @@ if __name__ == "__main__":
                                     shuffle=True,
                                     random_state=124,
                                     ),
-                      process_name='5-fold-CV',
-                      parallel=True,
+                      process_name='10-fold-CV',
+                      #parallel=True,
                       verbosity=1,
                       )
 
     # define leave one out
     loo = Partition(process=LeaveOneOut(),
                     process_name='LOO',
-                    parallel=True,
+                    #parallel=True,
                     verbosity=2)
 
     # define log transform
     log = Transform(process=FunctionTransformer(np.log),
                     process_name='log',
                     retain_f_ids=True,
-                    parallel=True,
+                    #parallel=True,
                     verbosity=1)
+
+    # define polynomial transform
+    quad = Transform(process=FunctionTransformer(lambda x: np.power(x, 2) - x + 1),
+                     process_name='quad',
+                     retain_f_ids=True,
+                     #parallel=True,
+                     verbosity=1)
 
     # define MDS transform
     mds = Transform(process=MDS(n_components=500),
                     process_name='mds',
-                    parallel=True,
+                    #parallel=True,
                     )
 
     # define PCA transform
     pca = Transform(process=PCA(n_components=3, whiten=True),
                     process_name='pca',
-                    parallel=True,
+                    #parallel=True,
                     verbosity=1)
 
     # define LinearSVC classify process
     svm = Classify(process=LinearSVC(),
                    process_name='svm',
                    class_attr='Shedding',
-                   parallel=True,
+                   #parallel=True,
                    verbosity=1,
                    )
 
@@ -86,7 +93,7 @@ if __name__ == "__main__":
     rf = Classify(process=RandomForestClassifier(),
                   process_name='RF',
                   class_attr='Shedding',
-                  parallel=True,
+                  #parallel=True,
                   verbosity=1,
                   f_weights_handle='feature_importances_',
                   )
@@ -109,17 +116,17 @@ if __name__ == "__main__":
     bsr = Score(process=balanced_accuracy_score,
                 process_name='bsr',
                 pred_attr='Shedding',
-                parallel=True,
+                #parallel=True,
                 verbosity=1,
                 )
 
     # create pipeline to run
-    pipeline = Pipeline(processes=(tr_tst_80_20, loo, log, pca, rf, bsr),
+    pipeline = Pipeline(processes=(tr_tst_80_20, pca, kfold, quad, rf, bsr),
                         pipeline_name='test',
                         verbosity=1)
 
     # initiate ray for parallel processsion
-    ray.init(_temp_dir="/hdd/tmp/ray/")
+    #ray.init(_temp_dir="/hdd/tmp/ray/")
 
     # run pipeline
     pipeline.run(ds)
