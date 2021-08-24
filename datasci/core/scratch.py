@@ -40,11 +40,11 @@ if __name__ == "__main__":
                              )
 
     # define inner train/validation partition object
-    kfold = Partition(process=KFold(n_splits=15,
+    kfold = Partition(process=KFold(n_splits=10,
                                     shuffle=True,
                                     random_state=124,
                                     ),
-                      process_name='15-fold-CV',
+                      process_name='5-fold-CV',
                       parallel=True,
                       verbosity=1,
                       )
@@ -52,27 +52,20 @@ if __name__ == "__main__":
     # define leave one out
     loo = Partition(process=LeaveOneOut(),
                     process_name='LOO',
-                    #parallel=True,
+                    parallel=True,
                     verbosity=2)
 
     # define log transform
     log = Transform(process=FunctionTransformer(np.log),
                     process_name='log',
                     retain_f_ids=True,
-                    #parallel=True,
+                    parallel=True,
                     verbosity=1)
-
-    # define polynomial transform
-    quad = Transform(process=FunctionTransformer(lambda x: np.power(x, 2) - x + 1),
-                     process_name='quad',
-                     retain_f_ids=True,
-                     parallel=True,
-                     verbosity=1)
 
     # define MDS transform
     mds = Transform(process=MDS(n_components=500),
                     process_name='mds',
-                    #parallel=True,
+                    parallel=True,
                     )
 
     # define PCA transform
@@ -85,7 +78,7 @@ if __name__ == "__main__":
     svm = Classify(process=LinearSVC(),
                    process_name='svm',
                    class_attr='Shedding',
-                   #parallel=True,
+                   parallel=True,
                    verbosity=1,
                    )
 
@@ -100,8 +93,7 @@ if __name__ == "__main__":
 
     # define kfold feature selection process
     kffs = FeatureSelect(process=KFFS(classifier=SSVM(solver=LPPrimalDualPy,
-                                                      use_cuda=True,
-                                                      ),
+                                                      use_cuda=True),
                                       f_weights_handle='weights_',
                                       f_rnk_func=np.abs,
                                       random_state=235,
@@ -117,25 +109,20 @@ if __name__ == "__main__":
     bsr = Score(process=balanced_accuracy_score,
                 process_name='bsr',
                 pred_attr='Shedding',
-                #parallel=True,
-                verbosity=2,
+                parallel=True,
+                verbosity=1,
                 )
 
     # create pipeline to run
-    pipeline = Pipeline(processes=(tr_tst_80_20, pca, kfold, quad, rf, bsr),
+    pipeline = Pipeline(processes=(tr_tst_80_20, loo, log, pca, rf, bsr),
                         pipeline_name='test',
-                        checkpoint_path='test.pickle',
-                        verbosity=1,
-                        )
+                        verbosity=1)
 
     # initiate ray for parallel processsion
     ray.init(_temp_dir="/hdd/tmp/ray/")
 
     # run pipeline
-    pipeline.run(ds,
-                 #stop_before=None,
-                 checkpoint=True,
-                 )
+    pipeline.run(ds)
 
     # get results
     results = pipeline.results_
