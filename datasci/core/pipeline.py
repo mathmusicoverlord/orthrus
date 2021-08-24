@@ -68,6 +68,17 @@ def compose(funcs: Tuple[Callable, ...]):
 
     return f
 
+def _find_super_batch(batch: str, kv: dict):
+    # compute super batch
+    super_batch = '_'.join(batch.split('_')[:-1])
+
+    # check if it is in the dictionary
+    if super_batch in kv.keys():
+        return super_batch
+    else:
+        return None
+
+
 
 # module classes
 class Process(ABC):
@@ -355,15 +366,17 @@ class Partition(Process):
         parts = split(ds_new.data.loc[train_samples], **label_dict, **self.split_args)
 
         # record training and test labels
-        train_test_labels = pd.DataFrame(index=ds_new.metadata.index)
+        train_test_labels = pd.DataFrame(index=ds_new.metadata.index, columns=[i for i, (train_idx, test_idx) in enumerate(parts)])
+        parts = split(ds_new.data.loc[train_samples], **label_dict, **self.split_args)  # iterator destroyed
+
         for i, (train_idx, test_idx) in enumerate(parts):
 
             if self.verbosity > 1:
                 print("Generating split %d...." % (i,))
                 
             # create new column for split
-            col_name = i
-            train_test_labels[col_name] = 'Test'
+            #col_name = i
+            train_test_labels[i] = 'Test'
 
             # fill in training and test
             train_test_labels.loc[train_samples[train_idx], i] = 'Train'
@@ -1195,46 +1208,77 @@ class Pipeline(Process):
             self._current_process += 1
 
             # compose transforms and update the rest
-            for batch in next_results.keys():
-                # grab next_result on batch
-                next_result = next_results.get(batch)
-
-                # try to extract transform from next_result
-                next_transform = next_result.get('transform', None)
-
-                # check if batch in the current results
-                if batch in results.keys():
-                    # set current result on batch
-                    result = results.get(batch)
-
-                    # check if result has transforms
-                    transforms = result.get('transforms', None)
-
-                    # set default else append
-                    if next_transform is not None:
-                        if transforms is None:
-                            result['transforms'] = (next_transform,)
-                        else:
-                            transforms = list(transforms)
-                            transforms.append(next_transform)
-                            result['transforms'] = tuple(transforms)
-
-                        # set transform to composition
-                        result['transform'] = compose(result['transforms'])
-
-                    # overwrite everything except transform, transformer
-                    for (k, v) in next_result.items():
-                        if k not in ['transform', 'transformer']:
-                            result[k] = v
-                else:
-                    # if not just update the results dict
-                    results[batch] = next_results[batch]
+            self._update_results(results, next_results)
 
         self.results_ = results
 
         return ds, self.results_
 
+    def _update_results(self, results, next_results):
+        for batch in next_results.keys():
+
+            # define the next result
+            next_result = next_results[batch]
+
+            # check if the batch is in the results
+            if batch in results.keys():
+
+                # define the result
+                result = results[batch]
+
+                # update the result from the next_result
+                self._update_result(result, next_result)
+
+            else:
+                # check if it is a sub-batch of another
+                super_batch = _find_super_batch(batch, results)
+
+                # inherit from super batch if the key isn't present
+                if super_batch is None:
+                    # if not just update the results dict
+                    results[batch] = dict()
+                    result = results[batch]
+                    self._update_result(result, next_result)
+
+                else:
+                    # inherit from super batch
+                    results[batch] = results[super_batch]
+                    result = results[batch]
+
+                    # update result from next result
+                    self._update_result(result, next_result)
+
+
+
+
+    def _update_result(self, result: dict , next_result: dict):
+
+        # check if result has transforms
+        transforms = result.get('transforms', None)
+
+        # try to extract transform from next_result
+        next_transform = next_result.get('transform', None)
+
+        # set default else append
+        if next_transform is not None:
+            if transforms is None:
+                result['transforms'] = (next_transform,)
+            else:
+                transforms = list(transforms)
+                transforms.append(next_transform)
+                result['transforms'] = tuple(transforms)
+
+            # set transform to composition
+            result['transform'] = compose(result['transforms'])
+
+        # overwrite everything except transform, transformer
+        for (k, v) in next_result.items():
+            if k not in ['transform', 'transformer']:
+                result[k] = v
+
 # TODO: Add Pipeline class which can accept a tuple of processes and compose their results
+
+# TODO: Pass transforms to subpartitions coming out of a partition
 
 # TODO: Add second level of verbosity to Score, print Train, Test, Validation scores
 #       along with mean and std when appropriate
