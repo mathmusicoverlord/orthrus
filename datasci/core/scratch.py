@@ -40,11 +40,11 @@ if __name__ == "__main__":
                              )
 
     # define inner train/validation partition object
-    kfold = Partition(process=KFold(n_splits=10,
+    kfold = Partition(process=KFold(n_splits=15,
                                     shuffle=True,
                                     random_state=124,
                                     ),
-                      process_name='10-fold-CV',
+                      process_name='15-fold-CV',
                       #parallel=True,
                       verbosity=1,
                       )
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                 process_name='bsr',
                 pred_attr='Shedding',
                 #parallel=True,
-                verbosity=1,
+                verbosity=2,
                 )
 
     # create pipeline to run

@@ -1042,7 +1042,7 @@ class Score(Process):
 
             # check type of score an retype scores as needed
             if i == 0:
-                if not (type(score) in [int, float, str]):
+                if not (pd.api.types.infer_dtype(score) in ['floating', 'integer', 'string']):
                     scores = scores.astype(object)
 
             # try to store the score (fingers crossed!)
@@ -1055,7 +1055,44 @@ class Score(Process):
         pred_type_prefix = pred_type.split('_')[0]
         result['_'.join([pred_type_prefix, 'pred_scores'])] = scores
 
+        # print result
+        if self.verbosity > 1:
+            print("\n%s scores:" % (scores.name))
+            for row in scores.index:
+                score = scores.loc[row]
+                if pd.api.types.infer_dtype(score) == "floating":
+                    print("%s: %.2f%%" % (row, score * 100))
+                else:
+                    print("%s:\n%s" % (row, str(score)))
         return result
+
+    def run(self, ds: DataSet, batch_args: dict = None):
+
+        # run super
+        ds, results = super(Score, self).run(ds, batch_args)
+
+        # print mean, std, min, max
+        if self.verbosity > 1:
+            # collapse scores first
+            scores = self._collapse_class_pred_scores()
+
+            # check the dtype
+            if np.array(scores).dtype == 'float64':
+                levels = ['\d_\D', '\d_\d_\D']
+                for level in levels:
+                    # compute first level scores
+                    fl_scores = scores.filter(regex='batch_' + level)
+                    valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
+                    fl_scores = fl_scores.loc[valid_score_type.values]
+                    print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
+                    for score_type in fl_scores.index:
+                        print("\t%s:" % (score_type,))
+                        for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
+                            print("\t%s: %.2f%%" % (stat, score * 100))
+                        print()
+                    print()
+
+        return ds, results
 
     def _process_classification_labels(self, score_process: Callable):
 
@@ -1154,6 +1191,18 @@ class Score(Process):
 
         return score
 
+    def _compute_stats(self, scores: Series):
+        mean_score = scores.mean(skipna=True)
+        std_score = scores.std(skipna=True)
+        min_score = scores.min(skipna=True)
+        max_score = scores.max(skipna=True)
+
+        stats = {"Mean": mean_score,
+                 "Std. Dev.": std_score,
+                 "Minimum": min_score,
+                 "Maximum": max_score}
+
+        return stats
 
 class Pipeline(Process):
 
