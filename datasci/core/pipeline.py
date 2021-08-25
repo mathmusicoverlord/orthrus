@@ -4,14 +4,15 @@ This module contains the classes and functions associated with pipeline componen
 
 from abc import ABC, abstractmethod
 from typing import Union, Callable, Tuple
+import os
 import inspect
 import pandas as pd
-from numpy import ndarray
 import numpy as np
+from numpy import ndarray
 from pandas import DataFrame, Series
 from datasci.core.dataset import DataSet
 from datasci.core.helper import generate_save_path
-from datasci.core.helper import save_object
+from datasci.core.helper import save_object, load_object
 import warnings
 from copy import copy, deepcopy
 import ray
@@ -293,10 +294,10 @@ class Process(ABC):
              overwrite: bool = False):
 
         # generate new save path in case you don't want to overwrite
-        save_path = generate_save_path(save_path, overwrite)
+        #save_path = generate_save_path(save_path, overwrite)
 
         # save instance of object
-        save_object(self, save_path)
+        save_object(self, save_path, overwrite)
 
 
 class Partition(Process):
@@ -1204,6 +1205,7 @@ class Score(Process):
 
         return stats
 
+
 class Pipeline(Process):
 
     def __init__(self,
@@ -1211,7 +1213,17 @@ class Pipeline(Process):
                  pipeline_name: str = None,
                  parallel: bool = False,
                  verbosity: int = 0,
+                 checkpoint_path: str = None,
                  ):
+
+        # parameters
+        self.pipeline_name = pipeline_name
+        self.processes = processes
+
+        # private attributes
+        self._current_process = 0
+        self._checkpoint_path = checkpoint_path
+        self._stop_before = None
 
         # init with Process class
         super(Pipeline, self).__init__(process=None,
@@ -1220,48 +1232,163 @@ class Pipeline(Process):
                                        verbosity=verbosity,
                                        )
 
-        # parameters
-        self.pipeline_name = pipeline_name
-        self.processes = processes
+        # try to load self from checkpoint path
+        if self.checkpoint_path is not None:
+            checkpoint = load_object(self.checkpoint_path, block=False)
+            if checkpoint is None:
+                warnings.warn("No Pipeline found at checkpoint_path! The Pipeline will start from the beginning and"
+                              " use the checkpoint_path provided to save instances of the Pipeline.")
+            else:
+                if self.verbosity > 0:
+                    print("Loading Pipeline %s from file..." % (self.pipeline_name,))
+                # save these parameters
+                checkpoint_path = deepcopy(self._checkpoint_path)
+                stop_before = self._stop_before
 
-        # private attributes
-        self._current_process = 0
+                # update params from saved pipeline
+                self.__dict__.update(checkpoint.__dict__)
+
+                # set these back to the original pipeline
+                self._checkpoint_path = checkpoint_path
+                self._stop_before = stop_before
+
 
     @property
     def process_name(self):
         return self.processes[self._current_process].process_name
 
+    @property
+    def checkpoint_path(self):
+        if self._checkpoint_path is None:
+            return None
+        else:
+            return os.path.abspath(self._checkpoint_path)
+
+    @property
+    def stop_before(self):
+        # grab stop_before value
+        sb = self._stop_before
+
+        if sb is None:
+            idx = len(self.processes)
+
+        elif type(sb) == str:
+            hit = [process.process_name == sb for process in self.processes]
+            ids = np.where(hit)[0]
+            if ids.size > 1:
+                raise ValueError("Non-unique identifier for stop_before process, "
+                                 "make the names of your processes unique if you are using a string identifier!")
+            elif ids.size == 0:
+                raise ValueError("Identifier for stop_before process does not exist in processes!")
+            else:
+                idx = ids.item()
+
+        elif type(sb) == int:
+            idx = sb
+
+        else:
+            raise ValueError("stop_before must be either an integer or"
+                             " a string which identifies the process to stop before!")
+
+        # check for appropriate index
+        if idx > len(self.processes) - 1:
+            return None
+        elif idx <= self._current_process:
+            raise ValueError("Integer index for stop_before process must be"
+                             " strictly greater than self._current_process!")
+
+        return idx
+
     def _run(self, ds: DataSet, **kwargs):
         pass
 
-    def run(self, ds: DataSet, batch_args: dict = None):
+    def run(self,
+            ds: DataSet,
+            batch_args: dict = None,
+            stop_before: Union[str, int] = None,
+            checkpoint=False):
 
-        # make direct reference
-        results = deepcopy(batch_args)
+        # store stop_before point
+        self._stop_before = stop_before
+
+        # check for valid checkpoint
+        if checkpoint and self.checkpoint_path is None:
+            raise ValueError("No checkpoint_path provided to save instances!")
+
+        # check if pipeline is finished running
+        if self._current_process == len(self.processes):
+            if self.verbosity > 0:
+                print("Pipeline %s already finished running!" % (self.pipeline_name,))
+            return ds, self.results_
+
+        # check for checkpoint
+        if checkpoint and self._current_process > 0:
+            if self.verbosity > 0:
+                print("Starting Pipeline %s from process %s..." % (self.pipeline_name,
+                                                                   self.processes[self._current_process].process_name,))
+        else:
+            # make direct reference
+            self.results_ = deepcopy(batch_args)
+
+        # define processes that need to complete
+        processes = self.processes[self._current_process: self.stop_before]
 
         # maybe it just works?
-        for process in self.processes:
+        for process in processes:
 
             # print to screen
             if self.verbosity > 0:
                 print("Starting %dth process %s...\n" % (self._current_process, self.process_name))
 
             # run process
-            _, next_results = process.run(ds, results)
+            _, next_results = process.run(ds, self.results_)
 
             # check for None type initial results
-            if results is None:
-                results = {}
+            if self.results_ is None:
+                self.results_ = {}
+
+            # compose transforms and update the rest
+            self._update_results(self.results_, next_results)
 
             # update current process
             self._current_process += 1
 
-            # compose transforms and update the rest
-            self._update_results(results, next_results)
+            # checkpoint if true
+            if checkpoint:
+                if self.verbosity > 0:
+                    print("Saving current state of pipeline to disk...\n")
+                self.save(self._checkpoint_path, overwrite=True)
 
-        self.results_ = results
+            # debug
+            # if self._current_process == 2:
+            #     break
 
         return ds, self.results_
+
+    def _update_result(self, result: dict , next_result: dict):
+
+        # check if result has transforms
+        transforms = result.get('transforms', None)
+
+        # try to extract transform from next_result
+        next_transform = next_result.get('transform', None)
+
+        # set default else append
+        if next_transform is not None:
+            if transforms is None:
+                result['transforms'] = (next_transform,)
+            else:
+                transforms = list(transforms)
+                transforms.append(next_transform)
+                result['transforms'] = tuple(transforms)
+
+            # set transform to composition
+            result['transform'] = compose(result['transforms'])
+
+        # overwrite everything except transform, transformer
+        for (k, v) in next_result.items():
+            if k not in ['transform', 'transformer']:
+                result[k] = v
 
     def _update_results(self, results, next_results):
         for batch in next_results.keys():
@@ -1297,34 +1424,6 @@ class Pipeline(Process):
                     # update result from next result
                     self._update_result(result, next_result)
 
-    def _update_result(self, result: dict , next_result: dict):
-
-        # check if result has transforms
-        transforms = result.get('transforms', None)
-
-        # try to extract transform from next_result
-        next_transform = next_result.get('transform', None)
-
-        # set default else append
-        if next_transform is not None:
-            if transforms is None:
-                result['transforms'] = (next_transform,)
-            else:
-                transforms = list(transforms)
-                transforms.append(next_transform)
-                result['transforms'] = tuple(transforms)
-
-            # set transform to composition
-            result['transform'] = compose(result['transforms'])
-
-        # overwrite everything except transform, transformer
-        for (k, v) in next_result.items():
-            if k not in ['transform', 'transformer']:
-                result[k] = v
-
-
-# TODO: Add second level of verbosity to Score, print Train, Test, Validation scores
-#       along with mean and std when appropriate
 
 # TODO: Add Regress Class
 
