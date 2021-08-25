@@ -1365,7 +1365,8 @@ class Pipeline(Process):
 
         return ds, self.results_
 
-    def _update_result(self, result: dict , next_result: dict):
+    @staticmethod
+    def _update_result(result: dict, next_result: dict):
 
         # check if result has transforms
         transforms = result.get('transforms', None)
