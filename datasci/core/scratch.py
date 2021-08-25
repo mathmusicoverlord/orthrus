@@ -123,13 +123,16 @@ if __name__ == "__main__":
     # create pipeline to run
     pipeline = Pipeline(processes=(tr_tst_80_20, pca, kfold, quad, rf, bsr),
                         pipeline_name='test',
+                        checkpoint_path='test.pickle',
                         verbosity=1)
 
     # initiate ray for parallel processsion
     #ray.init(_temp_dir="/hdd/tmp/ray/")
 
     # run pipeline
-    pipeline.run(ds)
+    pipeline.run(ds,
+                 #stop_before=None,
+                 checkpoint=True)
 
     # get results
     results = pipeline.results_
