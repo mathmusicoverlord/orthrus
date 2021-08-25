@@ -45,7 +45,7 @@ if __name__ == "__main__":
                                     random_state=124,
                                     ),
                       process_name='15-fold-CV',
-                      #parallel=True,
+                      parallel=True,
                       verbosity=1,
                       )
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     quad = Transform(process=FunctionTransformer(lambda x: np.power(x, 2) - x + 1),
                      process_name='quad',
                      retain_f_ids=True,
-                     #parallel=True,
+                     parallel=True,
                      verbosity=1)
 
     # define MDS transform
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # define PCA transform
     pca = Transform(process=PCA(n_components=3, whiten=True),
                     process_name='pca',
-                    #parallel=True,
+                    parallel=True,
                     verbosity=1)
 
     # define LinearSVC classify process
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     rf = Classify(process=RandomForestClassifier(),
                   process_name='RF',
                   class_attr='Shedding',
-                  #parallel=True,
+                  parallel=True,
                   verbosity=1,
                   f_weights_handle='feature_importances_',
                   )
@@ -127,7 +127,7 @@ if __name__ == "__main__":
                         verbosity=1)
 
     # initiate ray for parallel processsion
-    #ray.init(_temp_dir="/hdd/tmp/ray/")
+    ray.init(_temp_dir="/hdd/tmp/ray/")
 
     # run pipeline
     pipeline.run(ds,
