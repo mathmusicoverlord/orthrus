@@ -344,7 +344,7 @@ class IFR:
             print("=====================================================")
             print("Finishing Execution. %d features out of a total of %d features were selected."% ((self.results['frequency'] > 0).sum(), data.shape[1]))
             print("=====================================================")
-        # ray.shutdown()
+        ray.shutdown()
         return self.results
 
     @ray.remote
@@ -483,6 +483,7 @@ class IFR:
                     score_validation,
                     sorted_abs_weights,
                     weight_ratios,
+                    None,
                     None,
                     None)
                 exit_reason = "small_weight_at_jump"
