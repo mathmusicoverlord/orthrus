@@ -941,7 +941,8 @@ def batch_jobs_(function_handle,
                 list_of_arguments, 
                 verbose_frequency : int=10,
                 num_cpus_per_worker : float=1., 
-                num_gpus_per_worker : float=0.):
+                num_gpus_per_worker : float=0.,
+                local_mode=False):
 
     """
     This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
@@ -985,7 +986,7 @@ def batch_jobs_(function_handle,
         >>> ray.shutdown()
     """
     import ray
-    ray.init(ignore_reinit_error=True)
+    ray.init(ignore_reinit_error=True, local_mode=local_mode)
 
     #calculate the max number of processes to run at one time
     import multiprocessing
