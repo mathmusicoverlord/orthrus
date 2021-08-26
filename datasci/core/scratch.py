@@ -100,7 +100,8 @@ if __name__ == "__main__":
 
     # define kfold feature selection process
     kffs = FeatureSelect(process=KFFS(classifier=SSVM(solver=LPPrimalDualPy,
-                                                      use_cuda=True),
+                                                      use_cuda=True,
+                                                      ),
                                       f_weights_handle='weights_',
                                       f_rnk_func=np.abs,
                                       random_state=235,
@@ -124,7 +125,8 @@ if __name__ == "__main__":
     pipeline = Pipeline(processes=(tr_tst_80_20, pca, kfold, quad, rf, bsr),
                         pipeline_name='test',
                         checkpoint_path='test.pickle',
-                        verbosity=1)
+                        verbosity=1,
+                        )
 
     # initiate ray for parallel processsion
     ray.init(_temp_dir="/hdd/tmp/ray/")
@@ -132,7 +134,8 @@ if __name__ == "__main__":
     # run pipeline
     pipeline.run(ds,
                  #stop_before=None,
-                 checkpoint=True)
+                 checkpoint=True,
+                 )
 
     # get results
     results = pipeline.results_
