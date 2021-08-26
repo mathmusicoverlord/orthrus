@@ -183,7 +183,8 @@
 </div>
 <div class="section" id="module-datasci.core.dataset">
 <span id="datasci-core-dataset-module"></span><h2>datasci.core.dataset module<a class="headerlink" href="#module-datasci.core.dataset" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the main DataSet class used for all preprocessing, visualization, and classification.</p>
+<p>This module contains the main DataSet class used for all preprocessing, visualization, feature selection,
+and classification.</p>
 <dl class="py class">
 <dt id="datasci.core.dataset.DataSet">
 <em class="property">class </em><code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">vardata: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">dissimilarity_matrix: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet" title="Permalink to this definition">¶</a></dt>
@@ -320,6 +321,28 @@ used on the data. Default is the empty string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="datasci.core.dataset.DataSet.n_samples">
+<code class="sig-name descname">n_samples</code><a class="headerlink" href="#datasci.core.dataset.DataSet.n_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of samples in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="datasci.core.dataset.DataSet.n_features">
+<code class="sig-name descname">n_features</code><a class="headerlink" href="#datasci.core.dataset.DataSet.n_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of features in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -517,7 +540,7 @@ of the <code class="docutils literal notranslate"><span class="pre">selector</sp
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_results_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature results e.g. weights, ranks,
-etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id2"><span class="problematic" id="id3">results_</span></a>”.</p></li>
+etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id3"><span class="problematic" id="id4">results_</span></a>”.</p></li>
 <li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to
 <a class="reference internal" href="#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>inplace</strong> (<em>bool</em>) – If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
@@ -647,6 +670,20 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dd></dl>
 
 <dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">n_features</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of features in the dataset.</p>
+<p>Returns: The number of features in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<em class="property">property </em><code class="sig-name descname">n_samples</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of samples in the dataset.</p>
+<p>Returns: The number of samples in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="datasci.core.dataset.DataSet.normalize">
 <code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
@@ -728,13 +765,16 @@ Default is false.</p>
 
 <dl class="py method">
 <dt id="datasci.core.dataset.DataSet.save">
-<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
 as <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
 with underscores.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance of DataSet to. Default is None.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance of DataSet to. Default is None.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If True and the file_path already exists, then the associated file will be overwritten.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>inplace method.</p>
@@ -1027,6 +1067,29 @@ for auto-generation of a project directory.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt id="datasci.core.helper.generate_save_path">
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_save_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_save_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes a file path, checks if the file exists, and then
+appends an integer in parentheses to the file name depending on the
+number of copies. This mimics the Linux functionality of making copies.
+If overwrite is True, then the function just returns the original path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The file path to be checked.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Flag indicating whether or not to overwrite the file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The modified file path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="datasci.core.helper.get_close_matches_icase">
 <code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Case-insensitive version of difflib.get_close_matches</p>
@@ -1186,11 +1249,15 @@ If the object is not an iterator the object itself is returned.</p>
 
 <dl class="py function">
 <dt id="datasci.core.helper.save_object">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an an object in pickle format at the specified path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance to.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object</strong> (<em>object</em>) – Object to save to disk.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance to.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If True and the file_path already exists, then the associated file will be overwritten.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>inplace method.</p>
