@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>datasci.manifold namespace &mdash; DataSci 1 documentation</title>
+  <title>orthrus.manifold namespace &mdash; orthrus 1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -87,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rst/getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">orthrus</a></li>
 </ul>
 
             
@@ -103,7 +103,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -136,13 +136,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>datasci.manifold namespace</li>
+      <li>orthrus.manifold namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst_copy/datasci.manifold.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst_copy/orthrus.manifold.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,17 +155,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="datasci-manifold-namespace">
-<h1>datasci.manifold namespace<a class="headerlink" href="#datasci-manifold-namespace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="orthrus-manifold-namespace">
+<h1>orthrus.manifold namespace<a class="headerlink" href="#orthrus-manifold-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-datasci.manifold.mds">
-<span id="datasci-manifold-mds-module"></span><h2>datasci.manifold.mds module<a class="headerlink" href="#module-datasci.manifold.mds" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.manifold.mds">
+<span id="orthrus-manifold-mds-module"></span><h2>orthrus.manifold.mds module<a class="headerlink" href="#module-orthrus.manifold.mds" title="Permalink to this headline">¶</a></h2>
 <p>This module contains classes implementing manifold learning algorithms.</p>
 <dl class="py class">
-<dt id="datasci.manifold.mds.MDS">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.manifold.mds.</code><code class="sig-name descname">MDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prev_embedding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.manifold.mds.MDS">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.manifold.mds.</code><code class="sig-name descname">MDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prev_embedding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
 <p>This class compute the Multidimensional Scaling (MDS) embedding of an <span class="math notranslate nohighlight">\(\text{n_samples}\times\text{n_samples}\)</span>
 distance matrix <span class="math notranslate nohighlight">\(X\)</span> for <code class="docutils literal notranslate"><span class="pre">n_components</span></code>. So that the data is embedding into Euclidean space with dimension
@@ -193,8 +193,8 @@ between frames.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="datasci.manifold.mds.MDS.eigenvalues_">
-<code class="sig-name descname">eigenvalues_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvalues_" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.manifold.mds.MDS.eigenvalues_">
+<code class="sig-name descname">eigenvalues_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.eigenvalues_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The eigenvalues corresponding to the MDS embedding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -204,8 +204,8 @@ between frames.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.manifold.mds.MDS.eigenvectors_">
-<code class="sig-name descname">eigenvectors_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.eigenvectors_" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.manifold.mds.MDS.eigenvectors_">
+<code class="sig-name descname">eigenvectors_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.eigenvectors_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The eigenvectors corresponding to the MDS embedding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -215,8 +215,8 @@ between frames.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.manifold.mds.MDS.embedding_">
-<code class="sig-name descname">embedding_</code><a class="headerlink" href="#datasci.manifold.mds.MDS.embedding_" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.manifold.mds.MDS.embedding_">
+<code class="sig-name descname">embedding_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.embedding_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The embedding given by MDS with n_components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -226,11 +226,11 @@ between frames.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.manifold.mds.MDS.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.manifold.mds.MDS.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the position of the points in the embedding space. Stores the eigenvalues and eigenvectors into
-<a class="reference internal" href="#datasci.manifold.mds.MDS.eigenvalues_" title="datasci.manifold.mds.MDS.eigenvalues_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvalues_</span></code></a> and <a class="reference internal" href="#datasci.manifold.mds.MDS.eigenvectors_" title="datasci.manifold.mds.MDS.eigenvectors_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvectors_</span></code></a> respectively. Stores the embedding into
-<a class="reference internal" href="#datasci.manifold.mds.MDS.embedding_" title="datasci.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a></p>
+<a class="reference internal" href="#orthrus.manifold.mds.MDS.eigenvalues_" title="orthrus.manifold.mds.MDS.eigenvalues_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvalues_</span></code></a> and <a class="reference internal" href="#orthrus.manifold.mds.MDS.eigenvectors_" title="orthrus.manifold.mds.MDS.eigenvectors_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvectors_</span></code></a> respectively. Stores the embedding into
+<a class="reference internal" href="#orthrus.manifold.mds.MDS.embedding_" title="orthrus.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -244,15 +244,15 @@ will be used between samples.</p></li>
 <dd class="field-even"><p>The fit MDS instance.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS">MDS</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#orthrus.manifold.mds.MDS" title="orthrus.manifold.mds.MDS">MDS</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.manifold.mds.MDS.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.manifold.mds.MDS.fit_transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fits the MDS model to the data via <a class="reference internal" href="#datasci.manifold.mds.MDS.fit" title="datasci.manifold.mds.MDS.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MDS.fit()</span></code></a>, returns the embedding stored in <a class="reference internal" href="#datasci.manifold.mds.MDS.embedding_" title="datasci.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a>.</p>
+<dt id="orthrus.manifold.mds.MDS.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the MDS model to the data via <a class="reference internal" href="#orthrus.manifold.mds.MDS.fit" title="orthrus.manifold.mds.MDS.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MDS.fit()</span></code></a>, returns the embedding stored in <a class="reference internal" href="#orthrus.manifold.mds.MDS.embedding_" title="orthrus.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

@@ -1,4 +1,4 @@
-name: DataSci
+name: orthrus
 channels:
   - conda-forge
   - defaults

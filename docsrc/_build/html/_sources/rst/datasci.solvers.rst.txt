@@ -1,13 +1,13 @@
-datasci.solvers namespace
+orthrus.solvers namespace
 =========================
 
 Submodules
 ----------
 
-datasci.solvers.linear module
+orthrus.solvers.linear module
 -----------------------------
 
-.. automodule:: datasci.solvers.linear
+.. automodule:: orthrus.solvers.linear
    :members:
    :undoc-members:
    :show-inheritance:

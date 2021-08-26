@@ -18,7 +18,7 @@ parser.add_argument('--exp_params',
 args = parser.parse_args()
 
 # imports
-from datasci.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
+from orthrus.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
 
 # set experiment parameters
 exp_params = module_from_path('exp_params', args.exp_params)
@@ -51,7 +51,7 @@ num_gpus_per_worker = script_args.get('NUM_GPUS_PER_WORKER', default_val(exp_par
 
 local_mode = script_args.get('LOCAL_MODE', default_val(exp_params, 'LOCAL_MODE', False))
 
-from datasci.sparse.feature_selection.helper import get_batch_correction_matric_for_ranked_features
+from orthrus.sparse.feature_selection.helper import get_batch_correction_matric_for_ranked_features
 
 # define the script run function
 def run(ds,
@@ -67,7 +67,7 @@ def run(ds,
         local_mode,
         ):
 
-        from datasci.core.helper import load_object
+        from orthrus.core.helper import load_object
         features_dataframe = load_object(os.path.join(results_dir, features_file))['f_results']
         # classify data
         result = get_batch_correction_matric_for_ranked_features(ds, 

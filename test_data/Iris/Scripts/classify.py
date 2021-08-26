@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # imports
     import sys
     from sklearn.metrics import balanced_accuracy_score as bsr
-    from datasci.core.helper import save_object
+    from orthrus.core.helper import save_object
 
     # set experiment parameters
     sys.path.append()

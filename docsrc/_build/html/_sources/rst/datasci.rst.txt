@@ -1,4 +1,4 @@
-datasci namespace
+orthrus namespace
 =================
 
 Subpackages
@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   datasci.core
-   datasci.preprocessing
-   datasci.decomposition
-   datasci.manifold
-   datasci.model_selection
-   datasci.solvers
-   datasci.sparse
+   orthrus.core
+   orthrus.preprocessing
+   orthrus.decomposition
+   orthrus.manifold
+   orthrus.model_selection
+   orthrus.solvers
+   orthrus.sparse
    
    

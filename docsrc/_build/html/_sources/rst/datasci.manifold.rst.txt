@@ -1,13 +1,13 @@
-datasci.manifold namespace
+orthrus.manifold namespace
 ==========================
 
 Submodules
 ----------
 
-datasci.manifold.mds module
+orthrus.manifold.mds module
 ---------------------------
 
-.. automodule:: datasci.manifold.mds
+.. automodule:: orthrus.manifold.mds
    :members:
    :undoc-members:
    :show-inheritance:

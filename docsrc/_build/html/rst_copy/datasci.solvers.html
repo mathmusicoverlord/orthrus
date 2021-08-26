@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>datasci.solvers namespace &mdash; DataSci 1 documentation</title>
+  <title>orthrus.solvers namespace &mdash; orthrus 1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -87,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rst/getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">orthrus</a></li>
 </ul>
 
             
@@ -103,7 +103,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -136,13 +136,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>datasci.solvers namespace</li>
+      <li>orthrus.solvers namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst_copy/datasci.solvers.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst_copy/orthrus.solvers.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,31 +155,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="datasci-solvers-namespace">
-<h1>datasci.solvers namespace<a class="headerlink" href="#datasci-solvers-namespace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="orthrus-solvers-namespace">
+<h1>orthrus.solvers namespace<a class="headerlink" href="#orthrus-solvers-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-datasci.solvers.linear">
-<span id="datasci-solvers-linear-module"></span><h2>datasci.solvers.linear module<a class="headerlink" href="#module-datasci.solvers.linear" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.solvers.linear">
+<span id="orthrus-solvers-linear-module"></span><h2>orthrus.solvers.linear module<a class="headerlink" href="#module-orthrus.solvers.linear" title="Permalink to this headline">¶</a></h2>
 <p>This module contain solvers for linear programs.</p>
 <dl class="py class">
-<dt id="datasci.solvers.linear.LPNewton">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.solvers.linear.</code><code class="sig-name descname">LPNewton</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">device</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">tol</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">imax</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.solvers.linear.LPNewton" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.solvers.linear.LPNewton">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.solvers.linear.</code><code class="sig-name descname">LPNewton</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">device</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">tol</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">imax</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.solvers.linear.LPNewton" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.solvers.linear.LPNewton.convert_type">
-<code class="sig-name descname">convert_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.solvers.linear.LPNewton.convert_type" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.solvers.linear.LPNewton.convert_type">
+<code class="sig-name descname">convert_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.solvers.linear.LPNewton.convert_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="datasci.solvers.linear.LPNewton.solve">
-<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u0</span></em>, <em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">hf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.solvers.linear.LPNewton.solve" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.solvers.linear.LPNewton.solve">
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u0</span></em>, <em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">hf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.solvers.linear.LPNewton.solve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="datasci.solvers.linear.LPNewton.step">
-<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ui</span></em>, <em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">hf</span></em>, <em class="sig-param"><span class="n">dI</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.solvers.linear.LPNewton.step" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.solvers.linear.LPNewton.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ui</span></em>, <em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">hf</span></em>, <em class="sig-param"><span class="n">dI</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.solvers.linear.LPNewton.step" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

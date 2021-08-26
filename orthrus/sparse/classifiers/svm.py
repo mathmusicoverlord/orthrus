@@ -4,7 +4,7 @@ from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics.pairwise import pairwise_kernels
 import torch as tc
 import numpy as np
-from datasci.solvers.linear import LPNewton
+from orthrus.solvers.linear import LPNewton
 from copy import copy
 import ray
 

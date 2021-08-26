@@ -1,13 +1,13 @@
-datasci.decomposition namespace
+orthrus.decomposition namespace
 ===============================
 
 Submodules
 ----------
 
-datasci.decomposition.general module
+orthrus.decomposition.general module
 ------------------------------------
 
-.. automodule:: datasci.decomposition.general
+.. automodule:: orthrus.decomposition.general
    :members:
    :undoc-members:
    :show-inheritance:

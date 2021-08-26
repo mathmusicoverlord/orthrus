@@ -6,8 +6,8 @@ Generic script for running feature set size reduction on a dataset.
 import argparse
 import os
 from pickle import NONE
-from datasci.core.helper import load_object
-from datasci.sparse.feature_selection.helper import reduce_feature_set_size
+from orthrus.core.helper import load_object
+from orthrus.sparse.feature_selection.helper import reduce_feature_set_size
 # command line arguments
 parser = argparse.ArgumentParser("generic-ifr")
 
@@ -19,7 +19,7 @@ parser.add_argument('--exp_params',
 args = parser.parse_args()
 
 # imports
-from datasci.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
+from orthrus.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
 
 # set experiment parameters
 exp_params = module_from_path('exp_params', args.exp_params)

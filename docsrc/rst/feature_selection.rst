@@ -1,17 +1,17 @@
 Feature Selection using IFR
 ===========================
-:py:class:`DataSet's <datasci.core.dataset.DataSet>` through its modular design makes it really easy to perform feature selection using a variety of feature selection methods. This 
-tutorial provides an in depth look of using :py:meth:`feature_select <datasci.core.dataset.DataSet.feature_select>` method in combination with :py:class:`IFR <datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR>`.
+:py:class:`DataSet's <orthrus.core.dataset.DataSet>` through its modular design makes it really easy to perform feature selection using a variety of feature selection methods. This
+tutorial provides an in depth look of using :py:meth:`feature_select <orthrus.core.dataset.DataSet.feature_select>` method in combination with :py:class:`IFR <orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR>`.
     
 The first step is to load the dataset and make sure we have the right attribute in the metadata. For this example we are going to work with the GSE730732 dataset and select features for 
 controls vs shedders in hour 1 to 8. We resolved the issues with datatypes in GSE73072 dataset in `creating a dataset <create_dataset.html>`_, learnt how to `normalize the data <normalization_and_imputation.html>`_
 , and created a new attribute ``response`` in the `adding new attributes to metadata <add_new_attributes_using_queries.html>`_, please check these tutorial first.
 
     >>> # load dataset
-    >>> from datasci.core.dataset import load_dataset
+    >>> from orthrus.core.dataset import load_dataset
     >>> ds = load_dataset('path/to/gse73072.ds')
     >>> class_attr = 'Response'
-    >>> from datasci.preprocessing.batch_corrections import Limma
+    >>> from orthrus.preprocessing.batch_corrections import Limma
     >>> limma_obj = Limma()
     >>> #Apply Limma on SubjectID attribute
     >>> ds.normalize(limma_obj, norm_name='Limma', supervised_attr='SubjectID')
@@ -35,16 +35,16 @@ The code snippet below does this job.
     >>> sample_ids = (ds.metadata[class_attr].isin(['controls', 'shedders'])) & (ds.metadata['StudyID'].isin(studies))
 
 Next, let's define our feature selector, which is Iterative Feature Removal, for our example. First, we need to define a classifier that IFR will use. In this example we are going 
-to use GPU based :py:class:`SSVMClassifier <datasci.sparse.classifiers.svm.SSVMClassifier>` with `LPPrimalDualPy <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/solvers/LPPrimalDualPy.py>`_ solver
+to use GPU based :py:class:`SSVMClassifier <orthrus.sparse.classifiers.svm.SSVMClassifier>` with `LPPrimalDualPy <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/solvers/LPPrimalDualPy.py>`_ solver
 
-    >>> from datasci.sparse.classifiers.svm import SSVMClassifier
+    >>> from orthrus.sparse.classifiers.svm import SSVMClassifier
     >>> from calcom.solvers import LPPrimalDualPy
     >>> model = SSVMClassifier(C = 1, solver =LPPrimalDualPy, use_cuda = True)
     >>> weights_handle="weights_"
 
-Second, let's create the :py:class:`IFR <datasci.sparse.feature_selection.IterativeFeatureRemoval.IFR>` object. Please check the documentation to understand about the arguments to IFR.
+Second, let's create the :py:class:`IFR <orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR>` object. Please check the documentation to understand about the arguments to IFR.
 
-    >>> from datasci.sparse.feature_selection.IterativeFeatureRemoval import IFR
+    >>> from orthrus.sparse.feature_selection.IterativeFeatureRemoval import IFR
     >>> feature_selector = IFR(model,
     ...                        weights_handle=weights_handle,
     ...                        verbosity = 2,
@@ -58,7 +58,7 @@ Second, let's create the :py:class:`IFR <datasci.sparse.feature_selection.Iterat
     ...                        )
 
 
-Third, we now define the parameters for the :py:meth:`feature_select <datasci.core.dataset.DataSet.feature_select>` method. Please check the method documentation to know the parameters in detail.
+Third, we now define the parameters for the :py:meth:`feature_select <orthrus.core.dataset.DataSet.feature_select>` method. Please check the method documentation to know the parameters in detail.
 Here, we are interested in the following attributes: ``selector``, ``attr``, ``selector_name``, ``sample_ids``, ``fit_handle``, ``f_results_handle``. So far we have defined all but ``fit_handle`` and ``f_results_handle``.
 The purpose of these arguments is to provide alternate handle to the feature selectors ``fit`` or ``run`` method and the handle on how to access the results. Although the default values of 
 ``fit_handle``, which is 'fit', matches the fit handle of IFR, ``f_results_handle`` does not. We now show how to provide a different results handle.
@@ -80,15 +80,15 @@ At this stage we have all the varibles we need for feature selection and we are 
     ...                             f_results_handle=feature_selection_results_handle
     ...                             )
     
-The return of :py:meth:`feature_select <datasci.core.dataset.DataSet.feature_select>` method is a dictionary that contains two elements:
+The return of :py:meth:`feature_select <orthrus.core.dataset.DataSet.feature_select>` method is a dictionary that contains two elements:
 
  1. ``selector`` : This is ``feature_selector`` object and can be used now to access any information about the feature selection.
  2. ``f_results`` : This a Pandas.DataFrame with feature ids (columns of ds.data) as index and columns are ``feature_selector`` specific. For 
     instance, ``f_results`` for ``IFR``  contains three columns ``frequency``, ``weights`` and ``selection_iteration`` for each feature id.
 
-Finally, we can save these to disk using :py:meth:`save_object <datasci.core.helper.save_object>` method.
+Finally, we can save these to disk using :py:meth:`save_object <orthrus.core.helper.save_object>` method.
 
-    >>> from datasci.core.helper import save_object
+    >>> from orthrus.core.helper import save_object
     >>> save_object(feature_selection_results, 'path/to/dst/dir/control_vs_shedders/feature_selection_results.pickle')
 
 In the `next tutorial <feature_set_size_reducton.html>`_ we will look at how to reduce the size of these features in ``f_results`` to find an optimal number of features for a classification problem.

@@ -6,7 +6,7 @@ import random
 from calcom.solvers import LPPrimalDualPy
 import copy 
 from sklearn.metrics import balanced_accuracy_score
-from datasci.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs_
 import ray
 
 class IFR:
@@ -32,7 +32,7 @@ class IFR:
 
     Parameters:
         classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
-                of a ``fit`` and ``predict`` method. Default classifier is datasci.sparse.classifiers.svm .SSVMClassifier, it will
+                of a ``fit`` and ``predict`` method. Default classifier is orthrus.sparse.classifiers.svm .SSVMClassifier, it will
                 be a CPU based classifier if ``num_gpus_per_worker`` is 0, otherwise it will be a GPU classifier.
 
         scorer (object): Function which scores the prediction labels on training and test partitions. This function
@@ -101,8 +101,8 @@ class IFR:
 
 
     Examples:
-            >>> import datasci.core.dataset as DS
-            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
             >>> x = DS.load_dataset('path/to/gse_730732.h5')
             >>> from calcom.solvers import LPPrimalDualPy
             >>> import calcom
@@ -154,7 +154,7 @@ class IFR:
         self.num_gpus_per_worker = num_gpus_per_worker
 
         if classifier == None:
-            from datasci.sparse.classifiers.svm import SSVMClassifier
+            from orthrus.sparse.classifiers.svm import SSVMClassifier
             if self.num_gpus_per_worker == 0:
                 use_cuda = False
             elif self.num_gpus_per_worker > 0:

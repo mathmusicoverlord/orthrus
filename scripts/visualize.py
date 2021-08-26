@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("generic-visualization")
     parser.add_argument('--exp_params',
                         type=str,
-                        default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                        default=os.path.join(os.environ['ORTHRUS_PATH'], 'test_data', 'Iris', 'Experiments',
                                              'classify_setosa_versicolor_svm',
                                              'classify_setosa_versicolor_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
@@ -39,9 +39,9 @@ if __name__ == '__main__':
     # imports for script
     from sklearn.decomposition import PCA
     from umap import UMAP
-    from datasci.manifold.mds import MDS
-    from datasci.core.helper import module_from_path
-    from datasci.core.helper import default_val
+    from orthrus.manifold.mds import MDS
+    from orthrus.core.helper import module_from_path
+    from orthrus.core.helper import default_val
     import pandas as pd
 
     # set experiment parameters

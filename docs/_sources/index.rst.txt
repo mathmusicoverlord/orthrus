@@ -1,9 +1,9 @@
-.. DataSci documentation master file, created by
+.. orthrus documentation master file, created by
    sphinx-quickstart on Wed Jan 13 17:25:41 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to DataSci's documentation!
+Welcome to orthrus's documentation!
 ===================================
 
 .. toctree::

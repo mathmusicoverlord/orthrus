@@ -1,69 +1,69 @@
-datasci.sparse.feature\_selection namespace
+orthrus.sparse.feature\_selection namespace
 ===========================================
 
 Submodules
 ----------
 
-datasci.sparse.feature\_selection.IterativeFeatureRemoval module
+orthrus.sparse.feature\_selection.IterativeFeatureRemoval module
 ----------------------------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.IterativeFeatureRemoval
+.. automodule:: orthrus.sparse.feature_selection.IterativeFeatureRemoval
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.helper module
+orthrus.sparse.feature\_selection.helper module
 -----------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.helper
+.. automodule:: orthrus.sparse.feature_selection.helper
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.kffs module
+orthrus.sparse.feature\_selection.kffs module
 ---------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.kffs
+.. automodule:: orthrus.sparse.feature_selection.kffs
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.kfold\_loso\_ifr module
+orthrus.sparse.feature\_selection.kfold\_loso\_ifr module
 ---------------------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.kfold_loso_ifr
+.. automodule:: orthrus.sparse.feature_selection.kfold_loso_ifr
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.kfold\_shuffle\_ifr module
+orthrus.sparse.feature\_selection.kfold\_shuffle\_ifr module
 ------------------------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.kfold_shuffle_ifr
+.. automodule:: orthrus.sparse.feature_selection.kfold_shuffle_ifr
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.pathway\_selection module
+orthrus.sparse.feature\_selection.pathway\_selection module
 -----------------------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.pathway_selection
+.. automodule:: orthrus.sparse.feature_selection.pathway_selection
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.pca\_snr\_selection module
+orthrus.sparse.feature\_selection.pca\_snr\_selection module
 ------------------------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.pca_snr_selection
+.. automodule:: orthrus.sparse.feature_selection.pca_snr_selection
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.sparse.feature\_selection.sabs module
+orthrus.sparse.feature\_selection.sabs module
 ---------------------------------------------
 
-.. automodule:: datasci.sparse.feature_selection.sabs
+.. automodule:: orthrus.sparse.feature_selection.sabs
    :members:
    :undoc-members:
    :show-inheritance:

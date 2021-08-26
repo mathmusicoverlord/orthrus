@@ -4,14 +4,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="datasci",  # Replace with your own username
+    name="orthrus",  # Replace with your own username
     version="0.0.1",
     author="Eric Kehoe, Kartikay Sharma",
     author_email="ekehoe32@gmail.com",
     description="A package for automating pre-processing, visualization, and classification of generic data sets",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ekehoe32/DataSci",
+    url="https://github.com/ekehoe32/orthrus",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

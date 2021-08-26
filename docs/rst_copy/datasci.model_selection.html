@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>datasci.model_selection namespace &mdash; DataSci 1 documentation</title>
+  <title>orthrus.model_selection namespace &mdash; orthrus 1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -87,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rst/getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">orthrus</a></li>
 </ul>
 
             
@@ -103,7 +103,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -136,13 +136,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>datasci.model_selection namespace</li>
+      <li>orthrus.model_selection namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst_copy/datasci.model_selection.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst_copy/orthrus.model_selection.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,34 +155,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="datasci-model-selection-namespace">
-<h1>datasci.model_selection namespace<a class="headerlink" href="#datasci-model-selection-namespace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="orthrus-model-selection-namespace">
+<h1>orthrus.model_selection namespace<a class="headerlink" href="#orthrus-model-selection-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-datasci.model_selection.partitioning">
-<span id="datasci-model-selection-partitioning-module"></span><h2>datasci.model_selection.partitioning module<a class="headerlink" href="#module-datasci.model_selection.partitioning" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.model_selection.partitioning">
+<span id="orthrus-model-selection-partitioning-module"></span><h2>orthrus.model_selection.partitioning module<a class="headerlink" href="#module-orthrus.model_selection.partitioning" title="Permalink to this headline">¶</a></h2>
 <p>This module defines various partitioning classes which partitions samples in batches of training and test split.
 These classes must have the sklearn equivalent of a split method. The split method returns a list of train-test partitions;
 one for each fold in the experiment. See sklearn.model_selection.KFold for an example partitioner.</p>
 <dl class="py class">
-<dt id="datasci.model_selection.partitioning.TrainPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainPartitioner</code><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.model_selection.partitioning.TrainPartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.model_selection.partitioning.</code><code class="sig-name descname">TrainPartitioner</code><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainPartitioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.model_selection.partitioning.TrainPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainPartitioner.split" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.model_selection.partitioning.TrainPartitioner.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainPartitioner.split" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="datasci.model_selection.partitioning.TrainTestPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.model_selection.partitioning.</code><code class="sig-name descname">TrainTestPartitioner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.model_selection.partitioning.TrainTestPartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.model_selection.partitioning.</code><code class="sig-name descname">TrainTestPartitioner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainTestPartitioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.model_selection.partitioning.TrainTestPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.model_selection.partitioning.TrainTestPartitioner.split" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.model_selection.partitioning.TrainTestPartitioner.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainTestPartitioner.split" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
