@@ -7,7 +7,18 @@ must have the same number of columns as :py:attr:`DataSet.data`
 '''
 
 class LogNormalizer():
-    def fit_transform(self, X):
+    def fit_transform(self, X, y=None):
+
+        return self.transform(X)
+
+    def fit(self, X, y=None):
+        """
+        """
+
+        return X
+
+
+    def transform(self, X):
         """
         Applies element wise log to the data. Any values that are negative infinity are set to zero after applying log.
 
