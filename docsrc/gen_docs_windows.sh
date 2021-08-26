@@ -1,5 +1,5 @@
 #!/usr/bin/
-cd c:/Users/ekeho/Documents/DataSci/docsrc
-conda activate DataSci
-sphinx-apidoc --implicit-namespaces -o rst ../datasci/
+cd c:/Users/ekeho/Documents/orthrus/docsrc
+conda activate orthrus
+sphinx-apidoc --implicit-namespaces -o rst ../orthrus/
 make github

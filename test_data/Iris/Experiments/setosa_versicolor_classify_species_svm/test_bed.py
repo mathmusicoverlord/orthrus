@@ -6,9 +6,9 @@ All experimental parameters to be exported are denoted by UPPERCASE names as a c
 # imports
 import datetime
 import os
-from datasci.core.dataset import load_dataset
-from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
-from datasci.sparse.classifiers.svm import L1SVM
+from orthrus.core.dataset import load_dataset
+from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
+from orthrus.sparse.classifiers.svm import L1SVM
 from calcom.solvers import LPPrimalDualPy
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import KFold
@@ -19,7 +19,7 @@ import numpy as np
 EXP_NAME = 'test_bed'
 
 # set working directories
-PROJ_DIR = os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris') # <--- put your absolute path
+PROJ_DIR = os.path.join(os.environ['ORTHRUS_PATH'], 'test_data', 'Iris') # <--- put your absolute path
 DATA_DIR = os.path.join(PROJ_DIR, 'Data')
 EXP_DIR = os.path.join(PROJ_DIR, 'Experiments', EXP_NAME)
 RESULTS_DIR = os.path.join(EXP_DIR, 'Results')

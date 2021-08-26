@@ -1,21 +1,21 @@
-datasci.core namespace
+orthrus.core namespace
 ======================
 
 Submodules
 ----------
 
-datasci.core.dataset module
+orthrus.core.dataset module
 ---------------------------
 
-.. automodule:: datasci.core.dataset
+.. automodule:: orthrus.core.dataset
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.core.helper module
+orthrus.core.helper module
 --------------------------
 
-.. automodule:: datasci.core.helper
+.. automodule:: orthrus.core.helper
    :members:
    :undoc-members:
    :show-inheritance:

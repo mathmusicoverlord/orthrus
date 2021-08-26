@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser("generic-classification")
 
 parser.add_argument('--exp_params',
                     type=str,
-                    default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                    default=os.path.join(os.environ['ORTHRUS_PATH'], 'test_data', 'Iris', 'Experiments',
                                          'classify_setosa_versicolor_svm',
                                          'classify_setosa_versicolor_svm_params.py'),
                     help='File path of containing the experimental parameters. Default is the Iris experiment.')
@@ -26,7 +26,7 @@ parser.add_argument('--score',
 args = parser.parse_args()
 
 # imports
-from datasci.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
+from orthrus.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
 
 # set experiment parameters
 exp_params = module_from_path('exp_params', args.exp_params)

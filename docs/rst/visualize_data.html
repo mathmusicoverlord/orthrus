@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Visualizing Data &mdash; DataSci 1 documentation</title>
+  <title>Visualizing Data &mdash; orthrus 1 documentation</title>
   
 
   
@@ -55,7 +55,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -115,7 +115,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normalization_and_imputation.html">Data Normalization and Imputation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
 </ul>
 
             
@@ -131,7 +131,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -190,18 +190,18 @@
   <div class="section" id="visualizing-data">
 <h1>Visualizing Data<a class="headerlink" href="#visualizing-data" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will go over some of the finer points of using the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method
-of the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. For all
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method
+of the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. For all
 of these examples we will use the GSE73072 dataset, as it contains enough
 complexity to demostrate the utitlity of the method, see the
 <a class="reference external" href="what_is_the_dataset.html">What is the DataSet class?</a> tutorial for
 details on how to access this dataset. First we load the dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </pre></div>
@@ -209,10 +209,10 @@ details on how to access this dataset. First we load the dataset:</p>
 <div class="section" id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
 <p>One can easily start plotting their data without any in-depth knowledge of the method. In this example we will
-plot the GSE73072 data in 2D using <a class="reference internal" href="datasci.manifold.html#datasci.manifold.mds.MDS" title="datasci.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a> and coloring
+plot the GSE73072 data in 2D using <a class="reference internal" href="orthrus.manifold.html#orthrus.manifold.mds.MDS" title="orthrus.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a> and coloring
 the plot by the <code class="docutils literal notranslate"><span class="pre">virus</span></code> attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.manifold.mds</span> <span class="kn">import</span> <span class="n">MDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.manifold.mds</span> <span class="kn">import</span> <span class="n">MDS</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize the data with MDS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -229,7 +229,7 @@ is overlap of the colored classes.</p>
 </div>
 <div class="section" id="customizing-plots">
 <h2>Customizing Plots<a class="headerlink" href="#customizing-plots" title="Permalink to this headline">¶</a></h2>
-<p>By default the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a>
+<p>By default the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a>
 method uses <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a> as a backend and the
 <a class="reference external" href="https://seaborn.pydata.org/tutorial/color_palettes.html">seaborn</a> palettes for coloring. For example we can
 specify <code class="docutils literal notranslate"><span class="pre">palette='bright'</span></code> and <code class="docutils literal notranslate"><span class="pre">mrkr_list=['o']</span></code> to use the bright seaborn color palette and circle Pyplot
@@ -248,7 +248,7 @@ markers:</p>
 <p>In fact any keyword arguments that can be passed to
 <a class="reference external" href="https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html">matplotlib.axes.Axes.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=2</span></code>) and
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=3</span></code>) can also be
-passed to the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
+passed to the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
 the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types via the keyword argument <code class="docutils literal notranslate"><span class="pre">sample_ids</span></code>, color the samples by time point in hours,
 use different markers for virus types via the <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> argument, and embed into 3D rather than 2D via the <code class="docutils literal notranslate"><span class="pre">dim</span></code> argument:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># restrict the samples to H1N1 and H3N2</span>
@@ -274,19 +274,19 @@ use different markers for virus types via the <code class="docutils literal notr
 </div>
 <div class="section" id="saving-plots">
 <h2>Saving Plots<a class="headerlink" href="#saving-plots" title="Permalink to this headline">¶</a></h2>
-<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.visualize" title="datasci.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. By default
+<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. By default
 plots will save to the <code class="docutils literal notranslate"><span class="pre">DataSet.path</span></code> directory and with the name <code class="docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">attr</span></code> _  <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> _ <code class="docutils literal notranslate"><span class="pre">dim</span></code>
 with the appropriate extension. Alternatively one can specify the keyword argument <code class="docutils literal notranslate"><span class="pre">save_name</span></code> without an extension, e.g., <code class="docutils literal notranslate"><span class="pre">save_name=gse73072_mds_dim3</span></code>.</p>
 </div>
 <div class="section" id="using-plotly">
 <h2>Using Plotly<a class="headerlink" href="#using-plotly" title="Permalink to this headline">¶</a></h2>
-<p>The DataSci package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
+<p>The orthrus package uses two backends for plotting, <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a>
 and <a class="reference external" href="https://plotly.com/python/">Plotly</a>. Pyplot is ideal for generating non-interative plots, such as
 figures to be included in a document, while Plotly is ideal for generating interactive plots which can be exported as .html
 or hosted on server with use of <a class="reference external" href="https://plotly.com/dash/">dash</a>. We provide a few examples below to demonstrate the Plotly
 backend. Here is one where export the interative plotly figure to an <code class="docutils literal notranslate"><span class="pre">.html</span></code> file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># set figure directory</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="s2">&quot;docsrc/_build/html/figures&quot;</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># visualize data using plotly</span>
@@ -316,7 +316,7 @@ Here is an example where we host our figure on <code class="docutils literal not
 <span class="gp">... </span>            <span class="n">port</span><span class="o">=</span><span class="s1">&#39;5000&#39;</span><span class="p">)</span>
 
 <span class="go">Dash is running on http://127.0.0.1:5000/</span>
-<span class="go">* Serving Flask app &quot;datasci.core.helper&quot; (lazy loading)</span>
+<span class="go">* Serving Flask app &quot;orthrus.core.helper&quot; (lazy loading)</span>
 <span class="go">* Environment: production</span>
 <span class="go">  WARNING: This is a development server. Do not use it in a production deployment.</span>
 <span class="go">  Use a production WSGI server instead.</span>

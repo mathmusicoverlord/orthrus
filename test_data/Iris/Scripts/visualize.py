@@ -8,7 +8,7 @@ if __name__ == '__main__':
     import sys
     from sklearn.decomposition import PCA
     from umap import UMAP
-    from datasci.manifold.mds import MDS
+    from orthrus.manifold.mds import MDS
 
     # set experiment parameters
     from Experiments.setosa_versicolor_classify_species_svm import setosa_versicolor_classify_species_svm_params as exp_params

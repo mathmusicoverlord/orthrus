@@ -2,16 +2,16 @@ Classification
 ==============
 
 In this tutorial we will learn how to setup and perform classification experiments using the
-:py:meth:`classify() <datasci.core.dataset.DataSet.classify>` method of the 
-:py:class:`DataSet <datasci.core.dataset.DataSet>` class. We start by loading the Iris dataset
-provided in the DataSci package::
+:py:meth:`classify() <orthrus.core.dataset.DataSet.classify>` method of the
+:py:class:`DataSet <orthrus.core.dataset.DataSet>` class. We start by loading the Iris dataset
+provided in the orthrus package::
 
     >>> # imports
     >>> import os
-    >>> from datasci.core.dataset import load_dataset
+    >>> from orthrus.core.dataset import load_dataset
 
     >>> # load the data
-    >>> file_path = os.path.join(os.environ["DATASCI_PATH"],
+    >>> file_path = os.path.join(os.environ["ORTHRUS_PATH"],
     ...                          "test_data/Iris/Data/iris.ds")
     >>> ds = load_dataset(file_path)
 
@@ -105,23 +105,23 @@ GSE7302: k-Fold Cross-Validation with SSVM on GPU
 --------------------------------------------------
 
 In this example we will run a k-fold cross-validation experiment with the GSE73072 dataset
-using :py:class:`Sparse Support Vector Machines <datasci.sparse.classifiers.svm.SSVMClassifier>` (SSVM)
+using :py:class:`Sparse Support Vector Machines <orthrus.sparse.classifiers.svm.SSVMClassifier>` (SSVM)
 on a GPU to distguish between shedding and non-shedding individuals infected with HRV in the 
 first 24 hours of exposure. First we load the dataset::
 
     >>> # imports
     >>> import os
-    >>> from datasci.core.dataset import load_dataset
+    >>> from orthrus.core.dataset import load_dataset
 
     >>> # load the data
-    >>> file_path = os.path.join(os.environ["DATASCI_PATH"],
+    >>> file_path = os.path.join(os.environ["ORTHRUS_PATH"],
     ...                          "test_data/GSE73072/Data/GSE73072.ds")
     >>> ds = load_dataset(file_path)
 
 Then we set the sample ids, partitioner, and the classifier::
 
     >>> # imports
-    >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+    >>> from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
     >>> from sklearn.model_selection import StratifiedKFold
     >>> from calcom.solvers import LPPrimalDualPy
 
@@ -196,7 +196,7 @@ We now run the experiment::
 We can also save the results for later::
 
     >>> # imports
-    >>> from datasci.core.helper import save_object
+    >>> from orthrus.core.helper import save_object
     
     
     >>> # save the results

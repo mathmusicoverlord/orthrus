@@ -13,9 +13,9 @@ from numpy.core import ndarray
 from pandas.core.frame import DataFrame
 from sklearn.preprocessing import FunctionTransformer
 from pandas.core.frame import Series
-from datasci.core.helper import scatter_pyplot
-from datasci.core.helper import scatter_plotly
-from datasci.core.helper import generate_save_path
+from orthrus.core.helper import scatter_pyplot
+from orthrus.core.helper import scatter_plotly
+from orthrus.core.helper import generate_save_path
 
 # classes
 class DataSet:
@@ -90,7 +90,7 @@ class DataSet:
 
     Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
@@ -268,7 +268,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> from sklearn.manifold import MDS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
@@ -278,7 +278,7 @@ class DataSet:
             >>> ds.visualize(embedding=embedding, attr='Species', no_axes=True)
 
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> from sklearn.decomposition import PCA
             >>> import numpy as np
             >>> df = pydat('iris')
@@ -468,7 +468,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> from sklearn.preprocessing import StandardScaler  as SS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
@@ -538,7 +538,7 @@ class DataSet:
 
         Examples:
             >>> import pandas as pd
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> from sklearn.impute import KNNImputer
             >>> data = pd.DataFrame(index=['a', 'b', 'c'],
             ...                     columns= ['x', 'y', 'z'],
@@ -583,7 +583,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
@@ -633,7 +633,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
@@ -727,7 +727,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
@@ -938,7 +938,7 @@ class DataSet:
 
         Examples:
             >>> from pydataset import data as pydat
-            >>> from datasci.core.dataset import DataSet as DS
+            >>> from orthrus.core.dataset import DataSet as DS
             >>> df = pydat('iris')
             >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
             >>> metadata = df[['Species']]
@@ -1078,8 +1078,8 @@ class DataSet:
 
         Examples:
             >>> # imports
-            >>> import datasci.core.dataset as dataset
-            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> import orthrus.core.dataset as dataset
+            >>> from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
             >>> from calcom.solvers import LPPrimalDualPy
             >>> from sklearn.model_selection import KFold
             >>> from sklearn.metrics import balanced_accuracy_score as bsr
@@ -1374,10 +1374,10 @@ class DataSet:
         Examples:
             >>> # imports
             >>> import numpy as np
-            >>> import datasci.core.dataset as dataset
-            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> import orthrus.core.dataset as dataset
+            >>> from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
             >>> from calcom.solvers import LPPrimalDualPy
-            >>> from datasci.sparse.feature_selection.kffs import KFFS
+            >>> from orthrus.sparse.feature_selection.kffs import KFFS
             ...
             >>> # load dataset
             >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
@@ -1541,7 +1541,7 @@ def load_dataset(file_path: str):
         DataSet : Class instance encoded by pickle binary file_path.
 
     Examples:
-            >>> ds = load_dataset(file_path=os.path.join(os.environ["DATASCI_PATH"], "test_data/Iris/Data/iris.ds"))
+            >>> ds = load_dataset(file_path=os.path.join(os.environ["ORTHRUS_PATH"], "test_data/Iris/Data/iris.ds"))
     """
     # open file and unpickle
     with open(file_path, 'rb') as f:
@@ -1624,7 +1624,7 @@ def from_ccd(file_path: str, name: str = None, index_col: str = '_id'):
 # TODO: Add
 
 if __name__ == "__main__":
-    from datasci.core.dataset import DataSet as DS
+    from orthrus.core.dataset import DataSet as DS
     import pandas as pd
 
     # load data

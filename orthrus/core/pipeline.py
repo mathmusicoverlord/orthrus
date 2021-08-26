@@ -10,9 +10,9 @@ import pandas as pd
 import numpy as np
 from numpy import ndarray
 from pandas import DataFrame, Series
-from datasci.core.dataset import DataSet
-from datasci.core.helper import generate_save_path
-from datasci.core.helper import save_object, load_object
+from orthrus.core.dataset import DataSet
+from orthrus.core.helper import generate_save_path
+from orthrus.core.helper import save_object, load_object
 import warnings
 from copy import copy, deepcopy
 import ray

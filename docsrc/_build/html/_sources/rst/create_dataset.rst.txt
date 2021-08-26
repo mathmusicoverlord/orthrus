@@ -1,9 +1,9 @@
 Creating a DataSet
 ==================
-There are number of options available to create a new :py:class:`DataSet <datasci.core.dataset.DataSet>` file:
+There are number of options available to create a new :py:class:`DataSet <orthrus.core.dataset.DataSet>` file:
     
-1. By utilizing the :py:class:`DataSet's <datasci.core.dataset.DataSet>` :py:meth:`__init__ <datasci.core.dataset.DataSet.__init__>` method:
-    The :py:attr:`data <datasci.core.dataset.DataSet.data>` , :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <datasci.core.dataset.DataSet.vardata>` variables in :py:class:`DataSet <datasci.core.dataset.DataSet>` object are `Pandas.DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. 
+1. By utilizing the :py:class:`DataSet's <orthrus.core.dataset.DataSet>` :py:meth:`__init__ <orthrus.core.dataset.DataSet.__init__>` method:
+    The :py:attr:`data <orthrus.core.dataset.DataSet.data>` , :py:attr:`metadata <orthrus.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <orthrus.core.dataset.DataSet.vardata>` variables in :py:class:`DataSet <orthrus.core.dataset.DataSet>` object are `Pandas.DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_.
     So, we should ensure that either these variables are read as Pandas.DataFrame or should be converted into one before we can create the dataset.
     :: 
         import pandas as pd
@@ -29,7 +29,7 @@ There are number of options available to create a new :py:class:`DataSet <datasc
 
     Now let's create and save the dataset object
     ::
-        from datasci.core.dataset import DataSet as DS
+        from orthrus.core.dataset import DataSet as DS
         import os
         ds = DS(name=name, 
                 description=description,
@@ -42,17 +42,17 @@ There are number of options available to create a new :py:class:`DataSet <datasc
     Another example:
     ::
         from pydataset import data as pydat
-        from datasci.core.dataset import DataSet as DS
+        from orthrus.core.dataset import DataSet as DS
         df = pydat('iris')
         data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
         metadata = df[['Species']]
         ds = DS(name='Iris', data=data, metadata=metadata)
     
 
-2. Converting a `CCDataSet <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/io/CCDataSet.py>`_ object to :py:class:`DataSet <datasci.core.dataset.DataSet>` object
-    We can utilize :py:meth:`from_ccd <datasci.core.dataset.from_ccd>` method to convert a ``CCDataSet`` object to a ``Dataset`` object.
+2. Converting a `CCDataSet <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/io/CCDataSet.py>`_ object to :py:class:`DataSet <orthrus.core.dataset.DataSet>` object
+    We can utilize :py:meth:`from_ccd <orthrus.core.dataset.from_ccd>` method to convert a ``CCDataSet`` object to a ``Dataset`` object.
     :: 
-        from datasci.core.dataset import from_ccd     
+        from orthrus.core.dataset import from_ccd
         ccd_path = 'path/to/gse_730732.h5' #this is the ccd file!
         ds = from_ccd(ccd_path) 
     
@@ -60,7 +60,7 @@ There are number of options available to create a new :py:class:`DataSet <datasc
 Some Problems You May Encounter
 -------------------------------
 
-Sometimes there may be issues with datatypes in the :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>`, so it may be necessary to apply reformat method to proper datatypes. 
+Sometimes there may be issues with datatypes in the :py:attr:`metadata <orthrus.core.dataset.DataSet.metadata>`, so it may be necessary to apply reformat method to proper datatypes.
 Let's check the `shedding` column in gse_730732 dataset.
 ::
     >>> ds.metadata['shedding'].value_counts()
@@ -84,7 +84,7 @@ This is an incorrect behavior and this  happens because the elements and datatyp
 
 Solutions
 ---------
-1. Use :py:meth:`reformat_metadata <datasci.core.dataset.DataSet.reformat_metadata>` method:
+1. Use :py:meth:`reformat_metadata <orthrus.core.dataset.DataSet.reformat_metadata>` method:
     Try the inbuild method first to see if datatypes are inferred automatically.
     ::
         >>> ds.reformat_metadata(convert_dtypes=True)

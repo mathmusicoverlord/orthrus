@@ -12,7 +12,7 @@ to be confused with an Iterable which has the potential to become an iterator.
 
 An example of running product_parallelize.py is as follows:
 
-python product_parallelize.py classify.py --exp_params /hdd/DataSci/test_data/Iris/Experiments/setosa_versicolor_classify_species_svm/setosa_versicolor_classify_species_svm_params.py
+python product_parallelize.py classify.py --exp_params /hdd/orthrus/test_data/Iris/Experiments/setosa_versicolor_classify_species_svm/setosa_versicolor_classify_species_svm_params.py
 
 The results will be saved, per the "save" function provided in your script, for each combination of parameters. The standard
 save name will be appended with an integer indicating the parallel run, e.g., save_name_0.blah, save_name_1.blah, etc...
@@ -30,8 +30,8 @@ from inspect import signature
 import sys
 from tqdm import tqdm
 from copy import deepcopy
-from datasci.core.helper import batch_jobs_
-from datasci.core.helper import module_from_path
+from orthrus.core.helper import batch_jobs_
+from orthrus.core.helper import module_from_path
 import csv
 import numpy as np
 # functions

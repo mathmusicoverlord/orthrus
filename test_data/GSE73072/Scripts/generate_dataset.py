@@ -6,10 +6,10 @@ if __name__ == "__main__":
     import GEOparse
     import os
     import pandas as pd
-    from datasci.core.dataset import DataSet
+    from orthrus.core.dataset import DataSet
 
     # load data from geo
-    data_dir = os.path.join(os.environ["DATASCI_PATH"], 'test_data/GSE73072/Data')
+    data_dir = os.path.join(os.environ["ORTHRUS_PATH"], 'test_data/GSE73072/Data')
     gse = GEOparse.get_GEO(geo="GSE73072", destdir=data_dir)
 
     # extract metadata

@@ -1,4 +1,4 @@
-datasci.sparse namespace
+orthrus.sparse namespace
 ========================
 
 Subpackages
@@ -7,5 +7,5 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   datasci.sparse.classifiers
-   datasci.sparse.feature_selection
+   orthrus.sparse.classifiers
+   orthrus.sparse.feature_selection

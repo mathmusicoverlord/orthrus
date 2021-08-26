@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>datasci.preprocessing namespace &mdash; DataSci 1 documentation</title>
+  <title>orthrus.preprocessing namespace &mdash; orthrus 1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -87,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rst/getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">orthrus</a></li>
 </ul>
 
             
@@ -103,7 +103,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -136,13 +136,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>datasci.preprocessing namespace</li>
+      <li>orthrus.preprocessing namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst_copy/datasci.preprocessing.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst_copy/orthrus.preprocessing.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,20 +155,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="datasci-preprocessing-namespace">
-<h1>datasci.preprocessing namespace<a class="headerlink" href="#datasci-preprocessing-namespace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="orthrus-preprocessing-namespace">
+<h1>orthrus.preprocessing namespace<a class="headerlink" href="#orthrus-preprocessing-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-datasci.preprocessing.normalizations">
-<span id="datasci-preprocessing-normalizations-module"></span><h2>datasci.preprocessing.normalizations module<a class="headerlink" href="#module-datasci.preprocessing.normalizations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.preprocessing.normalizations">
+<span id="orthrus-preprocessing-normalizations-module"></span><h2>orthrus.preprocessing.normalizations module<a class="headerlink" href="#module-orthrus.preprocessing.normalizations" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="datasci.preprocessing.normalizations.LogNormalizer">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.normalizations.</code><code class="sig-name descname">LogNormalizer</code><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.preprocessing.normalizations.LogNormalizer">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.preprocessing.normalizations.</code><code class="sig-name descname">LogNormalizer</code><a class="headerlink" href="#orthrus.preprocessing.normalizations.LogNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.preprocessing.normalizations.LogNormalizer.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.LogNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.preprocessing.normalizations.LogNormalizer.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.preprocessing.normalizations.LogNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies element wise log to the data. Any values that are negative infinity are set to zero after applying log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -186,12 +186,12 @@
 </dd></dl>
 
 <dl class="py class">
-<dt id="datasci.preprocessing.normalizations.MedianFoldChangeNormalizer">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.preprocessing.normalizations.</code><code class="sig-name descname">MedianFoldChangeNormalizer</code><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.preprocessing.normalizations.MedianFoldChangeNormalizer">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.preprocessing.normalizations.</code><code class="sig-name descname">MedianFoldChangeNormalizer</code><a class="headerlink" href="#orthrus.preprocessing.normalizations.MedianFoldChangeNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="datasci.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">controls</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">controls</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.preprocessing.normalizations.MedianFoldChangeNormalizer.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -1,7 +1,7 @@
-datasci
+orthrus
 =======
 
 .. toctree::
    :maxdepth: 4
 
-   datasci
+   orthrus

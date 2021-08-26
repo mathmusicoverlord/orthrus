@@ -1,15 +1,15 @@
 if __name__ == "__main__":
 
-    from datasci.core.pipeline import *
+    from orthrus.core.pipeline import *
     from sklearn.model_selection import KFold
     from sklearn.model_selection import ShuffleSplit
     from sklearn.svm import LinearSVC
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import balanced_accuracy_score
-    from datasci.core.helper import save_object, load_object
-    from datasci.sparse.feature_selection.kffs import KFFS
-    from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
-    from datasci.manifold.mds import MDS
+    from orthrus.core.helper import save_object, load_object
+    from orthrus.sparse.feature_selection.kffs import KFFS
+    from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
+    from orthrus.manifold.mds import MDS
     from calcom.solvers import LPPrimalDualPy
     import ray
     from sklearn.decomposition import PCA
@@ -23,13 +23,13 @@ if __name__ == "__main__":
     # imports
     import datetime
     import os
-    from datasci.core.dataset import load_dataset
+    from orthrus.core.dataset import load_dataset
     from sklearn.model_selection import ShuffleSplit
     from sklearn.model_selection import LeaveOneOut
     from sklearn.model_selection import KFold
 
     # load dataset
-    ds = load_dataset('/hdd/DataSci/test_data/GSE73072/Data/GSE73072.ds')
+    ds = load_dataset('/hdd/orthrus/test_data/GSE73072/Data/GSE73072.ds')
     ds = ds.slice_dataset(feature_ids=ds.vardata.index[:100])
 
     # define train/test partition object

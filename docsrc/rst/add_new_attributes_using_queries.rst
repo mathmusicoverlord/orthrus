@@ -1,8 +1,8 @@
 Adding new attributes to metadata
 =================================
-There may be situations where the :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>` does not have a direct attribute you want to visualize or classify with. For instance,
+There may be situations where the :py:attr:`metadata <orthrus.core.dataset.DataSet.metadata>` does not have a direct attribute you want to visualize or classify with. For instance,
 while the GSE_730732 dataset has a `shedding` attribute, it does not have an attribute for `control` class; the `control` class is inferred
-from time. In this instance, all samples with `time_id` <= 0 are considered controls. The :py:meth:`generate_attr_from_queries <datasci.core.dataset.DataSet.generate_attr_from_queries>`
+from time. In this instance, all samples with `time_id` <= 0 are considered controls. The :py:meth:`generate_attr_from_queries <orthrus.core.dataset.DataSet.generate_attr_from_queries>`
 method can be used to create new attributes using queries, which can then be used for classifciation and visualization.
 
 Let's consider the example that we want to visualize the following classes:
@@ -11,7 +11,7 @@ Let's consider the example that we want to visualize the following classes:
 
 Load the GSE_730732 data, and recall that we fixed the issues in types of various attributes in (refernce create_dataset.rst file) 
 ::
-    >>> from datasci.core.dataset import load_dataset
+    >>> from orthrus.core.dataset import load_dataset
     >>> ds = load_dataset('path/to/gse73072.ds')
 
 Next, we'll use `Pandas.DataFrame.query <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_ method
@@ -29,9 +29,9 @@ We can do the same for the shedders class.
     >>> print(ds.metadata.query(shedders_query).shape)
     (116, 11)
 
-Now that we have queries for both the classes, we can use these queries to create a new attribute in the :py:attr:`metadata <datasci.core.dataset.DataSet.metadata>` DataFrame. First, we 
+Now that we have queries for both the classes, we can use these queries to create a new attribute in the :py:attr:`metadata <orthrus.core.dataset.DataSet.metadata>` DataFrame. First, we
 need to create a dictionary, where the keys are the labels for the attribute and the values are the queries we defined above. Next,
-we will use :py:meth:`generate_attr_from_queries <datasci.core.dataset.DataSet.generate_attr_from_queries>` method to add a new attribute.
+we will use :py:meth:`generate_attr_from_queries <orthrus.core.dataset.DataSet.generate_attr_from_queries>` method to add a new attribute.
 ::
     >>> qs = {'controls': controls_query, 'shedders': shedders_query}
     >>> new_attribute_name = 'Response'
@@ -58,5 +58,5 @@ Finally, we can use this new attribute for visualization using MDS.
   
     2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)
     
-Remember that the new attribute is available only in this particular :py:class:`DataSet <datasci.core.dataset.DataSet>` object, and has not yet been stored on disk. To make these changes permanent
-store this :py:class:`DataSet <datasci.core.dataset.DataSet>` object on disk by calling  :py:meth:`save <datasci.core.dataset.DataSet.save>` method.
+Remember that the new attribute is available only in this particular :py:class:`DataSet <orthrus.core.dataset.DataSet>` object, and has not yet been stored on disk. To make these changes permanent
+store this :py:class:`DataSet <orthrus.core.dataset.DataSet>` object on disk by calling  :py:meth:`save <orthrus.core.dataset.DataSet.save>` method.

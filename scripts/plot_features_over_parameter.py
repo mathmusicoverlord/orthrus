@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--exp_params',
                         type=str,
-                        default=os.path.join(os.environ['DATASCI_PATH'], 'test_data', 'Iris', 'Experiments',
+                        default=os.path.join(os.environ['ORTHRUS_PATH'], 'test_data', 'Iris', 'Experiments',
                                              'classify_setosa_versicolor_svm',
                                              'classify_setosa_versicolor_svm_params.py'),
                         help='File path of containing the experimental parameters. Default is the Iris experiment.')
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     # imports
     import shutil
     import numpy as np
-    from datasci.core.helper import module_from_path
-    from datasci.core.helper import default_val
+    from orthrus.core.helper import module_from_path
+    from orthrus.core.helper import default_val
     from sklearn.metrics import balanced_accuracy_score as bsr
     from matplotlib import pyplot as plt
 

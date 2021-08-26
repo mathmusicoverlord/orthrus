@@ -13,14 +13,14 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-for root, subdirs, files in os.walk('../datasci/'):
+for root, subdirs, files in os.walk('../orthrus/'):
     for subdir in subdirs:
         sys.path.append(os.path.join(os.path.abspath('.'), os.path.join(root, subdir))+'/')
         print(os.path.join(os.path.abspath('.'), os.path.join(root, subdir))+'/')
 
 # -- Project information -----------------------------------------------------
 
-project = 'DataSci'
+project = 'orthrus'
 copyright = '2021, Eric Kehoe, Kartikay Sharma'
 author = 'Eric Kehoe, Kartikay Sharma'
 

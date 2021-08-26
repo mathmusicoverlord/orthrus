@@ -11,7 +11,7 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import balanced_accuracy_score as bsr
-from datasci.model_selection.partitioning import TrainPartitioner
+from orthrus.model_selection.partitioning import TrainPartitioner
 import numpy as np
 import pandas as pd
 from pandas import DataFrame

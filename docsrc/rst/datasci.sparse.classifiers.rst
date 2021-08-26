@@ -1,13 +1,13 @@
-datasci.sparse.classifiers namespace
+orthrus.sparse.classifiers namespace
 ====================================
 
 Submodules
 ----------
 
-datasci.sparse.classifiers.svm module
+orthrus.sparse.classifiers.svm module
 -------------------------------------
 
-.. automodule:: datasci.sparse.classifiers.svm
+.. automodule:: orthrus.sparse.classifiers.svm
    :members:
    :undoc-members:
    :show-inheritance:

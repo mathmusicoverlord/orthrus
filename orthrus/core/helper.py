@@ -1,5 +1,5 @@
 '''
-This module contains user-defined and general purpose helper functions use by the DataSci package.
+This module contains user-defined and general purpose helper functions use by the orthrus package.
 '''
 
 from inspect import ismethod
@@ -98,7 +98,7 @@ def scatter_pyplot(df: pd.DataFrame,
     Examples:
         >>> import pandas as pd
         >>> from pydataset import data as pydat
-        >>> from datasci.core.helper import scatter_pyplot
+        >>> from orthrus.core.helper import scatter_pyplot
         >>> df = pydat('iris')
         >>> scatter_pyplot(df=df,
         ...                grp_colors='Species',
@@ -463,7 +463,7 @@ def scatter_plotly(df: pd.DataFrame,
     Examples:
         >>> import pandas as pd
         >>> from pydataset import data as pydat
-        >>> from datasci.core.helper import scatter_plotly
+        >>> from orthrus.core.helper import scatter_plotly
         >>> df = pydat('iris')
         >>> scatter_plotly(df=df,
         ...                grp_colors='Species',
@@ -620,12 +620,12 @@ def plot_scores(results_list, param_list=None, average='mean', variation='std', 
 
     Examples:
             >>> # imports
-            >>> import datasci.core.dataset as dataset
-            >>> from datasci.sparse.classifiers.svm import SSVMClassifier as SSVM
+            >>> import orthrus.core.dataset as dataset
+            >>> from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
             >>> from calcom.solvers import LPPrimalDualPy
             >>> from sklearn.model_selection import KFold
             >>> from sklearn.metrics import balanced_accuracy_score as bsr
-            >>> from datasci.core.helper import plot_scores
+            >>> from orthrus.core.helper import plot_scores
             ...
             >>> # load dataset
             >>> ds = dataset.load_dataset('./test_data/GSE161731_tmm_log2.ds')
@@ -793,7 +793,7 @@ def generate_experiment(name: str, proj_dir: str):
                   "# imports\n" \
                   "import datetime\n" \
                   "import os\n" \
-                  "from datasci.core.dataset import load_dataset\n\n" \
+                  "from orthrus.core.dataset import load_dataset\n\n" \
                   "# set experiment name\n" \
                   "EXP_NAME = \'" + name + "\'\n\n" \
                   "# set working directories\n" \
@@ -996,7 +996,7 @@ def batch_jobs_(function_handle,
 
     Example:
         >>> import ray
-        >>> from datasci.core.helper import batch_jobs_
+        >>> from orthrus.core.helper import batch_jobs_
         >>> import numpy as np
         >>> @ray.remote
         ... def job_handle(a: int, b: int):

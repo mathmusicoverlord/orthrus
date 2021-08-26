@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>datasci.core namespace &mdash; DataSci 1 documentation</title>
+  <title>orthrus.core namespace &mdash; orthrus 1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -87,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rst/getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst/modules.html">orthrus</a></li>
 </ul>
 
             
@@ -103,7 +103,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -136,13 +136,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>datasci.core namespace</li>
+      <li>orthrus.core namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst_copy/datasci.core.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst_copy/orthrus.core.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,17 +155,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="datasci-core-namespace">
-<h1>datasci.core namespace<a class="headerlink" href="#datasci-core-namespace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="orthrus-core-namespace">
+<h1>orthrus.core namespace<a class="headerlink" href="#orthrus-core-namespace" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-datasci.core.dataset">
-<span id="datasci-core-dataset-module"></span><h2>datasci.core.dataset module<a class="headerlink" href="#module-datasci.core.dataset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.core.dataset">
+<span id="orthrus-core-dataset-module"></span><h2>orthrus.core.dataset module<a class="headerlink" href="#module-orthrus.core.dataset" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the main DataSet class used for all preprocessing, visualization, and classification.</p>
 <dl class="py class">
-<dt id="datasci.core.dataset.DataSet">
-<em class="property">class </em><code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">vardata: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">dissimilarity_matrix: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.dataset.</code><code class="sig-name descname">DataSet</code><span class="sig-paren">(</span><em class="sig-param">name: str = ''</em>, <em class="sig-param">description: str = ''</em>, <em class="sig-param">path: str = '.'</em>, <em class="sig-param">data: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">metadata: pandas.core.frame.DataFrame = Empty DataFrame Columns: [] Index: []</em>, <em class="sig-param">vardata: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">dissimilarity_matrix: pandas.core.frame.DataFrame = None</em>, <em class="sig-param">normalization_method: str = ''</em>, <em class="sig-param">imputation_method: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Primary base class for storing data and metadata for a generic dataset. Contains methods for quick data
 pre-processing, visualization, and classification.</p>
@@ -195,8 +195,8 @@ used on the data. Default is the empty string.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.name">
-<code class="sig-name descname">name</code><a class="headerlink" href="#datasci.core.dataset.DataSet.name" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reference name for the dataset. Default is the empty string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -206,8 +206,8 @@ used on the data. Default is the empty string.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.description">
-<code class="sig-name descname">description</code><a class="headerlink" href="#datasci.core.dataset.DataSet.description" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.description">
+<code class="sig-name descname">description</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short description of data set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -217,8 +217,8 @@ used on the data. Default is the empty string.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.path">
-<code class="sig-name descname">path</code><a class="headerlink" href="#datasci.core.dataset.DataSet.path" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.path">
+<code class="sig-name descname">path</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>File path for saving DataSet instance and related outputs. Default is the empty string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -228,8 +228,8 @@ used on the data. Default is the empty string.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.data">
-<code class="sig-name descname">data</code><a class="headerlink" href="#datasci.core.dataset.DataSet.data" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.data">
+<code class="sig-name descname">data</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Numerical data or features of the data set arranged as samples x features.
 Default is the empty DataFrame.</p>
 <dl class="field-list simple">
@@ -240,8 +240,8 @@ Default is the empty DataFrame.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.metadata">
-<code class="sig-name descname">metadata</code><a class="headerlink" href="#datasci.core.dataset.DataSet.metadata" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.metadata">
+<code class="sig-name descname">metadata</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Categorical data or attributes of the dataset arranged as samples x attributes.
 The sample labels in the index column should be the same format as those used for the data DataFrame.
 If labels are missing or there are more labels than in the data, the class will automatically restrict
@@ -255,8 +255,8 @@ empty DataFrame.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.vardata">
-<code class="sig-name descname">vardata</code><a class="headerlink" href="#datasci.core.dataset.DataSet.vardata" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.vardata">
+<code class="sig-name descname">vardata</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.vardata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Categorical data or attributes of the features on the dataset arranged as
 features x attributes. The feature labels in the index column should be the same format as those used for
 the columns in the data DataFrame. Default is None.</p>
@@ -268,8 +268,8 @@ the columns in the data DataFrame. Default is None.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.dissimilarity_matrix">
-<code class="sig-name descname">dissimilarity_matrix</code><a class="headerlink" href="#datasci.core.dataset.DataSet.dissimilarity_matrix" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.dissimilarity_matrix">
+<code class="sig-name descname">dissimilarity_matrix</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.dissimilarity_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Symmetric matrix whose columns and index are given by the samples.
 Its contents give the pairwise dissimilarities between the samples. Default is None.</p>
 <dl class="field-list simple">
@@ -280,8 +280,8 @@ Its contents give the pairwise dissimilarities between the samples. Default is N
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.normalization_method">
-<code class="sig-name descname">normalization_method</code><a class="headerlink" href="#datasci.core.dataset.DataSet.normalization_method" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.normalization_method">
+<code class="sig-name descname">normalization_method</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.normalization_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Label indicating the normalization used on the data. Future normalization will
 append as normalization_1/normalization_2/…/normalization_n indicating the sequence of normalizations
 used on the data. Default is the empty string.</p>
@@ -293,8 +293,8 @@ used on the data. Default is the empty string.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.imputation_method">
-<code class="sig-name descname">imputation_method</code><a class="headerlink" href="#datasci.core.dataset.DataSet.imputation_method" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.imputation_method">
+<code class="sig-name descname">imputation_method</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.imputation_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Label indicating the imputation used on the data. Default is the empty string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -304,9 +304,9 @@ used on the data. Default is the empty string.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="datasci.core.dataset.DataSet.experiments">
-<code class="sig-name descname">experiments</code><a class="headerlink" href="#datasci.core.dataset.DataSet.experiments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
+<dt id="orthrus.core.dataset.DataSet.experiments">
+<code class="sig-name descname">experiments</code><a class="headerlink" href="#orthrus.core.dataset.DataSet.experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds experimental results. e.g. from <a class="reference internal" href="#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
@@ -316,7 +316,7 @@ used on the data. Default is the empty string.</p>
 
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
@@ -324,8 +324,8 @@ used on the data. Default is the empty string.</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.autosummarize">
-<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="o">=</span><span class="default_value">'metadata'</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.autosummarize">
+<code class="sig-name descname">autosummarize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="o">=</span><span class="default_value">'metadata'</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.autosummarize" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method gives a human-readable output of summary statistics for the data/metadata/vardata.
 It includes basic statistics such as mean, median, mode, etc. and gives value counts for discrete data
 attributes. When using dash am interactive dashboard will be created. The user will then be able to view
@@ -347,7 +347,7 @@ See dash documentation for further details.</p></li>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
@@ -358,8 +358,8 @@ See dash documentation for further details.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.classify">
-<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">predict_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.classify">
+<code class="sig-name descname">classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classifier</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">classifier_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">predict_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partitioner_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scorer_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">scorer_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">f_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_rnk_func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.classify" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method runs a classification experiment. The user provides a classifier, a class to partition the data
 into train/test partitions, and a scoring method. The experiment returns the fit classifiers across the
 train/test partitions, the train/test scores. Additionally, the experiment will either return, or append
@@ -401,8 +401,8 @@ sklearn.metrics.balanced_accuracy_score for an example.</p></li>
 </ul>
 </dd>
 </dl>
-<p>:param <a class="reference internal" href="#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the classification results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<p>:param <a class="reference internal" href="#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the classification results will be stored to <a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the classification results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
@@ -414,7 +414,7 @@ features will be ranked from greatest to least importance. e.g. rank = 1 most im
 <li><p><strong>s_rnk_func</strong> (<em>object</em>) – Function to be applied to sample weights for sample ranking. Default is None, and the
 samples will be ranked in from least to greatest.</p></li>
 <li><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
+<a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr</span></code> + <code class="docutils literal notranslate"><span class="pre">classifier_name</span></code> + <code class="docutils literal notranslate"><span class="pre">partitioner_name</span></code> + <code class="docutils literal notranslate"><span class="pre">scorer_name</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>boolean</em>) – If True, logs will be printed to console. Default = True</p></li>
 </ul>
 </dd>
@@ -435,8 +435,8 @@ for each fold generated by <code class="docutils literal notranslate"><span clas
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">orthrus.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
@@ -471,8 +471,8 @@ for each fold generated by <code class="docutils literal notranslate"><span clas
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.feature_select">
-<code class="sig-name descname">feature_select</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">selector_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">f_results_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'results_'</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.feature_select" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.feature_select">
+<code class="sig-name descname">feature_select</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">selector_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">f_results_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'results_'</span></em>, <em class="sig-param"><span class="n">append_to_meta</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">inplace</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">experiment_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.feature_select" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method runs a feature selection experiment. The user provides a feature selector and a ranking function.
 The experiment returns, or appends depending on the <code class="docutils literal notranslate"><span class="pre">append</span></code> flag, the feature weights, and their
 associated rankings.</p>
@@ -497,15 +497,15 @@ etc.The attribute should be array-like with rows corresponding to the features. 
 </ul>
 </dd>
 </dl>
-<p>:param <a class="reference internal" href="#datasci.core.dataset.DataSet.metadata" title="datasci.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#datasci.core.dataset.DataSet.vardata" title="datasci.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
-:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
+<p>:param <a class="reference internal" href="#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.:
+:param inplace: If True the feature selection results will be stored to <a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.</p>
 <blockquote>
 <div><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> the feature selection results will be returned to the user. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>experiment_name</strong> (<em>string</em>) – Common name of experiment to use when <code class="docutils literal notranslate"><span class="pre">inplace=True</span></code> and storing results into
-<a class="reference internal" href="#datasci.core.dataset.DataSet.experiments" title="datasci.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
+<a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">attr``+</span> <span class="pre">``selector_name</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>(selector) - Contains the fit feature selector. (f_weights) - Contains the feature weights and
@@ -518,10 +518,10 @@ rankings in the feature selection experiment.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">orthrus.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.feature_selection.kffs</span> <span class="kn">import</span> <span class="n">KFFS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.feature_selection.kffs</span> <span class="kn">import</span> <span class="n">KFFS</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;./test_data/GSE161731_tmm_log2.ds&#39;</span><span class="p">)</span>
@@ -551,8 +551,8 @@ rankings in the feature selection experiment.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.generate_attr_from_queries">
-<code class="sig-name descname">generate_attr_from_queries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attrname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">queries</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">attr_exist_mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'err'</span></em>, <em class="sig-param"><span class="n">which</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'metadata'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.generate_attr_from_queries" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.generate_attr_from_queries">
+<code class="sig-name descname">generate_attr_from_queries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attrname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">queries</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">attr_exist_mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'err'</span></em>, <em class="sig-param"><span class="n">which</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'metadata'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.generate_attr_from_queries" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function creates or updates an attribute in the metadata or vardata. New values for the attribute
 are provided by the queries, which is a dictionary. For each value in the queries dictionary, indices are
 extracted using the query method on the dataframe and the key is used as new value at these indices. Any index
@@ -587,16 +587,16 @@ is ‘metadata’.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.impute">
-<code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.impute">
+<code class="sig-name descname">impute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imputer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">impute_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.impute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imputes the data of the dataset according to an imputer class. Appends the imputation method
-used to <a class="reference internal" href="#datasci.core.dataset.DataSet.imputation_method" title="datasci.core.dataset.DataSet.imputation_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code></a>.</p>
+used to <a class="reference internal" href="#orthrus.core.dataset.DataSet.imputation_method" title="orthrus.core.dataset.DataSet.imputation_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imputer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-imputer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+imputer.fit_transform(<a class="reference internal" href="#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
+as <a class="reference internal" href="#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
@@ -611,7 +611,7 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
 <span class="gp">... </span>                    <span class="n">columns</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
@@ -624,16 +624,16 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">norm_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalize_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the data of the dataset according to a normalizer class. Appends the normalization method
-used to <a class="reference internal" href="#datasci.core.dataset.DataSet.normalization_method" title="datasci.core.dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
+used to <a class="reference internal" href="#orthrus.core.dataset.DataSet.normalization_method" title="orthrus.core.dataset.DataSet.normalization_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>normalizer</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-normalizer.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
+normalizer.fit_transform(<a class="reference internal" href="#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have the same number of columns
+as <a class="reference internal" href="#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
@@ -650,7 +650,7 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>  <span class="k">as</span> <span class="n">SS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
@@ -663,8 +663,8 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.print_description">
-<code class="sig-name descname">print_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line_width</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.print_description" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.print_description">
+<code class="sig-name descname">print_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line_width</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">50</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.print_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method prints the description of the dataset in a human-readable format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -677,8 +677,8 @@ as <a class="reference internal" href="#datasci.core.dataset.DataSet.data" title
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.reformat_metadata">
-<code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.reformat_metadata">
+<code class="sig-name descname">reformat_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">convert_dtypes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.reformat_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method performs a basic reformatting of metadata including: Replacing double-spaces with a single space,
 Stripping white space from string ends, Removing mixed-case and capitalizing strings. Additionally one can use
 pandas infer_dtypes function to automatically infer the datatypes for each attribute.</p>
@@ -693,7 +693,7 @@ Default is false.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
@@ -704,10 +704,10 @@ Default is false.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.save">
-<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an instance of a DataSet class in pickle format. If no path is given the instance will save
-as <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
+as <a class="reference internal" href="#orthrus.core.dataset.DataSet.path" title="orthrus.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>/<a class="reference internal" href="#orthrus.core.dataset.DataSet.name" title="orthrus.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a>.ds where the spaces in <a class="reference internal" href="#orthrus.core.dataset.DataSet.name" title="orthrus.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> are replaced
 with underscores.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -719,7 +719,7 @@ with underscores.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
@@ -730,8 +730,8 @@ with underscores.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.slice_dataset">
-<code class="sig-name descname">slice_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.slice_dataset" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.slice_dataset">
+<code class="sig-name descname">slice_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.slice_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method slices a DataSet at the prescribed sample and features ids.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -740,19 +740,19 @@ with underscores.</p>
 [‘gene1’, ‘gene3’], etc…, can also be pandas series or numpy array. Defaults to use all features.</p></li>
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Reference name for slice DataSet. Defaults to <a class="reference internal" href="#orthrus.core.dataset.DataSet.name" title="orthrus.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _slice</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Slice of DataSet.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Species&#39;</span><span class="p">]]</span>
@@ -764,8 +764,8 @@ with underscores.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="datasci.core.dataset.DataSet.visualize">
-<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dissimilarity</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pyplot'</span></em>, <em class="sig-param"><span class="n">viz_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.DataSet.visualize">
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cross_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">feature_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sample_ids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dissimilarity</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pyplot'</span></em>, <em class="sig-param"><span class="n">viz_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">supervised</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.DataSet.visualize" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method visualizes the data by embedding it in 2 or 3 dimensions via the transformation
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>. The user can restrict both the sample indices and feature indices, as well
 as color and mark the samples by chosen metadata attributes. The transformation will happen post
@@ -774,7 +774,7 @@ restricting the features and samples.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>embedding</strong> (<em>object</em>) – Class instance which must contain the method fit_transform. The output of
-embedding.fit_transform(<a class="reference internal" href="#datasci.core.dataset.DataSet.data" title="datasci.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
+embedding.fit_transform(<a class="reference internal" href="#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.data</span></code></a>) must have at most 3 columns.</p></li>
 <li><p><strong>attr</strong> (<em>str</em>) – Name of the metadata attribute to color samples by.</p></li>
 <li><p><strong>cross_attr</strong> (<em>str</em>) – Name of the secondary metadata attribute to mark samples by.</p></li>
 <li><p><strong>feature_ids</strong> (<em>list-like</em>) – List of indicators for the features to use. e.g. [1,3], [True, False, True],
@@ -782,19 +782,19 @@ embedding.fit_transform(<a class="reference internal" href="#datasci.core.datase
 <li><p><strong>sample_ids</strong> (<em>like-like</em>) – List of indicators for the samples to use. e.g. [1,3], [True, False, True],
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>use_dissimilarity</strong> (<em>bool</em>) – If True the embedding will fit to the dissimilarity matrix stored in
-<a class="reference internal" href="#datasci.core.dataset.DataSet.dissimilarity_matrix" title="datasci.core.dataset.DataSet.dissimilarity_matrix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code></a>. The default is false.</p></li>
+<a class="reference internal" href="#orthrus.core.dataset.DataSet.dissimilarity_matrix" title="orthrus.core.dataset.DataSet.dissimilarity_matrix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.dissimilarity_matrix</span></code></a>. The default is false.</p></li>
 <li><p><strong>backend</strong> (<em>str</em>) – Plotting backend to use. Can be either <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> or <code class="docutils literal notranslate"><span class="pre">plotly</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">pyplot</span></code>.</p></li>
 <li><p><strong>viz_name</strong> (<em>str</em>) – Common name for the embedding used. e.g. MDS, PCA, UMAP, etc… The default is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">embedding</span></code>.__str__().</p></li>
 <li><p><strong>supervised</strong> (<em>bool</em>) – If True the attr labels are based to the embedding fit method, rather than None.</p></li>
 <li><p><strong>save</strong> (<em>bool</em>) – Flag indicating to save the file. The file will save to self.path with the file name
-<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
-<a class="reference internal" href="#datasci.core.dataset.DataSet.name" title="datasci.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
-<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="#datasci.core.dataset.DataSet.save" title="datasci.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
+<a class="reference internal" href="#orthrus.core.dataset.DataSet.name" title="orthrus.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.png for <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and
+<a class="reference internal" href="#orthrus.core.dataset.DataSet.name" title="orthrus.core.dataset.DataSet.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.name</span></code></a> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="xref py py-attr docutils literal notranslate"><span class="pre">attrname</span></code>.html for <code class="docutils literal notranslate"><span class="pre">plotly</span></code></p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – Optional file name to save figure to when <a class="reference internal" href="#orthrus.core.dataset.DataSet.save" title="orthrus.core.dataset.DataSet.save"><code class="xref py py-attr docutils literal notranslate"><span class="pre">save</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This save name will</p></li>
 </ul>
 </dd>
 </dl>
-<p>:param be prepended by <a class="reference internal" href="#datasci.core.dataset.DataSet.path" title="datasci.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>. Default is None.:
+<p>:param be prepended by <a class="reference internal" href="#orthrus.core.dataset.DataSet.path" title="orthrus.core.dataset.DataSet.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.path</span></code></a>. Default is None.:
 :param **kwargs: Keyword arguments passed directly to <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_pyplot()</span></code> when using the</p>
 <blockquote>
 <div><p>backend <code class="docutils literal notranslate"><span class="pre">pyplot</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">helper.scatter_plotly()</span></code> when using the backend <code class="docutils literal notranslate"><span class="pre">plotly</span></code>, for
@@ -812,7 +812,7 @@ indicating plot properties.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">MDS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">]]</span>
@@ -823,7 +823,7 @@ indicating plot properties.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">DataSet</span> <span class="k">as</span> <span class="n">DS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
@@ -852,8 +852,8 @@ indicating plot properties.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.dataset.from_ccd">
-<code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">from_ccd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">index_col</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'_id'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.from_ccd" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.from_ccd">
+<code class="sig-prename descclassname">orthrus.core.dataset.</code><code class="sig-name descname">from_ccd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">index_col</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'_id'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.from_ccd" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads a Calcom Dataset object and returns an instance of a DataSet class.
 :param file_path: Path of the CCDataSet file to load.
 :type file_path: str
@@ -866,7 +866,7 @@ indicating plot properties.</p>
 <dd class="field-odd"><p>Class instance of Dataset.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-even"><p><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -876,8 +876,8 @@ indicating plot properties.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.dataset.load_dataset">
-<code class="sig-prename descclassname">datasci.core.dataset.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.dataset.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.dataset.load_dataset">
+<code class="sig-prename descclassname">orthrus.core.dataset.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.dataset.load_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads and returns an instance of a DataSet class in pickle format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -887,22 +887,22 @@ indicating plot properties.</p>
 <dd class="field-even"><p>Class instance encoded by pickle binary file_path.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet">DataSet</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span> <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span> <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 </dd></dl>
 
 </div>
-<div class="section" id="module-datasci.core.helper">
-<span id="datasci-core-helper-module"></span><h2>datasci.core.helper module<a class="headerlink" href="#module-datasci.core.helper" title="Permalink to this headline">¶</a></h2>
-<p>This module contains user-defined and general purpose helper functions use by the DataSci package.</p>
+<div class="section" id="module-orthrus.core.helper">
+<span id="orthrus-core-helper-module"></span><h2>orthrus.core.helper module<a class="headerlink" href="#module-orthrus.core.helper" title="Permalink to this headline">¶</a></h2>
+<p>This module contains user-defined and general purpose helper functions use by the orthrus package.</p>
 <dl class="py function">
-<dt id="datasci.core.helper.batch_jobs_">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">batch_jobs_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function_handle</span></em>, <em class="sig-param"><span class="n">list_of_arguments</span></em>, <em class="sig-param"><span class="n">max_processes</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">verbose_frequency</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.batch_jobs_">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">batch_jobs_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function_handle</span></em>, <em class="sig-param"><span class="n">list_of_arguments</span></em>, <em class="sig-param"><span class="n">max_processes</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">verbose_frequency</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
 which defines the worker, and a list of arguments for the jobs.</p>
 <dl class="field-list simple">
@@ -929,7 +929,7 @@ Note:
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">batch_jobs_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">batch_jobs_</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
 <span class="gp">... </span><span class="k">def</span> <span class="nf">job_handle</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -948,8 +948,8 @@ Note:
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.default_val">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.default_val">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a default value when a module doesn’t contain an attribute.
 :param module: Module in consideration
 :param attr: The name of the attribute whose existence is in question.
@@ -963,8 +963,8 @@ Note:
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.generate_experiment">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.generate_experiment">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function creates the directory structure for an experiment and generates a parameters python file containing
 a template for experimental parameters to be exported for the experiment in mind. The experiment will automatically
 be placed in the Experiments directory of the project directory.</p>
@@ -972,7 +972,7 @@ be placed in the Experiments directory of the project directory.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – The name of the experiment.</p></li>
-<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#datasci.core.helper.generate_project" title="datasci.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
+<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#orthrus.core.helper.generate_project" title="orthrus.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
 for auto-generation of a project directory.</p></li>
 </ul>
 </dd>
@@ -983,8 +983,8 @@ for auto-generation of a project directory.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.generate_project">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">generate_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.generate_project" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.generate_project">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">generate_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.generate_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function creates the directory structure for a project— this includes a Data, Experiments, and scripts directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1000,14 +1000,14 @@ for auto-generation of a project directory.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.get_close_matches_icase">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.get_close_matches_icase">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Case-insensitive version of difflib.get_close_matches</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.load_object">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">load_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.load_object" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.load_object">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">load_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.load_object" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads and returns any object stored in pickle format at the file_path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1028,8 +1028,8 @@ the function will error when the file is not found.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.method_exists">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">method_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.method_exists" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.method_exists">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">method_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.method_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function takes a class instance and a method name and checks whether or not the method name
 is a method of the class instance.</p>
 <dl class="field-list simple">
@@ -1049,8 +1049,8 @@ is a method of the class instance.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.module_from_path">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">module_from_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">module_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.module_from_path" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.module_from_path">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">module_from_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">module_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.module_from_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function imports a module from a file path and returns the module object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1069,8 +1069,8 @@ is a method of the class instance.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.plot_scores">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">plot_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results_list</span></em>, <em class="sig-param"><span class="n">param_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">average</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">variation</span><span class="o">=</span><span class="default_value">'std'</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.plot_scores" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.plot_scores">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">plot_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results_list</span></em>, <em class="sig-param"><span class="n">param_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">average</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">variation</span><span class="o">=</span><span class="default_value">'std'</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.plot_scores" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function plots the training and test scores from the results of classification experiments over a
 continuous range of hyper-parameters. It is helpful for these accuracy scores as one varies a continuous parameter
 for the classifier, or experiment.</p>
@@ -1097,12 +1097,12 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datasci.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">orthrus.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">plot_scores</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">plot_scores</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;./test_data/GSE161731_tmm_log2.ds&#39;</span><span class="p">)</span>
@@ -1140,8 +1140,8 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.save_object">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.save_object">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method saves an an object in pickle format at the specified path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1154,8 +1154,8 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.scatter_plotly">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.scatter_plotly">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
 or numerical metadata.</p>
 <dl class="field-list simple">
@@ -1193,7 +1193,7 @@ configuring host server. See dash documentation for further details.</p></li>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_plotly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">scatter_plotly</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_plotly</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
@@ -1207,8 +1207,8 @@ configuring host server. See dash documentation for further details.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="datasci.core.helper.scatter_pyplot">
-<code class="sig-prename descclassname">datasci.core.helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">palette</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#datasci.core.helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.helper.scatter_pyplot">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">palette</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
 or numerical metadata.</p>
 <dl class="field-list simple">
@@ -1243,7 +1243,7 @@ or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mpl
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pyplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>

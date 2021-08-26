@@ -1,21 +1,21 @@
-datasci.preprocessing namespace
+orthrus.preprocessing namespace
 ===============================
 
 Submodules
 ----------
 
-datasci.preprocessing.batch\_corrections module
+orthrus.preprocessing.batch\_corrections module
 -----------------------------------------------
 
-.. automodule:: datasci.preprocessing.batch_corrections
+.. automodule:: orthrus.preprocessing.batch_corrections
    :members:
    :undoc-members:
    :show-inheritance:
 
-datasci.preprocessing.normalizations module
+orthrus.preprocessing.normalizations module
 -------------------------------------------
 
-.. automodule:: datasci.preprocessing.normalizations
+.. automodule:: orthrus.preprocessing.normalizations
    :members:
    :undoc-members:
    :show-inheritance:

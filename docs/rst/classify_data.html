@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Classification &mdash; DataSci 1 documentation</title>
+  <title>Classification &mdash; orthrus 1 documentation</title>
   
 
   
@@ -55,7 +55,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DataSci
+            <a href="../index.html" class="icon icon-home"> orthrus
           
 
           
@@ -102,7 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normalization_and_imputation.html">Data Normalization and Imputation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">datasci</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
 </ul>
 
             
@@ -118,7 +118,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">DataSci</a>
+          <a href="../index.html">orthrus</a>
         
       </nav>
 
@@ -175,15 +175,15 @@
   <div class="section" id="classification">
 <h1>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will learn how to setup and perform classification experiments using the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet.classify" title="datasci.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a> method of the
-<a class="reference internal" href="datasci.core.html#datasci.core.dataset.DataSet" title="datasci.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. We start by loading the Iris dataset
-provided in the DataSci package:</p>
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a> method of the
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. We start by loading the Iris dataset
+provided in the orthrus package:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                         <span class="s2">&quot;test_data/Iris/Data/iris.ds&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </pre></div>
@@ -276,22 +276,22 @@ this is reflected in the rank of the feature.</p>
 <div class="section" id="gse7302-k-fold-cross-validation-with-ssvm-on-gpu">
 <h2>GSE7302: k-Fold Cross-Validation with SSVM on GPU<a class="headerlink" href="#gse7302-k-fold-cross-validation-with-ssvm-on-gpu" title="Permalink to this headline">¶</a></h2>
 <p>In this example we will run a k-fold cross-validation experiment with the GSE73072 dataset
-using <a class="reference internal" href="datasci.sparse.classifiers.html#datasci.sparse.classifiers.svm.SSVMClassifier" title="datasci.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">Support</span> <span class="pre">Vector</span> <span class="pre">Machines</span></code></a> (SSVM)
+using <a class="reference internal" href="orthrus.sparse.classifiers.html#orthrus.sparse.classifiers.svm.SSVMClassifier" title="orthrus.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">Support</span> <span class="pre">Vector</span> <span class="pre">Machines</span></code></a> (SSVM)
 on a GPU to distguish between shedding and non-shedding individuals infected with HRV in the
 first 24 hours of exposure. First we load the dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATASCI_PATH&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then we set the sample ids, partitioner, and the classifier:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
 
@@ -365,7 +365,7 @@ first 24 hours of exposure. First we load the dataset:</p>
 </div>
 <p>We can also save the results for later:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datasci.core.helper</span> <span class="kn">import</span> <span class="n">save_object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">save_object</span>
 
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># save the results</span>

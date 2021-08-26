@@ -1,7 +1,7 @@
 import numpy as np
 import ray
 import copy
-from datasci.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs_
 def reduce_feature_set_size(ds, 
                             features_dataframe, 
                             sample_ids,
@@ -45,7 +45,7 @@ def reduce_feature_set_size(ds,
 
     Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
-                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+                                        (check orthrus.core.dataset.DataSet.feature_select method for details)
 
         sample_ids (like-like): List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
             ['human1', 'human3'], etc..., can also be pandas series or numpy array.
@@ -99,8 +99,8 @@ def reduce_feature_set_size(ds,
             that produced the highest score. It contains reduced features ids (index of features_df).
 
     Example:
-            >>> import datasci.core.dataset as DS
-            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
             
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
@@ -128,7 +128,7 @@ def reduce_feature_set_size(ds,
 
             >>> partitioner = KFold(n_splits=5, shuffle=True, random_state=0)
 
-            >>> import datasci.sparse.feature_selection.helper as fhelper
+            >>> import orthrus.sparse.feature_selection.helper as fhelper
 
             >>> reduced_feature_results = fhelper.reduce_feature_set_size(x, 
                                     features_df, 
@@ -239,7 +239,7 @@ def sliding_window_classification_on_ranked_features(ds,
 
     Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
-                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+                                        (check orthrus.core.dataset.DataSet.feature_select method for details)
 
         sample_ids (like-like): List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
             ['human1', 'human3'], etc..., can also be pandas series or numpy array.
@@ -286,8 +286,8 @@ def sliding_window_classification_on_ranked_features(ds,
 
 
     Example:
-            >>> import datasci.core.dataset as DS
-            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
             
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
@@ -315,7 +315,7 @@ def sliding_window_classification_on_ranked_features(ds,
 
             >>> partitioner = KFold(n_splits=5, shuffle=True, random_state=0)
 
-            >>> import datasci.sparse.feature_selection.helper as fhelper
+            >>> import orthrus.sparse.feature_selection.helper as fhelper
 
             >>> sliding_window_results = fhelper.sliding_window_classification_on_ranked_features(x, 
                                     features_df, 
@@ -426,7 +426,7 @@ def rank_features_by_attribute(features_df, args):
 
     Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
-                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+                                        (check orthrus.core.dataset.DataSet.feature_select method for details)
 
         args (dict): This dictionary contains variables to determine which attribute to rank feature on and the
                     order of ranking. Check details for various key and values below:
@@ -441,8 +441,8 @@ def rank_features_by_attribute(features_df, args):
         ndarray of shape (n, )): n = number of features in feature_ids or features_df (if feature_ids is None). It contains sorted feature ids (index of features_df).
 
     Examples:
-            >>> import datasci.core.dataset as DS
-            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
             
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
@@ -502,7 +502,7 @@ def rank_features_by_mean_attribute_value(features_df, args):
 
     Args:
         features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
-                                        (check datasci.core.dataset.DataSet.feature_select method for details)
+                                        (check orthrus.core.dataset.DataSet.feature_select method for details)
 
         args (dict): This dictionary contains variables to determine which attribute to rank feature on and the
                     order of ranking. Check details for various key and values below:
@@ -518,8 +518,8 @@ def rank_features_by_mean_attribute_value(features_df, args):
         ndarray of shape (n, )): n = number of features in feature_ids or features_df (if feature_ids is None). It contains sorted feature ids (index of features_df).
 
     Examples:
-            >>> import datasci.core.dataset as DS
-            >>> import datasci.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
             
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
@@ -678,7 +678,7 @@ def get_batch_correction_matric_for_ranked_features(ds,
     return results
 
 def  get_top_95_features(file_path, attr, cutoff_fraction=0.05):
-    import datasci.core.helper as helper
+    import orthrus.core.helper as helper
     result = helper.load_object(file_path)
     ranking_method_args = {'attr': attr, 'order': 'desc'}
     ranked_feature_ids = rank_features_by_attribute(result['f_results'], ranking_method_args)
