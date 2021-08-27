@@ -29,7 +29,7 @@ if __name__ == "__main__":
     from sklearn.model_selection import KFold
 
     # load dataset
-    ds = load_dataset('/hdd/orthrus/test_data/GSE73072/Data/GSE73072.ds')
+    ds = load_dataset('/hdd/orthrus/test_data/GSE73072/Data/GSE73072(1).ds')
     ds = ds.slice_dataset(feature_ids=ds.vardata.index[:100])
 
     # define train/test partition object
