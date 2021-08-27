@@ -1660,6 +1660,28 @@ training/validation/test labels (<code class="docutils literal notranslate"><spa
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Process.collapse_results">
 <code class="sig-name descname">collapse_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>list<span class="p">, </span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'all'</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#orthrus.core.pipeline.Process.collapse_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method collapses the results of the process by batches. Specifically given a key in <code class="xref py py-attr docutils literal notranslate"><span class="pre">which</span></code>
+to a result, say <code class="docutils literal notranslate"><span class="pre">result_label</span></code> in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self.results_[batch]</span></code>, <a class="reference internal" href="#orthrus.core.pipeline.Process.collapse_results" title="orthrus.core.pipeline.Process.collapse_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code></a> will call
+a sub-classes <code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_result_label()</span></code> method if available, which returns an object containing all
+of the results across batches relevant to <code class="docutils literal notranslate"><span class="pre">result_label</span></code>. See <code class="xref py py-meth docutils literal notranslate"><span class="pre">Partition._collapse_tvt_labels()</span></code> for
+an example. In this example, training/test labels can be collapsed into
+a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> object containing the training/test splits for each batch.</p>
+<p>If a sub-class does not have a method to collapse a specific result across batches, then this method will
+call <a class="reference internal" href="#orthrus.core.pipeline.Process.extract_result" title="orthrus.core.pipeline.Process.extract_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Process.extract_result()</span></code></a> which returns a dictionary with keys the batches and values the
+batch-specific result.</p>
+<p>This method attempts to collapse the result for all keys listed in <code class="xref py py-attr docutils literal notranslate"><span class="pre">which</span></code> and returns a dictionary
+where the keys are <code class="xref py py-attr docutils literal notranslate"><span class="pre">which</span></code> and the values are the collapsed results across batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>which</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Process.extract_result">
+<code class="sig-name descname">extract_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process.extract_result" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
