@@ -1373,12 +1373,22 @@ or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mpl
 <dt id="orthrus.core.pipeline.Classify">
 <em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Classify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">class_attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">predict_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'predict'</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">predict_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">classes_handle</span><span class="o">=</span><span class="default_value">'classes_'</span></em>, <em class="sig-param"><span class="n">f_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">s_weights_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Classify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Fit" title="orthrus.core.pipeline.Fit"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Fit</span></code></a></p>
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Classify.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Classify.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.FeatureSelect">
 <em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">FeatureSelect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">f_ranks_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Transform</span></code></a></p>
+<dl class="py method">
+<dt id="orthrus.core.pipeline.FeatureSelect.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="orthrus.core.pipeline.FeatureSelect.transform">
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.transform" title="Permalink to this definition">¶</a></dt>
@@ -1423,6 +1433,11 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Partition.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -1465,6 +1480,11 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Pipeline.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Pipeline.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Pipeline.stop_before">
@@ -1606,6 +1626,11 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 </dd></dl>
 
 <dl class="py method">
+<dt id="orthrus.core.pipeline.Process.run_">
+<em class="property">abstract </em><code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="orthrus.core.pipeline.Process.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process.save" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1648,12 +1673,22 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Score.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Score.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Transform">
 <em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">retain_f_ids</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">fit_transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit_transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Fit" title="orthrus.core.pipeline.Fit"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Fit</span></code></a></p>
+<dl class="py method">
+<dt id="orthrus.core.pipeline.Transform.run_">
+<code class="sig-name descname">run_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Transform.run_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Transform.transform">
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Transform.transform" title="Permalink to this definition">¶</a></dt>
