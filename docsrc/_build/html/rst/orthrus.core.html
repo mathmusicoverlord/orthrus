@@ -1498,31 +1498,6 @@ libraries.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="orthrus.core.pipeline.collapse_dict_dict_pandas">
-<code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">collapse_dict_dict_pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kv</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">inner_key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#orthrus.core.pipeline.collapse_dict_dict_pandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes a dictionary <code class="xref py py-attr docutils literal notranslate"><span class="pre">kv</span></code> of dictionaries <code class="docutils literal notranslate"><span class="pre">kvi</span></code>, each which contains pandas
-<code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as values,
-extracts the pandas object from each inner dictionary <code class="docutils literal notranslate"><span class="pre">kvi</span></code> at the specified <code class="xref py py-attr docutils literal notranslate"><span class="pre">inner_key</span></code>,
-and then compiles them into a single <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>kv</strong> (<em>dict</em>) – Dictionary of dictionaries</p></li>
-<li><p><strong>inner_key</strong> (<em>str</em>) – Key to use on the inner dictionaries where the <code class="docutils literal notranslate"><span class="pre">Series</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> values exist.</p></li>
-<li><p><strong>**kwargs</strong> – Additional arguments for specifying the column names, index name, and column prefix and suffix, for
-the output DataFrame.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The concatenated <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> or <code class="docutils literal notranslate"><span class="pre">Series</span></code> objects contained within the inner dictionaries.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="orthrus.core.pipeline.compose">
 <code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">compose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">funcs</span><span class="p">:</span> <span class="n">Tuple<span class="p">[</span>Callable<span class="p">, </span><span class="p">…</span><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.compose" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function takes a tuple of functions <span class="math notranslate nohighlight">\((f_1,\ldots,f_n)\)</span> and returns their composition
