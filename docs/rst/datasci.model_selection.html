@@ -33,15 +33,12 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="orthrus.solvers namespace" href="orthrus.solvers.html" />
-    <link rel="prev" title="orthrus.manifold namespace" href="orthrus.manifold.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,24 +84,9 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">orthrus</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="orthrus.html">orthrus namespace</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="orthrus.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="orthrus.core.html">orthrus.core namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.preprocessing.html">orthrus.preprocessing namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.decomposition.html">orthrus.decomposition namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.manifold.html">orthrus.manifold namespace</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">orthrus.model_selection namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.solvers.html">orthrus.solvers namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.sparse.html">orthrus.sparse namespace</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
 </ul>
 
             
@@ -153,17 +135,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="modules.html">orthrus</a> &raquo;</li>
-        
-          <li><a href="orthrus.html">orthrus namespace</a> &raquo;</li>
-        
       <li>orthrus.model_selection namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst/orthrus.model_selection.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst/datasci.model_selection.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -181,33 +159,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-orthrus.model_selection.partitioning">
-<span id="orthrus-model-selection-partitioning-module"></span><h2>orthrus.model_selection.partitioning module<a class="headerlink" href="#module-orthrus.model_selection.partitioning" title="Permalink to this headline">¶</a></h2>
-<p>This module defines various partitioning classes which partitions samples in batches of training and test split.
-These classes must have the sklearn equivalent of a split method. The split method returns a list of train-test partitions;
-one for each fold in the experiment. See sklearn.model_selection.KFold for an example partitioner.</p>
-<dl class="py class">
-<dt id="orthrus.model_selection.partitioning.TrainPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.model_selection.partitioning.</code><code class="sig-name descname">TrainPartitioner</code><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainPartitioner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="orthrus.model_selection.partitioning.TrainPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainPartitioner.split" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="orthrus.model_selection.partitioning.TrainTestPartitioner">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.model_selection.partitioning.</code><code class="sig-name descname">TrainTestPartitioner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_idx</span></em>, <em class="sig-param"><span class="n">test_idx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainTestPartitioner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="orthrus.model_selection.partitioning.TrainTestPartitioner.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.model_selection.partitioning.TrainTestPartitioner.split" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="orthrus-model-selection-partitioning-module">
+<h2>orthrus.model_selection.partitioning module<a class="headerlink" href="#orthrus-model-selection-partitioning-module" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -216,10 +169,6 @@ one for each fold in the experiment. See sklearn.model_selection.KFold for an ex
            
           </div>
           <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="orthrus.solvers.html" class="btn btn-neutral float-right" title="orthrus.solvers namespace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="orthrus.manifold.html" class="btn btn-neutral float-left" title="orthrus.manifold namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
 
   <hr/>
 
