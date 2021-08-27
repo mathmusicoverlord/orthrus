@@ -5,56 +5,58 @@ There are number of options available to create a new :py:class:`DataSet <orthru
 1. By utilizing the :py:class:`DataSet's <orthrus.core.dataset.DataSet>` :py:meth:`__init__ <orthrus.core.dataset.DataSet.__init__>` method:
     The :py:attr:`data <orthrus.core.dataset.DataSet.data>` , :py:attr:`metadata <orthrus.core.dataset.DataSet.metadata>`, and :py:attr:`vardata <orthrus.core.dataset.DataSet.vardata>` variables in :py:class:`DataSet <orthrus.core.dataset.DataSet>` object are `Pandas.DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_.
     So, we should ensure that either these variables are read as Pandas.DataFrame or should be converted into one before we can create the dataset.
-    :: 
-        import pandas as pd
-        #load the data matrix as a Pandas.DataFrame from a csv file 
-        path_to_data = 'path/to/data_matrix.csv'
-        data_df = pd.read_csv(path_to_data)
 
-        #do the same thing for metadata and vardata
-        path_to_metadata = 'path/to/metadata.csv'
-        metadata_df = pd.read_csv(path_to_metadata)
-        path_to_vardata = 'path/to/vardata.csv'
-        vardata_df = pd.read_csv(path_to_vardata)
+    >>> import pandas as pd
+    >>> #load the data matrix as a Pandas.DataFrame from a csv file 
+    >>> path_to_data = 'path/to/data_matrix.csv'
+    >>> data_df = pd.read_csv(path_to_data)
+    >>> #do the same thing for metadata and vardata
+    >>> path_to_metadata = 'path/to/metadata.csv'
+    >>> metadata_df = pd.read_csv(path_to_metadata)
+    >>> path_to_vardata = 'path/to/vardata.csv'
+    >>> vardata_df = pd.read_csv(path_to_vardata)
 
     Next, we can add some more details to the object such as the dataset name and description
-    ::
-        name = 'first_dataset'
-        description = 'The dataset was created with \n \
-               1. data file = %s \n \
-               2. metadata file = %s \n \
-               3. vardata file = %s \n \
-        The data matrix had been previously element-wise log-normalized.' %(path_to_data,
-            path_to_metadata, path_to_vardata)
+    
+    >>> name = 'first_dataset'
+    >>> description = 'The dataset was created with \n \
+    ... 2. data file = %s \n \
+    ... 3. metadata file = %s \n \
+    ... 4. vardata file = %s \n \
+    ... The data matrix had previously been element-wise log-normalized.' %(path_to_data,
+    ... path_to_metadata, path_to_vardata)
 
     Now let's create and save the dataset object
-    ::
-        from orthrus.core.dataset import DataSet as DS
-        import os
-        ds = DS(name=name, 
-                description=description,
-                data=data_df,
-                metadata=metadata_df, 
-                vardata=vardata_df)
-        save_path = 'path/to/dst/dir'
-        ds.save(file_path = os.path.join(save_path, ds.name+'.ds'))
+
+    >>> from orthrus.core.dataset import DataSet as DS
+    >>> import os
+    >>> ds = DS(name=name, 
+    ... description=description,
+    ... data=data_df,
+    ... metadata=metadata_df, 
+    ... vardata=vardata_df)
+    >>> save_path = 'path/to/dst/dir'
+    >>> ds.save(file_path = os.path.join(save_path, ds.name+'.ds'))
 
     Another example:
-    ::
-        from pydataset import data as pydat
-        from orthrus.core.dataset import DataSet as DS
-        df = pydat('iris')
-        data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
-        metadata = df[['Species']]
-        ds = DS(name='Iris', data=data, metadata=metadata)
+
+    >>> from pydataset import data as pydat
+    >>> from orthrus.core.dataset import DataSet as DS
+    >>> df = pydat('iris')
+    >>> data = df[['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']]
+    >>> metadata = df[['Species']]
+    >>> ds = DS(name='Iris', data=data, metadata=metadata)
+
+    Example 3:
+    
     
 
 2. Converting a `CCDataSet <https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/io/CCDataSet.py>`_ object to :py:class:`DataSet <orthrus.core.dataset.DataSet>` object
     We can utilize :py:meth:`from_ccd <orthrus.core.dataset.from_ccd>` method to convert a ``CCDataSet`` object to a ``Dataset`` object.
-    :: 
-        from orthrus.core.dataset import from_ccd
-        ccd_path = 'path/to/gse_730732.h5' #this is the ccd file!
-        ds = from_ccd(ccd_path) 
+ 
+    >>> from orthrus.core.dataset import from_ccd
+    >>> ccd_path = 'path/to/gse_730732.h5' #this is the ccd file!
+    >>> ds = from_ccd(ccd_path) 
     
 
 Some Problems You May Encounter

@@ -33,15 +33,12 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="orthrus.model_selection namespace" href="orthrus.model_selection.html" />
-    <link rel="prev" title="orthrus.decomposition namespace" href="orthrus.decomposition.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,24 +84,9 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">orthrus</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="orthrus.html">orthrus namespace</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="orthrus.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="orthrus.core.html">orthrus.core namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.preprocessing.html">orthrus.preprocessing namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.decomposition.html">orthrus.decomposition namespace</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">orthrus.manifold namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.model_selection.html">orthrus.model_selection namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.solvers.html">orthrus.solvers namespace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="orthrus.sparse.html">orthrus.sparse namespace</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
 </ul>
 
             
@@ -153,17 +135,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="modules.html">orthrus</a> &raquo;</li>
-        
-          <li><a href="orthrus.html">orthrus namespace</a> &raquo;</li>
-        
       <li>orthrus.manifold namespace</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/rst/orthrus.manifold.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/rst/datasci.manifold.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -181,118 +159,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-orthrus.manifold.mds">
-<span id="orthrus-manifold-mds-module"></span><h2>orthrus.manifold.mds module<a class="headerlink" href="#module-orthrus.manifold.mds" title="Permalink to this headline">¶</a></h2>
-<p>This module contains classes implementing manifold learning algorithms.</p>
-<dl class="py class">
-<dt id="orthrus.manifold.mds.MDS">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.manifold.mds.</code><code class="sig-name descname">MDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prev_embedding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
-<p>This class compute the Multidimensional Scaling (MDS) embedding of an <span class="math notranslate nohighlight">\(\text{n_samples}\times\text{n_samples}\)</span>
-distance matrix <span class="math notranslate nohighlight">\(X\)</span> for <code class="docutils literal notranslate"><span class="pre">n_components</span></code>. So that the data is embedding into Euclidean space with dimension
-<code class="docutils literal notranslate"><span class="pre">n_components</span></code>. The algorithm is as follows:</p>
-<ol class="arabic simple">
-<li><p>Compute <span class="math notranslate nohighlight">\(D = X\odot X\)</span> (Distances squared) where <span class="math notranslate nohighlight">\(\odot\)</span> indicates the point-wise product.</p></li>
-<li><p>Compute <span class="math notranslate nohighlight">\(B = CDC\)</span> where <span class="math notranslate nohighlight">\(C\)</span> is the double-centering matrix <span class="math notranslate nohighlight">\(C=I-\frac{1}{\text{n_samples}}ee^T\)</span>
-and <span class="math notranslate nohighlight">\(e\)</span> is the ones vector of dimension <span class="math notranslate nohighlight">\(\text{n_samples}\)</span>.</p></li>
-<li><p>Compute <span class="math notranslate nohighlight">\(E\)</span>, the matrix whose columns are the eigenvectors of <span class="math notranslate nohighlight">\(B\)</span>, and compute <span class="math notranslate nohighlight">\(\lambda\)</span>
-the vector of corresponding eigenvalues.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(\tilde{\Lambda}\)</span> be the diagonal matrix containing the top <code class="docutils literal notranslate"><span class="pre">n_components</span></code> largest eigenvalues in
-descending order, and let <span class="math notranslate nohighlight">\(\tilde{E}\)</span> be the matrix whose columns are the eigenvectors, columns
-of <span class="math notranslate nohighlight">\(E\)</span>, that correspond to the diagonal entries in <span class="math notranslate nohighlight">\(\tilde{\Lambda}\)</span>.</p></li>
-<li><p>The embedding is given by <span class="math notranslate nohighlight">\(Y = \tilde{E}\tilde{\Lambda}^{\frac{1}{2}}\)</span>.</p></li>
-</ol>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_components</strong> (<em>int</em>) – The number of components (dimensions) to use for the embedding.</p></li>
-<li><p><strong>use_cuda</strong> (<em>bool</em>) – Flag indicating whether or not to use cuda tensors on the gpu.</p></li>
-<li><p><strong>prev_embedding</strong> (<em>ndarray of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_components</em><em>)</em>) – Optional embedding used to orient the new
-embedding from. This is useful if you are generating sequential embeddings where you want continuity
-between frames.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt id="orthrus.manifold.mds.MDS.eigenvalues_">
-<code class="sig-name descname">eigenvalues_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.eigenvalues_" title="Permalink to this definition">¶</a></dt>
-<dd><p>The eigenvalues corresponding to the MDS embedding.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>ndarray of shape (n_samples,)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="orthrus.manifold.mds.MDS.eigenvectors_">
-<code class="sig-name descname">eigenvectors_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.eigenvectors_" title="Permalink to this definition">¶</a></dt>
-<dd><p>The eigenvectors corresponding to the MDS embedding.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>ndarray of shape (n_samples, n_samples)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="orthrus.manifold.mds.MDS.embedding_">
-<code class="sig-name descname">embedding_</code><a class="headerlink" href="#orthrus.manifold.mds.MDS.embedding_" title="Permalink to this definition">¶</a></dt>
-<dd><p>The embedding given by MDS with n_components.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>ndarray of shape (n_samples, n_components)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="orthrus.manifold.mds.MDS.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the position of the points in the embedding space. Stores the eigenvalues and eigenvectors into
-<a class="reference internal" href="#orthrus.manifold.mds.MDS.eigenvalues_" title="orthrus.manifold.mds.MDS.eigenvalues_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvalues_</span></code></a> and <a class="reference internal" href="#orthrus.manifold.mds.MDS.eigenvectors_" title="orthrus.manifold.mds.MDS.eigenvectors_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.eigenvectors_</span></code></a> respectively. Stores the embedding into
-<a class="reference internal" href="#orthrus.manifold.mds.MDS.embedding_" title="orthrus.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>) or </em><em>(</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) – An array representing the
-distances between samples. Should be a symmetric non-negative matrix, but if not euclidean l2
-will be used between samples.</p></li>
-<li><p><strong>y</strong> (<em>Ignored</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The fit MDS instance.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#orthrus.manifold.mds.MDS" title="orthrus.manifold.mds.MDS">MDS</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="orthrus.manifold.mds.MDS.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.manifold.mds.MDS.fit_transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fits the MDS model to the data via <a class="reference internal" href="#orthrus.manifold.mds.MDS.fit" title="orthrus.manifold.mds.MDS.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MDS.fit()</span></code></a>, returns the embedding stored in <a class="reference internal" href="#orthrus.manifold.mds.MDS.embedding_" title="orthrus.manifold.mds.MDS.embedding_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MDS.embedding_</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>array-like of shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_samples</em><em>)</em>) – An array representing the distances between samples.
-Should be a symmetric non-negative matrix.</p></li>
-<li><p><strong>y</strong> (<em>Ignored</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The embedding produced my MDS with n_components</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>ndarray of shape (n_samples, n_features)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="orthrus-manifold-mds-module">
+<h2>orthrus.manifold.mds module<a class="headerlink" href="#orthrus-manifold-mds-module" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -301,10 +169,6 @@ Should be a symmetric non-negative matrix.</p></li>
            
           </div>
           <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="orthrus.model_selection.html" class="btn btn-neutral float-right" title="orthrus.model_selection namespace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="orthrus.decomposition.html" class="btn btn-neutral float-left" title="orthrus.decomposition namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
 
   <hr/>
 

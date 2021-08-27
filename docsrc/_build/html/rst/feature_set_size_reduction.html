@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Feature Set Size Reduction &mdash; orthrus 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> orthrus
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">orthrus</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Feature Set Size Reduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/rst/feature_set_size_reduction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="feature-set-size-reduction">
+<h1>Feature Set Size Reduction<a class="headerlink" href="#feature-set-size-reduction" title="Permalink to this headline">¶</a></h1>
+<p>In the <a class="reference external" href="feature_selection.html">previous tutorial</a>, we learnt how to select features using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code> method
+in combination with <code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code>. However, these feature sets can often be quite large and are often not ready
+to be used for classification just yet. For example, out of the 22,277 features in the GSE73072 dataset, the <code class="docutils literal notranslate"><span class="pre">IFR</span></code> algorithm may extract around 5000-8000 features,
+i.e. features with <code class="docutils literal notranslate"><span class="pre">frequency</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>. So, in this step we are aiming to reduce the size of this feature set using <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method</p>
+<p>LOAD THE DATASET OBJECT AND DEFINE THE QUERIES AGAIN</p>
+<p>Let’s first load the object we saved to the disk in the last tutorial using <code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object</span></code> method.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">load_object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_selection_results</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="s1">&#39;path/to/dst/dir/control_vs_shedders/feature_selection_results.pickle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The feature set size reduction is essentially a grid search on the number of features. In this we first rank our features by a method, as we will see below. Then, we
+define a grid of values for the number of top ranked features to use in the upcoming step. Next, for each sampled value <cite>n</cite> from the grid, we use the top <cite>n</cite> feature to train and evaluate a new model.
+Please check the method docomentation for <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method to see how to use <code class="docutils literal notranslate"><span class="pre">partitioners</span></code> and/or <code class="docutils literal notranslate"><span class="pre">train/validation</span></code> partition splits.
+These settings control on which partition the score is evaluated on.</p>
+<p>To use <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method, we need to define a <code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">scorer</span></code>, and <code class="docutils literal notranslate"><span class="pre">partitioner</span></code> and the grid itself.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">(</span><span class="n">dual</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scorer</span> <span class="o">=</span> <span class="n">balanced_accuracy_score</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partitioner</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#define the grid of values for top features</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Next, we are going need a ranking scheme to rank for our features. <code class="xref py py-mod docutils literal notranslate"><span class="pre">feature_helper</span></code> module
+provides a few ranking methods. In this tutorial, we are going to use <code class="xref py py-meth docutils literal notranslate"><span class="pre">rank_features_by_attribute</span></code> to
+rank our features. This method provides the functionality to rank features by a numeric column in <code class="docutils literal notranslate"><span class="pre">feature_selection_results['f_results']</span></code> in ascending or descending order.
+As discussed briefly in the <a class="reference external" href="feature_selection.html">previous tutorial</a>, <code class="docutils literal notranslate"><span class="pre">IFR's</span></code> result contains three columns and one of them is <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, which we are going to use
+to rank our features. A feature with higher frequency is ranked higher.</p>
+<p>We need to define the ranking method and the arguments to the ranking method:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span>  <span class="nn">orthrus.sparse.feature_selection.helper</span> <span class="kn">import</span> <span class="n">rank_features_by_attribute</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranking_method</span> <span class="o">=</span> <span class="n">rank_features_by_attribute</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># args to rank feature by frequency in descending order and restricting to features that have frequency greater than 5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">restricted_features_ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">feature_selection_results</span><span class="p">[</span><span class="s1">&#39;f_results&#39;</span><span class="p">][</span><span class="s1">&#39;frequency&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranking_method_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span><span class="p">,</span> <span class="s1">&#39;feature_ids&#39;</span><span class="p">:</span> <span class="n">restricted_features_ids</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>TALK ABOUT RAY PROCESSES</p>
+<blockquote>
+<div><dl class="simple">
+<dt>reduced_feature_results = reduce_feature_set_size(ds,</dt><dd><p>features,
+sample_ids,
+attr,
+model,
+scorer,
+ranking_method,
+ranking_method_args,
+partitioner=partitioner,
+start=start,
+end=end,
+step=step,
+num_cpus_per_worker=num_cpus_per_worker,
+num_gpus_per_worker=num_gpus_per_worker)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>TALK ABOUT RESULTS</p>
+<p>SAVE RESULTS TO DISK</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -33,7 +33,6 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -169,9 +168,9 @@
             
   <div class="section" id="adding-new-attributes-to-metadata">
 <h1>Adding new attributes to metadata<a class="headerlink" href="#adding-new-attributes-to-metadata" title="Permalink to this headline">¶</a></h1>
-<p>There may be situations where the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> does not have a direct attribute you want to visualize or classify with. For instance,
+<p>There may be situations where the <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> does not have a direct attribute you want to visualize or classify with. For instance,
 while the GSE_730732 dataset has a <cite>shedding</cite> attribute, it does not have an attribute for <cite>control</cite> class; the <cite>control</cite> class is inferred
-from time. In this instance, all samples with <cite>time_id</cite> &lt;= 0 are considered controls. The <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.generate_attr_from_queries" title="orthrus.core.dataset.DataSet.generate_attr_from_queries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code></a>
+from time. In this instance, all samples with <cite>time_id</cite> &lt;= 0 are considered controls. The <code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code>
 method can be used to create new attributes using queries, which can then be used for classifciation and visualization.</p>
 <dl class="simple">
 <dt>Let’s consider the example that we want to visualize the following classes:</dt><dd><ol class="arabic simple">
@@ -200,9 +199,9 @@ to filter the required samples.</p>
 <span class="go">(116, 11)</span>
 </pre></div>
 </div>
-<p>Now that we have queries for both the classes, we can use these queries to create a new attribute in the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> DataFrame. First, we
+<p>Now that we have queries for both the classes, we can use these queries to create a new attribute in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> DataFrame. First, we
 need to create a dictionary, where the keys are the labels for the attribute and the values are the queries we defined above. Next,
-we will use <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.generate_attr_from_queries" title="orthrus.core.dataset.DataSet.generate_attr_from_queries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code></a> method to add a new attribute.</p>
+we will use <code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_attr_from_queries</span></code> method to add a new attribute.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;controls&#39;</span><span class="p">:</span> <span class="n">controls_query</span><span class="p">,</span> <span class="s1">&#39;shedders&#39;</span><span class="p">:</span> <span class="n">shedders_query</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_attribute_name</span> <span class="o">=</span> <span class="s1">&#39;Response&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">generate_attr_from_queries</span><span class="p">(</span><span class="n">new_attribute_name</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">attr_exist_mode</span><span class="o">=</span><span class="s1">&#39;overwrite&#39;</span><span class="p">)</span>
@@ -225,8 +224,8 @@ we will use <a class="reference internal" href="orthrus.core.html#orthrus.core.d
 <a class="reference internal image-reference" href="rst/../../../figures/add_new_queries_gse73072_visualization.png"><img alt="2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)" src="rst/../../../figures/add_new_queries_gse73072_visualization.png" style="width: 800px;" /></a>
 <p class="caption"><span class="caption-text">2D MDS embedding of GSE730732 dataset for controls and shedders (hr 1-8)</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
-<p>Remember that the new attribute is available only in this particular <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object, and has not yet been stored on disk. To make these changes permanent
-store this <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object on disk by calling  <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.save" title="orthrus.core.dataset.DataSet.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save</span></code></a> method.</p>
+<p>Remember that the new attribute is available only in this particular <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object, and has not yet been stored on disk. To make these changes permanent
+store this <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object on disk by calling  <code class="xref py py-meth docutils literal notranslate"><span class="pre">save</span></code> method.</p>
 </div>
 
 
