@@ -1456,7 +1456,10 @@ the results across batches into a dictionary.</p>
 <li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
 keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
 labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
-to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>. Note: Batches should be specified by batch_0, batch_1, … , batch_0_1, batch_0_2, etc
+if you want to link your processes in a <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Pipeline</span></code></a> instance, batch_0_1 is considered a
+derivative batch of batch_0 and will inherit if possible batch specific transforms, labels, etc…
+from batch_0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1523,7 +1526,10 @@ the results across batches into a dictionary.</p>
 <li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
 keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
 labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
-to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>. Note: Batches should be specified by batch_0, batch_1, … , batch_0_1, batch_0_2, etc
+if you want to link your processes in a <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Pipeline</span></code></a> instance, batch_0_1 is considered a
+derivative batch of batch_0 and will inherit if possible batch specific transforms, labels, etc…
+from batch_0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1675,7 +1681,10 @@ the results across batches into a dictionary.</p>
 <li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
 keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
 labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
-to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>. Note: Batches should be specified by batch_0, batch_1, … , batch_0_1, batch_0_2, etc
+if you want to link your processes in a <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Pipeline</span></code></a> instance, batch_0_1 is considered a
+derivative batch of batch_0 and will inherit if possible batch specific transforms, labels, etc…
+from batch_0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1741,7 +1750,10 @@ the results across batches into a dictionary.</p>
 <li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
 keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
 labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
-to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>. Note: Batches should be specified by batch_0, batch_1, … , batch_0_1, batch_0_2, etc
+if you want to link your processes in a <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Pipeline</span></code></a> instance, batch_0_1 is considered a
+derivative batch of batch_0 and will inherit if possible batch specific transforms, labels, etc…
+from batch_0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
