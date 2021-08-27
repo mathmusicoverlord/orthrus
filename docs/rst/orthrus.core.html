@@ -1399,7 +1399,32 @@ or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mpl
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Partition.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_labels</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The primary run method. This method calls a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method on <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> with keyword arguments
+given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_args[batch]</span></code> internally, but takes care of all the
+boiler plate code for running the process across multiple batches in serial or parallel. It collects all of
+the results across batches into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to process.</p></li>
+<li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
+labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The first argument is the object <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> and the second argument is</dt><dd><p><a class="reference internal" href="#orthrus.core.pipeline.Process.results_" title="orthrus.core.pipeline.Process.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Process.results_</span></code></a></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a>, dict]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1420,7 +1445,32 @@ or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mpl
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Pipeline.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_before</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">checkpoint</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Pipeline.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The primary run method. This method calls a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method on <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> with keyword arguments
+given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_args[batch]</span></code> internally, but takes care of all the
+boiler plate code for running the process across multiple batches in serial or parallel. It collects all of
+the results across batches into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to process.</p></li>
+<li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
+labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The first argument is the object <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> and the second argument is</dt><dd><p><a class="reference internal" href="#orthrus.core.pipeline.Process.results_" title="orthrus.core.pipeline.Process.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Process.results_</span></code></a></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a>, dict]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Pipeline.stop_before">
@@ -1515,7 +1565,7 @@ finished, a value of 1 indicated the process has finished.</p>
 <dt id="orthrus.core.pipeline.Process.results_">
 <code class="sig-name descname">results_</code><a class="headerlink" href="#orthrus.core.pipeline.Process.results_" title="Permalink to this definition">¶</a></dt>
 <dd><p>The results of the run process. The keys of the dictionary indicates the batch results
-for a given batch there is a dictionary of results with keys indicating the result type, e.g,
+for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
 training/validation/test labels (<code class="docutils literal notranslate"><span class="pre">tvt_labels</span></code>), classification labels (<code class="docutils literal notranslate"><span class="pre">class_labels</span></code>), etc…</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1537,7 +1587,32 @@ training/validation/test labels (<code class="docutils literal notranslate"><spa
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Process.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The primary run method. This method calls a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method on <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> with keyword arguments
+given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_args[batch]</span></code> internally, but takes care of all the
+boiler plate code for running the process across multiple batches in serial or parallel. It collects all of
+the results across batches into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to process.</p></li>
+<li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
+labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The first argument is the object <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> and the second argument is</dt><dd><p><a class="reference internal" href="#orthrus.core.pipeline.Process.results_" title="orthrus.core.pipeline.Process.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Process.results_</span></code></a></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a>, dict]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Process.save">
@@ -1558,7 +1633,32 @@ training/validation/test labels (<code class="docutils literal notranslate"><spa
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Score.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Score.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The primary run method. This method calls a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method on <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> with keyword arguments
+given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_args[batch]</span></code> internally, but takes care of all the
+boiler plate code for running the process across multiple batches in serial or parallel. It collects all of
+the results across batches into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to process.</p></li>
+<li><p><strong>batch_args</strong> (<em>dict</em>) – A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+keyword arguments to a sub-classes <code class="docutils literal notranslate"><span class="pre">run_</span></code> method. A keyword argument may indicate the training/test
+labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+to <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The first argument is the object <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> and the second argument is</dt><dd><p><a class="reference internal" href="#orthrus.core.pipeline.Process.results_" title="orthrus.core.pipeline.Process.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Process.results_</span></code></a></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">DataSet</a>, dict]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
