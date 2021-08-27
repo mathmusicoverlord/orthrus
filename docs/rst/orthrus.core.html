@@ -540,7 +540,7 @@ of the <code class="docutils literal notranslate"><span class="pre">selector</sp
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_results_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature results e.g. weights, ranks,
-etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id3"><span class="problematic" id="id4">results_</span></a>”.</p></li>
+etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id5"><span class="problematic" id="id6">results_</span></a>”.</p></li>
 <li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to
 <a class="reference internal" href="#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>inplace</strong> (<em>bool</em>) – If True the feature selection results will be stored to <a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
@@ -1431,31 +1431,107 @@ or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mpl
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Process">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>The base class for all processes in the pipeline module. Processes wrap class instances and functions for machine
 learning task, e.g, normalization via an object with a <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">transform</span></code> method, classification via an
 object with a <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code> method, etc… Fits well within the
 <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn API</a>, but can be adapted to other popular machine learning
-libraries.</p>
+libraries. A <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance is meant to be run on a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> instance, via the method
+<a class="reference internal" href="#orthrus.core.pipeline.Process.run" title="orthrus.core.pipeline.Process.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Process.run()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>process</strong> (<em>object</em><em> or </em><em>Callable</em>) – The object to perform the action defined by the <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
-<li><p><strong>process_name</strong> (<em>str</em>) – The common name assigned to the <code class="xref py py-attr docutils literal notranslate"><span class="pre">process</span></code>.</p></li>
-<li><p><strong>parallel</strong> (<em>bool</em>) – Flag indicating wether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s</p></li>
-<li><p><strong>verbosity</strong> (<em>int</em>) – </p></li>
+<li><p><strong>process_name</strong> (<em>str</em>) – The common name assigned to the <a class="reference internal" href="#orthrus.core.pipeline.Process.process" title="orthrus.core.pipeline.Process.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">process</span></code></a>.</p></li>
+<li><p><strong>parallel</strong> (<em>bool</em>) – Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
+Default is False:</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.process">
+<code class="sig-name descname">process</code><a class="headerlink" href="#orthrus.core.pipeline.Process.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object to perform the action defined by the <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object or Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.process_name">
+<code class="sig-name descname">process_name</code><a class="headerlink" href="#orthrus.core.pipeline.Process.process_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The common name assigned to the <a class="reference internal" href="#orthrus.core.pipeline.Process.process" title="orthrus.core.pipeline.Process.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">process</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.parallel">
+<code class="sig-name descname">parallel</code><a class="headerlink" href="#orthrus.core.pipeline.Process.parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
+Default is False:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.verbosity">
+<code class="sig-name descname">verbosity</code><a class="headerlink" href="#orthrus.core.pipeline.Process.verbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.run_status_">
+<code class="sig-name descname">run_status_</code><a class="headerlink" href="#orthrus.core.pipeline.Process.run_status_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the process has finished. A value of 0 indicates the process has not
+finished, a value of 1 indicated the process has finished.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Process.results_">
+<code class="sig-name descname">results_</code><a class="headerlink" href="#orthrus.core.pipeline.Process.results_" title="Permalink to this definition">¶</a></dt>
+<dd><p>The results of the run process. The keys of the dictionary indicates the batch results
+for a given batch there is a dictionary of results with keys indicating the result type, e.g,
+training/validation/test labels (<code class="docutils literal notranslate"><span class="pre">tvt_labels</span></code>), classification labels (<code class="docutils literal notranslate"><span class="pre">class_labels</span></code>), etc…</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Process.collapse_results">
 <code class="sig-name descname">collapse_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">which</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>list<span class="p">, </span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'all'</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#orthrus.core.pipeline.Process.collapse_results" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="orthrus.core.pipeline.Process.process_name">
-<em class="property">property </em><code class="sig-name descname">process_name</code><a class="headerlink" href="#orthrus.core.pipeline.Process.process_name" title="Permalink to this definition">¶</a></dt>
+<dt id="id4">
+<em class="property">property </em><code class="sig-name descname">process_name</code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
