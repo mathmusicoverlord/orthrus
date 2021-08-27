@@ -1786,7 +1786,23 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Process.save_results">
 <code class="sig-name descname">save_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save_path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">collapse</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Process.save_results" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Saves the result of the finished process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_path</strong> (<em>str</em><em> or </em><em>dict</em>) – If it is a string then the entire dictionary of results is pickled in either
+uncollapsed or collapsed format. If it is a dictionary, the keys should be be the specific results to
+save, with values the individual save paths. Note: <code class="xref py py-attr docutils literal notranslate"><span class="pre">collapse</span></code> must be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> in order
+to save the individual results.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Indicates whether or not to overwrite the existing data specified by <code class="xref py py-attr docutils literal notranslate"><span class="pre">save_path</span></code>.</p></li>
+<li><p><strong>collapse</strong> (<em>bool</em>) – Flag indicating whether or not to collapse the results.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
