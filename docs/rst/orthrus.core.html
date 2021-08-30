@@ -1536,6 +1536,33 @@ easily generate training/validation/test labels for a dataset by calling two par
 </dl>
 </dd></dl>
 
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ShuffleSplit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span> <span class="s1">&#39;test_data/Iris/iris.ds&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define kfold partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="p">),</span>
+<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Partition.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_labels</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition.run" title="Permalink to this definition">¶</a></dt>
