@@ -1523,14 +1523,11 @@ for a given batch. For each batch there is a dictionary of results with keys ind
 training/validation/test labels (<code class="docutils literal notranslate"><span class="pre">tvt_labels</span></code>), classification labels (<code class="docutils literal notranslate"><span class="pre">class_labels</span></code>), etc… A
 <a class="reference internal" href="#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> instance, after it runs, outputs the following results per batch:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt>tvt_labels (Series): A sample in the series will be labeled either <cite>Train</cite>, <cite>Valid</cite>, or <cite>Test</cite>. If a batch</dt><dd><p>already contains training and test labels, then the training samples will be partitioned into training and
+<li><p>tvt_labels (Series): A sample in the series will be labeled either <cite>Train</cite>, <cite>Valid</cite>, or <cite>Test</cite>. If a batch
+already contains training and test labels, then the training samples will be partitioned into training and
 validation. e.g. if batch_0[‘tvt_labels’] is has training/test labels then the partition process will split
 the training data into training/validation for new batches batch_0_0, batch_0_1, etc… This allows one to
-easily generate training/validation/test labels for a dataset by calling two partition processes back to back.</p>
-</dd>
-</dl>
-</li>
+easily generate training/validation/test labels for a dataset by calling two partition processes back to back.</p></li>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
