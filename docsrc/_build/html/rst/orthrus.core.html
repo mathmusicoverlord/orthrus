@@ -1562,25 +1562,21 @@ easily generate training/validation/test labels for a dataset by calling two par
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">])</span>
+<span class="go">Generating 5-fold-CV splits...</span>
+<span class="go">0      Train</span>
+<span class="go">1       Test</span>
+<span class="go">2      Train</span>
+<span class="go">3       Test</span>
+<span class="go">4      Train</span>
+<span class="go">       ...</span>
+<span class="go">145    Train</span>
+<span class="go">146    Train</span>
+<span class="go">147    Train</span>
+<span class="go">148    Train</span>
+<span class="go">149    Train</span>
+<span class="go">Name: 5-fold-CV_0, Length: 150, dtype: object</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p>Generating 5-fold-CV splits…
-0      Train
-1       Test
-2      Train
-3       Test
-4      Train</p>
-<blockquote>
-<div><p>…</p>
-</div></blockquote>
-<p>145    Train
-146    Train
-147    Train
-148    Train
-149    Train
-Name: 5-fold-CV_0, Length: 150, dtype: object</p>
-</div></blockquote>
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Partition.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_labels</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition.run" title="Permalink to this definition">¶</a></dt>
