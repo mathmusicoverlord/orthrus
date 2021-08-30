@@ -1537,33 +1537,32 @@ easily generate training/validation/test labels for a dataset by calling two par
 </dd></dl>
 
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Partition</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ShuffleSplit</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span> <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define kfold partition</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span>
-<span class="gp">... </span>                                <span class="p">),</span>
-<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
+<p>::
+&gt;&gt;&gt; # imports
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; from orthrus.core.pipeline import Partition
+&gt;&gt;&gt; from sklearn.model_selection import KFold
+&gt;&gt;&gt; from sklearn.model_selection import ShuffleSplit
+&gt;&gt;&gt; from orthrus.core.dataset import load_dataset
+…
+&gt;&gt;&gt; # load dataset
+&gt;&gt;&gt; ds = load_dataset(os.path.join(os.environ[‘ORTHRUS_PATH’], ‘test_data/Iris/Data/iris.ds’))
+…
+&gt;&gt;&gt; # define kfold partition
+&gt;&gt;&gt; kfold = Partition(process=KFold(n_splits=5,
+…                                 shuffle=True,
+…                                 random_state=124,
+…                                 ),
+…                   process_name=’5-fold-CV’,
+…                   parallel=False,
+…                   verbosity=1,
+…                   )
+…
+&gt;&gt;&gt; # run process
+&gt;&gt;&gt; ds, results = kfold.run(ds)
+…
+&gt;&gt;&gt; # print results
+&gt;&gt;&gt; print(results[‘batch_0’][‘tvt_labels’])</p>
 <p>Generating 5-fold-CV splits…
 0      Train
 1       Test
