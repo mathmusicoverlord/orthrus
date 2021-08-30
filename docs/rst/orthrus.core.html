@@ -540,7 +540,7 @@ of the <code class="docutils literal notranslate"><span class="pre">selector</sp
 [‘human1’, ‘human3’], etc…, can also be pandas series or numpy array. Defaults to use all samples.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <code class="docutils literal notranslate"><span class="pre">selector</span></code>. Default is “fit”.</p></li>
 <li><p><strong>f_results_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">selector</span></code> attribute containing feature results e.g. weights, ranks,
-etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id6"><span class="problematic" id="id7">results_</span></a>”.</p></li>
+etc.The attribute should be array-like with rows corresponding to the features. Default is “<a href="#id11"><span class="problematic" id="id12">results_</span></a>”.</p></li>
 <li><p><strong>append_to_meta</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the feature selection results will be appended to
 <a class="reference internal" href="#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.metadata</span></code></a> and <a class="reference internal" href="#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.vardata</span></code></a>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>inplace</strong> (<em>bool</em>) – If True the feature selection results will be stored to <a class="reference internal" href="#orthrus.core.dataset.DataSet.experiments" title="orthrus.core.dataset.DataSet.experiments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataSet.experiments</span></code></a>.
@@ -1442,6 +1442,100 @@ to <code class="xref py py-attr docutils literal notranslate"><span class="pre">
 <dt id="orthrus.core.pipeline.Partition">
 <em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Partition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">split_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_group</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">split_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'split'</span></em>, <em class="sig-param"><span class="n">split_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Process</span></code></a></p>
+<p>:py:class`Process` subclass used to partition a dataset into training, validation, and test samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> (<em>object</em>) – Object to partition the data with, see for example scikit learn’s
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html">KFold</a>.</p></li>
+<li><p><strong>process_name</strong> (<em>str</em>) – The common name assigned to the <a class="reference internal" href="#orthrus.core.pipeline.Partition.process" title="orthrus.core.pipeline.Partition.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">process</span></code></a>.</p></li>
+<li><p><strong>parallel</strong> (<em>bool</em>) – Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
+Default is False. <a href="#id3"><span class="problematic" id="id4">:py:function:`ray.init`</span></a> must be called to initiate the ray cluster before any running
+can be done.</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em>) – Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
+<li><p><strong>split_attr</strong> (<em>str</em>) – Attribute in the dataset’s metadata to split with respect to. Default is None.</p></li>
+<li><p><strong>split_group</strong> (<em>str</em>) – Attribute in the dataset’s metadata to group with respect to, see
+for example scikit learn’s
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html">StratifiedShuffleSplit</a>.
+Should be provided when your split need to respect the proportions of the <code class="xref py py-attr docutils literal notranslate"><span class="pre">split_group</span></code> class.
+Default is None.</p></li>
+<li><p><strong>split_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">split</span></code> method used by <code class="docutils literal notranslate"><span class="pre">partitioner</span></code>. Default is “split”.</p></li>
+<li><p><strong>split_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.split()</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Partition.process">
+<code class="sig-name descname">process</code><a class="headerlink" href="#orthrus.core.pipeline.Partition.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object to partition the data with, see for example scikit learn’s
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html">KFold</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Partition.parallel">
+<code class="sig-name descname">parallel</code><a class="headerlink" href="#orthrus.core.pipeline.Partition.parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
+Default is False:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Partition.verbosity">
+<code class="sig-name descname">verbosity</code><a class="headerlink" href="#orthrus.core.pipeline.Partition.verbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Partition.run_status_">
+<code class="sig-name descname">run_status_</code><a class="headerlink" href="#orthrus.core.pipeline.Partition.run_status_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the process has finished. A value of 0 indicates the process has not
+finished, a value of 1 indicated the process has finished.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Partition.results_">
+<code class="sig-name descname">results_</code><a class="headerlink" href="#orthrus.core.pipeline.Partition.results_" title="Permalink to this definition">¶</a></dt>
+<dd><p>The results of the run process. The keys of the dictionary indicates the batch results
+for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+training/validation/test labels (<code class="docutils literal notranslate"><span class="pre">tvt_labels</span></code>), classification labels (<code class="docutils literal notranslate"><span class="pre">class_labels</span></code>), etc… A
+<a class="reference internal" href="#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> instance, after it runs, outputs the following results per batch:</p>
+<ul class="simple">
+<li><p>tvt_labels (Series): A sample in the series will be labeled either <cite>Train</cite>, <cite>Valid</cite>, or <cite>Test</cite>. If a batch</p></li>
+</ul>
+<p>already contains training and test labels, then the training samples will be partitioned into training and
+validation. e.g. if batch_0[‘tvt_labels’] is has training/test labels then the partition process will split
+the training data into training/validation for new batches batch_0_0, batch_0_1, etc… This allows one to
+easily generate training/validation/test labels for a dataset by calling two partition processes back to back.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Partition.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">append_labels</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Partition.run" title="Permalink to this definition">¶</a></dt>
@@ -1587,9 +1681,10 @@ libraries. A <a class="reference internal" href="#orthrus.core.pipeline.Process"
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>process</strong> (<em>object</em><em> or </em><em>Callable</em>) – The object to perform the action defined by the <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
 <li><p><strong>process_name</strong> (<em>str</em>) – The common name assigned to the <a class="reference internal" href="#orthrus.core.pipeline.Process.process" title="orthrus.core.pipeline.Process.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">process</span></code></a>.</p></li>
-<li><p><strong>parallel</strong> (<em>bool</em>) – Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
-Default is False. <a href="#id3"><span class="problematic" id="id4">:py:function:`ray.init`</span></a> must be called to initiate the ray cluster before any running
-can be done.</p></li>
+<li><p><strong>parallel</strong> (<em>bool</em>) – <p>Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
+Default is False. <a href="#id8"><span class="problematic" id="id9">:py:function:`ray.init`</span></a> must be called to initiate the ray cluster before any running
+can be done.</p>
+</p></li>
 <li><p><strong>verbosity</strong> (<em>int</em>) – Number indicating the level of verbosity, i.e., text output to console to the user. The higher
 the verbosity the larger the text output. Default is 1, indicating the standard text output with a
 <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
