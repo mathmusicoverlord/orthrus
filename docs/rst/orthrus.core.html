@@ -2678,8 +2678,8 @@ default is “class_labels”.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname">-sample_weight_attr</code></dt>
+<dt id="orthrus.core.pipeline.Score._sample_weight_attr">
+<code class="sig-name descname">_sample_weight_attr</code><a class="headerlink" href="#orthrus.core.pipeline.Score._sample_weight_attr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attribute in the metadata of the dataset you wish to weight the scores by, e.g.,
 misclassifying a sick sample might be more costly than misclassifying a healthy sample.</p>
 <dl class="field-list simple">
@@ -2771,7 +2771,7 @@ training/validation/test labels (<code class="docutils literal notranslate"><spa
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bsr</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">balanced_accuracy_score</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;bsr&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>            <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run partition and classification processes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results_0</span> <span class="o">=</span> <span class="n">shuffle</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -2782,6 +2782,10 @@ training/validation/test labels (<code class="docutils literal notranslate"><spa
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># score classification results</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">results_1</span><span class="p">)</span>
+<span class="go">-----------</span>
+<span class="go">bsr scores:</span>
+<span class="go">Train: 100.00%</span>
+<span class="go">Test: 96.67%</span>
 </pre></div>
 </div>
 <dl class="py method">
