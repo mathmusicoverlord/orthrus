@@ -1579,8 +1579,9 @@ selected features, see the example below.</p></li>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define KFFS feature selector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kffs</span> <span class="o">=</span> <span class="n">FeatureSelect</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFFS</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+<span class="gp">... </span>                     <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;KFFS&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">supervised_attr</span><span class="o">=</span><span class="s1">&#39;Shedding&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="n">transform_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">n_top_features</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
-<span class="gp">... </span>                     <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;mds&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
