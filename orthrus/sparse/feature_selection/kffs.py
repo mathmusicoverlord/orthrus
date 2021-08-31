@@ -135,7 +135,7 @@ class KFFS(BaseEstimator):
         check_is_fitted(self)
 
         # calculate top ids
-        ids = self.ranks_ >= n_top_features
+        ids = self.ranks_ <= n_top_features - 1
 
         return X[:, ids]
 
