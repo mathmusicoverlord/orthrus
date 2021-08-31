@@ -1611,20 +1611,45 @@ is given, otherwise it is trained on all of the data.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;class_labels&#39;</span><span class="p">])</span>
 <span class="go">---------------------------------</span>
-<span class="go">        mds_0     mds_1     mds_2</span>
-<span class="go">0   -2.684206  0.326609  0.021512</span>
-<span class="go">1   -2.715399 -0.169557  0.203523</span>
-<span class="go">2   -2.889819 -0.137346 -0.024710</span>
-<span class="go">3   -2.746437 -0.311124 -0.037674</span>
-<span class="go">4   -2.728593  0.333925 -0.096229</span>
-<span class="go">..        ...       ...       ...</span>
-<span class="go">145  1.944017  0.187415 -0.179303</span>
-<span class="go">146  1.525663 -0.375021  0.120637</span>
-<span class="go">147  1.764046  0.078520 -0.130784</span>
-<span class="go">148  1.901629  0.115877 -0.722873</span>
-<span class="go">149  1.389666 -0.282887 -0.362318</span>
-<span class="go">_</span>
-<span class="go">[150 rows x 3 columns]</span>
+<span class="go">0         setosa</span>
+<span class="go">1         setosa</span>
+<span class="go">2         setosa</span>
+<span class="go">3         setosa</span>
+<span class="go">4         setosa</span>
+<span class="go">         ...</span>
+<span class="go">145    virginica</span>
+<span class="go">146    virginica</span>
+<span class="go">147    virginica</span>
+<span class="go">148    virginica</span>
+<span class="go">149    virginica</span>
+<span class="go">Name: RF labels, Length: 150, dtype: object</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define random forest classify process using probabilities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">RFC</span><span class="p">(),</span>
+<span class="gp">... </span>               <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">predict_handle</span><span class="o">=</span><span class="s1">&#39;predict_proba&#39;</span>
+<span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">shuffle</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;class_scores&#39;</span><span class="p">])</span>
+<span class="go">---------------------------------</span>
+<span class="go">0         setosa</span>
+<span class="go">1         setosa</span>
+<span class="go">2         setosa</span>
+<span class="go">3         setosa</span>
+<span class="go">4         setosa</span>
+<span class="go">         ...</span>
+<span class="go">145    virginica</span>
+<span class="go">146    virginica</span>
+<span class="go">147    virginica</span>
+<span class="go">148    virginica</span>
+<span class="go">149    virginica</span>
+<span class="go">Name: RF labels, Length: 150, dtype: object</span>
 </pre></div>
 </div>
 </dd></dl>
