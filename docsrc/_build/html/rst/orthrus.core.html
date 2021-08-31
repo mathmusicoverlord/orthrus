@@ -1400,6 +1400,8 @@ Default is “transform”.</p></li>
 <li><p><strong>transform_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.transform()</span></code>.</p></li>
 <li><p><strong>fit_transform_handle</strong> (<em>str</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit_transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>.
 Default is “fit_transform”.</p></li>
+<li><p><strong>f_ranks_handle</strong> (<em>str</em>) – Name of the attribute in <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a> containing the feature ranks.
+Default is None.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1464,8 +1466,8 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.FeatureSelect.fit_handle">
-<code class="sig-name descname">fit_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.fit_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.FeatureSelect._fit_handle">
+<code class="sig-name descname">_fit_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect._fit_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>. Default is “fit”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1486,8 +1488,8 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.FeatureSelect.transform_handle">
-<code class="sig-name descname">transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.transform_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.FeatureSelect._transform_handle">
+<code class="sig-name descname">_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect._transform_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>.
 Default is “transform”.</p>
 <dl class="field-list simple">
@@ -1509,10 +1511,22 @@ Default is “transform”.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.FeatureSelect.fit_transform_handle">
-<code class="sig-name descname">fit_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.fit_transform_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.FeatureSelect._fit_transform_handle">
+<code class="sig-name descname">_fit_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect._fit_transform_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">fit_transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>.
 Default is “fit_transform”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.FeatureSelect._f_ranks_handle">
+<code class="sig-name descname">_f_ranks_handle</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect._f_ranks_handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the attribute in <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a> containing the feature ranks.
+Default is None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -2318,6 +2332,10 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <li><p><strong>transform_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.transform()</span></code>.</p></li>
 <li><p><strong>fit_transform_handle</strong> (<em>str</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit_transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>.
 Default is “fit_transform”.</p></li>
+<li><p><strong>retain_f_ids</strong> (<em>bool</em>) – Flag indicating whether or not to retain the original feature labels. For example,
+some transforms may just transform each individual feature and we would like to keep the name of that
+feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
+with the orginal feature labels, e.g. PCA, MDS, UMAP, etc… The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2382,8 +2400,8 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.Transform.fit_handle">
-<code class="sig-name descname">fit_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.fit_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.Transform._fit_handle">
+<code class="sig-name descname">_fit_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform._fit_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>. Default is “fit”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -2404,8 +2422,8 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.Transform.transform_handle">
-<code class="sig-name descname">transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.transform_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.Transform._transform_handle">
+<code class="sig-name descname">_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform._transform_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>. Default is “transform”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -2426,13 +2444,27 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="orthrus.core.pipeline.Transform.fit_transform_handle">
-<code class="sig-name descname">fit_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.fit_transform_handle" title="Permalink to this definition">¶</a></dt>
+<dt id="orthrus.core.pipeline.Transform._fit_transform_handle">
+<code class="sig-name descname">_fit_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform._fit_transform_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">fit_transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>.
 Default is “fit_transform”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Transform.retain_f_ids">
+<code class="sig-name descname">retain_f_ids</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.retain_f_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether or not to retain the original feature labels. For example,
+some transforms may just transform each individual feature and we would like to keep the name of that
+feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
+with the orginal feature labels, e.g. PCA, MDS, UMAP, etc… The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
