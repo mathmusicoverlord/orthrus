@@ -511,7 +511,7 @@ class Process(ABC):
 
 class Partition(Process):
     """
-    :py:class`Process` subclass used to partition a dataset into training, validation, and test samples.
+    :py:class:`Process` subclass used to partition a dataset into training, validation, and test samples.
 
     Parameters:
         process (object): Object to partition the data with, see for example scikit learn's
@@ -955,7 +955,7 @@ class Fit(Process, ABC):
 
 class Transform(Fit):
     """
-    :py:class`Process` subclass used to transform a dataset, e.g. normalization, imputation, log transformation, etc...
+    :py:class:`Fit` subclass used to transform a dataset, e.g. normalization, imputation, log transformation, etc...
 
     Parameters:
         process (object): Object to tranform the data with, see for example this packages implementation of
@@ -973,7 +973,7 @@ class Transform(Fit):
 
         supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
 
-        fit_handle (string): Name of ``fit`` method used by :py:attr:`transform.process`. Default is "fit".
+        fit_handle (string): Name of ``fit`` method used by :py:attr:`Transform.process`. Default is "fit".
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
 
@@ -983,6 +983,11 @@ class Transform(Fit):
 
         fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`Transform.process`.
             Default is "fit_transform".
+
+        retain_f_ids (bool): Flag indicating whether or not to retain the original feature labels. For example,
+            some transforms may just transform each individual feature and we would like to keep the name of that
+            feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
+            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``.
 
     Attributes:
         process (object): Object to tranform the data with, see for example this packages implementation of
@@ -1000,16 +1005,21 @@ class Transform(Fit):
 
         supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
 
-        fit_handle (string): Name of ``fit`` method used by :py:attr:`transform.process`. Default is "fit".
+        _fit_handle (string): Name of ``fit`` method used by :py:attr:`Transform.process`. Default is "fit".
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
 
-        transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
+        _transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
 
         transform_args (dict): Keyword arguments passed to :py:meth:`process.transform()`.
 
-        fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`Transform.process`.
+        _fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`Transform.process`.
             Default is "fit_transform".
+
+        retain_f_ids (bool): Flag indicating whether or not to retain the original feature labels. For example,
+            some transforms may just transform each individual feature and we would like to keep the name of that
+            feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
+            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``.
 
         run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
             finished, a value of 1 indicated the process has finished.
@@ -1017,13 +1027,12 @@ class Transform(Fit):
         results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
             for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
             training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
-            :py:class:`Partition` instance, after it runs, outputs the following results per batch:
+            :py:class:`Transform` instance, after it runs, outputs the following results per batch:
 
-            * tvt_labels (Series): A sample in the series will be labeled either `Train`, `Valid`, or `Test`. If a batch
-              already contains training and test labels, then the training samples will be partitioned into training and
-              validation. e.g. if batch_0['tvt_labels'] is has training/test labels then the partition process will split
-              the training data into training/validation for new batches batch_0_0, batch_0_1, etc... This allows one to
-              easily generate training/validation/test labels for a dataset by calling two partition processes back to back.
+            * transform (Callable): Bound method calling :py:meth:`Transform.process.transform()`
+              which is trained on training data in :py:attr:`results_[batch]['tvt_labels']` if it is given, otherwise it
+              is trained on all of the data. The bound method can be used to transform future datasets, see the example
+              below.
 
     Examples:
         >>> # imports
@@ -1109,7 +1118,22 @@ class Transform(Fit):
                               " Make sure that its fit_transform method fits"
                               " the transformation inplace!" % (self.__class__.__name__,))
 
-    def _fit_transform(self, ds: DataSet, **kwargs):
+    def _fit_transform(self, ds: DataSet, **kwargs) -> Tuple[object, DataSet]:
+        """
+        Private method for fit transforming a dataset :py:attr:`ds`. with :py:attr:`Transform.process`.
+
+        Args:
+            ds (DataSet): The dataset to run the process on.
+
+            **kwargs: Keyword arguments indicating for example the training/test
+                labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+                to :py:attr:`ds`.
+
+        Returns:
+            tuple :
+                * object: The fitted :py:attr:`Transform.process`.
+                * DataSet: The transformed data.
+        """
 
         # extract training ids
         training_ids = self._extract_training_ids(ds, **kwargs)
@@ -1149,7 +1173,18 @@ class Transform(Fit):
 
         return result
 
-    def _generate_transform(self, process):
+    def _generate_transform(self, process) -> Callable:
+        """
+        Private method for generating a callable transform function on a dataset.
+
+        Args:
+            process (object): The transformer object to extract the transform from.
+
+        Returns:
+            Callable : A bound method to transform datasets with. Calls :py:meth:`Transform.process.transform()`
+                internally.
+        """
+
         # check for a transform handle
         if self._transform_handle is not None:
             inner_transform = eval("process." + self._transform_handle)
@@ -1183,8 +1218,17 @@ class Transform(Fit):
 
         return transform
 
-    def transform(self, ds: DataSet):
+    def transform(self, ds: DataSet) -> dict:
+        """
+        Transforms the dataset :py:attr:`ds` for every transform contained within :py:attr:`Transform.results_`.
 
+        Args:
+            ds (DataSet): The dataset to transform.
+
+        Returns:
+            dict : The keys indicate the batch in :py:attr:`Transform.results_` and the values are the transformed
+                datasets given by :py:attr:`Transform.results_[batch]['transform'](ds)`.
+        """
         assert self.results_ is not None, "Transform must call its run method on a dataset" \
                                           " before it can transform a new dataset!"
 
@@ -1194,7 +1238,138 @@ class Transform(Fit):
 
 
 class FeatureSelect(Transform):
+    """
+    :py:class:`Transform` subclass used to select and restrict features in a dataset.
 
+    Parameters:
+        process (object): Object to feature select and restrict the data with, see for example this packages
+            implementation of k-fold feature selection: :py:class:`KFFS <orthrus.sparse.feature_selection.kffs.KFFS>`.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        fit_handle (string): Name of ``fit`` method used by :py:attr:`FeatureSelect.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        transform_handle (str): Name of ``transform`` method used by :py:attr:`FeatureSelect.process`.
+            Default is "transform".
+
+        transform_args (dict): Keyword arguments passed to :py:meth:`process.transform()`.
+
+        fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`FeatureSelect.process`.
+            Default is "fit_transform".
+
+        f_ranks_handle (str): Name of the attribute in :py:attr:`FeatureSelect.process` containing the feature ranks.
+            Default is None.
+
+    Attributes:
+        process (object): Object to feature select and restrict the data with, see for example this packages
+            implementation of k-fold feature selection: :py:class:`KFFS <orthrus.sparse.feature_selection.kffs.KFFS>`.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        _fit_handle (string): Name of ``fit`` method used by :py:attr:`FeatureSelect.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        _transform_handle (str): Name of ``transform`` method used by :py:attr:`FeatureSelect.process`.
+            Default is "transform".
+
+        transform_args (dict): Keyword arguments passed to :py:meth:`process.transform()`.
+
+        _fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`FeatureSelect.process`.
+            Default is "fit_transform".
+
+        _f_ranks_handle (str): Name of the attribute in :py:attr:`FeatureSelect.process` containing the feature ranks.
+            Default is None.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
+            :py:class:`Transform` instance, after it runs, outputs the following results per batch:
+
+            * transform (Callable): Bound method calling :py:meth:`FeatureSelect.process.transform()`
+              which is trained on training data in :py:attr:`results_[batch]['tvt_labels']` if it is given, otherwise it
+              is trained on all of the data. The bound method can be used to restrict future datasets to the
+              selected features, see the example below.
+
+    Examples:
+        >>> # imports
+        >>> import os
+        >>> from orthrus.core.pipeline import FeatureSelect
+        >>> from orthrus.sparse.feature_selection.kffs import KFFS
+        >>> from sklearn.svm import LinearSVC
+        >>> import numpy as np
+        >>> from orthrus.core.dataset import load_dataset
+        ...
+        >>> # load dataset
+        >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+        ...                                'test_data/GSE73072/Data/GSE73072.ds'))
+        ...
+        >>> # speed up things for this example
+        >>> ds = ds.slice_dataset(feature_ids=ds.vardata.index[:1000])
+        ...
+        >>> # define KFFS feature selector
+        >>> kffs = FeatureSelect(process=KFFS(classifier=LinearSVC(penalty='l1',
+        ...                                                        dual=False),
+        ...                                   f_weights_handle='coef_',
+        ...                                   f_rnk_func=np.abs,
+        ...                                   random_state=235,
+        ...                                   ),
+        ...                      process_name='kffs',
+        ...                      supervised_attr='Shedding',
+        ...                      transform_args=dict(n_top_features=100),
+        ...                      f_ranks_handle='ranks_',
+        ...                      verbosity=1)
+        ...
+        >>> # run process
+        >>> ds, results = kffs.run(ds)
+        ...
+        >>> # use resulting transform
+        >>> transform = results['batch']['transform']
+        >>> ds_new = transform(ds)
+        ...
+        >>> # print results
+        >>> print(ds_new.data)
+        ---------------------------------
+                mds_0     mds_1     mds_2
+        0   -2.684206  0.326609  0.021512
+        1   -2.715399 -0.169557  0.203523
+        2   -2.889819 -0.137346 -0.024710
+        3   -2.746437 -0.311124 -0.037674
+        4   -2.728593  0.333925 -0.096229
+        ..        ...       ...       ...
+        145  1.944017  0.187415 -0.179303
+        146  1.525663 -0.375021  0.120637
+        147  1.764046  0.078520 -0.130784
+        148  1.901629  0.115877 -0.722873
+        149  1.389666 -0.282887 -0.362318
+
+        [150 rows x 3 columns]
+    """
     def __init__(self,
                  process: object,
                  process_name: str = None,
@@ -1259,7 +1434,7 @@ class FeatureSelect(Transform):
         def transform(ds: DataSet):
             if self.verbosity > 0:
                 print(r"Restricting features in the data using %s..." % (self.process_name,))
-            feature_ids = select(ds.data.columns.to_numpy().reshape(1, -1), **self.transform_args)
+            feature_ids = np.array(select(ds.data.columns.to_numpy().reshape(1, -1), **self.transform_args)).reshape(-1,).tolist()
             ds_new = ds.slice_dataset(feature_ids=feature_ids)
 
             return ds_new
