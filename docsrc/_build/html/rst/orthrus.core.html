@@ -1602,6 +1602,7 @@ is given, otherwise it is trained on all of the data.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define random forest classify process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">RFC</span><span class="p">(),</span>
 <span class="gp">... </span>               <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
