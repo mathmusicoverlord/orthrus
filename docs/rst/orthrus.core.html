@@ -1629,7 +1629,7 @@ is given, otherwise it is trained on all of the data.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">RFC</span><span class="p">(),</span>
 <span class="gp">... </span>               <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">predict_handle</span><span class="o">=</span><span class="s1">&#39;predict_proba&#39;</span>
+<span class="gp">... </span>               <span class="n">predict_handle</span><span class="o">=</span><span class="s1">&#39;predict_proba&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
@@ -1638,18 +1638,20 @@ is given, otherwise it is trained on all of the data.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;class_scores&#39;</span><span class="p">])</span>
 <span class="go">---------------------------------</span>
-<span class="go">0         setosa</span>
-<span class="go">1         setosa</span>
-<span class="go">2         setosa</span>
-<span class="go">3         setosa</span>
-<span class="go">4         setosa</span>
-<span class="go">         ...</span>
-<span class="go">145    virginica</span>
-<span class="go">146    virginica</span>
-<span class="go">147    virginica</span>
-<span class="go">148    virginica</span>
-<span class="go">149    virginica</span>
-<span class="go">Name: RF labels, Length: 150, dtype: object</span>
+<span class="go">RF scores  setosa  versicolor  virginica</span>
+<span class="go">0             1.0        0.00       0.00</span>
+<span class="go">1             1.0        0.00       0.00</span>
+<span class="go">2             1.0        0.00       0.00</span>
+<span class="go">3             1.0        0.00       0.00</span>
+<span class="go">4             1.0        0.00       0.00</span>
+<span class="go">..            ...         ...        ...</span>
+<span class="go">145           0.0        0.01       0.99</span>
+<span class="go">146           0.0        0.00       1.00</span>
+<span class="go">147           0.0        0.00       1.00</span>
+<span class="go">148           0.0        0.00       1.00</span>
+<span class="go">149           0.0        0.03       0.97</span>
+<span class="go">_</span>
+<span class="go">[150 rows x 3 columns]</span>
 </pre></div>
 </div>
 </dd></dl>
