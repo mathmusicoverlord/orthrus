@@ -1570,6 +1570,12 @@ The columns in the <code class="docutils literal notranslate"><span class="pre">
 values of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> will be scores indicating the strength of membership to a specific class.
 The classifier is fit only on the training data in <code class="xref py py-attr docutils literal notranslate"><span class="pre">results_[batch]['tvt_labels']</span></code> if it
 is given, otherwise it is trained on all of the data.</p></li>
+<li><p>f_weights (Series): Feature weights or importances given by the classifier. The index of the <code class="docutils literal notranslate"><span class="pre">Series</span></code>
+is given by the features in the dataset and the values are the feature weights determined by the
+classifier.</p></li>
+<li><p>s_weights (Series): Sample weights or importances given by the classifier. The index of the <code class="docutils literal notranslate"><span class="pre">Series</span></code>
+is given by the samples in the dataset and the values are the sample weights determined by the
+classifier.</p></li>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
