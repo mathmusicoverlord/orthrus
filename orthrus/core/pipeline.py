@@ -1,5 +1,5 @@
 """
-This module contains the classes and functions associated with pipeline components and workflows.
+This module contains the classes and functions associated with process and pipeline components.
 """
 
 from abc import ABC, abstractmethod
@@ -19,12 +19,38 @@ import ray
 
 
 # module functions
-def _valid_args(func: Callable):
+def _valid_args(func: Callable) -> list:
+    """
+    This function takes a function and returns the keyword arguments that are valid for input.
+
+    Args:
+        func (Callable): The function whose arguments are to be inspected.
+
+    Returns:
+        list : Contains the keyword arguments which are valid for ``func``.
+    """
 
     return list(inspect.signature(func).parameters.keys())
 
 
 def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
+    """
+    Takes a dictionary :py:attr:`kv` of dictionaries ``kvi``, each which contains pandas
+    ``Series`` or ``DataFrame`` as values,
+    extracts the pandas object from each inner dictionary ``kvi`` at the specified :py:attr:`inner_key`,
+    and then compiles them into a single ``DataFrame`` object.
+
+    Args:
+        kv (dict): Dictionary of dictionaries
+
+        inner_key (str): Key to use on the inner dictionaries where the ``Series`` or ``DataFrame`` values exist.
+
+        **kwargs: Additional arguments for specifying the column names, index name, and column prefix and suffix, for
+            the output ``DataFrame``.
+
+    Returns:
+        DataFrame : The concatenated ``DataFrame`` or ``Series`` objects contained within the inner dictionaries.
+    """
 
     # initalize out
     out = DataFrame()
@@ -54,7 +80,16 @@ def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
 
 def compose(funcs: Tuple[Callable, ...]):
+    """
+    This function takes a tuple of functions :math:`(f_1,\ldots,f_n)` and returns their composition
+    :math:`f = f_1\circ\cdots\circ f_n`.
 
+    Args:
+        funcs (tuple of Callable): Tuple of functions to be composed.
+
+    Returns:
+        Callable : Composition of the above tuple of functions.
+    """
     # define the composition
     def f(x: object):
 
@@ -69,26 +104,53 @@ def compose(funcs: Tuple[Callable, ...]):
 
     return f
 
-def _find_super_batch(batch: str, kv: dict):
-    # compute super batch
-    super_batch = '_'.join(batch.split('_')[:-1])
-
-    # check if it is in the dictionary
-    if super_batch in kv.keys():
-        return super_batch
-    else:
-        return None
-
-
 
 # module classes
 class Process(ABC):
+    """
+    The base class for all processes in the pipeline module. Processes wrap class instances and functions for machine
+    learning task, e.g, normalization via an object with a ``fit`` and ``transform`` method, classification via an
+    object with a ``fit`` and ``predict`` method, etc... Fits well within the
+    `scikit-learn API <https://scikit-learn.org/stable/>`_, but can be adapted to other popular machine learning
+    libraries. A :py:class:`Process` instance is meant to be run on a :py:class:`DataSet` instance, via the method
+    :py:meth:`Process.run`.
+
+    Parameters:
+        process (object or Callable): The object to perform the action defined by the :py:class:`Process` instance.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+    Attributes:
+        process (object or Callable): The object to perform the action defined by the :py:class:`Process` instance.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False:
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc...
+    """
 
     def __init__(self,
                  process: object,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  ):
 
         # set parameters
@@ -104,16 +166,28 @@ class Process(ABC):
         self._process_name = process_name
 
     @property
-    def process_name(self):
-
+    def process_name(self) -> str:
+        """
+        The process name given in the :py:meth:`__init__`, if it is ``None`` a default process name is given.
+        """
         # set default name
         if self._process_name is None:
             self._process_name = self.process.__str__().replace('\n', '')
 
         return self._process_name
 
-    def _preprocess(self, ds: DataSet, **kwargs):
+    def _preprocess(self, ds: DataSet, **kwargs) -> DataSet:
+        """
+        Applies any data slicing/transformations given in :py:attr:`kwargs` to :py:attr:`ds`.
 
+        Args:
+            ds DataSet: The dataset to be pre-processed
+
+            **kwargs: Keyword arguments containing transforms and slicing operations to performed on the data
+                before further processing.
+        Returns:
+            DataSet : Pre-processed data.
+        """
         # prep for subclasses _run method
 
         # grab transformation object
@@ -123,14 +197,49 @@ class Process(ABC):
         return ds_new
 
     @abstractmethod
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+        """
+        Method defined for a sub-class. Run the particular process on the data, see for example: :py:class:`Classify`,
+        :py:class:`Partition`, and :py:class:`Transform`.
+
+        Args:
+            ds (DataSet): The dataset to run the process on.
+
+            **kwargs: Keyword arguments indicating for example the training/test
+                labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+                to :py:attr:`ds`.
+
+        Returns:
+            dict : Results of the processing, with key labeling the specific results given as values.
+
+        """
         pass
 
-    def run(self, ds: DataSet, batch_args: dict = None):
+    def run(self, ds: DataSet, batch_args: dict = None) -> Tuple[DataSet, dict]:
+        """
+        The primary run method. This method calls a sub-classes ``_run`` method on :py:attr:`ds` with keyword arguments
+        given by :py:attr:`batch_args[batch]` internally, but takes care of all the
+        boiler plate code for running the process across multiple batches in serial or parallel. It collects all of
+        the results across batches into a dictionary.
 
+        Args:
+            ds (DataSet): The dataset to process.
+
+            batch_args (dict): A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+                keyword arguments to a sub-classes ``_run`` method. A keyword argument may indicate the training/test
+                labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+                to :py:attr:`ds`. Note: Batches should be specified by ``batch_0``, ``batch_1``, ... , ``batch_0_0``,
+                ``batch_0_0``, etc if you want to link your processes in a :py:attr:`Pipeline` instance,
+                In particular ``batch_0_1`` is considered a derivative batch of ``batch_0`` and will inherit if
+                possible batch specific transforms, labels, etc... from ``batch_0``.
+
+        Returns:
+            Tuple[DataSet, dict] : The first argument is the object :py:attr:`ds` and the second argument is
+            :py:attr:`Process.results_`
+        """
         if batch_args is None:
             self.results_ = dict(batch=self._run(ds))
-            return
+            return ds, self.results_
 
         # setup for sequential or parallel processesing
         if self.parallel:
@@ -150,7 +259,17 @@ class Process(ABC):
 
         return ds, self.results_
 
-    def _run_par(self, ds: DataSet, batch_args: dict):
+    def _run_par(self, ds: DataSet, batch_args: dict) -> dict:
+        """
+        Runs process on different batches in parallel using `ray <https://ray.io/>`_
+
+        Args:
+            ds (DataSet) : See :py:meth:`Process.run`.
+            batch_args (dict): See :py:meth:`Process.run`.
+
+        Returns:
+            dict : Results across different batches, specifically :py:attr:`Process.results_`.
+        """
 
         # define a remote _run method
         _run = ray.remote(lambda *args, **kwargs: self._run(*args, **kwargs))
@@ -169,7 +288,53 @@ class Process(ABC):
         # collect results
         return dict(zip(batch_args.keys(), ray.get(futures)))
 
+    @staticmethod
+    def _find_super_batch(batch: str, kv: dict) -> Union[str, None]:
+        """
+        Takes the batch label :py:atr:`batch` and attempts to find its super batch in
+        :py:attr:`kv`. For example, ``batch_0_1`` would have super batch ``batch_0`` and
+        the method would return this if the super batch is in the keys of :py:attr:`kv`.
+
+        Args:
+            batch (str): Name of the batch.
+            kv (dict): Dictionary to check for super batch in.
+
+        Returns:
+            str: Name of the super batch.
+        """
+
+        # compute super batch
+        super_batch = '_'.join(batch.split('_')[:-1])
+
+        # check if it is in the dictionary
+        if super_batch in kv.keys():
+            return super_batch
+        else:
+            return None
+
     def collapse_results(self, which: Union[list, str] = 'all') -> dict:
+        """
+        This method collapses the results of the process by batches. Specifically given a key in :py:attr:`which`
+        to a result, say ``result_label`` in :py:attr:`self.results_[batch]`, :py:meth:`collapse_results` will call
+        a sub-classes :py:meth:`collapse_result_label` method if available, which returns an object containing all
+        of the results across batches relevant to ``result_label``. See :py:meth:`Partition._collapse_tvt_labels` for
+        an example. In this example, training/test labels can be collapsed into
+        a ``DataFrame`` object containing the training/test splits for each batch.
+
+        If a sub-class does not have a method to collapse a specific result across batches, then this method will
+        call :py:meth:`Process.extract_result` which returns a dictionary with keys the batches and values the
+        batch-specific result.
+
+        This method attempts to collapse the result for all keys listed in :py:attr:`which` and returns a dictionary
+        where the keys are :py:attr:`which` and the values are the collapsed results across batches.
+
+        Args:
+            which (list or str): List of keys pertaining to the results to be collapsed across batches.
+
+        Returns:
+            dict : Contains the collapsed result across batches for each key in :py:attr:`which`.
+
+        """
         # check that the process has been run
         assert self.results_ is not None, r"The %s process has not been run yet!" % (self.__class__.__name__,)
 
@@ -191,14 +356,26 @@ class Process(ABC):
             except AttributeError:
                 warnings.warn("%s does not contain a collapsing method for %s!"
                               " Returning \"uncollapsed\" object." % (self.__class__.__name__, key))
-                result = self._extract_result(key)
+                result = self.extract_result(key)
 
             # update dictionary
             out.update({key: result})
 
         return out
 
-    def _extract_result(self, which: str):
+    def extract_result(self, which: str) -> dict:
+        """
+        For a key, given by :py:attr:`which`, in :py:attr:`Process.results_[batch]` this method creates a dictionary
+        with keys batches in :py:attr:`Process.results_` and values :py:attr:`Process.results_[batch][which]`,
+        effectively restricting :py:attr:`Process.results_` to only the results related to :py:attr:`which`.
+
+        Args:
+            which (str): The key in :py:attr:`Process.results_[batch]` to extract all results across batches with
+                respect to.
+
+        Returns:
+            dict : Restricted dictionary containing only the results related to :py:attr:`which`.
+        """
 
         # check that the process has been run
         assert self.results_ is not None, r"The %s process has not been run yet!" % (self.__class__.__name__,)
@@ -221,7 +398,24 @@ class Process(ABC):
     def save_results(self,
                      save_path: Union[str, dict] = None,
                      overwrite: bool = False,
-                     collapse: bool = True):
+                     collapse: bool = True) -> None:
+        """
+        Saves the result of the finished process. Objects in collapsed form can either be save as a
+        serialized pickle file or a .csv (e.g. numpy.ndarray, pandas.DataFrame, pandas.Series).
+
+        Args:
+            save_path (str or dict): If it is a string then the entire dictionary of results is pickled in either
+                uncollapsed or collapsed format. If it is a dictionary, the keys should be be the specific results to
+                save, with values the individual save paths. Note: :py:attr:`collapse` must be set to ``True`` in order
+                to save the individual results.
+                
+            overwrite (bool): Indicates whether or not to overwrite the existing data specified by :py:attr:`save_path`.
+
+            collapse (bool): Flag indicating whether or not to collapse the results.
+
+        Returns:
+            inplace method.
+        """
 
         # make sure there is either a save path or multiple
         assert save_path is not None, "You must provide a save path or multiple save paths in a dictionary!"
@@ -291,7 +485,22 @@ class Process(ABC):
 
     def save(self,
              save_path: str,
-             overwrite: bool = False):
+             overwrite: bool = False) -> None:
+
+        """
+        Save the :py:class:`Process` instance in serialized format using pickle or dill. Calls
+        :py:func:`orthrus.core.helper.save_object` internally.
+
+        Args:
+            save_path (str): File path to save instance.
+
+            overwrite (bool): If ``True`` :py:attr:`save_path` will be overwritten, if ``False``
+                :py:attr:`save_path` will be appended with a version number ``i``, see
+                :py:func:`orthrus.core.helper.generate_save_path`.
+
+        Returns:
+            Inplace method.
+        """
 
         # generate new save path in case you don't want to overwrite
         #save_path = generate_save_path(save_path, overwrite)
@@ -301,6 +510,159 @@ class Process(ABC):
 
 
 class Partition(Process):
+    """
+    :py:class`Process` subclass used to partition a dataset into training, validation, and test samples.
+
+    Parameters:
+        process (object): Object to partition the data with, see for example scikit learn's
+            `KFold <https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html>`_.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        split_attr (str): Attribute in the dataset's metadata to split with respect to. Default is None.
+
+        split_group (str): Attribute in the dataset's metadata to group with respect to, see
+            for example scikit learn's
+            `StratifiedShuffleSplit <https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html>`_.
+            Should be provided when your split need to respect the proportions of the :py:attr:`split_group` class.
+            Default is None.
+
+        split_handle (string): Name of ``split`` method used by ``partitioner``. Default is "split".
+
+        split_args (dict): Keyword arguments passed to :py:meth:`process.split()`.
+
+    Attributes:
+        process (object): Object to partition the data with, see for example scikit learn's
+            `KFold <https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html>`_.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False:
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+                split_attr (str): Attribute in the dataset's metadata to split with respect to. Default is None.
+
+        split_group (str): Attribute in the dataset's metadata to group with respect to, see
+            for example scikit learn's
+            `StratifiedShuffleSplit <https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html>`_.
+            Should be provided when your split need to respect the proportions of the :py:attr:`split_group` class.
+            Default is None.
+
+        split_handle (string): Name of ``split`` method used by ``partitioner``. Default is "split".
+
+        split_args (dict): Keyword arguments passed to :py:meth:`process.split()`.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
+            :py:class:`Partition` instance, after it runs, outputs the following results per batch:
+
+            * tvt_labels (Series): A sample in the series will be labeled either `Train`, `Valid`, or `Test`. If a batch
+              already contains training and test labels, then the training samples will be partitioned into training and
+              validation. e.g. if batch_0['tvt_labels'] is has training/test labels then the partition process will split
+              the training data into training/validation for new batches batch_0_0, batch_0_1, etc... This allows one to
+              easily generate training/validation/test labels for a dataset by calling two partition processes back to back.
+
+    Examples:
+        >>> # imports
+        >>> import os
+        >>> from orthrus.core.pipeline import Partition
+        >>> from sklearn.model_selection import KFold
+        >>> from orthrus.core.dataset import load_dataset
+        ...
+        >>> # load dataset
+        >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+        ...                                'test_data/Iris/Data/iris.ds'))
+        ...
+        >>> # define kfold partition
+        >>> kfold = Partition(process=KFold(n_splits=5,
+        ...                                 shuffle=True,
+        ...                                 random_state=124,
+        ...                                 ),
+        ...                   process_name='5-fold-CV',
+        ...                   verbosity=1,
+        ...                   )
+        ...
+        >>> # run process
+        >>> ds, results = kfold.run(ds)
+        ...
+        >>> # print results
+        >>> print(results['batch_0']['tvt_labels'])
+        ...
+        Generating 5-fold-CV splits...
+        0      Train
+        1       Test
+        2      Train
+        3       Test
+        4      Train
+               ...
+        145    Train
+        146    Train
+        147    Train
+        148    Train
+        149    Train
+        Name: 5-fold-CV_0, Length: 150, dtype: object
+
+        >>> # imports
+        >>> from sklearn.model_selection import StratifiedShuffleSplit
+        ...
+        >>> # load dataset
+        >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+        ...                                'test_data/Iris/Data/iris.ds'))
+        ...
+        >>> # define kfold partition
+        >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
+        ...                                                    random_state=113,
+        ...                                                    train_size=.8),
+        ...                     process_name='80-20-tr-tst',
+        ...                     verbosity=1,
+        ...                     split_attr ='species',
+        ...                     )
+        ...
+        >>> # run shuffle->kfold
+        >>> ds, results = kfold.run(*shuffle.run(ds))
+        ...
+        >>> # print results
+        >>> print("batch_0_0 tvt_labels:\\n%s\\n" %\\
+        ...       (results['batch_0_0']['tvt_labels'],))
+        ...
+        >>> # print train/valid/test counts
+        >>> print("batch_0_0 tvt_labels counts:\\n%s" %\\
+        ...       (results['batch_0_0']['tvt_labels'].value_counts(),))
+        ---------------------
+        batch_0_0 tvt_labels:
+        0      Train
+        1      Valid
+        2       Test
+        3      Train
+        4      Valid
+               ...
+        145    Train
+        146    Train
+        147     Test
+        148    Train
+        149    Train
+        Name: 80-20-tr-tst_0_5-fold-CV_0, Length: 150, dtype: object
+        ----------------------------
+        batch_0_0 tvt_labels counts:
+        Train    96
+        Test     30
+        Valid    24
+        Name: 80-20-tr-tst_0_5-fold-CV_0, dtype: int64
+    """
 
     def __init__(self,
                  process: object,
@@ -311,6 +673,7 @@ class Partition(Process):
                  split_group: str = None,
                  split_handle: str = 'split',
                  split_args: dict = {}):
+
 
         # init with Process class
         super(Partition, self).__init__(process=process,
@@ -325,7 +688,7 @@ class Partition(Process):
         self.split_args = split_args
         self.split_handle = split_handle
 
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
 
         # run the supers _preprocess method
         ds_new = self._preprocess(ds, **kwargs)
@@ -339,7 +702,7 @@ class Partition(Process):
         if (tvt_labels == 'Valid').any():
             raise ValueError("Labels already contain training, validation, and test!")
 
-        # initialize parition result
+        # initialize partition result
         result = dict()
 
         # grab verbosity
@@ -393,8 +756,22 @@ class Partition(Process):
         # return to run method
         return result
 
-    def run(self, ds: DataSet, batch_args: dict = None, append_labels=True):
+    def run(self, ds: DataSet, batch_args: dict = None, append_labels=True) -> Tuple[DataSet, dict]:
+        """
+        See :py:meth:`Process.run` docstring.
 
+        Args:
+            ds (DataSet): See :py:meth:`Process.run` docstring.
+
+            batch_args (dict): See :py:meth:`Process.run` docstring.
+
+            append_labels (bool): If ``tvt_labels`` exist in :py:attr:`batch_args[batch]` then these labels will be
+                appended to :py:attr:`Partition.results_`. Useful in the case of splitting training into
+                training/validation and wanting to keep the original train/test labels. The default is True.
+
+        Returns:
+            Tuple[DataSet, dict] : See :py:meth:`Process.run` docstring.
+        """
         # run the super first
         super(Partition, self).run(ds, batch_args)
 
@@ -432,8 +809,15 @@ class Partition(Process):
 
         return ds, self.results_
 
-    def _collapse_tvt_labels(self):
+    def _collapse_tvt_labels(self) -> DataFrame:
+        """
+        Collapses ``tvt_labels`` into a dataframe where the columns are given as batches and the index is given as
+        the samples in the dataset.
 
+        Returns:
+            DataFrame : Collapsed train/valid/test labels across batches
+
+        """
         # collapse the dict of dict of series to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="tvt_labels",
@@ -442,8 +826,55 @@ class Partition(Process):
         return results
 
 
-class Fit(Process):
+class Fit(Process, ABC):
+    """
+    Base class used for any sub-class of :py:class:`Process` implementing a ``fit`` method, e.g., :py:class:`Transform`,
+    :py:class:`Classify`.
 
+    Parameters:
+        process (object): Object to fit on the data with, see for example scikit learn's
+            `StandardScaler <https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html>`_.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        fit_handle (string): Name of ``fit`` method used by :py:attr:`Fit.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+    Attributes:
+        process (object): Object to fit on the data with, see for example scikit learn's
+            `StandardScaler <https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html>`_.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False:
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        _fit_handle (string): Name of ``fit`` method used by :py:attr:`Fit.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc...
+    """
     def __init__(self,
                  process: object,
                  process_name: str = None,
@@ -467,8 +898,20 @@ class Fit(Process):
         # set private attributes
         self._fit_handle = fit_handle
 
-    def _extract_training_ids(self, ds: DataSet, **kwargs):
+    @staticmethod
+    def _extract_training_ids(ds: DataSet, **kwargs) -> Series:
+        """
+        Private method which extracts training indices from existing training/test labels.
 
+        Args:
+            ds (DataSet): The dataset to run the process on.
+
+            **kwargs: Possible keyword arguments:
+                * ``tvt_labels``: Existing training/test labels to extract training ids from.
+
+        Returns:
+            Series : Boolean series with ``True`` indicating the sample is a training sample.
+        """
         # grab training labels
         tvt_labels = kwargs.get('tvt_labels', None)
         if tvt_labels is None:
@@ -478,8 +921,21 @@ class Fit(Process):
 
         return training_ids
 
-    def _fit(self, ds: DataSet, **kwargs):
+    def _fit(self, ds: DataSet, **kwargs) -> object:
+        """
+        Private method for fitting :py:attr:`Fit.process` to a dataset :py:attr:`ds`.
 
+        Args:
+            ds (DataSet): The dataset to run the process on.
+
+            **kwargs: Keyword arguments indicating for example the training/test
+                labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+                to :py:attr:`ds`.
+
+        Returns:
+            object : The fitted :py:attr:`Fit.process`.
+
+        """
         # extract training ids
         training_ids = self._extract_training_ids(ds, **kwargs)
 
@@ -498,6 +954,119 @@ class Fit(Process):
 
 
 class Transform(Fit):
+    """
+    :py:class`Process` subclass used to transform a dataset, e.g. normalization, imputation, log transformation, etc...
+
+    Parameters:
+        process (object): Object to tranform the data with, see for example this packages implementation of
+            multi-dimensional scaling: :py:class:`MDS <orthrus.manifold.mds.MDS>`.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        fit_handle (string): Name of ``fit`` method used by :py:attr:`transform.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
+
+        transform_args (dict): Keyword arguments passed to :py:meth:`process.transform()`.
+
+        fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`Transform.process`.
+            Default is "fit_transform".
+
+    Attributes:
+        process (object): Object to tranform the data with, see for example this packages implementation of
+            multi-dimensional scaling: :py:class:`MDS <orthrus.manifold.mds.MDS>`.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        supervised_attr (str): Supervision attribute in the dataset's metadata to fit with respect to.
+
+        fit_handle (string): Name of ``fit`` method used by :py:attr:`transform.process`. Default is "fit".
+
+        fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
+
+        transform_args (dict): Keyword arguments passed to :py:meth:`process.transform()`.
+
+        fit_transform_handle (str): Name of ``fit_transform`` method used by :py:attr:`Transform.process`.
+            Default is "fit_transform".
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
+            :py:class:`Partition` instance, after it runs, outputs the following results per batch:
+
+            * tvt_labels (Series): A sample in the series will be labeled either `Train`, `Valid`, or `Test`. If a batch
+              already contains training and test labels, then the training samples will be partitioned into training and
+              validation. e.g. if batch_0['tvt_labels'] is has training/test labels then the partition process will split
+              the training data into training/validation for new batches batch_0_0, batch_0_1, etc... This allows one to
+              easily generate training/validation/test labels for a dataset by calling two partition processes back to back.
+
+    Examples:
+        >>> # imports
+        >>> import os
+        >>> from orthrus.core.pipeline import Transform
+        >>> from orthrus.manifold.mds import MDS
+        >>> from orthrus.core.dataset import load_dataset
+        ...
+        >>> # load dataset
+        >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+        ...                                'test_data/Iris/Data/iris.ds'))
+        ...
+        >>> # define MDS embedding
+        >>> mds = Transform(process=MDS(n_components=3),
+        ...                 transform_handle=None,
+        ...                 process_name='mds',
+        ...                 verbosity=1)
+        ...
+        >>> # run process
+        >>> ds, results = mds.run(ds)
+        ...
+        >>> # use resulting transform
+        >>> transform = results['batch']['transform']
+        >>> ds_new = transform(ds)
+        ...
+        >>> # print results
+        >>> print(ds_new.data)
+        ---------------------------------
+                mds_0     mds_1     mds_2
+        0   -2.684206  0.326609  0.021512
+        1   -2.715399 -0.169557  0.203523
+        2   -2.889819 -0.137346 -0.024710
+        3   -2.746437 -0.311124 -0.037674
+        4   -2.728593  0.333925 -0.096229
+        ..        ...       ...       ...
+        145  1.944017  0.187415 -0.179303
+        146  1.525663 -0.375021  0.120637
+        147  1.764046  0.078520 -0.130784
+        148  1.901629  0.115877 -0.722873
+        149  1.389666 -0.282887 -0.362318
+
+        [150 rows x 3 columns]
+    """
 
     def __init__(self,
                  process: object,
@@ -1043,7 +1612,7 @@ class Score(Process):
 
             # check type of score an retype scores as needed
             if i == 0:
-                if not (pd.api.types.infer_dtype(score) in ['floating', 'integer', 'string']):
+                if not (type(score) in [float, int, str]):
                     scores = scores.astype(object)
 
             # try to store the score (fingers crossed!)
@@ -1408,7 +1977,7 @@ class Pipeline(Process):
 
             else:
                 # check if it is a sub-batch of another
-                super_batch = _find_super_batch(batch, results)
+                super_batch = self._find_super_batch(batch, results)
 
                 # inherit from super batch if the key isn't present
                 if super_batch is None:
