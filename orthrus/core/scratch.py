@@ -6,6 +6,7 @@ if __name__ == "__main__":
     from sklearn.svm import LinearSVC
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import balanced_accuracy_score
+    from sklearn.metrics import confusion_matrix
     from orthrus.core.helper import save_object, load_object
     from orthrus.sparse.feature_selection.kffs import KFFS
     from orthrus.sparse.classifiers.svm import SSVMClassifier as SSVM
@@ -45,7 +46,7 @@ if __name__ == "__main__":
                                     random_state=124,
                                     ),
                       process_name='15-fold-CV',
-                      parallel=True,
+                      #parallel=True,
                       verbosity=1,
                       )
 
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     quad = Transform(process=FunctionTransformer(lambda x: np.power(x, 2) - x + 1),
                      process_name='quad',
                      retain_f_ids=True,
-                     parallel=True,
+                     #parallel=True,
                      verbosity=1)
 
     # define MDS transform
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     # define PCA transform
     pca = Transform(process=PCA(n_components=3, whiten=True),
                     process_name='pca',
-                    parallel=True,
+                    #parallel=True,
                     verbosity=1)
 
     # define LinearSVC classify process
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     rf = Classify(process=RandomForestClassifier(),
                   process_name='RF',
                   class_attr='Shedding',
-                  parallel=True,
+                  #parallel=True,
                   verbosity=1,
                   f_weights_handle='feature_importances_',
                   )
@@ -121,6 +122,14 @@ if __name__ == "__main__":
                 verbosity=2,
                 )
 
+    # define conf
+    conf = Score(process=confusion_matrix,
+                 process_name='confusion',
+                 pred_attr='Shedding',
+                 #parallel=True,
+                 verbosity=2,
+                 )
+
     # create pipeline to run
     pipeline = Pipeline(processes=(tr_tst_80_20, pca, kfold, quad, rf, bsr),
                         pipeline_name='test',
@@ -129,16 +138,14 @@ if __name__ == "__main__":
                         )
 
     # initiate ray for parallel processsion
-    ray.init(_temp_dir="/hdd/tmp/ray/")
+    #ray.init(_temp_dir="/hdd/tmp/ray/")
 
     # run pipeline
     pipeline.run(ds,
-                 #stop_before=None,
-                 checkpoint=True,
-                 )
+                 stop_before=None,
+                 checkpoint=True)
 
     # get results
     results = pipeline.results_
 
-    ray.shutdown()
-
+    #ray.shutdown()
