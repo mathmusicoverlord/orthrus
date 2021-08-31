@@ -94,9 +94,9 @@ class KFFS(BaseEstimator):
 
             if not (self.f_weights_handle is None):
                 f_weights_name = "weights_" + str(i)
-                f_weights = eval("self.classifier" + "." + self.f_weights_handle)
+                f_weights = eval("self.classifier" + "." + self.f_weights_handle).reshape(-1,)
                 f_weight_results[f_weights_name] = np.nan
-                f_weight_results.loc[feature_index, f_weights_name] = pd.Series(index=feature_index , data=f_weights)
+                f_weight_results.loc[feature_index, f_weights_name] = pd.Series(index=feature_index, data=f_weights)
                 if not (self.f_rnk_func is None):
                     f_rnk_name = "ranks_" + str(i)
                     weights = f_weight_results.loc[feature_index, f_weights_name]
@@ -129,7 +129,7 @@ class KFFS(BaseEstimator):
     def transform(self, X, n_top_features=10):
 
         # check X
-        X = check_array(X)
+        #X = check_array(X)
 
         # Check is fit had been called
         check_is_fitted(self)
