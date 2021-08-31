@@ -1857,14 +1857,14 @@ selected features, see the example below.</p></li>
 <dl class="py method">
 <dt id="orthrus.core.pipeline.FeatureSelect.transform">
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms the dataset <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> for every transform contained within <a class="reference internal" href="#orthrus.core.pipeline.Transform.results_" title="orthrus.core.pipeline.Transform.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.results_</span></code></a>.</p>
+<dd><p>Transforms the dataset <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> for every transform contained within <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.results_" title="orthrus.core.pipeline.FeatureSelect.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.results_</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to transform.</p>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><em>DataSet</em></a>) – The dataset to restrict features with.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The keys indicate the batch in <a class="reference internal" href="#orthrus.core.pipeline.Transform.results_" title="orthrus.core.pipeline.Transform.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.results_</span></code></a> and the values are the transformed
-datasets given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.results_[batch]['transform'](ds)</span></code>.</p>
+<dd class="field-even"><p>The keys indicate the batch in <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.results_" title="orthrus.core.pipeline.FeatureSelect.results_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.results_</span></code></a> and the values are the restricted
+datasets given by <code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.results_[batch]['transform'](ds)</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>dict</p>
