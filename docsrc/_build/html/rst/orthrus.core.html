@@ -2518,6 +2518,29 @@ of its results.</p>
 <span class="go">    Maximum: 100.00%</span>
 </pre></div>
 </div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="p">(</span><span class="n">log</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="n">shuffle</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="n">kfold</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="n">rf</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="n">bsr</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">pipeline_name</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                                 <span class="s1">&#39;test_data/Iris/example_pipeline.pickle&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the pipeline with checkpoint, stop before rf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stop_before</span><span class="o">=</span><span class="s1">&#39;rf&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># simulate stop and reloading</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                                 <span class="s1">&#39;test_data/Iris/example_pipeline.pickle&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># finish the pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="id16">
 <em class="property">property </em><code class="sig-name descname">checkpoint_path</code><a class="headerlink" href="#id16" title="Permalink to this definition">¶</a></dt>
