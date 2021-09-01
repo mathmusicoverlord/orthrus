@@ -2311,7 +2311,7 @@ training/validation and wanting to keep the original train/test labels. The defa
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Pipeline">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">processes</span><span class="p">:</span> <span class="n">Tuple<span class="p">[</span><a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process">orthrus.core.pipeline.Process</a><span class="p">, </span><span class="p">…</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">pipeline_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">checkpoint_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Pipeline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">processes</span><span class="p">:</span> <span class="n">Tuple<span class="p">[</span><a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process">orthrus.core.pipeline.Process</a><span class="p">, </span><span class="p">…</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">()</span></em>, <em class="sig-param"><span class="n">pipeline_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">checkpoint_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Process</span></code></a></p>
 <p><a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> subclass used create a seemless pipeline of processes. The <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> class
 acheives the following:</p>
@@ -2530,7 +2530,7 @@ of its results.</p>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the pipeline with checkpoint, stop before rf</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stop_before</span><span class="o">=</span><span class="s1">&#39;rf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stop_before</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># simulate stop and reloading</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">pipeline</span>
@@ -2539,6 +2539,57 @@ of its results.</p>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># finish the pipeline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">---------------------</span>
+<span class="go">Starting 0th process log...</span>
+<span class="go">_</span>
+<span class="go">Saving current state of pipeline to disk...</span>
+<span class="go">_</span>
+<span class="go">Starting 1th process 80-20-tr-tst...</span>
+<span class="go">_</span>
+<span class="go">Saving current state of pipeline to disk...</span>
+<span class="go">_</span>
+<span class="go">Starting 2th process 5-fold-CV...</span>
+<span class="go">_</span>
+<span class="go">Saving current state of pipeline to disk...</span>
+<span class="go">_</span>
+<span class="go">Loading Pipeline example from file...</span>
+<span class="go">_</span>
+<span class="go">Starting Pipeline example from process RF...</span>
+<span class="go">_</span>
+<span class="go">Starting 3th process RF...</span>
+<span class="go">_</span>
+<span class="go">Starting 4th process bsr...</span>
+<span class="go">Batches Train/Test:</span>
+<span class="go">    Train:</span>
+<span class="go">    Mean: 100.00%</span>
+<span class="go">    Std. Dev.: nan%</span>
+<span class="go">    Minimum: 100.00%</span>
+<span class="go">    Maximum: 100.00%</span>
+<span class="go">    _</span>
+<span class="go">    Test:</span>
+<span class="go">    Mean: 96.67%</span>
+<span class="go">    Std. Dev.: nan%</span>
+<span class="go">    Minimum: 96.67%</span>
+<span class="go">    Maximum: 96.67%</span>
+<span class="go">-------------------------</span>
+<span class="go">Batches Train/Test/Valid:</span>
+<span class="go">    Train:</span>
+<span class="go">    Mean: 100.00%</span>
+<span class="go">    Std. Dev.: 0.00%</span>
+<span class="go">    Minimum: 100.00%</span>
+<span class="go">    Maximum: 100.00%</span>
+<span class="go">    _</span>
+<span class="go">    Test:</span>
+<span class="go">    Mean: 97.33%</span>
+<span class="go">    Std. Dev.: 1.49%</span>
+<span class="go">    Minimum: 96.67%</span>
+<span class="go">    Maximum: 100.00%</span>
+<span class="go">    _</span>
+<span class="go">    Valid:</span>
+<span class="go">    Mean: 93.36%</span>
+<span class="go">    Std. Dev.: 5.14%</span>
+<span class="go">    Minimum: 87.50%</span>
+<span class="go">    Maximum: 100.00%</span>
 </pre></div>
 </div>
 <dl class="py method">
