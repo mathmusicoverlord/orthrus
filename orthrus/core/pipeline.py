@@ -341,6 +341,46 @@ class Process(ABC):
         Returns:
             dict : Contains the collapsed result across batches for each key in :py:attr:`which`.
 
+        Examples:
+            >>> # imports
+            >>> import os
+            >>> from orthrus.core.pipeline import Partition
+            >>> from sklearn.model_selection import KFold
+            >>> from orthrus.core.dataset import load_dataset
+            ...
+            >>> # load dataset
+            >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                'test_data/Iris/Data/iris.ds'))
+            ...
+            >>> # define kfold partition
+            >>> kfold = Partition(process=KFold(n_splits=5,
+            ...                                 shuffle=True,
+            ...                                 random_state=124,
+            ...                                 ),
+            ...                   process_name='5-fold-CV',
+            ...                   verbosity=1,
+            ...                   )
+            ...
+            >>> # run process
+            >>> ds, results = kfold.run(ds)
+            ...
+            >>> # print results
+            >>> tvt_labels = kfold.collapse_results()['tvt_labels']
+            >>> print(tvt_labels)
+            ...
+            5-fold-CV splits batch_0_split batch_1_split  ... batch_3_split batch_4_split
+            0                        Train          Test  ...         Train         Train
+            1                         Test         Train  ...         Train         Train
+            2                        Train         Train  ...          Test         Train
+            3                         Test         Train  ...         Train         Train
+            4                        Train         Train  ...         Train         Train
+            ..                         ...           ...  ...           ...           ...
+            145                      Train          Test  ...         Train         Train
+            146                      Train          Test  ...         Train         Train
+            147                      Train         Train  ...         Train         Train
+            148                      Train         Train  ...          Test         Train
+            149                      Train         Train  ...         Train         Train
+            [150 rows x 5 columns]
         """
         # check that the process has been run
         assert self.results_ is not None, r"The %s process has not been run yet!" % (self.__class__.__name__,)
@@ -2668,7 +2708,7 @@ class Pipeline(Process):
         self._current_process = 0
         self._checkpoint_path = checkpoint_path
         self._stop_before = None
-        self._labels = ["processes", "pipeline_name", "parallel", "verbosity", "checkpoint_path"]
+        self._labels = ["pipeline_name", "parallel", "verbosity", "checkpoint_path"]
 
         # try to load self from checkpoint path
         if self.checkpoint_path is not None:
@@ -2690,6 +2730,13 @@ class Pipeline(Process):
                 self._checkpoint_path = checkpoint_path
                 self._stop_before = stop_before
 
+    def __repr__(self):
+        params = inspect.signature(self.__init__).parameters
+        pipeline_str = '(' + ', '.join([process.process_name for process in self.processes]) + ')'
+        non_default_labels = [label for label in self._labels if getattr(self, label) != params[label].default]
+        kws = [f"{key}={getattr(self, key)!r}" for key in non_default_labels]
+        kws.insert(0, "processes=" + pipeline_str)
+        return "{}({})".format(type(self).__name__, ", ".join(kws))
 
     @property
     def process_name(self) -> str:
