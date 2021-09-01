@@ -623,7 +623,7 @@ class Partition(Process):
         >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
         ...                                'test_data/Iris/Data/iris.ds'))
         ...
-        >>> # define kfold partition
+        >>> # define 80-20 train/test partition
         >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
         ...                                                    random_state=113,
         ...                                                    train_size=.8),
@@ -795,7 +795,8 @@ class Partition(Process):
 
         # append original labels
         if append_labels and (batch_args is not None):
-            results.update({k: dict(tvt_labels=v['tvt_labels']) for (k, v) in batch_args.items()})
+            if 'tvt_labels' in batch_args[list(batch_args.keys())[0]].keys():
+                results.update({k: dict(tvt_labels=v['tvt_labels']) for (k, v) in batch_args.items()})
             try:
                 del results['batch']
             except KeyError:
@@ -1034,6 +1035,8 @@ class Transform(Fit):
               is trained on all of the data. The bound method can be used to transform future datasets, see the example
               below.
 
+            * transformer (object): The fit transformer generated from :py:attr:`Transform.process`.
+
     Examples:
         >>> # imports
         >>> import os
@@ -1073,7 +1076,7 @@ class Transform(Fit):
         147  1.764046  0.078520 -0.130784
         148  1.901629  0.115877 -0.722873
         149  1.389666 -0.282887 -0.362318
-
+        _
         [150 rows x 3 columns]
     """
 
@@ -1151,7 +1154,7 @@ class Transform(Fit):
 
         return process, data
 
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
 
         # initalize output
         result = dict()
@@ -1173,7 +1176,7 @@ class Transform(Fit):
 
         return result
 
-    def _generate_transform(self, process) -> Callable:
+    def _generate_transform(self, process: object) -> Callable:
         """
         Private method for generating a callable transform function on a dataset.
 
@@ -1227,7 +1230,7 @@ class Transform(Fit):
 
         Returns:
             dict : The keys indicate the batch in :py:attr:`Transform.results_` and the values are the transformed
-                datasets given by :py:attr:`Transform.results_[batch]['transform'](ds)`.
+            datasets given by :py:attr:`Transform.results_[batch]['transform'](ds)`.
         """
         assert self.results_ is not None, "Transform must call its run method on a dataset" \
                                           " before it can transform a new dataset!"
@@ -1309,12 +1312,18 @@ class FeatureSelect(Transform):
         results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
             for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
             training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
-            :py:class:`Transform` instance, after it runs, outputs the following results per batch:
+            :py:class:`FeatureSelect` instance, after it runs, outputs the following results per batch:
 
             * transform (Callable): Bound method calling :py:meth:`FeatureSelect.process.transform()`
               which is trained on training data in :py:attr:`results_[batch]['tvt_labels']` if it is given, otherwise it
               is trained on all of the data. The bound method can be used to restrict future datasets to the
               selected features, see the example below.
+
+            * selector (object): The fit feature selector generated from :py:attr:`FeatureSelect.process`.
+
+            * f_ranks (Series): Feature ranks given by the feature selector. The index of the ``Series``
+              is given by the features in the dataset and the values are the feature ranks determined by the
+              feature selector.
 
     Examples:
         >>> # imports
@@ -1355,20 +1364,20 @@ class FeatureSelect(Transform):
         >>> # print results
         >>> print(ds_new.data)
         ---------------------------------
-                mds_0     mds_1     mds_2
-        0   -2.684206  0.326609  0.021512
-        1   -2.715399 -0.169557  0.203523
-        2   -2.889819 -0.137346 -0.024710
-        3   -2.746437 -0.311124 -0.037674
-        4   -2.728593  0.333925 -0.096229
-        ..        ...       ...       ...
-        145  1.944017  0.187415 -0.179303
-        146  1.525663 -0.375021  0.120637
-        147  1.764046  0.078520 -0.130784
-        148  1.901629  0.115877 -0.722873
-        149  1.389666 -0.282887 -0.362318
-
-        [150 rows x 3 columns]
+        ID_REF       1773_at  200056_s_at  ...  201427_s_at  201462_at
+        GSM1881744  6.964445     7.486071  ...     3.658097   8.622978
+        GSM1881745  7.162511     7.434805  ...     3.580072   8.667888
+        GSM1881746  7.071087     7.809637  ...     3.596919   8.432335
+        GSM1881747  6.943840     7.549568  ...     3.572631   8.585819
+        GSM1881748  6.937150     7.687864  ...     3.893286   8.625159
+        ...              ...          ...  ...          ...        ...
+        GSM1884625  6.748496     6.635707  ...     3.699136   8.147086
+        GSM1884626  6.467847     6.055161  ...     3.609685   7.171061
+        GSM1884627  6.474651     7.860354  ...     3.959776   7.848822
+        GSM1884628  7.078167     7.508468  ...     3.583747   8.158019
+        GSM1884629  6.457082     7.465501  ...     3.953059   7.773569
+        _
+        [2886 rows x 100 columns]
     """
     def __init__(self,
                  process: object,
@@ -1405,10 +1414,10 @@ class FeatureSelect(Transform):
         # private attributes
         self._f_ranks_handle = f_ranks_handle
 
-    def _preprocess(self, ds: DataSet, **kwargs):
+    def _preprocess(self, ds: DataSet, **kwargs) -> DataSet:
         return ds  # avoid double preprocessing from Transform
 
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
 
         # preprocess data with the super
         ds_new = super(FeatureSelect, self)._preprocess(ds, **kwargs)
@@ -1426,7 +1435,7 @@ class FeatureSelect(Transform):
 
         return result
 
-    def _generate_transform(self, process=None):
+    def _generate_transform(self, process: object = None) -> Callable:
         # generate selector
         select = eval("process." + self._transform_handle)
 
@@ -1441,8 +1450,19 @@ class FeatureSelect(Transform):
 
         return transform
 
-    def _generate_f_ranks(self, process: object, ds: DataSet):
+    def _generate_f_ranks(self, process: object, ds: DataSet) -> dict:
+        """
+        Private method for generating feature ranks from :py:attr:`FeatureSelect.process` using
+        :py:attr:`FeatureSelect._f_ranks_handle`.
 
+        Args:
+            process (object): Object to extract feature ranks from.
+            ds (DataSet): Dataset used to extract features.
+
+        Returns:
+            dict : key="f_ranks", value=Series of feature ranks indexed by
+            :py:attr:`vardata.index <orthrus.core.dataset.DataSet.vardata>`
+        """
         # initialize out
         out = {}
 
@@ -1470,8 +1490,15 @@ class FeatureSelect(Transform):
 
         return out
 
-    def _collapse_f_ranks(self):
+    def _collapse_f_ranks(self) -> dict:
+        """
+        Collapses ``f_ranks`` into a dataframe where the columns are given as batches and the index is given as
+        the features in the dataset.
 
+        Returns:
+            DataFrame : Collapsed feature ranks across batches
+
+        """
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_ranks",
@@ -1479,8 +1506,17 @@ class FeatureSelect(Transform):
                                              col_suffix="f_ranks")
         return results
 
-    def transform(self, ds: DataSet):
+    def transform(self, ds: DataSet) -> dict:
+        """
+        Transforms the dataset :py:attr:`ds` for every transform contained within :py:attr:`FeatureSelect.results_`.
 
+        Args:
+            ds (DataSet): The dataset to restrict features with.
+
+        Returns:
+            dict : The keys indicate the batch in :py:attr:`FeatureSelect.results_` and the values are the restricted
+            datasets given by :py:attr:`FeatureSelect.results_[batch]['transform'](ds)`.
+        """
         assert self.results_ is not None, "Transform must call its run method on a dataset" \
                                           " before it can transform a new dataset!"
 
@@ -1490,7 +1526,179 @@ class FeatureSelect(Transform):
 
 
 class Classify(Fit):
+    """
+        :py:class:`Fit` subclass used to classify a dataset.
 
+        Parameters:
+            process (object): Object to classify the data with, see for example scikit-learn's
+                `LinearSVC <https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html>`_.
+
+            process_name (str): The common name assigned to the :py:attr:`process`.
+
+            parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+                Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+                can be done.
+
+            verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+                the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+                :py:class:`Process` instance.
+
+            class_attr (str): Attribute in the dataset's metadata to classify with respect to.
+
+            fit_handle (string): Name of ``fit`` method used by :py:attr:`Classify.process`. Default is "fit".
+
+            fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+            predict_handle (str): Name of ``predict`` method used by :py:attr:`Classify.process`. Default is "predict".
+
+            predict_args (dict): Keyword arguments passed to :py:meth:`process.predict()`.
+
+            classes_handle (str): Name of attribute in :py:attr:`Classify.process` contain the list of class labels.
+                The default is scikit-learn's default "classes_".
+
+            f_weights_handle (string): Name of :py:attr:`Classify.process` attribute containing feature weights.
+                Default is None.
+
+            s_weights_handle (string): Name of :py:attr:`Classify.process` attribute containing sample weights.
+                Default is None.
+
+        Attributes:
+            process (object): Object to classify the data with, see for example scikit-learn's
+                `LinearSVC <https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html>`_.
+
+            process_name (str): The common name assigned to the :py:attr:`process`.
+
+            parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+                Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+                can be done.
+
+            verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+                the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+                :py:class:`Process` instance.
+
+            class_attr (str): Attribute in the dataset's metadata to classify with respect to.
+
+            _fit_handle (string): Name of ``fit`` method used by :py:attr:`Classify.process`. Default is "fit".
+
+            fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+            _predict_handle (str): Name of ``predict`` method used by :py:attr:`Classify.process`. Default is "predict".
+
+            predict_args (dict): Keyword arguments passed to :py:meth:`process.predict()`.
+
+            _classes_handle (str): Name of attribute in :py:attr:`Classify.process` contain the list of class labels.
+                The default is scikit-learn's default "classes_".
+
+            _f_weights_handle (string): Name of :py:attr:`Classify.process` attribute containing feature weights.
+                Default is None.
+
+            _s_weights_handle (string): Name of :py:attr:`Classify.process` attribute containing sample weights.
+                Default is None.
+
+            run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+                finished, a value of 1 indicated the process has finished.
+
+            results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+                for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+                training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc... A
+                :py:class:`Classify` instance, after it runs, outputs the following results per batch:
+
+                * class_labels (Series): Prediction labels generated by the classifier, the index of the ``Series``
+                  is given by the samples in the dataset. The values of the ``Series`` will be labels contained in
+                  :py:attr:`Classify.process.classes_`. The classifier is fit only on the training data in
+                  :py:attr:`results_[batch]['tvt_labels']` if it is given, otherwise it is trained on all of the data.
+
+                * class_scores (Series or DataFrame): Prediction scores generated by the classifier,
+                  the index of the ``Series`` or ``DataFrame`` is given by the samples in the dataset.
+                  The columns in the ``DataFrame`` are given by the classes in :py:attr:`Classify.process.classes_`, the
+                  values of the ``DataFrame`` will be scores indicating the strength of membership to a specific class.
+                  The classifier is fit only on the training data in :py:attr:`results_[batch]['tvt_labels']` if it
+                  is given, otherwise it is trained on all of the data.
+
+                * classifier (object): The fit classifier generated from :py:attr:`Classify.process`
+
+                * f_weights (Series): Feature weights or importances given by the classifier. The index of the ``Series``
+                  is given by the features in the dataset and the values are the feature weights determined by the
+                  classifier.
+
+                * s_weights (Series): Sample weights or importances given by the classifier. The index of the ``Series``
+                  is given by the samples in the dataset and the values are the sample weights determined by the
+                  classifier.
+
+        Examples:
+            >>> # imports
+            >>> import os
+            >>> from orthrus.core.pipeline import Classify, Partition
+            >>> from sklearn.ensemble import RandomForestClassifier as RFC
+            >>> from sklearn.model_selection import StratifiedShuffleSplit
+            >>> from orthrus.core.dataset import load_dataset
+            ...
+            >>> # load dataset
+            >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                'test_data/Iris/Data/iris.ds'))
+            ...
+            >>> # define 80-20 train/test partition
+            >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
+            ...                                                    random_state=113,
+            ...                                                    train_size=.8),
+            ...                     process_name='80-20-tr-tst',
+            ...                     verbosity=1,
+            ...                     split_attr ='species',
+            ...                     )
+            ...
+            >>> # define random forest classify process
+            >>> rf = Classify(process=RFC(),
+            ...                process_name='RF',
+            ...                class_attr='species',
+            ...                verbosity=1)
+            ...
+            >>> # run process
+            >>> ds, results = rf.run(*shuffle.run(ds))
+            ...
+            >>> # print results
+            >>> print(results['batch_0']['class_labels'])
+            ---------------------------------
+            0         setosa
+            1         setosa
+            2         setosa
+            3         setosa
+            4         setosa
+                     ...
+            145    virginica
+            146    virginica
+            147    virginica
+            148    virginica
+            149    virginica
+            Name: RF labels, Length: 150, dtype: object
+
+            >>> # define random forest classify process using probabilities
+            >>> rf = Classify(process=RFC(),
+            ...                process_name='RF',
+            ...                class_attr='species',
+            ...                predict_handle='predict_proba',
+            ...                verbosity=1)
+            ...
+            >>> # run process
+            >>> ds, results = rf.run(*shuffle.run(ds))
+            ...
+            >>> # print results
+            >>> print(results['batch_0']['class_scores'])
+            ---------------------------------
+            RF scores  setosa  versicolor  virginica
+            0             1.0        0.00       0.00
+            1             1.0        0.00       0.00
+            2             1.0        0.00       0.00
+            3             1.0        0.00       0.00
+            4             1.0        0.00       0.00
+            ..            ...         ...        ...
+            145           0.0        0.01       0.99
+            146           0.0        0.00       1.00
+            147           0.0        0.00       1.00
+            148           0.0        0.00       1.00
+            149           0.0        0.03       0.97
+            _
+            [150 rows x 3 columns]
+        """
     def __init__(self,
                  process: object,
                  class_attr: str,
@@ -1501,7 +1709,7 @@ class Classify(Fit):
                  predict_handle: str = 'predict',
                  fit_args: dict = {},
                  predict_args: dict = {},
-                 classes_handle='classes_',
+                 classes_handle: str = 'classes_',
                  f_weights_handle: str = None,
                  s_weights_handle: str = None,
                  ):
@@ -1531,7 +1739,15 @@ class Classify(Fit):
         if self._fit_handle is None or self._predict_handle is None:
             raise ValueError("Classify process must have both a fit method and a predict method!")
 
-    def _collapse_class_labels(self):
+    def _collapse_class_labels(self) -> DataFrame:
+        """
+        Collapses ``class_labels`` into a dataframe where the columns are given as batches and the index is given as
+        the samples in the dataset.
+
+        Returns:
+            DataFrame : Collapsed prediction labels across batches
+
+        """
 
         # collapse the dict of dict of series to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
@@ -1540,8 +1756,16 @@ class Classify(Fit):
                                              col_suffix='_'.join([self.process_name, "labels"]))
         return results
 
-    def _collapse_class_scores(self):
+    def _collapse_class_scores(self) -> DataFrame:
+        """
+        Collapses ``class_scores`` into a dataframe where the columns are given as ``batch``_``class`` for ``batch`` in
+        :py:attr:`Classify.results_` and ``class`` in :py:attr:`Classify.process.classes_`. The index is given as
+        the samples in the dataset.
 
+        Returns:
+            DataFrame : Collapsed prediction scores across batches
+
+        """
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="class_scores",
@@ -1549,8 +1773,15 @@ class Classify(Fit):
                                              col_suffix="scores")
         return results
 
-    def _collapse_f_weights(self):
+    def _collapse_f_weights(self) -> DataFrame:
+        """
+        Collapses ``f_weights`` into a dataframe where the columns are given as batches and the index is given as
+        the features in the dataset.
 
+        Returns:
+            DataFrame : Collapsed feature weights across batches
+
+        """
         # collapse the dict of dict of series to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_weights",
@@ -1559,8 +1790,15 @@ class Classify(Fit):
 
         return results
 
-    def _collapse_s_weights(self):
+    def _collapse_s_weights(self) -> DataFrame:
+        """
+        Collapses ``s_weights`` into a dataframe where the columns are given as batches and the index is given as
+        the samples in the dataset.
 
+        Returns:
+            DataFrame : Collapsed sample weights across batches
+
+        """
         # collapse the dict of dict of series to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="s_weights",
@@ -1569,7 +1807,7 @@ class Classify(Fit):
 
         return results
 
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
 
         # initialize output
         result = dict()
@@ -1592,6 +1830,19 @@ class Classify(Fit):
         return result
 
     def _generate_labels_or_scores(self, process: object, ds: DataSet) -> dict:
+        """
+        Private method used to create classification labels or scores for :py:attr:`ds`
+        using :py:attr:`Classify.process`.
+
+        Args:
+            process (object): Classifier used to make predictions.
+            ds (DataSet): Dataset to be used to make predictions on.
+
+        Returns:
+            dict : key = "class_labels" or "class_scores", value = ``Series`` or ``DataFrame`` with classification labels
+            or scores.
+
+        """
 
         # predict on dataset
         if self.verbosity > 0:
@@ -1612,6 +1863,19 @@ class Classify(Fit):
         return {pred_label: pred}
 
     def _generate_f_s_weights(self, process: object, ds: DataSet) -> dict:
+        """
+        Private method used to generate feature or sample weights for :py:attr:`ds`
+        using :py:attr:`Classify.process`.
+
+        Args:
+            process (object): Classifier used to make predictions.
+            ds (DataSet): Dataset to be used to make predictions on.
+
+        Returns:
+            dict : keys = {"f_weights", "s_weights", values = {``Series`` with feature weights, ``Series`` with sample
+            weights}.
+
+        """
 
         # initialize output
         out = dict()
@@ -1636,6 +1900,133 @@ class Classify(Fit):
 
 
 class Score(Process):
+    """
+    :py:class:`Process` subclass used to score classification and regression results.
+
+    Parameters:
+        process (Callable): The function used to score the classification results.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        score_args (dict): Keyword arguments passed to :py:attr:`Score.process()`.
+
+        pred_type (str): Can be either "class_labels", "class_scores", "reg_scores", currently. It indicates the
+            type predictions made, i.e., classification labels, classification scores, or regression scores. The
+            default is "class_labels".
+
+        sample_weight_attr (str): Attribute in the metadata of the dataset you wish to weight the scores by, e.g.,
+            misclassifying a sick sample might be more costly than misclassifying a healthy sample.
+
+        infer_class_labels_on_output (bool): If ``True`` the process will attempt to assign labels to the output score.
+            For example if one uses a confusion matrix the process will attempt to assign the class labels given in
+            :py:attr:`Score.classes` to the rows and columns for indexing.
+
+        classes (list): Classes used for classification labels. You can provide a subset of classification labels
+            to look at scores relative to fewer classes. The default is None.
+
+    Attributes:
+        process (Callable): The function used to score the classification results.
+
+        process_name (str): The common name assigned to the :py:attr:`process`.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        score_args (dict): Keyword arguments passed to :py:attr:`Score.process()`.
+
+        pred_type (str): Can be either "class_labels", "class_scores", "reg_scores", currently. It indicates the
+            type predictions made, i.e., classification labels, classification scores, or regression scores. The
+            default is "class_labels".
+
+        _sample_weight_attr (str): Attribute in the metadata of the dataset you wish to weight the scores by, e.g.,
+            misclassifying a sick sample might be more costly than misclassifying a healthy sample.
+
+        _infer_class_labels_on_output (bool): If ``True`` the process will attempt to assign labels to the output score.
+            For example if one uses a confusion matrix the process will attempt to assign the class labels given in
+            :py:attr:`Score.classes` to the rows and columns for indexing.
+
+        _classes (list): Classes used for classification labels. You can provide a subset of classification labels
+            to look at scores relative to fewer classes. The default is None.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the process has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc...
+            A :py:class:`Score` instance, after it runs, outputs the following results per batch:
+
+            * class_pred_scores (Series): Scores generated by :py:attr:`Score.process` on classification results
+              generated by :py:class:`Classify`. The index of the ``Series`` is given by the labels in
+              ``batch['tvt_labels']``, e.g., "Train", "Valid", "Test". The values of the ``Series`` are the associated
+              scores for each sample type: "Train", "Valid", "Test".
+
+            * reg_pred_scores (Series): Scores generated by :py:attr:`Score.process` on regression results
+              generated by :py:class:`Regress`. The index of the ``Series`` is given by the labels in
+              ``batch['tvt_labels']``, e.g., "Train", "Valid", "Test". The values of the ``Series`` are the associated
+              scores for each sample type: "Train", "Valid", "Test".
+
+    Examples:
+            >>> # imports
+            >>> import os
+            >>> from orthrus.core.pipeline import Score, Classify, Partition
+            >>> from sklearn.ensemble import RandomForestClassifier as RFC
+            >>> from sklearn.model_selection import StratifiedShuffleSplit
+            >>> from sklearn.metrics import balanced_accuracy_score
+            >>> from orthrus.core.dataset import load_dataset
+            ...
+            >>> # load dataset
+            >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                'test_data/Iris/Data/iris.ds'))
+            ...
+            >>> # define 80-20 train/test partition
+            >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
+            ...                                                    random_state=113,
+            ...                                                    train_size=.8),
+            ...                     process_name='80-20-tr-tst',
+            ...                     verbosity=1,
+            ...                     split_attr ='species',
+            ...                     )
+            ...
+            >>> # define random forest classify process
+            >>> rf = Classify(process=RFC(),
+            ...                process_name='RF',
+            ...                class_attr='species',
+            ...                verbosity=1)
+            ...
+            >>> # define balance accuracy score process
+            >>> bsr = Score(process=balanced_accuracy_score,
+            ...             process_name='bsr',
+            ...             pred_attr='species',
+            ...             verbosity=2)
+            ...
+            >>> # run partition and classification processes
+            >>> ds, results_0 = shuffle.run(ds)
+            >>> ds, results_1 = rf.run(ds, results_0)
+            ...
+            >>> # carry over tvt_labels, use Pipeline for chaining processes instead!
+            >>> [results_1[batch].update(results_0[batch]) for batch in results_1]
+            ...
+            >>> # score classification results
+            >>> ds, results = bsr.run(ds, results_1)
+            -----------
+            bsr scores:
+            Train: 100.00%
+            Test: 96.67%
+    """
 
     def __init__(self,
                  process: Callable,
@@ -1646,7 +2037,7 @@ class Score(Process):
                  score_args: dict = {},
                  pred_type: str = 'class_labels',
                  sample_weight_attr: str = None,
-                 infer_class_labels_on_output=True,
+                 infer_class_labels_on_output: bool = True,
                  classes: list = None,
                  ):
 
@@ -1667,7 +2058,7 @@ class Score(Process):
         self._sample_weight_attr = sample_weight_attr
         self._infer_class_labels_on_output = infer_class_labels_on_output
 
-    def _run(self, ds: DataSet, **kwargs):
+    def _run(self, ds: DataSet, **kwargs) -> dict:
 
         # preprocess data
         ds_new = self._preprocess(ds, **kwargs)
@@ -1811,7 +2202,7 @@ class Score(Process):
                     print("%s:\n%s" % (row, str(score)))
         return result
 
-    def run(self, ds: DataSet, batch_args: dict = None):
+    def run(self, ds: DataSet, batch_args: dict = None) -> Tuple[DataSet, dict]:
 
         # run super
         ds, results = super(Score, self).run(ds, batch_args)
@@ -1822,7 +2213,7 @@ class Score(Process):
             scores = self._collapse_class_pred_scores()
 
             # check the dtype
-            if np.array(scores).dtype == 'float64':
+            if type(np.array(scores).reshape(-1,)[0].item()) == float:
                 levels = ['\d_\D', '\d_\d_\D']
                 for level in levels:
                     # compute first level scores
@@ -1839,7 +2230,17 @@ class Score(Process):
 
         return ds, results
 
-    def _process_classification_labels(self, score_process: Callable):
+    def _process_classification_labels(self, score_process: Callable) -> Callable:
+        """
+        Private method to generate a scoring metric on classification labels which
+        contains label information.
+
+        Args:
+            score_process (Callable): Scoring metric to use on classification labels.
+
+        Returns:
+            Callable : Decorated function which will return a score with appropriate labeling
+        """
 
         def class_labels_scorer(y_true, y_pred, **kwargs):
 
@@ -1856,9 +2257,28 @@ class Score(Process):
 
         return class_labels_scorer
 
-    def _process_classification_scores(self, score_process: Callable):
+    def _process_classification_scores(self, score_process: Callable) -> Callable:
+        """
+        Private method to generate a scoring metric on classification labels which
+        contains label information.
 
+        Args:
+            score_process (Callable): Scoring metric to use on classification labels.
+
+        Returns:
+            Callable : Decorated function which will return a score with appropriate labeling
+        """
         def class_scores_scorer(y_true, y_pred, **kwargs):
+            """
+            Private method to generate a scoring metric on classification scores which
+            contains label information.
+
+            Args:
+                score_process (Callable): Scoring metric to use on classification scores.
+
+            Returns:
+                Callable : Decorated function which will return a score with appropriate labeling
+            """
 
             # change shape of y_true to mimic scores (one-hot-encoding)
             y_true_reformated = DataFrame(index=y_true.index,
@@ -1885,11 +2305,28 @@ class Score(Process):
 
         return class_scores_scorer
 
-    def _process_regression_values(self, score_process: Callable):
+    def _process_regression_values(self, score_process: Callable) -> Callable:
+        """
+        Private method to generate a scoring metric on regression scores which
+        contains label information.
+
+        Args:
+            score_process (Callable): Scoring metric to use on regression scores.
+
+        Returns:
+            Callable : Decorated function which will return a score with appropriate labeling
+        """
         pass
 
-    def _collapse_class_pred_scores(self):
+    def _collapse_class_pred_scores(self) -> DataFrame:
+        """
+        Collapses ``class_pred_scores`` into a dataframe where the columns are given as batches and the index is given as
+        the sample tvt split, either "Train", "Valid", or "Test".
 
+        Returns:
+            DataFrame : Collapsed scores of classification results
+
+        """
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="class_pred_scores",
@@ -1897,8 +2334,17 @@ class Score(Process):
                                              col_suffix=self.process_name + "_scores")
         return results
 
-    def _format_ndarray_output_with_labels(self, score, labels):
+    def _format_ndarray_output_with_labels(self, score, labels: list) -> Union[Series, DataFrame]:
+        """
+        Private method used to infer labels on output score from :py:attr:`Score.process`.
 
+        Args:
+            score (object): The score to be adorned with label information.
+            labels (list): Labels to do the adorning with.
+
+        Returns:
+            Dataframe or Series : Score adorned with relevant labels.
+        """
         # check if score is array-like
         if isinstance(score, (list, tuple, ndarray)):
 
@@ -1936,7 +2382,15 @@ class Score(Process):
 
         return score
 
-    def _compute_stats(self, scores: Series):
+    def _compute_stats(self, scores: Series) -> dict:
+        """
+        Private method used to compute basic statistics of scores on classification/regression results.
+
+        Args:
+            scores (Series): Scores across batches.
+        Returns:
+            dict : mean, standard deviation, minimum, and maximum score across batches.
+        """
         mean_score = scores.mean(skipna=True)
         std_score = scores.std(skipna=True)
         min_score = scores.min(skipna=True)
@@ -1951,12 +2405,226 @@ class Score(Process):
 
 
 class Pipeline(Process):
+    """
+    :py:class:`Process` subclass used create a seemless pipeline of processes. The :py:class:`Pipeline` class
+    acheives the following:
 
+    * Processes run sequantially
+    * Results from previous processes are passed/inherited along the way.
+    * The pipeline can be saved along the way as to create checkpoints.
+    * The pipeline can be run to a certain point and then can continue from that point at a later time.
+
+    Parameters:
+        processes (tuple of Process): Contains the processes in the order in which they are meant to be run.
+
+        pipeline_name (str): The common name assigned to the :py:class:`Pipeline` instance.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is None. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done. If provided, the ``parallel`` value set here will be assigned to each process within.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is None, indicating the standard text output with a
+            :py:class:`Process` instance. If provided, the ``verbosity`` set here will be assigned to each process within.
+
+        checkpoint_path (str): File path indicating the location of the saved, or to be saved, pipeline.
+            Default is None.
+
+    Attributes:
+        processes (tuple of Process): Contains the processes in the order in which they are meant to be run.
+
+        pipeline_name (str): The common name assigned to the :py:class:`Pipeline` instance.
+
+        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
+            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
+            can be done.
+
+        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
+            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
+            :py:class:`Process` instance.
+
+        checkpoint_path (str): File path indicating the location of the saved, or to be saved, pipeline.
+            Default is None.
+
+        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
+            finished, a value of 1 indicated the pipeline has finished.
+
+        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
+            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
+            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc...
+            A :py:class:`Pipeline` instance, after it runs, outputs any of the results generated by its processes
+            contained in :py:attr:`Pipeline.processes`. Refer to each individual process's docstring for a description
+            of its results.
+
+    Examples:
+            >>> # imports
+            >>> import os
+            >>> import numpy as np
+            >>> from orthrus.core.pipeline import *
+            >>> from sklearn.ensemble import RandomForestClassifier as RFC
+            >>> from sklearn.model_selection import StratifiedShuffleSplit, KFold
+            >>> from sklearn.preprocessing import FunctionTransformer
+            >>> from sklearn.metrics import balanced_accuracy_score
+            >>> from orthrus.core.dataset import load_dataset
+            ...
+            >>> # load dataset
+            >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                'test_data/Iris/Data/iris.ds'))
+            ...
+            >>> # define 80-20 train/test partition
+            >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
+            ...                                                    random_state=113,
+            ...                                                    train_size=.8),
+            ...                     process_name='80-20-tr-tst',
+            ...                     split_attr ='species',
+            ...                     )
+            ...
+            >>> # define 5-fold partition for train/valid/test
+            >>> kfold = Partition(process=KFold(n_splits=5,
+            ...                                 shuffle=True,
+            ...                                 random_state=124,
+            ...                                 ),
+            ...                   process_name='5-fold-CV')
+            ...
+            >>> # define log transform process
+            >>> log = Transform(process=FunctionTransformer(np.log),
+            ...                 process_name='log',
+            ...                 retain_f_ids=True)
+            ...
+            >>> # define random forest classify process
+            >>> rf = Classify(process=RFC(),
+            ...                process_name='RF',
+            ...                class_attr='species')
+            ...
+            >>> # define balance accuracy score process
+            >>> bsr = Score(process=balanced_accuracy_score,
+            ...             process_name='bsr',
+            ...             pred_attr='species')
+            ...
+            >>> # define the pipeline
+            >>> pipeline = Pipeline(processes=(log,
+            ...                                shuffle,
+            ...                                kfold,
+            ...                                rf,
+            ...                                bsr),
+            ...                     pipeline_name='example',
+            ...                     checkpoint_path=os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                                  'test_data/Iris/example_pipeline.pickle'),
+            ...                     verbosity=2)
+            ...
+            >>> # run the pipeline
+            >>> ds, results = pipeline.run(ds)
+            -------------------
+            Batches Train/Test:
+                Train:
+                Mean: 100.00%
+                Std. Dev.: 0.00%
+                Minimum: 100.00%
+                Maximum: 100.00%
+                _
+                Test:
+                Mean: 95.94%
+                Std. Dev.: 3.98%
+                Minimum: 90.91%
+                Maximum: 100.00%
+            -------------------------
+            Batches Train/Test/Valid:
+                Train:
+                Mean: 100.00%
+                Std. Dev.: 0.00%
+                Minimum: 100.00%
+                Maximum: 100.00%
+                _
+                Test:
+                Mean: 97.33%
+                Std. Dev.: 1.49%
+                Minimum: 96.67%
+                Maximum: 100.00%
+                _
+                Valid:
+                Mean: 93.88%
+                Std. Dev.: 4.75%
+                Minimum: 87.50%
+                Maximum: 100.00%
+
+            >>> # define the pipeline
+            >>> pipeline = Pipeline(processes=(log,
+            ...                                shuffle,
+            ...                                kfold,
+            ...                                rf,
+            ...                                bsr),
+            ...                     pipeline_name='example',
+            ...                     checkpoint_path=os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                                  'test_data/Iris/example_pipeline.pickle'),
+            ...                     verbosity=2)
+            ...
+            >>> # run the pipeline with checkpoint, stop before rf
+            >>> ds, results = pipeline.run(ds, checkpoint=True, stop_before='RF')
+            ...
+            >>> # simulate stop and reloading
+            >>> del pipeline
+            >>> pipeline = Pipeline(checkpoint_path=os.path.join(os.environ['ORTHRUS_PATH'],
+            ...                                                  'test_data/Iris/example_pipeline.pickle'))
+            ...
+            >>> # finish the pipeline
+            >>> pipeline.run(ds)
+            ---------------------
+            Starting 0th process log...
+            _
+            Saving current state of pipeline to disk...
+            _
+            Starting 1th process 80-20-tr-tst...
+            _
+            Saving current state of pipeline to disk...
+            _
+            Starting 2th process 5-fold-CV...
+            _
+            Saving current state of pipeline to disk...
+            _
+            Loading Pipeline example from file...
+            _
+            Starting Pipeline example from process RF...
+            _
+            Starting 3th process RF...
+            _
+            Starting 4th process bsr...
+            Batches Train/Test:
+                Train:
+                Mean: 100.00%
+                Std. Dev.: nan%
+                Minimum: 100.00%
+                Maximum: 100.00%
+                _
+                Test:
+                Mean: 96.67%
+                Std. Dev.: nan%
+                Minimum: 96.67%
+                Maximum: 96.67%
+            -------------------------
+            Batches Train/Test/Valid:
+                Train:
+                Mean: 100.00%
+                Std. Dev.: 0.00%
+                Minimum: 100.00%
+                Maximum: 100.00%
+                _
+                Test:
+                Mean: 97.33%
+                Std. Dev.: 1.49%
+                Minimum: 96.67%
+                Maximum: 100.00%
+                _
+                Valid:
+                Mean: 93.36%
+                Std. Dev.: 5.14%
+                Minimum: 87.50%
+                Maximum: 100.00%
+    """
     def __init__(self,
-                 processes: Tuple[Process, ...],
+                 processes: Tuple[Process, ...] = tuple(),
                  pipeline_name: str = None,
-                 parallel: bool = False,
-                 verbosity: int = 0,
+                 parallel: bool = None,
+                 verbosity: int = None,
                  checkpoint_path: str = None,
                  ):
 
@@ -1968,6 +2636,17 @@ class Pipeline(Process):
         self._current_process = 0
         self._checkpoint_path = checkpoint_path
         self._stop_before = None
+
+        # set and parallel and verbosity globally if True
+        if parallel is not None:
+            for process in processes:
+                process.parallel = parallel
+
+        if verbosity is not None:
+            for process in processes:
+                process.verbosity = verbosity
+        else:
+            verbosity = 1
 
         # init with Process class
         super(Pipeline, self).__init__(process=None,
@@ -1984,7 +2663,7 @@ class Pipeline(Process):
                               " use the checkpoint_path provided to save instances of the Pipeline.")
             else:
                 if self.verbosity > 0:
-                    print("Loading Pipeline %s from file..." % (self.pipeline_name,))
+                    print("Loading Pipeline %s from file..." % (checkpoint.pipeline_name,))
                 # save these parameters
                 checkpoint_path = deepcopy(self._checkpoint_path)
                 stop_before = self._stop_before
@@ -1998,18 +2677,27 @@ class Pipeline(Process):
 
 
     @property
-    def process_name(self):
+    def process_name(self) -> str:
+        """
+        Gives the name of the current process.
+        """
         return self.processes[self._current_process].process_name
 
     @property
-    def checkpoint_path(self):
+    def checkpoint_path(self) -> str:
+        """
+        Generates checkpoint path for loading a pipeline from a pickle file.
+        """
         if self._checkpoint_path is None:
             return None
         else:
             return os.path.abspath(self._checkpoint_path)
 
     @property
-    def stop_before(self):
+    def stop_before(self) -> int:
+        """
+        Generates integer index for process to stop before in pipeline.
+        """
         # grab stop_before value
         sb = self._stop_before
 
@@ -2050,7 +2738,37 @@ class Pipeline(Process):
             ds: DataSet,
             batch_args: dict = None,
             stop_before: Union[str, int] = None,
-            checkpoint=False):
+            checkpoint: bool = False) -> Tuple[DataSet, dict]:
+
+        """
+        Runs the pipeline in sequence. The pipeline can be stopped and restarted at a checkpoint.
+
+        Args:
+            ds (DataSet): The dataset to process.
+
+            batch_args (dict): A dictionary with keys given by batch. Each value in the dictionary is a dictionary of
+                keyword arguments to a sub-classes ``_run`` method. A keyword argument may indicate the training/test
+                labels for that batch, or classification labels for that batch, or a batch-specific transform to apply
+                to :py:attr:`ds`. Note: Batches should be specified by ``batch_0``, ``batch_1``, ... , ``batch_0_0``,
+                ``batch_0_0``, etc if you want to link your processes in a :py:attr:`Pipeline` instance,
+                In particular ``batch_0_1`` is considered a derivative batch of ``batch_0`` and will inherit if
+                possible batch specific transforms, labels, etc... from ``batch_0``.
+
+            stop_before (int or str): Specifies the process to stop at, for example if a process has the name "fire"
+                specifying :py:attr:`stop_before` = "fire" will cause the pipeline to stop before the fire process is
+                executed. If the process named "fire" is 3rd in the list of processes then you can simply pass
+                :py:attr:`stop_before` = 3. The default is None, and will cause the pipeline to run all the way
+                through.
+
+            checkpoint (bool): If ``True`` then the pipeline will save to :py:attr:`Pipeline.checkpoint_path`.
+                :py:attr:`Pipeline.checkpoint_path` must be filled in order to use checkpointing! If ``False``
+                the pipelin will execute without saving along the way.
+
+        Returns:
+            Tuple[DataSet, dict] : The first argument is the object :py:attr:`ds` and the second argument is
+            :py:attr:`Process.results_`
+
+        """
 
         # store stop_before point
         self._stop_before = stop_before
@@ -2065,8 +2783,8 @@ class Pipeline(Process):
                 print("Pipeline %s already finished running!" % (self.pipeline_name,))
             return ds, self.results_
 
-        # check for checkpoint
-        if checkpoint and self._current_process > 0:
+        # check for where the pipeline is at
+        if self._current_process > 0:
             if self.verbosity > 0:
                 print("Starting Pipeline %s from process %s..." % (self.pipeline_name,
                                                                    self.processes[self._current_process].process_name,))
@@ -2094,6 +2812,10 @@ class Pipeline(Process):
             # compose transforms and update the rest
             self._update_results(self.results_, next_results)
 
+            # check for multiple batches and left over signle batch
+            if len(self.results_) > 1 and 'batch' in self.results_.keys():
+                del self.results_['batch']
+
             # update current process
             self._current_process += 1
 
@@ -2107,11 +2829,24 @@ class Pipeline(Process):
             # if self._current_process == 2:
             #     break
 
+        # check if last process
+        if self._current_process == len(self.processes):
+            self.run_status_ = 1
+
         return ds, self.results_
 
     @staticmethod
     def _update_result(result: dict, next_result: dict):
+        """
+        Private method used to update the result in batch from process to process.
 
+        Args:
+            result (dict): The current result on a batch from the current state of the pipeline.
+            next_result (dict): The next result on a batch from the next process.
+
+        Returns:
+            inplace
+        """
         # check if result has transforms
         transforms = result.get('transforms', None)
 
@@ -2136,6 +2871,17 @@ class Pipeline(Process):
                 result[k] = v
 
     def _update_results(self, results, next_results):
+        """
+        Private method used to update the results from process to process. Calls
+        :py:meth:`Pipeline._update_result` internally.
+
+        Args:
+            result (dict of dict): The current results from the current state of the pipeline.
+            next_result (dict of dict): The next results from the next process.
+
+        Returns:
+            inplace
+        """
         for batch in next_results.keys():
 
             # define the next result
