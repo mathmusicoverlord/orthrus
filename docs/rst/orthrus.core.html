@@ -2446,7 +2446,6 @@ of its results.</p>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="p">)</span>
 <span class="gp">...</span>
@@ -2455,27 +2454,22 @@ of its results.</p>
 <span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span>
 <span class="gp">... </span>                                <span class="p">),</span>
-<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="p">)</span>
+<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define log transform process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">),</span>
 <span class="gp">... </span>                <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                <span class="n">retain_f_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>                <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>                <span class="n">retain_f_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define random forest classify process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">RFC</span><span class="p">(),</span>
 <span class="gp">... </span>               <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define balance accuracy score process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bsr</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">balanced_accuracy_score</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;bsr&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>            <span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the pipeline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="p">(</span><span class="n">log</span><span class="p">,</span>
@@ -2485,7 +2479,8 @@ of its results.</p>
 <span class="gp">... </span>                               <span class="n">bsr</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">pipeline_name</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                                                 <span class="s1">&#39;test_data/Iris/example_pipeline.pickle&#39;</span>
+<span class="gp">... </span>                                                 <span class="s1">&#39;test_data/Iris/example_pipeline.pickle&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="p">)</span>
 </pre></div>
 </div>
