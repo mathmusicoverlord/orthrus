@@ -161,9 +161,16 @@ class Process(ABC):
         # set attributes
         self.run_status_ = 0
         self.results_ = None
+        self._labels: list = ["process", "process_name", "parallel", "verbosity"]
 
         # private
         self._process_name = process_name
+
+    def __repr__(self):
+        params = inspect.signature(self.__init__).parameters
+        non_default_labels = [label for label in self._labels if getattr(self, label) != params[label].default]
+        kws = [f"{key}={getattr(self, key)!r}" for key in non_default_labels]
+        return "{}({})".format(type(self).__name__, ", ".join(kws))
 
     @property
     def process_name(self) -> str:
@@ -668,7 +675,7 @@ class Partition(Process):
                  process: object,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  split_attr: str = None,
                  split_group: str = None,
                  split_handle: str = 'split',
@@ -687,6 +694,9 @@ class Partition(Process):
         self.split_group = split_group
         self.split_args = split_args
         self.split_handle = split_handle
+
+        # private attributes
+        self._labels += ["split_group", "split_attr"]
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
@@ -880,7 +890,7 @@ class Fit(Process, ABC):
                  process: object,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  supervised_attr: str = None,
                  fit_handle: str = 'fit',
                  fit_args: dict = {},
@@ -898,6 +908,7 @@ class Fit(Process, ABC):
 
         # set private attributes
         self._fit_handle = fit_handle
+        self._labels += ["fit_args", "supervised_attr"]
 
     @staticmethod
     def _extract_training_ids(ds: DataSet, **kwargs) -> Series:
@@ -1084,7 +1095,7 @@ class Transform(Fit):
                  process: object,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  retain_f_ids: bool = False,
                  fit_handle: str = 'fit',
                  transform_handle: str = 'transform',
@@ -1110,6 +1121,7 @@ class Transform(Fit):
         # set private attributes
         self._transform_handle = transform_handle
         self._fit_transform_handle = fit_transform_handle
+        self._labels += ["retain_f_ids", "transform_args"]
 
         # check appropriate parameters
         if self._fit_handle is None or self._transform_handle is None:
@@ -1383,7 +1395,7 @@ class FeatureSelect(Transform):
                  process: object,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  fit_handle: str = 'fit',
                  transform_handle: str = 'transform',
                  supervised_attr: str = None,
@@ -1413,6 +1425,7 @@ class FeatureSelect(Transform):
 
         # private attributes
         self._f_ranks_handle = f_ranks_handle
+        self._labels.remove("retain_f_ids")
 
     def _preprocess(self, ds: DataSet, **kwargs) -> DataSet:
         return ds  # avoid double preprocessing from Transform
@@ -1704,7 +1717,7 @@ class Classify(Fit):
                  class_attr: str,
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  fit_handle: str = 'fit',
                  predict_handle: str = 'predict',
                  fit_args: dict = {},
@@ -1725,7 +1738,6 @@ class Classify(Fit):
                                        )
 
         # set parameters
-        self.fit_args = fit_args
         self.predict_args = predict_args
         self.class_attr = self.supervised_attr  # shadows supervised_attr
 
@@ -1734,6 +1746,8 @@ class Classify(Fit):
         self._classes_handle = classes_handle
         self._f_weights_handle = f_weights_handle
         self._s_weights_handle = s_weights_handle
+        self._labels.remove("supervised_attr")
+        self._labels += ["class_attr", "predict_args"]
 
         # check appropriate parameters
         if self._fit_handle is None or self._predict_handle is None:
@@ -2033,7 +2047,7 @@ class Score(Process):
                  pred_attr: Union[str, list],
                  process_name: str = None,
                  parallel: bool = False,
-                 verbosity: int = 0,
+                 verbosity: int = 1,
                  score_args: dict = {},
                  pred_type: str = 'class_labels',
                  sample_weight_attr: str = None,
@@ -2048,7 +2062,6 @@ class Score(Process):
                                     verbosity=verbosity,
                                     )
         # parameters
-        self.process = process
         self.pred_type = pred_type
         self.pred_attr = pred_attr
         self.score_args = score_args
@@ -2057,6 +2070,7 @@ class Score(Process):
         self._classes = classes
         self._sample_weight_attr = sample_weight_attr
         self._infer_class_labels_on_output = infer_class_labels_on_output
+        self._labels += ["pred_type", "pred_attr", "score_args"]
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
@@ -2632,11 +2646,6 @@ class Pipeline(Process):
         self.pipeline_name = pipeline_name
         self.processes = processes
 
-        # private attributes
-        self._current_process = 0
-        self._checkpoint_path = checkpoint_path
-        self._stop_before = None
-
         # set and parallel and verbosity globally if True
         if parallel is not None:
             for process in processes:
@@ -2654,6 +2663,12 @@ class Pipeline(Process):
                                        parallel=parallel,
                                        verbosity=verbosity,
                                        )
+
+        # private attributes
+        self._current_process = 0
+        self._checkpoint_path = checkpoint_path
+        self._stop_before = None
+        self._labels = ["processes", "pipeline_name", "parallel", "verbosity", "checkpoint_path"]
 
         # try to load self from checkpoint path
         if self.checkpoint_path is not None:
@@ -2770,18 +2785,18 @@ class Pipeline(Process):
 
         """
 
+        # check if pipeline is finished running
+        if self._current_process == len(self.processes):
+            if self.verbosity > 0:
+                print("Pipeline %s already finished running!" % (self.pipeline_name,))
+            return ds, self.results_
+
         # store stop_before point
         self._stop_before = stop_before
 
         # check for valid checkpoint
         if checkpoint and self.checkpoint_path is None:
             raise ValueError("No checkpoint_path provided to save instances!")
-
-        # check if pipeline is finished running
-        if self._current_process == len(self.processes):
-            if self.verbosity > 0:
-                print("Pipeline %s already finished running!" % (self.pipeline_name,))
-            return ds, self.results_
 
         # check for where the pipeline is at
         if self._current_process > 0:
@@ -2919,3 +2934,9 @@ class Pipeline(Process):
 # TODO: Add Regress Class
 
 # TODO: Add _collapse_reg_pred_scores in Score
+
+# TODO: Implement Tune(Process) using ray
+
+# TODO: Implement batch restriction, .e.g, Process.run(..., batches:list = [...])
+
+# TODO: Implement parallel pipelines
