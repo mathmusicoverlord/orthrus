@@ -2785,19 +2785,19 @@ where the keys are <code class="xref py py-attr docutils literal notranslate"><s
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tvt_labels</span> <span class="o">=</span> <span class="n">kfold</span><span class="o">.</span><span class="n">collapse_results</span><span class="p">()[</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tvt_labels</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="go">Generating 5-fold-CV splits...</span>
-<span class="go">0      Train</span>
-<span class="go">1       Test</span>
-<span class="go">2      Train</span>
-<span class="go">3       Test</span>
-<span class="go">4      Train</span>
-<span class="go">       ...</span>
-<span class="go">145    Train</span>
-<span class="go">146    Train</span>
-<span class="go">147    Train</span>
-<span class="go">148    Train</span>
-<span class="go">149    Train</span>
-<span class="go">Name: 5-fold-CV_0, Length: 150, dtype: object</span>
+<span class="go">5-fold-CV splits batch_0_split batch_1_split  ... batch_3_split batch_4_split</span>
+<span class="go">0                        Train          Test  ...         Train         Train</span>
+<span class="go">1                         Test         Train  ...         Train         Train</span>
+<span class="go">2                        Train         Train  ...          Test         Train</span>
+<span class="go">3                         Test         Train  ...         Train         Train</span>
+<span class="go">4                        Train         Train  ...         Train         Train</span>
+<span class="go">..                         ...           ...  ...           ...           ...</span>
+<span class="go">145                      Train          Test  ...         Train         Train</span>
+<span class="go">146                      Train          Test  ...         Train         Train</span>
+<span class="go">147                      Train         Train  ...         Train         Train</span>
+<span class="go">148                      Train         Train  ...          Test         Train</span>
+<span class="go">149                      Train         Train  ...         Train         Train</span>
+<span class="go">[150 rows x 5 columns]</span>
 </pre></div>
 </div>
 </dd></dl>
