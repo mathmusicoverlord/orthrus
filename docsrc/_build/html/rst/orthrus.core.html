@@ -2327,12 +2327,12 @@ acheives the following:</p>
 <li><p><strong>processes</strong> (<em>tuple of Process</em>) – Contains the processes in the order in which they are meant to be run.</p></li>
 <li><p><strong>pipeline_name</strong> (<em>str</em>) – The common name assigned to the <a class="reference internal" href="#orthrus.core.pipeline.Pipeline" title="orthrus.core.pipeline.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> instance.</p></li>
 <li><p><strong>parallel</strong> (<em>bool</em>) – <p>Flag indicating whether or not to use <a class="reference external" href="https://ray.io/">ray</a>’s parallel processing.
-Default is False. <code class="xref py py-func docutils literal notranslate"><span class="pre">ray.init()</span></code> must be called to initiate the ray cluster before any running
-can be done.</p>
+Default is None. <code class="xref py py-func docutils literal notranslate"><span class="pre">ray.init()</span></code> must be called to initiate the ray cluster before any running
+can be done. If provided, the <code class="docutils literal notranslate"><span class="pre">parallel</span></code> value set here will be assigned to each process within.</p>
 </p></li>
 <li><p><strong>verbosity</strong> (<em>int</em>) – Number indicating the level of verbosity, i.e., text output to console to the user. The higher
-the verbosity the larger the text output. Default is 1, indicating the standard text output with a
-<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p></li>
+the verbosity the larger the text output. Default is None, indicating the standard text output with a
+<a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance. If provided, the <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> set here will be assigned to each process within.</p></li>
 <li><p><strong>checkpoint_path</strong> (<em>str</em>) – File path indicating the location of the saved, or to be saved, pipeline.
 Default is None.</p></li>
 </ul>
