@@ -2480,12 +2480,9 @@ of its results.</p>
 <span class="gp">... </span>                    <span class="n">pipeline_name</span><span class="o">=</span><span class="s1">&#39;example&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
 <span class="gp">... </span>                                                 <span class="s1">&#39;test_data/Iris/example_pipeline.pickle&#39;</span><span class="p">),</span>
-<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="p">)</span>
-</pre></div>
-</div>
-<dl>
-<dt>`       …</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the pipeline</span>
+<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the pipeline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="go">-----------</span>
 <span class="go">bsr scores:</span>
@@ -2493,8 +2490,6 @@ of its results.</p>
 <span class="go">Test: 96.67%</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 <dl class="py method">
 <dt id="id16">
 <em class="property">property </em><code class="sig-name descname">checkpoint_path</code><a class="headerlink" href="#id16" title="Permalink to this definition">¶</a></dt>
