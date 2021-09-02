@@ -1523,7 +1523,7 @@ class FeatureSelect(Transform):
         if self._f_ranks_handle is not None:
             f_ranks = eval("process." + self._f_ranks_handle)
             if type(f_ranks) == DataFrame:
-                f_ranks.rename(index=dict(zip(f_ranks.index.tolist(), ds.vardata.index.tolist())))
+                f_ranks.rename(index=dict(zip(f_ranks.index.tolist(), ds.vardata.index.tolist())), inplace=True)
                 f_ranks.columns.name = self.process_name + " f_ranks"
             else:
                 f_ranks = np.array(f_ranks)  # convert to ndarray
