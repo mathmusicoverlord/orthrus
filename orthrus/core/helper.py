@@ -782,8 +782,10 @@ def generate_experiment(name: str, proj_dir: str):
     # create figures and results directories
     fig_dir = os.path.join(exp_dir, 'Figures')
     results_dir = os.path.join(exp_dir, 'Results')
+    pipeline_dir = os.path.join(exp_dir, 'Pipelines')
     os.makedirs(fig_dir)
     os.makedirs(results_dir)
+    os.makedirs(pipeline_dir)
 
     # generate python file
     params_file = os.path.join(exp_dir, '_'.join([name, 'params.py']))
