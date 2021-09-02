@@ -5,6 +5,7 @@ subject out (LOSO) partitions.
 
 # imports
 from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import LeaveOneGroupOut
 from sklearn.model_selection import LeaveOneOut
@@ -15,6 +16,7 @@ from orthrus.model_selection.partitioning import TrainPartitioner
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
+from typing import Union, Optional
 
 class KFSIFR(BaseEstimator):
     """
@@ -121,6 +123,8 @@ class KFSIFR(BaseEstimator):
             inplace method.
 
         """
+        # check array
+        X, y = check_X_y(X, y)
 
         # set total feature set
         St = np.arange(X.shape[1])
@@ -254,3 +258,66 @@ class KFSIFR(BaseEstimator):
 
             # store results
             self.results_ = pd.concat([self.results_, Si], axis=1)
+
+    def transform(self,
+                  X,
+                  fold: Union[int, str] = 'mean',
+                  n_top_features: Optional[Union[int, float]] = None):
+        """
+        Restricts :py:attr:`X` to the top ranked features. If :py:attr:`KFSIFR.sort_freq_classes` is ``False`` then
+        the transform method will rank off of the frequencies, otherwise it will use the rankings available.
+
+        Args:
+            X (array-like of shape (n_samples, n_features)): The data to restrict features on.
+            fold (int or str): If an integer then the ranking of the feature will be decided on specfied fold.
+                One can also specify :py:attr:`fold` = "mean", indicating to use the mean rank across folds.
+
+            n_top_features (int, float, None): Specifies the number of top features to restrict to, if no value
+                is given the transform method will restrict to the top 1% of the features. If a float between 0
+                and 1 is provided the :py:attr:`n_top_features` will be computed by the given proportion of the features.
+
+        Returns:
+            (array-like of shape (n_samples, n_top_features)) : Restrict array to the top features.
+
+        """
+        # check for fit
+        check_is_fitted(self)
+
+        # check array
+        X = check_array(X)
+
+        # grab results
+        if self.sort_freq_classes:
+            rank_col = "Rank"
+        else:
+            rank_col = "Frequency"
+
+        # compute ranks
+        ranks = self.results_.filter(regex=rank_col+'*')
+
+        # grab relevant rankings
+        if fold == "mean":
+            ranks = ranks.mean(axis=1)
+        else:
+            ranks = ranks['%s_%s' % (rank_col, str(fold))]
+
+        # convert to sort values
+        if rank_col == "Rank":
+            ranks = ranks.values
+        elif rank_col == "Frequency":
+            ranks = (-ranks).argsort().values
+        else:
+            raise ValueError("Invalid ranking column given!")
+
+        # calculate n_top_features if necessary
+        if n_top_features is None:
+            n_top_features = np.round(.01*X.shape[1])
+        if type(n_top_features) == float:
+            assert(n_top_features>0 and n_top_features<=1,
+                   "Proportion must be provided as a float between 0 and 1.")
+            n_top_features = np.round(n_top_features*X.shape[1])
+
+        # restrict X
+        feature_ids = ranks < n_top_features
+
+        return X[:, feature_ids]
