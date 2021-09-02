@@ -159,7 +159,7 @@ def LPPrimalDualPy(c, A, b, **kwargs):
         met3 = gamma
         met4 = torch.norm(F)
 
-        err = np.max([met1, met2, met3, met4])
+        err = np.max([met1.item(), met2.item(), met3.item(), met4.item()])
 
         if output_flag == 1:
             amet1 = torch.norm(rho_t, 1)

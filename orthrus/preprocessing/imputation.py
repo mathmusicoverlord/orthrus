@@ -19,7 +19,7 @@ class HalfMinimum(SimpleImputer):
 
     def __init__(self, **kwargs):
         kwargs['strategy'] = 'constant'  # ensure proper stratgey
-        super.__init__(**kwargs)
+        super(HalfMinimum, self).__init__(**kwargs)
 
     def _compute_half_min(self, X, y=None):
         """
@@ -34,8 +34,8 @@ class HalfMinimum(SimpleImputer):
         """
 
         # compute half-minimum
-        v = .5*check_array(X)
-        v = v[v>0].nanmin()
+        v = check_array(X)
+        v = .5*v[v>0].min()
         self.fill_value = v
 
     def fit(self, X, y=None):
@@ -44,6 +44,6 @@ class HalfMinimum(SimpleImputer):
         self._compute_half_min(X, y)
 
         # call super
-        return super.fit(X, y)
+        return super(HalfMinimum,self).fit(X, y)
 
 

@@ -259,6 +259,8 @@ class KFSIFR(BaseEstimator):
             # store results
             self.results_ = pd.concat([self.results_, Si], axis=1)
 
+            return self
+        
     def transform(self,
                   X,
                   fold: Union[int, str] = 'mean',
