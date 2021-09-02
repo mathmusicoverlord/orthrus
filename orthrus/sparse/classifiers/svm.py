@@ -5,6 +5,7 @@ from sklearn.metrics.pairwise import pairwise_kernels
 import torch as tc
 import numpy as np
 from orthrus.solvers.linear import LPNewton
+from orthrus.solvers.nonlinear import LPPrimalDualPy
 from copy import copy
 import ray
 
@@ -73,7 +74,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         # Solver parameters
         self.C = C  # the margin weight
         self.tol = tol  # error tolerance for interior point solver
-        self.solver = solver  # solver for solving the LP
+        self._solver = solver  # solver for solving the LP
         self.errorTrace = errorTrace
         self.use_cuda = use_cuda  # Flag to attempt to use CUDA.
         self.verbosity = verbosity  # Level of verbosity
@@ -84,6 +85,13 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
         self.bias_ = None
         self.pred_labels_ = None
         self.classes_ = None
+
+    @property
+    def solver(self):
+        if self._solver is None:
+            return LPPrimalDualPy
+        else:
+            return self._solver
 
     def fit(self, X, y):
         '''
