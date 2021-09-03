@@ -19,7 +19,7 @@ parser.add_argument('--exp_params',
 
 parser.add_argument('--pipeline',
                     type=str,
-                    help='File path or name file of containing the pipeline. If just a file name is provided '
+                    help='File path or file name of containing the pipeline. If just a file name is provided '
                          'then the file is assumed to live in the Pipelines subdirectory of the experiment directory '
                          'where the experimental parameters reside.')
 
@@ -39,12 +39,15 @@ args = parser.parse_args()
 from orthrus.core.helper import save_object, module_from_path, default_val, pop_first_element as pop
 from orthrus.core.dataset import DataSet
 from orthrus.core.pipeline import Pipeline
+from orthrus.core.helper import generate_save_path, load_object
 import inspect
 from typing import Union
 
 # set args
 checkpoint = args.checkpoint
 stop_before = args.stop_before
+if stop_before is not None and stop_before.isnumeric():
+    stop_before = int(stop_before)
 
 # set experiment parameters
 exp_params = module_from_path('exp_params', args.exp_params)
@@ -59,7 +62,6 @@ ds = exp_params.DATASET
 # optional script params
 sample_ids = default_val(exp_params, 'SAMPLE_IDS')
 feature_ids = default_val(exp_params, 'FEATURE_IDS')
-
 
 # find pipeline
 pipeline_path = args.pipeline
@@ -81,7 +83,22 @@ elif len(pipeline) > 1:
     raise ValueError("Too many Pipeline instances in %s. Please provide one Pipeline instance per file!" % (pipeline_path,))
 else:
     pipeline = pipeline[0][1]
-#
+
+# generate default checkpoint path
+default_checkpoint_path = os.path.join(results_dir,
+                                       pipeline.pipeline_name,
+                                       pipeline.pipeline_name + '.pickle')
+
+# gather Pipeline parameters
+pipeline_params = list(inspect.signature(Pipeline).parameters.keys())
+pipeline_params.remove('checkpoint_path')
+pipeline_params.append('_checkpoint_path')
+
+# assign default checkpoint path
+if pipeline.checkpoint_path is None:
+    os.makedirs(os.path.split(default_checkpoint_path)[0], exist_ok=True)  # make the directory
+    pipeline.checkpoint_path = default_checkpoint_path
+
 # define the script run function
 def run(ds: DataSet,
         pipeline: Pipeline,
@@ -90,6 +107,13 @@ def run(ds: DataSet,
         sample_ids=None,
         feature_ids=None,
         ):
+
+# assign the default path
+
+    # check for checkpointing
+    if checkpoint:
+        # create copy of pipepline with correct checkpoint path
+        pipeline = Pipeline(**{k.lstrip('_'): pipeline.__dict__[k] for k in pipeline_params})
 
     # slice dataset
     ds_new = ds.slice_dataset(sample_ids=sample_ids, feature_ids=feature_ids)
@@ -102,15 +126,11 @@ def run(ds: DataSet,
     return pipeline
 
 # define the script save function
-def save(pipeline: Pipeline):
-    # save classification results
-    if pipeline.checkpoint_path is None:
-        save_folder = os.path.join(results_dir, pipeline.name)
-        os.makedirs(save_folder)
-        save_path = os.path.join(save_folder, pipeline.name + '.pickle')
-        pipeline.save(save_path)
-    else:
-        pipeline.save(checkpoint_path)
+def save(pipeline: Pipeline, checkpoint: bool):
+
+        if not checkpoint:
+            # save pipeline
+            pipeline.save(pipeline.checkpoint_path, overwrite=True)
 
 
 if __name__ == '__main__':
@@ -125,4 +145,4 @@ if __name__ == '__main__':
                    )
 
     # save the results
-    save(pipeline)
+    save(pipeline, checkpoint=pop(checkpoint))

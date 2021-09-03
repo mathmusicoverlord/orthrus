@@ -2755,6 +2755,10 @@ class Pipeline(Process):
         else:
             return os.path.abspath(self._checkpoint_path)
 
+    @checkpoint_path.setter
+    def checkpoint_path(self, checkpoint_path: str):
+        self._checkpoint_path = checkpoint_path
+
     @property
     def stop_before(self) -> int:
         """
