@@ -4,6 +4,8 @@ and classification.
 """
 
 # imports
+import copy
+import inspect
 import os
 import numpy as np
 import pandas as pd
@@ -16,6 +18,8 @@ from pandas.core.frame import Series
 from orthrus.core.helper import scatter_pyplot
 from orthrus.core.helper import scatter_plotly
 from orthrus.core.helper import generate_save_path
+from venn import venn
+from typing import Optional
 
 # classes
 class DataSet:
@@ -921,6 +925,71 @@ class DataSet:
                     print(series.value_counts())
                     print('-' * len(header))
                     print('\n')
+
+    def venn_diagram(self, columns: list,
+                     sample_ids: Optional[list] = None,
+                     ignore_na: bool = True,
+                     save_path: str = None,
+                     **kwargs):
+        """
+        This method creates a venn diagram using the `pyvenn <https://github.com/LankyCyril/pyvenn#readme>`_ package
+        as a backend.
+
+        Args:
+            columns (list): List of columns in the metadata. Each column should have boolean or 0,1 entries, indicating
+                class membership.
+
+            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
+                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+
+            ignore_na (bool): If ``True`` samples which have nan values in any of the :py:attr:`columns` will be ignored.
+                The default is ``True``.
+
+            **kwargs (dict): Passed to ``venn.venn()`` first and then passed to ``matplotlib.axes.Axes.update()`` for
+                further plot customization.
+
+        Returns:
+            AxesSubplot: The ``Axes`` to the figure plotted.
+
+        """
+        # slice dataset
+        ds = self.slice_dataset(sample_ids=sample_ids)
+
+        # define metadata on columns
+        metadata = ds.metadata[columns]
+
+        # find na columns
+        if ignore_na:
+            na_sample_ids = metadata.isna().any(axis=1)
+            metadata = metadata.loc[~na_sample_ids]
+
+        # cast columns as bool
+        metadata = metadata.astype(bool)
+
+        # define each class as a set
+        classes = dict()
+        for column in columns:
+            bin_labels = set(metadata[metadata[column]].index.tolist())
+            classes[column] = bin_labels
+
+        # set venn args
+        venn_params = inspect.signature(venn).parameters.keys()
+        ven_args = dict()
+        for param in venn_params:
+            if param in kwargs.keys():
+                ven_args[param] = copy.copy(kwargs[param])
+                del kwargs[param]
+
+        # make venn diagram
+        venn_diag = venn(classes, **ven_args)
+        venn_diag.update(kwargs)
+        venn_diag.figure.show()
+
+        # save
+        if save_path is not None:
+            venn_diag.figure.savefig(generate_save_path(save_path))
+
+        return venn_diag
 
     def save(self, file_path: str = None, overwrite: bool = False):
         """
