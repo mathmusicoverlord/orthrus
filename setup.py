@@ -9,7 +9,7 @@ with open("requirements.txt", "r") as reqs_file:
 
 setuptools.setup(
     name="orthrus",  # Replace with your own username
-    version="0.0.1",
+    version="0.0.3",
     author="Eric Kehoe, Kartikay Sharma",
     author_email="ekehoe32@gmail.com",
     description="A package for automating pre-processing, visualization, and classification of generic data sets",
