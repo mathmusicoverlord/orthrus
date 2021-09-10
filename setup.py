@@ -15,7 +15,7 @@ setuptools.setup(
     description="A package for automating pre-processing, visualization, and classification of generic data sets",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    #download_url="https://github.com/ekehoe32/orthrus/archive/refs/tags/v1.0-alpha.tar.gz",
+    download_url="https://github.com/ekehoe32/orthrus/archive/refs/tags/v1.1-alpha.tar.gz",
     url="https://github.com/ekehoe32/orthrus",
     packages=setuptools.find_packages(),
     classifiers=[
