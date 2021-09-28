@@ -237,7 +237,7 @@ class PathwayScore(BaseEstimator):
             assert len(self.classes_) == 2, "You must have exactly 2 classes for this score type!"
 
             # compute ratio
-            self.scores_ = self.scores_[0, :, :] / self.scores_[1, :, :]
+            self.scores_ = np.arctan(self.scores_[0, :, :] / self.scores_[1, :, :])
             self.scores_ = self.scores_.transpose()
 
 
