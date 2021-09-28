@@ -138,30 +138,15 @@ class PathwayScore(BaseEstimator):
             bar.close()
 
         # reshape the list of subspaces
-        #self.subspaces_ = np.array(self.subspaces_, dtype=object).reshape(len(self.classes_), -1)
-
-        return self
+        self.subspaces_ = np.array(self.subspaces_, dtype=object).reshape(len(self.classes_), -1)
 
     def transform(self, X, y=None):
 
         # convert data to numpy
         X = np.array(X)
 
-        # refactor for torch version
-        def vecnorm(x):
-            try:
-                return tc.linalg.norm(x, axis=1, keepdim=True)
-            except AttributeError:
-                return tc.norm(x, dim=1, keepdim=True)
-
-        def acos(x):
-            try:
-                return tc.acos(x)
-            except AttributeError:
-                return tc.acos(x)
-
         # divide by norms to obtain unit vectors
-        #X = X / np.linalg.norm(X, axis=1, keepdims=True)
+        X = X / np.linalg.norm(X, axis=1, keepdims=True)
 
         # compute angles
         if self.parallel:
@@ -172,16 +157,13 @@ class PathwayScore(BaseEstimator):
             def angle(X, i, j, Y, p):
 
                 # convert types
-                Z = self.convert_type(X[i*(len(self.pathways_)) + j])
+                Z = self.convert_type(X[i, j])
                 W = self.convert_type(Y[:, p])
-                W = W / vecnorm(W)
-
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
-                angles = vecnorm(angles)
-                angles[angles >= 1] = 1  # cant be too sure
-                angles = acos(angles)
+                angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles = tc.arccos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
 
@@ -225,16 +207,13 @@ class PathwayScore(BaseEstimator):
             def angle(X, i, j, Y):
 
                 # convert types
-                #Z = self.convert_type(X[i, j])
-                Z = self.convert_type(X[i*(len(self.pathways_)) + j])
+                Z = self.convert_type(X[i, j])
                 W = self.convert_type(Y)
-                W = W / vecnorm(W)
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
-                angles = vecnorm(angles)
-                angles[angles >= 1] = 1  # cant be too sure
-                angles = acos(angles)
+                angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles = tc.arccos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
 
@@ -258,8 +237,9 @@ class PathwayScore(BaseEstimator):
             assert len(self.classes_) == 2, "You must have exactly 2 classes for this score type!"
 
             # compute ratio
-            self.scores_ = np.nan_to_num(np.arctan(np.true_divide(self.scores_[0, :, :], self.scores_[1, :, :])), np.pi/4)
+            self.scores_ = np.arctan(self.scores_[0, :, :] / self.scores_[1, :, :])
             self.scores_ = self.scores_.transpose()
+
 
 
         # return
