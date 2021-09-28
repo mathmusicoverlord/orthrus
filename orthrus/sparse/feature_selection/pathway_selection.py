@@ -140,6 +140,8 @@ class PathwayScore(BaseEstimator):
         # reshape the list of subspaces
         self.subspaces_ = np.array(self.subspaces_, dtype=object).reshape(len(self.classes_), -1)
 
+        return self
+
     def transform(self, X, y=None):
 
         # convert data to numpy
