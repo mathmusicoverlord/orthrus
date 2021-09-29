@@ -150,9 +150,9 @@ class PathwayScore(BaseEstimator):
         # refactor for torch version
         def vecnorm(x):
             try:
-                return tc.linalg.norm(W, axis=1, keepdim=True)
+                return tc.linalg.norm(x, axis=1, keepdim=True)
             except AttributeError:
-                return tc.norm(W, dim=1, keepdim=True)
+                return tc.norm(x, dim=1, keepdim=True)
 
         # divide by norms to obtain unit vectors
         #X = X / np.linalg.norm(X, axis=1, keepdims=True)
