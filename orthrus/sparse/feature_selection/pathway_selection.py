@@ -262,7 +262,6 @@ class PathwayScore(BaseEstimator):
             self.scores_ = self.scores_.transpose()
 
 
-
         # return
         return self.scores_
 
