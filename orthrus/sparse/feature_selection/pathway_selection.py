@@ -138,7 +138,7 @@ class PathwayScore(BaseEstimator):
             bar.close()
 
         # reshape the list of subspaces
-        self.subspaces_ = np.array(self.subspaces_, dtype=object).reshape(len(self.classes_), -1)
+        #self.subspaces_ = np.array(self.subspaces_, dtype=object).reshape(len(self.classes_), -1)
 
         return self
 
@@ -148,7 +148,7 @@ class PathwayScore(BaseEstimator):
         X = np.array(X)
 
         # divide by norms to obtain unit vectors
-        X = X / np.linalg.norm(X, axis=1, keepdims=True)
+        #X = X / np.linalg.norm(X, axis=1, keepdims=True)
 
         # compute angles
         if self.parallel:
@@ -159,12 +159,14 @@ class PathwayScore(BaseEstimator):
             def angle(X, i, j, Y, p):
 
                 # convert types
-                Z = self.convert_type(X[i, j])
+                Z = self.convert_type(X[i*(len(self.pathways_)) + j])
                 W = self.convert_type(Y[:, p])
+                W = W / tc.linalg.norm(W, axis=1, keepdim=True)
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
                 angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles[angles >= 1] = 1  # cant be too sure
                 angles = tc.arccos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
@@ -209,12 +211,15 @@ class PathwayScore(BaseEstimator):
             def angle(X, i, j, Y):
 
                 # convert types
-                Z = self.convert_type(X[i, j])
+                #Z = self.convert_type(X[i, j])
+                Z = self.convert_type(X[i*(len(self.pathways_)) + j])
                 W = self.convert_type(Y)
+                W = W / tc.linalg.norm(W, axis=1, keepdim=True)
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
                 angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles[angles >= 1] = 1  # cant be too sure
                 angles = tc.arccos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
