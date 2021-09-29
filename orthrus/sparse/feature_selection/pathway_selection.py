@@ -147,6 +147,13 @@ class PathwayScore(BaseEstimator):
         # convert data to numpy
         X = np.array(X)
 
+        # refactor for torch version
+        def vecnorm(x):
+            try:
+                return tc.linalg.norm(W, axis=1, keepdim=True)
+            except AttributeError:
+                return tc.norm(W, dim=1, keepdim=True)
+
         # divide by norms to obtain unit vectors
         #X = X / np.linalg.norm(X, axis=1, keepdims=True)
 
@@ -161,11 +168,12 @@ class PathwayScore(BaseEstimator):
                 # convert types
                 Z = self.convert_type(X[i*(len(self.pathways_)) + j])
                 W = self.convert_type(Y[:, p])
-                W = W / tc.linalg.norm(W, axis=1, keepdim=True)
+                W = W / vecnorm(W)
+
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
-                angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles = vecnorm(angles)
                 angles[angles >= 1] = 1  # cant be too sure
                 angles = tc.arccos(angles)
 
@@ -214,11 +222,11 @@ class PathwayScore(BaseEstimator):
                 #Z = self.convert_type(X[i, j])
                 Z = self.convert_type(X[i*(len(self.pathways_)) + j])
                 W = self.convert_type(Y)
-                W = W / tc.linalg.norm(W, axis=1, keepdim=True)
+                W = W / vecnorm(W)
 
                 # compute product
                 angles = tc.matmul(W, Z.transpose(0, 1))
-                angles = tc.linalg.norm(angles, axis=1, keepdim=True)
+                angles = vecnorm(angles)
                 angles[angles >= 1] = 1  # cant be too sure
                 angles = tc.arccos(angles)
 
