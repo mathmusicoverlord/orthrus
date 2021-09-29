@@ -154,6 +154,12 @@ class PathwayScore(BaseEstimator):
             except AttributeError:
                 return tc.norm(x, dim=1, keepdim=True)
 
+        def acos(x):
+            try:
+                return acos(x)
+            except AttributeError:
+                return tc.acos(x)
+
         # divide by norms to obtain unit vectors
         #X = X / np.linalg.norm(X, axis=1, keepdims=True)
 
@@ -175,7 +181,7 @@ class PathwayScore(BaseEstimator):
                 angles = tc.matmul(W, Z.transpose(0, 1))
                 angles = vecnorm(angles)
                 angles[angles >= 1] = 1  # cant be too sure
-                angles = tc.arccos(angles)
+                angles = acos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
 
@@ -228,7 +234,7 @@ class PathwayScore(BaseEstimator):
                 angles = tc.matmul(W, Z.transpose(0, 1))
                 angles = vecnorm(angles)
                 angles[angles >= 1] = 1  # cant be too sure
-                angles = tc.arccos(angles)
+                angles = acos(angles)
 
                 return angles.detach().cpu().numpy().tolist()
 
