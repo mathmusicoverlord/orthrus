@@ -156,7 +156,7 @@ class PathwayScore(BaseEstimator):
 
         def acos(x):
             try:
-                return acos(x)
+                return tc.acos(x)
             except AttributeError:
                 return tc.acos(x)
 
