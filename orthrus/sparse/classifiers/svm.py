@@ -1,9 +1,11 @@
+import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics.pairwise import pairwise_kernels
 import torch as tc
 import numpy as np
+from matplotlib import pyplot as plt
 from orthrus.solvers.linear import LPNewton
 from orthrus.solvers.nonlinear import LPPrimalDualPy
 from copy import copy
@@ -34,7 +36,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             to violate the hard-margin hyperplane constraints. For values C close to zero, points will be able to
             violate the hard-margin constraints more so, and sparsity in the w vector will be maximized. Default value
             is 1.0.
-            
+
         tol (float): Error tolerance to use in interior point method specified by `solver`. Default value is .001.
 
         solver (object): Solver to use for solving the above linear program.
@@ -48,7 +50,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             text output.
 
         debug (bool): Passed to the solver to print debug information. Default value is False.
-        
+
     Attributes:
         weights_ (ndarray of shape (n_features,)): Vector of weights, obtained by fitting the SSVM classifier
             via :py:meth:`SSVMClassifier.fit`, defining the normal vector to the separating hyperplane.
@@ -422,3 +424,112 @@ class L1SVM(BaseEstimator, ClassifierMixin):
                 return x.detach().type(tc.float64).to(cuda)
             else:
                 return tc.tensor(data=x, device=cuda, dtype=tc.float64)
+
+
+class SSVMSelect(SSVMClassifier):
+
+    def __init__(self,
+                 C: float = 1.0,
+                 tol: float = 0.001,
+                 solver: object = None,
+                 errorTrace: object = None,
+                 use_cuda: bool = False,
+                 verbosity: int = 0,
+                 debug: bool = False,
+                 jump_ratio: float = 5.0,
+                 n_features: int = None,
+                 show_plot: bool = True,
+                 ):
+
+        super(SSVMClassifier, self).__init__(C=C,
+                                             tol=tol,
+                                             solver=solver,
+                                             errorTrace=errorTrace,
+                                             use_cuda=use_cuda,
+                                             verbosity=verbosity,
+                                             debug=debug,
+                                             )
+
+        # set attributes
+        self.jump_ratio = jump_ratio
+        self.n_features = n_features
+        self.show_plot = show_plot
+        self.f_ranks = None
+
+    def fit(self, X, y):
+
+        # call super
+        super(SSVMClassifier, self).fit(X, y)
+
+        if self.show_plot:
+            self.plot_weights()
+
+        return self
+
+    def select_features(self):
+
+        # pull feature weights
+        f_weights = np.abs(self.weights_)
+
+        # sort the weights
+        S = np.argsort(-f_weights)
+        f_weights_sorted = f_weights[S]
+
+        # compute ranks
+        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S, columns=[["Ranks"]])
+
+        if self.n_features is None:
+            a = f_weights_sorted[:-1]
+            b = f_weights_sorted[1:]
+            f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
+            try:
+                id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
+                print("%d features selected!" % (id, ))
+                features = S[:id]
+            except IndexError:
+                print("Jump failed, no features selected, resorting to number of features provided by user...")
+                assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
+                features = S[:self.n_features]
+        else:
+            features = S[:self.n_features]
+
+        return features
+
+    def plot_weights(self):
+        # pull feature weights
+        f_weights = np.abs(self.weights_)
+
+        # sort the weights
+        S = np.argsort(-f_weights)
+        f_weights_sorted = f_weights[S]
+
+        # plot the weights
+        fig = plt.figure()
+        ax = plt.axes()
+        ax.semilogy(f_weights_sorted)
+
+        # set axis labels and titles
+        ax.set(xlabel='Features',
+               ylabel='|Weight|',
+               title='SSVM Weights')
+
+        # set font sizes
+        ax.set_title(ax.get_title(), fontsize=16)
+        ax.set_xlabel(ax.get_xlabel(), fontsize=18)
+        ax.set_ylabel(ax.get_ylabel(), fontsize=18)
+
+        return fig, ax
+
+    def transform(self, X, y=None):
+
+        # check for fit
+        check_is_fitted(self)
+
+        # check array
+        X = check_array(X)
+
+        # find top features
+        features = self.select_features()
+
+        # restrict data
+        return X[:, features]
