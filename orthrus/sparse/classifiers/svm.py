@@ -441,14 +441,14 @@ class SSVMSelect(SSVMClassifier):
                  show_plot: bool = True,
                  ):
 
-        super(SSVMClassifier, self).__init__(C=C,
-                                             tol=tol,
-                                             solver=solver,
-                                             errorTrace=errorTrace,
-                                             use_cuda=use_cuda,
-                                             verbosity=verbosity,
-                                             debug=debug,
-                                             )
+        super(SSVMSelect, self).__init__(C=C,
+                                         tol=tol,
+                                         solver=solver,
+                                         errorTrace=errorTrace,
+                                         use_cuda=use_cuda,
+                                         verbosity=verbosity,
+                                         debug=debug,
+                                         )
 
         # set attributes
         self.jump_ratio = jump_ratio
@@ -459,7 +459,7 @@ class SSVMSelect(SSVMClassifier):
     def fit(self, X, y):
 
         # call super
-        super(SSVMClassifier, self).fit(X, y)
+        super(SSVMSelect, self).fit(X, y)
 
         if self.show_plot:
             self.plot_weights()
@@ -476,7 +476,7 @@ class SSVMSelect(SSVMClassifier):
         f_weights_sorted = f_weights[S]
 
         # compute ranks
-        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S, columns=[["Ranks"]])
+        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S.reshape(-1, 1), columns=[["Ranks"]])
 
         if self.n_features is None:
             a = f_weights_sorted[:-1]
