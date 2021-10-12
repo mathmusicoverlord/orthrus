@@ -8,7 +8,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from orthrus.solvers.linear import LPNewton
 from orthrus.solvers.nonlinear import LPPrimalDualPy
-from orthrus.sparse.feature_selection.helper import get_correlates
 from copy import copy
 import ray
 
@@ -228,7 +227,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
                 pass
             else:
                 raise ValueError("Positive label provided is not in class labels.")
-            pred_labels = d.reshape(-1, )
+            pred_labels = d.reshape(-1, ).tolist()
             return pred_labels
 
         else:
@@ -238,8 +237,8 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             # map -1, 1 labels to original labels
             invLabelDict = {-1: self.classes_[0], 1: self.classes_[1]}
             pred_labels = [invLabelDict[sample] for sample in predicted]
-            self.pred_labels_ = np.array(pred_labels)
-            return self.pred_labels_
+            self.pred_labels_ = pred_labels
+            return pred_labels
 
     def decision_function(self, X):
         import numpy as np
@@ -440,31 +439,34 @@ class SSVMSelect(SSVMClassifier):
                  jump_ratio: float = 5.0,
                  n_features: int = None,
                  show_plot: bool = True,
-                 corr_threshold: float = None,
                  ):
 
-        super(SSVMSelect, self).__init__(C=C,
-                                         tol=tol,
-                                         solver=solver,
-                                         errorTrace=errorTrace,
-                                         use_cuda=use_cuda,
-                                         verbosity=verbosity,
-                                         debug=debug,
-                                         )
+        super(SSVMClassifier, self).__init__(C=C,
+                                             tol=tol,
+                                             solver=solver,
+                                             errorTrace=errorTrace,
+                                             use_cuda=use_cuda,
+                                             verbosity=verbosity,
+                                             debug=debug,
+                                             )
 
         # set attributes
         self.jump_ratio = jump_ratio
         self.n_features = n_features
         self.show_plot = show_plot
-        self.corr_threshold = corr_threshold
-        self.features = None
-        self.correlates = None
         self.f_ranks = None
 
     def fit(self, X, y):
 
         # call super
-        super(SSVMSelect, self).fit(X, y)
+        super(SSVMClassifier, self).fit(X, y)
+
+        if self.show_plot:
+            self.plot_weights()
+
+        return self
+
+    def select_features(self):
 
         # pull feature weights
         f_weights = np.abs(self.weights_)
@@ -474,50 +476,22 @@ class SSVMSelect(SSVMClassifier):
         f_weights_sorted = f_weights[S]
 
         # compute ranks
-        self.f_ranks = pd.DataFrame(index=S.reshape(-1,), data=np.arange(len(f_weights)), columns=["Ranks"])
-        self.f_ranks.sort_index(inplace=True)
-        self.f_ranks["absWeights"] = f_weights
+        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S, columns=[["Ranks"]])
 
-        # select the features
-        self.features = self.select_features(X)
-
-        # store plots
-        self.plot_weights()
-
-        return self
-
-    def select_features(self, X):
-
-        # pull feature weights
-        f_weights = np.abs(self.weights_)
-
-        # sort the weights
-        S = np.argsort(-f_weights)
-        f_weights_sorted = f_weights[S]
-
-        # locate high weight features
-        a = f_weights_sorted[:-1]
-        b = f_weights_sorted[1:]
-        f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
-        try:
-            id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
-            print("%d features selected!" % (id, ))
-            features = S[:id]
-            self.n_features = id
-        except IndexError:
-            print("Jump failed, no features selected, resorting to number of features provided by user...")
-            assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
+        if self.n_features is None:
+            a = f_weights_sorted[:-1]
+            b = f_weights_sorted[1:]
+            f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
+            try:
+                id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
+                print("%d features selected!" % (id, ))
+                features = S[:id]
+            except IndexError:
+                print("Jump failed, no features selected, resorting to number of features provided by user...")
+                assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
+                features = S[:self.n_features]
+        else:
             features = S[:self.n_features]
-
-
-        if self.corr_threshold is not None:
-            print("Generating correlated features using threshold: %0.2f..." % (self.corr_threshold,))
-            self.correlates = get_correlates(features, X, self.corr_threshold)
-            features = np.concatenate((features, self.correlates), axis=None)
-
-        # create column for selected feature
-        self.f_ranks["Selected"] = 0
-        self.f_ranks.iloc[features, 2] = 1
 
         return features
 
@@ -530,11 +504,9 @@ class SSVMSelect(SSVMClassifier):
         f_weights_sorted = f_weights[S]
 
         # plot the weights
-        fig = plt.figure(figsize=(15, 10))
+        fig = plt.figure()
         ax = plt.axes()
         ax.semilogy(f_weights_sorted)
-        #ax.scatter(np.arange(len(f_weights)), f_weights_sorted)
-        #ax.set_yscale('symlog')
 
         # set axis labels and titles
         ax.set(xlabel='Features',
@@ -546,10 +518,6 @@ class SSVMSelect(SSVMClassifier):
         ax.set_xlabel(ax.get_xlabel(), fontsize=18)
         ax.set_ylabel(ax.get_ylabel(), fontsize=18)
 
-        # plot
-        if self.show_plot:
-            plt.show()
-
         return fig, ax
 
     def transform(self, X, y=None):
@@ -558,7 +526,10 @@ class SSVMSelect(SSVMClassifier):
         check_is_fitted(self)
 
         # check array
-        X = np.array(X)
+        X = check_array(X)
+
+        # find top features
+        features = self.select_features()
 
         # restrict data
-        return X[:, self.features]
+        return X[:, features]
