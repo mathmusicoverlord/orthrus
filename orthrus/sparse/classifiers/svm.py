@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from orthrus.solvers.linear import LPNewton
 from orthrus.solvers.nonlinear import LPPrimalDualPy
+from orthrus.sparse.feature_selection.helper import get_correlates
 from copy import copy
 import ray
 
@@ -439,6 +440,7 @@ class SSVMSelect(SSVMClassifier):
                  jump_ratio: float = 5.0,
                  n_features: int = None,
                  show_plot: bool = True,
+                 corr_threshold: float = None,
                  ):
 
         super(SSVMSelect, self).__init__(C=C,
@@ -454,6 +456,8 @@ class SSVMSelect(SSVMClassifier):
         self.jump_ratio = jump_ratio
         self.n_features = n_features
         self.show_plot = show_plot
+        self.corr_threshold = corr_threshold
+        self.correlates = None
         self.f_ranks = None
 
     def fit(self, X, y):
@@ -493,12 +497,18 @@ class SSVMSelect(SSVMClassifier):
                 id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
                 print("%d features selected!" % (id, ))
                 features = S[:id]
+                self.n_features = id
             except IndexError:
                 print("Jump failed, no features selected, resorting to number of features provided by user...")
                 assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
                 features = S[:self.n_features]
         else:
             features = S[:self.n_features]
+
+        if self.corr_threshold is not None:
+            print("Generating correlated features using threshold: %0.2f..." % (self.corr_threshold,))
+            self.correlates = get_correlates(features, X, self.corr_threshold)
+            feaures = np.concatenate(features, self.correlates, axis=None)
 
         return features
 
