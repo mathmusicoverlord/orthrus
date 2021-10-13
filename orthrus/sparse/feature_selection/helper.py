@@ -2,8 +2,9 @@ import numpy as np
 import ray
 import copy
 from orthrus.core.helper import batch_jobs_
+from sklearn.preprocessing import StandardScaler
 from typing import  Callable
-def reduce_feature_set_size(ds, 
+def reduce_feature_set_size(ds,
                             features_dataframe, 
                             sample_ids,
                             attr:str,
@@ -687,6 +688,33 @@ def  get_top_95_features(file, attr, cutoff_fraction=0.05):
     features_c = features.loc[features[attr] > cutoff]
     return features_c
 
+def get_correlates(S, X, c):
+    """
+    This function takes a list of feature indices and a data matrix and returns the features from ``X`` which have
+    correlation in absolute at least ``c``.
+
+    Args:
+        S (array-like of shape (n_important_features,): Feature indices of featues to be correlated to.
+        X (array-like of shape (n_samples, n_features)): Data matrix with features.
+        c (float): Correlation threshold.
+
+    Returns:
+        (ndarray) : Correlated features.
+    """
+
+    # convert indices to bool
+    s = (np.array(S).reshape(-1, 1) == np.arange(X.shape[1])).any(axis=0)
+    T = np.where(~s)[0]
+
+    # compute the correlation matrix
+    C = np.corrcoef(X.T)
+    C = C[s, :]
+    C = C[:, ~s]
+
+    # threshold the correlations
+    C = np.abs(C) >= c
+    return T[C.any(axis=0)]
+
 def plot_feature_frequency(f_ranks, attr):
     import matplotlib.pyplot as plt
     ranked_feature_ids = rank_features_by_attribute(f_ranks, {'attr': attr, 'order': 'desc'})
@@ -705,23 +733,23 @@ from orthrus.core.pipeline import Transform
 from orthrus.core.dataset import DataSet
 class ReduceIFRFeatures(Transform):
     def __init__(self,
-                #  process: object,        
+                #  process: object,
                  supervised_attr:str,
-                 classifier, 
-                 scorer, 
+                 classifier,
+                 scorer,
                  ranking_method_handle,
                  ranking_method_args: dict,
                  parallel: bool = False,
                  verbosity: int = 1,
-                 partitioner=None, 
-                 start : int = 5, 
-                 end : int = 100, 
-                 step : int = 5, 
-                 verbose_frequency : int=10, 
-                 num_cpus_per_worker : float=1., 
+                 partitioner=None,
+                 start : int = 5,
+                 end : int = 100,
+                 step : int = 5,
+                 verbose_frequency : int=10,
+                 num_cpus_per_worker : float=1.,
                  num_gpus_per_worker : float=0.,
                  local_mode=False):
-        
+
         # init with Process class
         super(ReduceIFRFeatures, self).__init__(process=None,
                                         process_name='ReduceIFRFeatures',
@@ -745,25 +773,25 @@ class ReduceIFRFeatures(Transform):
         self.local_mode = local_mode
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
-        
+
         ds = self._preprocess(ds, **kwargs)
         features_df = kwargs['f_ranks']
 
         sample_ids =  self._extract_training_ids(ds, **kwargs)
-        results_ = reduce_feature_set_size(ds, 
-                            features_df, 
+        results_ = reduce_feature_set_size(ds,
+                            features_df,
                             sample_ids,
                             self.supervised_attr,
-                            self.classifier, 
-                            self.scorer, 
+                            self.classifier,
+                            self.scorer,
                             self.ranking_method_handle,
                             self.ranking_method_args,
-                            partitioner=self.partitioner, 
-                            start=self.start, 
-                            end=self.end, 
-                            step=self.step, 
-                            verbose_frequency=self.verbose_frequency, 
-                            num_cpus_per_worker = self.num_cpus_per_worker, 
+                            partitioner=self.partitioner,
+                            start=self.start,
+                            end=self.end,
+                            step=self.step,
+                            verbose_frequency=self.verbose_frequency,
+                            num_cpus_per_worker = self.num_cpus_per_worker,
                             num_gpus_per_worker = self.num_gpus_per_worker,
                             local_mode=self.local_mode
                             )
