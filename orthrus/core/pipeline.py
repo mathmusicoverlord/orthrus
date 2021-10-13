@@ -2279,7 +2279,7 @@ class Score(Process):
                 for level in levels:
                     # compute first level scores
                     fl_scores = scores.filter(regex='batch_' + level)
-                    if ~fl_scores.empty:
+                    if fl_scores.size > 0:
                         valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
                         fl_scores = fl_scores.loc[valid_score_type.values]
                         print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
