@@ -2,6 +2,8 @@ import numpy as np
 import ray
 import copy
 from orthrus.core.helper import batch_jobs_
+from sklearn.preprocessing import StandardScaler
+
 def reduce_feature_set_size(ds, 
                             features_dataframe, 
                             sample_ids,
@@ -688,3 +690,30 @@ def  get_top_95_features(file_path, attr, cutoff_fraction=0.05):
     cutoff = max_val * cutoff_fraction
     features_c = features.loc[features[attr] > cutoff]
     return features_c
+
+def get_correlates(S, X, c):
+    """
+    This function takes a list of feature indices and a data matrix and returns the features from ``X`` which have
+    correlation in absolute at least ``c``.
+
+    Args:
+        S (array-like of shape (n_important_features,): Feature indices of featues to be correlated to.
+        X (array-like of shape (n_samples, n_features)): Data matrix with features.
+        c (float): Correlation threshold.
+
+    Returns:
+        (ndarray) : Correlated features.
+    """
+
+    # convert indices to bool
+    s = (np.array(S).reshape(-1, 1) == np.arange(X.shape[1])).any(axis=0)
+    T = np.where(~s)[0]
+
+    # compute the correlation matrix
+    C = np.corrcoef(X.T)
+    C = C[s, :]
+    C = C[:, ~s]
+
+    # threshold the correlations
+    C = np.abs(C) >= c
+    return T[C.any(axis=0)]
