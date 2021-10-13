@@ -457,6 +457,7 @@ class SSVMSelect(SSVMClassifier):
         self.n_features = n_features
         self.show_plot = show_plot
         self.corr_threshold = corr_threshold
+        self.features = None
         self.correlates = None
         self.f_ranks = None
 
@@ -464,6 +465,9 @@ class SSVMSelect(SSVMClassifier):
 
         # call super
         super(SSVMSelect, self).fit(X, y)
+
+        # select the features
+        self.features = self.select_features(X)
 
         # pull feature weights
         f_weights = np.abs(self.weights_)
@@ -480,7 +484,7 @@ class SSVMSelect(SSVMClassifier):
 
         return self
 
-    def select_features(self):
+    def select_features(self, X):
 
         # pull feature weights
         f_weights = np.abs(self.weights_)
@@ -550,8 +554,5 @@ class SSVMSelect(SSVMClassifier):
         # check array
         X = np.array(X)
 
-        # find top features
-        features = self.select_features()
-
         # restrict data
-        return X[:, features]
+        return X[:, self.features]
