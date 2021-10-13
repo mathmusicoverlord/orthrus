@@ -2279,15 +2279,16 @@ class Score(Process):
                 for level in levels:
                     # compute first level scores
                     fl_scores = scores.filter(regex='batch_' + level)
-                    valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
-                    fl_scores = fl_scores.loc[valid_score_type.values]
-                    print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
-                    for score_type in fl_scores.index:
-                        print("\t%s:" % (score_type,))
-                        for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
-                            print("\t%s: %.2f%%" % (stat, score * 100))
+                    if ~fl_scores.empty:
+                        valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
+                        fl_scores = fl_scores.loc[valid_score_type.values]
+                        print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
+                        for score_type in fl_scores.index:
+                            print("\t%s:" % (score_type,))
+                            for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
+                                print("\t%s: %.2f%%" % (stat, score * 100))
+                            print()
                         print()
-                    print()
 
         return ds, results
 
