@@ -1944,7 +1944,7 @@ class Classify(Fit):
         # extract feature weights
         if self._f_weights_handle is not None:
             f_weights = pd.Series(index=ds.vardata.index,
-                                  data=eval("process." + self._f_weights_handle),
+                                  data=np.array(eval("process." + self._f_weights_handle)).reshape(-1,),
                                   name='_'.join([self.process_name, 'f_weights']))
 
             out.update({'f_weights': f_weights})

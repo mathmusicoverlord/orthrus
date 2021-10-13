@@ -461,6 +461,16 @@ class SSVMSelect(SSVMClassifier):
         # call super
         super(SSVMSelect, self).fit(X, y)
 
+        # pull feature weights
+        f_weights = np.abs(self.weights_)
+
+        # sort the weights
+        S = np.argsort(-f_weights)
+        f_weights_sorted = f_weights[S]
+
+        # compute ranks
+        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S.reshape(-1, 1), columns=[["Ranks"]])
+
         if self.show_plot:
             self.plot_weights()
 
@@ -474,9 +484,6 @@ class SSVMSelect(SSVMClassifier):
         # sort the weights
         S = np.argsort(-f_weights)
         f_weights_sorted = f_weights[S]
-
-        # compute ranks
-        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S.reshape(-1, 1), columns=[["Ranks"]])
 
         if self.n_features is None:
             a = f_weights_sorted[:-1]
@@ -504,9 +511,11 @@ class SSVMSelect(SSVMClassifier):
         f_weights_sorted = f_weights[S]
 
         # plot the weights
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15, 10))
         ax = plt.axes()
         ax.semilogy(f_weights_sorted)
+        #ax.scatter(np.arange(len(f_weights)), f_weights_sorted)
+        #ax.set_yscale('symlog')
 
         # set axis labels and titles
         ax.set(xlabel='Features',
@@ -518,6 +527,9 @@ class SSVMSelect(SSVMClassifier):
         ax.set_xlabel(ax.get_xlabel(), fontsize=18)
         ax.set_ylabel(ax.get_ylabel(), fontsize=18)
 
+        # plot
+        plt.show()
+
         return fig, ax
 
     def transform(self, X, y=None):
@@ -526,7 +538,7 @@ class SSVMSelect(SSVMClassifier):
         check_is_fitted(self)
 
         # check array
-        X = check_array(X)
+        X = np.array(X)
 
         # find top features
         features = self.select_features()
