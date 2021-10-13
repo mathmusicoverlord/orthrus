@@ -13,7 +13,6 @@ from pandas import DataFrame, Series
 from orthrus.core.dataset import DataSet
 from orthrus.core.helper import generate_save_path
 from orthrus.core.helper import save_object, load_object
-from sklearn.metrics import classification_report
 import warnings
 from copy import copy, deepcopy
 import ray
@@ -2275,25 +2274,21 @@ class Score(Process):
             scores = self._collapse_class_pred_scores()
 
             # check the dtype
-            try:
-                if type(np.array(scores).reshape(-1,)[0:1].item()) == float:
-                    levels = ['\d+_\D', '\d+_\d+_\D']
-                    for level in levels:
-                        # compute first level scores
-                        fl_scores = scores.filter(regex='batch_' + level)
-                        if fl_scores.size > 0:
-                            valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
-                            fl_scores = fl_scores.loc[valid_score_type.values]
-                            print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
-                            for score_type in fl_scores.index:
-                                print("\t%s:" % (score_type,))
-                                for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
-                                    print("\t%s: %.2f%%" % (stat, score * 100))
-                                print()
+            if type(np.array(scores).reshape(-1,)[0].item()) == float:
+                levels = ['\d_\D', '\d_\d_\D']
+                for level in levels:
+                    # compute first level scores
+                    fl_scores = scores.filter(regex='batch_' + level)
+                    if ~fl_scores.empty:
+                        valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
+                        fl_scores = fl_scores.loc[valid_score_type.values]
+                        print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
+                        for score_type in fl_scores.index:
+                            print("\t%s:" % (score_type,))
+                            for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
+                                print("\t%s: %.2f%%" % (stat, score * 100))
                             print()
-            except AttributeError:
-                pass
-
+                        print()
 
         return ds, results
 
@@ -2994,214 +2989,6 @@ class Pipeline(Process):
                     # update result from next result
                     self._update_result(result, next_result)
 
-
-class Report(Score):
-    """
-    :py:class:`Process` subclass used to generate a classification report. See sklearn classification_report.
-
-    Parameters:
-        parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
-            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
-            can be done.
-
-        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
-            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
-            :py:class:`Process` instance.
-
-        score_args (dict): Keyword arguments passed to :py:attr:`Score.process()`.
-
-        pred_type (str): Can be either "class_labels", "class_scores", "reg_scores", currently. It indicates the
-            type predictions made, i.e., classification labels, classification scores, or regression scores. The
-            default is "class_labels".
-
-        sample_weight_attr (str): Attribute in the metadata of the dataset you wish to weight the scores by, e.g.,
-            misclassifying a sick sample might be more costly than misclassifying a healthy sample.
-
-        infer_class_labels_on_output (bool): If ``True`` the process will attempt to assign labels to the output score.
-            For example if one uses a confusion matrix the process will attempt to assign the class labels given in
-            :py:attr:`Score.classes` to the rows and columns for indexing.
-
-        classes (list): Classes used for classification labels. You can provide a subset of classification labels
-            to look at scores relative to fewer classes. The default is None.
-
-    Attributes:
-         parallel (bool): Flag indicating whether or not to use `ray <https://ray.io/>`_'s parallel processing.
-            Default is False. :py:func:`ray.init` must be called to initiate the ray cluster before any running
-            can be done.
-
-        verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher
-            the verbosity the larger the text output. Default is 1, indicating the standard text output with a
-            :py:class:`Process` instance.
-
-        score_args (dict): Keyword arguments passed to :py:attr:`Score.process()`.
-
-        pred_type (str): Can be either "class_labels", "class_scores", "reg_scores", currently. It indicates the
-            type predictions made, i.e., classification labels, classification scores, or regression scores. The
-            default is "class_labels".
-
-        _sample_weight_attr (str): Attribute in the metadata of the dataset you wish to weight the scores by, e.g.,
-            misclassifying a sick sample might be more costly than misclassifying a healthy sample.
-
-        _infer_class_labels_on_output (bool): If ``True`` the process will attempt to assign labels to the output score.
-            For example if one uses a confusion matrix the process will attempt to assign the class labels given in
-            :py:attr:`Score.classes` to the rows and columns for indexing.
-
-        _classes (list): Classes used for classification labels. You can provide a subset of classification labels
-            to look at scores relative to fewer classes. The default is None.
-
-        run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
-            finished, a value of 1 indicated the process has finished.
-
-        results_ (dict of dicts): The results of the run process. The keys of the dictionary indicates the batch results
-            for a given batch. For each batch there is a dictionary of results with keys indicating the result type, e.g,
-            training/validation/test labels (``tvt_labels``), classification labels (``class_labels``), etc...
-            A :py:class:`Score` instance, after it runs, outputs the following results per batch:
-
-            * class_pred_scores (Series): Scores generated by :py:attr:`Score.process` on classification results
-              generated by :py:class:`Classify`. The index of the ``Series`` is given by the labels in
-              ``batch['tvt_labels']``, e.g., "Train", "Valid", "Test". The values of the ``Series`` are the associated
-              scores for each sample type: "Train", "Valid", "Test".
-
-            * reg_pred_scores (Series): Scores generated by :py:attr:`Score.process` on regression results
-              generated by :py:class:`Regress`. The index of the ``Series`` is given by the labels in
-              ``batch['tvt_labels']``, e.g., "Train", "Valid", "Test". The values of the ``Series`` are the associated
-              scores for each sample type: "Train", "Valid", "Test".
-
-    Examples:
-            >>> # imports
-            >>> import os
-            >>> from orthrus.core.pipeline import Score, Classify, Partition
-            >>> from sklearn.ensemble import RandomForestClassifier as RFC
-            >>> from sklearn.model_selection import StratifiedShuffleSplit
-            >>> from sklearn.metrics import balanced_accuracy_score
-            >>> from orthrus.core.dataset import load_dataset
-            ...
-            >>> # load dataset
-            >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
-            ...                                'test_data/Iris/Data/iris.ds'))
-            ...
-            >>> # define 80-20 train/test partition
-            >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
-            ...                                                    random_state=113,
-            ...                                                    train_size=.8),
-            ...                     process_name='80-20-tr-tst',
-            ...                     verbosity=1,
-            ...                     split_attr ='species',
-            ...                     )
-            ...
-            >>> # define random forest classify process
-            >>> rf = Classify(process=RFC(),
-            ...                process_name='RF',
-            ...                class_attr='species',
-            ...                verbosity=1)
-            ...
-            >>> # define balance accuracy score process
-            >>> bsr = Score(process=balanced_accuracy_score,
-            ...             process_name='bsr',
-            ...             pred_attr='species',
-            ...             verbosity=2)
-            ...
-            >>> # run partition and classification processes
-            >>> ds, results_0 = shuffle.run(ds)
-            >>> ds, results_1 = rf.run(ds, results_0)
-            ...
-            >>> # carry over tvt_labels, use Pipeline for chaining processes instead!
-            >>> [results_1[batch].update(results_0[batch]) for batch in results_1]
-            ...
-            >>> # score classification results
-            >>> ds, results = bsr.run(ds, results_1)
-            -----------
-            bsr scores:
-            Train: 100.00%
-            Test: 96.67%
-    """
-
-    def __init__(self,
-                 pred_attr: Union[str, list],
-                 parallel: bool = False,
-                 verbosity: int = 1,
-                 pred_type: str = 'class_labels',
-                 sample_weight_attr: str = None,
-                 infer_class_labels_on_output: bool = True,
-                 classes: list = None,
-                 ):
-
-        process = classification_report
-        process_name = "report"
-
-        # init with Process class
-        super(Score, self).__init__(process=process,
-                                    process_name=process_name,
-                                    parallel=parallel,
-                                    verbosity=verbosity,
-                                    )
-        # parameters
-        self.pred_type = pred_type
-        self.pred_attr = pred_attr
-        self.score_args = dict(output_dict=True)
-
-        # private attributes
-        self._classes = classes
-        self._sample_weight_attr = sample_weight_attr
-        self._infer_class_labels_on_output = infer_class_labels_on_output
-        self._labels += ["pred_type", "pred_attr", "score_args"]
-
-    def report(self):
-
-        # generate scores
-        scores = self._collapse_class_pred_scores()
-
-        # generate levels
-        levels = ['\d+_\D', '\d+_\d+_\D']
-
-        # initialize output
-        rep = dict()
-
-        # extract score names
-        score = scores.iloc[0,0]
-        score_prefix = score.index
-        score_dict = dict()
-        for key in score_prefix:
-            try:
-                score_dict[key] = list(score[key].keys())
-            except AttributeError:
-                score_dict[key] = []
-
-        for level in levels:
-            # compute first level scores
-            fl_scores = scores.filter(regex='batch_' + level)
-            fl_scores = fl_scores.dropna()
-
-            # fill in dataframe
-            if level == '\d+_\D':
-                level_type = "train_test"
-            elif level == '\d+_\d+_\D':
-                level_type = "train_valid_test"
-            rep[level_type] = pd.DataFrame(index=fl_scores.columns)
-
-            # loop through scores
-            for score_type in fl_scores.index:
-
-                # grab type of scores
-                s = fl_scores.loc[score_type]
-
-                for key in score_dict.keys():
-                    if score_dict[key] == []:
-                        # fill in columns
-                        col = "_".join([score_type.capitalize(), key.capitalize()])
-                        rep[level_type][col] = pd.NA
-                        for batch in fl_scores.columns:
-                            rep[level_type].loc[batch, col] = s[batch][key]
-                    else:
-                        for metric in score_dict[key]:
-
-                            # fill in columns
-                            col = "_".join([score_type.capitalize(), key.capitalize(), metric.capitalize()])
-                            rep[level_type][col] = pd.NA
-                            for batch in fl_scores.columns:
-                                rep[level_type].loc[batch, col] = s[batch][key][metric]
-                                
-        return rep
 
 # TODO: Add Regress Class
 
