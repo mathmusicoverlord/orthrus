@@ -53,7 +53,7 @@ def generate_iterable_for_ray(script):
         else:
             value_remote = deepcopy(value)
             value_no_remote = deepcopy(value)
-            len_iters = len(list(deepcopy(value)))
+            len_iters.append(len(list(deepcopy(value))))
 
         options.append(value_remote)
         options_no_remote.append(value_no_remote)

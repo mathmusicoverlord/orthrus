@@ -2,8 +2,7 @@ import numpy as np
 import ray
 import copy
 from orthrus.core.helper import batch_jobs_
-from sklearn.preprocessing import StandardScaler
-
+from typing import  Callable
 def reduce_feature_set_size(ds, 
                             features_dataframe, 
                             sample_ids,
@@ -20,6 +19,7 @@ def reduce_feature_set_size(ds,
                             verbose_frequency : int=10, 
                             num_cpus_per_worker : float=1., 
                             num_gpus_per_worker : float=0.,
+                            local_mode=False,
                             **kwargs):
     """
     This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
@@ -175,7 +175,7 @@ def reduce_feature_set_size(ds,
         list_of_arguments.append(arguments)
 
     finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
     results = np.zeros((len(list_of_arguments), 2))
 
     for i, process in enumerate(finished_processes):
@@ -183,7 +183,7 @@ def reduce_feature_set_size(ds,
         results[i, 0] = feature_set_length
         results[i, 1] = score
     
-    ray.shutdown()
+    # ray.shutdown()
     #find the best n, i.e. smallest n that produced largest score
     results = results[results[:,1].argsort()[::-1]]
     max_bsr = np.max(results[:, 1])
@@ -365,7 +365,7 @@ def sliding_window_classification_on_ranked_features(ds,
         results[i, 0] = min_feature_index
         results[i, 1] = score
     results = results[results[:,0].argsort()]
-    ray.shutdown()
+    # ray.shutdown()
     
     return results
 
@@ -394,17 +394,10 @@ def run_single_classification_experiment_(model,
                 )
 
     if test_sample_ids is not None:
-        #code duplication. make it a function!
-        try:
-            data = ds.data[ds.vardata.index[test_sample_ids]]
-        except IndexError:
-            try:
-                data = ds.data[test_sample_ids]
-            except KeyError:
-                data = ds.data[ds.data.columns[test_sample_ids]]
+        ds = ds.slice_dataset(feature_ids=features, sample_ids=test_sample_ids)
 
-        data = data[features].values
-        labels = ds.metadata[attr].loc[test_sample_ids]
+        data = ds.data.values
+        labels = ds.metadata[attr]
 
         scores = []
         for classifier in classification_result['classifiers'].values:
@@ -672,16 +665,19 @@ def get_batch_correction_matric_for_ranked_features(ds,
         results[i, 0] = n_features - n
         results[i, 1] = rejection_rate
     
-    ray.shutdown()
+    # ray.shutdown()
     
     #sort results based on the first column: number of ranked features
     results = results[results[:,0].argsort()]
 
     return results
 
-def  get_top_95_features(file_path, attr, cutoff_fraction=0.05):
-    import orthrus.core.helper as helper
-    result = helper.load_object(file_path)
+def  get_top_95_features(file, attr, cutoff_fraction=0.05):
+    from orthrus.core.helper import load_object
+    if type(file) == str:
+        result = load_object(file)
+    else:
+        result = file
     ranking_method_args = {'attr': attr, 'order': 'desc'}
     ranked_feature_ids = rank_features_by_attribute(result['f_results'], ranking_method_args)
 
@@ -691,29 +687,95 @@ def  get_top_95_features(file_path, attr, cutoff_fraction=0.05):
     features_c = features.loc[features[attr] > cutoff]
     return features_c
 
-def get_correlates(S, X, c):
-    """
-    This function takes a list of feature indices and a data matrix and returns the features from ``X`` which have
-    correlation in absolute at least ``c``.
+def plot_feature_frequency(f_ranks, attr):
+    import matplotlib.pyplot as plt
+    ranked_feature_ids = rank_features_by_attribute(f_ranks, {'attr': attr, 'order': 'desc'})
+    f_ranks = f_ranks.loc[ranked_feature_ids]
+    f_ranks = f_ranks.loc[f_ranks[attr] > 0]
+    fig, axs = plt.subplots(1,1)
+    axs.plot(np.arange(len(f_ranks)), f_ranks[attr].values)
+    axs.set_ylabel("Frequency")
+    axs.set_xlabel("Feature index")
+    # axs.set_title(labels[tranfrom_id])
+    plt.show()
 
-    Args:
-        S (array-like of shape (n_important_features,): Feature indices of featues to be correlated to.
-        X (array-like of shape (n_samples, n_features)): Data matrix with features.
-        c (float): Correlation threshold.
 
-    Returns:
-        (ndarray) : Correlated features.
-    """
 
-    # convert indices to bool
-    s = (np.array(S).reshape(-1, 1) == np.arange(X.shape[1])).any(axis=0)
-    T = np.where(~s)[0]
+from orthrus.core.pipeline import Transform
+from orthrus.core.dataset import DataSet
+class ReduceIFRFeatures(Transform):
+    def __init__(self,
+                #  process: object,        
+                 supervised_attr:str,
+                 classifier, 
+                 scorer, 
+                 ranking_method_handle,
+                 ranking_method_args: dict,
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 partitioner=None, 
+                 start : int = 5, 
+                 end : int = 100, 
+                 step : int = 5, 
+                 verbose_frequency : int=10, 
+                 num_cpus_per_worker : float=1., 
+                 num_gpus_per_worker : float=0.,
+                 local_mode=False):
+        
+        # init with Process class
+        super(ReduceIFRFeatures, self).__init__(process=None,
+                                        process_name='ReduceIFRFeatures',
+                                        parallel=False,
+                                        verbosity=verbosity,
+                                        )
+        self.supervised_attr = supervised_attr
+        self.classifier = classifier
+        self.scorer = scorer
+        self.ranking_method_handle = ranking_method_handle
+        self.ranking_method_args = ranking_method_args
+        self.parallel = parallel
+        self.verbosity = verbosity
+        self.partitioner = partitioner
+        self.start  = start
+        self.end = end
+        self.step = step
+        self.verbose_frequency = verbose_frequency
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+        self.local_mode = local_mode
 
-    # compute the correlation matrix
-    C = np.corrcoef(X.T)
-    C = C[s, :]
-    C = C[:, ~s]
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+        
+        ds = self._preprocess(ds, **kwargs)
+        features_df = kwargs['f_ranks']
 
-    # threshold the correlations
-    C = np.abs(C) >= c
-    return T[C.any(axis=0)]
+        sample_ids =  self._extract_training_ids(ds, **kwargs)
+        results_ = reduce_feature_set_size(ds, 
+                            features_df, 
+                            sample_ids,
+                            self.supervised_attr,
+                            self.classifier, 
+                            self.scorer, 
+                            self.ranking_method_handle,
+                            self.ranking_method_args,
+                            partitioner=self.partitioner, 
+                            start=self.start, 
+                            end=self.end, 
+                            step=self.step, 
+                            verbose_frequency=self.verbose_frequency, 
+                            num_cpus_per_worker = self.num_cpus_per_worker, 
+                            num_gpus_per_worker = self.num_gpus_per_worker,
+                            local_mode=self.local_mode
+                            )
+        results_['transform'] = self._generate_transform(self, results_['reduced_feature_ids'])
+        return results_
+    # def _fit_transform(self, ds: DataSet, **kwargs) -> Tuple[object, DataSet]:
+
+    def _generate_transform(self, process: object, reduced_feature_ids) -> Callable:
+
+        # define transform
+        def transform(ds: DataSet):
+            ds_new = ds.slice_dataset(feature_ids=reduced_feature_ids)
+            return ds_new
+
+        return transform

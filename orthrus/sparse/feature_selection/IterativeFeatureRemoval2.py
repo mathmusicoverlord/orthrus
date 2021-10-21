@@ -128,7 +128,7 @@ class IFR:
             >>> result = x.feature_select(ifr,
                         attrname,
                         selector_name='IFR',
-                        f_results_handle='results_',
+                        f_results_handle='results',
                         append_to_meta=False,
                         )
     
@@ -358,7 +358,31 @@ class IFR:
 
     @ray.remote
     def select_features_for_data_partition(self, train_data, validation_data, train_labels, validation_labels):
-        _, n = train_data.shape
+        n_original_train_samples, n = train_data.shape
+
+        from imblearn.over_sampling import SMOTE
+        labels, counts = np.unique(np.array(train_labels), return_counts=True)
+        sm = SMOTE({labels[0]:50, labels[1]: 50}, k_neighbors=2)
+        
+        train_data, train_labels = sm.fit_resample(train_data, train_labels)
+      
+        #resample original number of training samples from surrogate data
+        x_train = np.empty((n_original_train_samples, n))
+        y_train = np.empty((n_original_train_samples))
+
+        i = 0
+        for label, count in zip(labels,counts):
+            idxs = np.where(train_labels==label)[0]
+            np.random.shuffle(idxs)
+            idxs = idxs[:count]
+            x_train[i:i+count] = train_data[idxs, :]
+            y_train[i:i+count] = train_labels[idxs]
+            i += count
+
+        assert np.linalg.matrix_rank(train_data) == n_original_train_samples, 'rank of subsampled matrix is less than %d'%n_original_train_samples
+        train_data = x_train
+        train_labels = y_train
+
         list_of_features_for_curr_fold = np.array([], dtype=np.int64)
         list_of_weights_for_curr_fold = np.array([], dtype=np.int64)  
         list_of_selection_iterations_for_current_fold = []
@@ -373,6 +397,7 @@ class IFR:
         diagnostic_info_dictionary = {}
         self._initialize_diagnostic_dictionary(diagnostic_info_dictionary)
         exit_reason = "max_iters"
+        num_selected_features = np.array([-1] * 10)
         for i in range(self.max_iters):
             if self.verbosity > 1:
                 print("=====================================================")
@@ -504,9 +529,23 @@ class IFR:
                 break
 
             count += 1
+
             #check if the number of selected features is greater than the cap
-            # if count > int(self.max_features_per_iter_ratio * train_data.shape[0]):
-            if count >= train_data.shape[0] - 1:
+            if count < n_original_train_samples -1:
+                #select features: order is list of sorted features
+                print('selected less features than max features cutoff')
+                selected = order[:count]
+            else:
+                print('Selected features more than cutoff. Picking random feature.')
+                idx = np.random.randint(count)
+                selected = order[idx:idx+1]
+
+            num_selected_features = np.roll(num_selected_features, -1)
+            num_selected_features[-1] = count
+
+            last_ten_same = np.unique(num_selected_features).shape[0] == 1
+            if count > n_original_train_samples or last_ten_same:
+
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
                     score_train,
                     score_validation,
@@ -516,14 +555,12 @@ class IFR:
                     None)
                 exit_reason = "max_features_per_iter_breached"
                 if self.verbosity>1:
-                    print('More features selected (%d) than the cutoff (%d)'%(count, train_data.shape[0]))
+                    print('%d features selected, when training data has %d samples('%(count, train_data.shape[0]-1))
                     print("Discarding iteration..")
                 
                 break
+ 
 
-            
-            #select features: order is list of sorted features
-            selected = order[:count]
 
             if self.verbosity>1:
                 print("\nSelected features on this iteration:")
@@ -647,8 +684,8 @@ class IFR:
         
         for idx in idxs:
             for j in range(len(weight_ratios[idx])):
-                axs[1][2].plot(weight_ratios[idx][j][:100])
-                axs[1][3].plot(sorted_abs_weights[idx][j][:100])
+                axs[1][2].plot(weight_ratios[idx][j][:20])
+                axs[1][3].plot(sorted_abs_weights[idx][j][:20])
         axs[1][2].set_ylabel('weight ratios')
         axs[1][3].set_ylabel('sorted absolute weights')
 
