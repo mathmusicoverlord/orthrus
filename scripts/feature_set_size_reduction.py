@@ -55,10 +55,6 @@ sample_ids_validation = script_args.get('SAMPLE_IDS_VALIDATION', default_val(exp
 num_cpus_per_worker = script_args.get('NUM_CPUS_PER_WORKER', default_val(exp_params, 'NUM_CPUS_PER_WORKER', 1))
 num_gpus_per_worker = script_args.get('NUM_GPUS_PER_WORKER', default_val(exp_params, 'NUM_GPUS_PER_WORKER', 0))
 
-if sample_ids_validation is None:
-    print('sample_ids_validation not defined in the params file. Using sample_ids_validation = sample_ids instead.')
-    sample_ids_validation = sample_ids
-
 
 def run(ds, 
         feauture_selection_results_file_name, 

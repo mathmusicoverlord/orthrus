@@ -35,7 +35,7 @@ ds = script_args.get('DATASET', exp_params.DATASET)
 feature_selector = script_args.get('FEATURE_SELECTOR',
                                     default_val(exp_params, 'FEATURE_SELECTOR'))
 f_results_handle = script_args.get('RESULTS_HANDLE',
-                                    default_val(exp_params, 'FEATURE_SELECTION_RESULTS_HANDLE'))
+                                    default_val(exp_params, 'FEATURE_SELECTION_RESULTS_HANDLE', 'results_'))
 
 ## optional script params
 sample_ids = script_args.get('SAMPLE_IDS', default_val(exp_params, 'SAMPLE_IDS'))
