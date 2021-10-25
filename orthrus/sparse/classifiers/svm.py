@@ -466,9 +466,6 @@ class SSVMSelect(SSVMClassifier):
         # call super
         super(SSVMSelect, self).fit(X, y)
 
-        # select the features
-        self.features = self.select_features(X)
-
         # pull feature weights
         f_weights = np.abs(self.weights_)
 
@@ -477,10 +474,15 @@ class SSVMSelect(SSVMClassifier):
         f_weights_sorted = f_weights[S]
 
         # compute ranks
-        self.f_ranks = pd.DataFrame(index=np.arange(len(f_weights)), data=S.reshape(-1, 1), columns=[["Ranks"]])
+        self.f_ranks = pd.DataFrame(index=S.reshape(-1,), data=np.arange(len(f_weights)), columns=["Ranks"])
+        self.f_ranks.sort_index(inplace=True)
+        self.f_ranks["absWeights"] = f_weights
 
-        if self.show_plot:
-            self.plot_weights()
+        # select the features
+        self.features = self.select_features(X)
+
+        # store plots
+        self.plot_weights()
 
         return self
 
@@ -493,26 +495,29 @@ class SSVMSelect(SSVMClassifier):
         S = np.argsort(-f_weights)
         f_weights_sorted = f_weights[S]
 
-        if self.n_features is None:
-            a = f_weights_sorted[:-1]
-            b = f_weights_sorted[1:]
-            f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
-            try:
-                id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
-                print("%d features selected!" % (id, ))
-                features = S[:id]
-                self.n_features = id
-            except IndexError:
-                print("Jump failed, no features selected, resorting to number of features provided by user...")
-                assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
-                features = S[:self.n_features]
-        else:
+        # locate high weight features
+        a = f_weights_sorted[:-1]
+        b = f_weights_sorted[1:]
+        f_ratios = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
+        try:
+            id = np.where(f_ratios > self.jump_ratio)[0][0] + 1
+            print("%d features selected!" % (id, ))
+            features = S[:id]
+            self.n_features = id
+        except IndexError:
+            print("Jump failed, no features selected, resorting to number of features provided by user...")
+            assert self.n_features is not None, "User did not provide the number of top features and the jump failed. Aborting feature selection!"
             features = S[:self.n_features]
+
 
         if self.corr_threshold is not None:
             print("Generating correlated features using threshold: %0.2f..." % (self.corr_threshold,))
             self.correlates = get_correlates(features, X, self.corr_threshold)
-            feaures = np.concatenate(features, self.correlates, axis=None)
+            features = np.concatenate((features, self.correlates), axis=None)
+
+        # create column for selected feature
+        self.f_ranks["Selected"] = 0
+        self.f_ranks.iloc[features, 2] = 1
 
         return features
 
@@ -542,7 +547,8 @@ class SSVMSelect(SSVMClassifier):
         ax.set_ylabel(ax.get_ylabel(), fontsize=18)
 
         # plot
-        plt.show()
+        if self.show_plot:
+            plt.show()
 
         return fig, ax
 
