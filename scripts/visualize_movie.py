@@ -7,6 +7,7 @@ if __name__ == '__main__':
     import argparse
     import os
     import cv2
+    import imageio
     import matplotlib.pyplot as plt
 
     # command line arguments
@@ -39,6 +40,11 @@ if __name__ == '__main__':
                         type=int,
                         default=10,
                         help='Frames per second in the output movie.')
+
+    parser.add_argument('--format',
+                        type=str,
+                        default=".mp4",
+                        help="Format of the movie file, e.g., .mp4, .gif, etc..")
 
 
     args = parser.parse_args()
@@ -96,7 +102,7 @@ if __name__ == '__main__':
         backend_args = dict(palette=palette, alpha=.7, s=200)
 
     # generate video directory
-    video_name = '_'.join([ds.name, exp_name, embedding.__str__().split('(')[0].lower(), class_attr.lower()])
+    video_name = '_'.join([embedding.__str__().split('(')[0].lower(), class_attr.lower(), args.format])
     video_dir = os.path.join(fig_dir, video_name)
     os.makedirs(video_dir, exist_ok=True)
     ds.path = video_dir
@@ -107,7 +113,7 @@ if __name__ == '__main__':
     for num_features in range(0, len(feature_ids), args.increment):
 
         # check the number of features is above the dimension
-        if num_features > args.dim:
+        if num_features >= args.dim:
             frame_number = frame_number + 1
             print(r"Generating frame number %d..." % (frame_number,))
 
@@ -135,14 +141,21 @@ if __name__ == '__main__':
     height, width, layers = frame.shape
 
     if save_name is None:
-        video = cv2.VideoWriter(os.path.join(video_dir, 'movie.mp4'),
-                                cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
+        save_path = os.path.join(video_dir, 'movie' + args.format)
     else:
-        video = cv2.VideoWriter(os.path.join(video_dir, save_name + '.mp4'),
+        save_path = s.path.join(video_dir, save_name + args.format)
+
+    if args.format == ".gif":
+        images = [imageio.imread(os.path.join(video_dir, image)) for image in images]
+        imageio.mimsave(save_path, images, 'GIF')
+
+    elif args.format == ".mp4":
+
+        video = cv2.VideoWriter(save_path,
                                 cv2.VideoWriter_fourcc(*'mp4v'), args.fps, (width, height))
 
-    for image in images:
-        video.write(cv2.imread(os.path.join(video_dir, image)))
+        for image in images:
+            video.write(cv2.imread(os.path.join(video_dir, image)))
 
-    cv2.destroyAllWindows()
-    video.release()
+        cv2.destroyAllWindows()
+        video.release()
