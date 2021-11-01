@@ -147,6 +147,7 @@ if __name__ == '__main__':
 
     if args.format == ".gif":
         images = [imageio.imread(os.path.join(video_dir, image)) for image in images]
+        images =  [images[0]]*5 + images + [images[-1]]*10
         imageio.mimsave(save_path, images, 'GIF')
 
     elif args.format == ".mp4":
