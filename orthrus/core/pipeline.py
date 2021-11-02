@@ -1071,7 +1071,9 @@ class Transform(Fit):
         retain_f_ids (bool): Flag indicating whether or not to retain the original feature labels. For example,
             some transforms may just transform each individual feature and we would like to keep the name of that
             feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
-            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``.
+            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``
+
+        new_f_ids (list): New list of feature ids to replace to original feature ids. Optional.
 
         run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
             finished, a value of 1 indicated the process has finished.
@@ -1137,6 +1139,7 @@ class Transform(Fit):
                  parallel: bool = False,
                  verbosity: int = 1,
                  retain_f_ids: bool = False,
+                 new_f_ids: list = None,
                  fit_handle: str = 'fit',
                  transform_handle: str = 'transform',
                  fit_transform_handle: str = 'fit_transform',
@@ -1156,6 +1159,7 @@ class Transform(Fit):
 
         # set parameters
         self.retain_f_ids = retain_f_ids
+        self.new_f_ids = new_f_ids
         self.transform_args = transform_args
 
         # set private attributes
@@ -1262,10 +1266,13 @@ class Transform(Fit):
                     raise ValueError("Transform changes the dimension of the data and therefore cannot retain"
                                      " the original feature ids in the new dataset!")
             else:
+                if self.new_f_ids is None:
+                    columns = ['_'.join([self.process_name, str(i)]) for i in range(data_new.shape[1])]
+                else:
+                    columns = self.new_f_ids
+                    
                 data_new = pd.DataFrame(data=data_new, index=ds.data.index,
-                                        columns=['_'.join([self.process_name, str(i)]) for i in
-                                                 range(data_new.shape[1])])
-
+                                        columns=columns)
                 # check if features are the same after transformation and use original feature ids for columns
                 ds_new = DataSet(data=data_new, metadata=ds.metadata)
 
@@ -1937,7 +1944,7 @@ class Classify(Fit):
         # extract feature weights
         if self._f_weights_handle is not None:
             f_weights = pd.Series(index=ds.vardata.index,
-                                  data=eval("process." + self._f_weights_handle),
+                                  data=np.array(eval("process." + self._f_weights_handle)).reshape(-1,),
                                   name='_'.join([self.process_name, 'f_weights']))
 
             out.update({'f_weights': f_weights})
@@ -2267,22 +2274,25 @@ class Score(Process):
             scores = self._collapse_class_pred_scores()
 
             # check the dtype
-            if type(np.array(scores).reshape(-1,)[0].item()) == float:
-                levels = ['\d_\D', '\d_\d_\D']
-                for level in levels:
-                    # compute first level scores
-                    fl_scores = scores.filter(regex='batch_' + level)
-                    if fl_scores.size != 0:
-                        
-                        valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
-                        fl_scores = fl_scores.loc[valid_score_type.values]
-                        print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
-                        for score_type in fl_scores.index:
-                            print("\t%s:" % (score_type,))
-                            for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
-                                print("\t%s: %.2f%%" % (stat, score * 100))
+            try:
+                if type(np.array(scores).reshape(-1,)[0].item()) == float:
+                    levels = ['\d_\D', '\d_\d_\D']
+                    for level in levels:
+                        # compute first level scores
+                        fl_scores = scores.filter(regex='batch_' + level)
+                        if fl_scores.size > 0:
+                            valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
+                            fl_scores = fl_scores.loc[valid_score_type.values]
+                            print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
+                            for score_type in fl_scores.index:
+                                print("\t%s:" % (score_type,))
+                                for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
+                                    print("\t%s: %.2f%%" % (stat, score * 100))
+                                print()
                             print()
-                        print()
+            except AttributeError:
+                pass
+
 
         return ds, results
 
