@@ -2274,21 +2274,25 @@ class Score(Process):
             scores = self._collapse_class_pred_scores()
 
             # check the dtype
-            if type(np.array(scores).reshape(-1,)[0].item()) == float:
-                levels = ['\d_\D', '\d_\d_\D']
-                for level in levels:
-                    # compute first level scores
-                    fl_scores = scores.filter(regex='batch_' + level)
-                    if fl_scores.size > 0:
-                        valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
-                        fl_scores = fl_scores.loc[valid_score_type.values]
-                        print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
-                        for score_type in fl_scores.index:
-                            print("\t%s:" % (score_type,))
-                            for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
-                                print("\t%s: %.2f%%" % (stat, score * 100))
+            try:
+                if type(np.array(scores).reshape(-1,)[0].item()) == float:
+                    levels = ['\d_\D', '\d_\d_\D']
+                    for level in levels:
+                        # compute first level scores
+                        fl_scores = scores.filter(regex='batch_' + level)
+                        if fl_scores.size > 0:
+                            valid_score_type = ~fl_scores.apply(lambda x: pd.unique(x)[0], axis=1).isna()
+                            fl_scores = fl_scores.loc[valid_score_type.values]
+                            print("Batches %s:" % ('/'.join(fl_scores.index.tolist())))
+                            for score_type in fl_scores.index:
+                                print("\t%s:" % (score_type,))
+                                for stat, score in self._compute_stats(fl_scores.loc[score_type]).items():
+                                    print("\t%s: %.2f%%" % (stat, score * 100))
+                                print()
                             print()
-                        print()
+            except AttributeError:
+                pass
+
 
         return ds, results
 

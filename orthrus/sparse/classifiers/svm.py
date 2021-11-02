@@ -228,7 +228,7 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
                 pass
             else:
                 raise ValueError("Positive label provided is not in class labels.")
-            pred_labels = d.reshape(-1, ).tolist()
+            pred_labels = d.reshape(-1, )
             return pred_labels
 
         else:
@@ -238,8 +238,8 @@ class SSVMClassifier(BaseEstimator, ClassifierMixin):
             # map -1, 1 labels to original labels
             invLabelDict = {-1: self.classes_[0], 1: self.classes_[1]}
             pred_labels = [invLabelDict[sample] for sample in predicted]
-            self.pred_labels_ = pred_labels
-            return pred_labels
+            self.pred_labels_ = np.array(pred_labels)
+            return self.pred_labels_
 
     def decision_function(self, X):
         import numpy as np
