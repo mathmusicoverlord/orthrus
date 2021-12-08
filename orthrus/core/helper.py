@@ -116,7 +116,7 @@ def scatter_pyplot(df: pd.DataFrame,
 
     # set defaults
     if mrkr_list is None:
-        mrkr_list = ["^", "o", ",", ".", "v", "+", "<", ">", "1", "2", "3", "4", "8", "s", "p", "P", "*", "h", "H", "x",
+        mrkr_list = ["^", "o", ",", "*", "v", ".", "<", ">", "1", "2", "3", "4", "8", "s", "p", "P", "+", "h", "H", "x",
                      "X", "D", "d", "|", "_", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     if grp_mrkrs is None:
