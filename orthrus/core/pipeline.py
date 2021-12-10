@@ -2276,8 +2276,8 @@ class Score(Process):
 
             # check the dtype
             try:
-                if type(np.array(scores).reshape(-1,)[0].item()) == float:
-                    levels = ['\d_\D', '\d_\d_\D']
+                if type(np.array(scores).reshape(-1,)[0:1].item()) == float:
+                    levels = ['\d+_\D', '\d+_\d+_\D']
                     for level in levels:
                         # compute first level scores
                         fl_scores = scores.filter(regex='batch_' + level)
@@ -3138,7 +3138,7 @@ class Report(Score):
         # parameters
         self.pred_type = pred_type
         self.pred_attr = pred_attr
-        self.score_args = dict(output_dict=False)
+        self.score_args = dict(output_dict=True)
 
         # private attributes
         self._classes = classes
@@ -3146,7 +3146,63 @@ class Report(Score):
         self._infer_class_labels_on_output = infer_class_labels_on_output
         self._labels += ["pred_type", "pred_attr", "score_args"]
 
-    
+    def report(self):
+
+        # generate scores
+        scores = self._collapse_class_pred_scores()
+
+        # generate levels
+        levels = ['\d+_\D', '\d+_\d+_\D']
+
+        # initialize output
+        rep = dict()
+
+        # extract score names
+        score = scores.iloc[0,0]
+        score_prefix = score.index
+        score_dict = dict()
+        for key in score_prefix:
+            try:
+                score_dict[key] = list(score[key].keys())
+            except AttributeError:
+                score_dict[key] = []
+
+        for level in levels:
+            # compute first level scores
+            fl_scores = scores.filter(regex='batch_' + level)
+            fl_scores = fl_scores.dropna()
+
+            # fill in dataframe
+            if level == '\d+_\D':
+                level_type = "train_test"
+            elif level == '\d+_\d+_\D':
+                level_type = "train_valid_test"
+            rep[level_type] = pd.DataFrame(index=fl_scores.columns)
+
+            # loop through scores
+            for score_type in fl_scores.index:
+
+                # grab type of scores
+                s = fl_scores.loc[score_type]
+
+                for key in score_dict.keys():
+                    if score_dict[key] == []:
+                        # fill in columns
+                        col = "_".join([score_type.capitalize(), key.capitalize()])
+                        rep[level_type][col] = pd.NA
+                        for batch in fl_scores.columns:
+                            rep[level_type].loc[batch, col] = s[batch][key]
+                    else:
+                        for metric in score_dict[key]:
+
+                            # fill in columns
+                            col = "_".join([score_type.capitalize(), key.capitalize(), metric.capitalize()])
+                            rep[level_type][col] = pd.NA
+                            for batch in fl_scores.columns:
+                                rep[level_type].loc[batch, col] = s[batch][key][metric]
+                                
+        return rep
+
 # TODO: Add Regress Class
 
 # TODO: Add _collapse_reg_pred_scores in Score
