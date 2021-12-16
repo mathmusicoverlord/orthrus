@@ -26,7 +26,6 @@ class IFR:
         2. Jump does not occur in the array of sorted absolute weights
         3. Jump occurs but the weight at the jump is too small ( < 10e-6)
         4. Number of features selected for the current iteration is greater than max_features_per_iter_ratio * num_samples in training partition. This condition prevents overfitting.
-        5. max_iters number of iterations complete successfully
 
     When one of these conditions happen, further feature extraction on the current fold is stopped.
 
@@ -48,15 +47,9 @@ class IFR:
 
         nfolds (int): The number of folds to partition data into (default: 3)
 
-        max_iters (int): Determines the maximum number of iterations of IFR on one data partition(default: 5)
-        
         cutoff (float): Threshold for the validation score to halt the process. (default: 0.75)
 
         jumpratio (float): The relative drop in the magnitude of coefficients in weight vector to identify numerically zero weights (default: 100)
-
-        max_features_per_iter_ratio (float) : A fraction that limits the max number of features that can be extracted per iteration. (default: 0.8)
-            if the number if selected features is greater than max_features_per_iter_ratio * #samples in training partition, further execution
-            on the current fold is stopped.
 
         verbosity (int) : Determines verbosity of print statments; 0 for no output; 2 for full output. (default: 0)
         
@@ -95,7 +88,6 @@ class IFR:
                 3. jump_failed: Jump does not occur in the array of sorted absolute weights
                 4. small_weight_at_jump: Jump occurs but the weight at the jump is too small ( < 10e-6)
                 5. max_features_per_iter_breached: Number of features selected for the current iteration is greater than max_features_per_iter_ratio * num_samples in training partition. This condition prevents overfitting.
-                6. max_iters: max_iters number of iterations complete successfully
 
 
 
@@ -116,10 +108,8 @@ class IFR:
                 weights_handle=weights_handle,
                 repetition = 50,
                 nfolds = 4,
-                max_iters = 100,
                 cutoff = .6,
                 jumpratio = 5,
-                max_features_per_iter_ratio = 2,
                 verbosity = 2,
                 num_gpus_per_worker=0.1
                 )
@@ -141,15 +131,14 @@ class IFR:
                 repetition: int=10,
                 partition_method: str = 'stratified_k-fold',
                 nfolds: int = 3,
-                max_iters: int=5,
                 cutoff: float=0.75,
                 jumpratio: float=100.,
-                max_features_per_iter_ratio: float=0.8,
                 verbosity: int=0,
                 verbose_frequency: int=10,
                 num_cpus_per_worker: float=1.,
                 num_gpus_per_worker: float=0.,
-                local_mode=False):
+                local_mode=False,
+                feature_frequency_p_value= None):
 
         self.num_cpus_per_worker = num_cpus_per_worker
         self.num_gpus_per_worker = num_gpus_per_worker
@@ -168,10 +157,8 @@ class IFR:
         self.repetition = repetition   # Number of time the data is randomly partitioned.
         self.partition_method =  partition_method # Passed to calcom.utils.generate_partitions
         self.nfolds = nfolds   # Passed to calcom.utils.generate_partitions
-        self.max_iters = max_iters    # Max iterations for IFR on one data partition
         self.cutoff = cutoff    # validation score threshold
         self.jumpratio = jumpratio # Relative drop needed to detect numerically zero weights in SSVM.
-        self.max_features_per_iter_ratio = max_features_per_iter_ratio   # fraction of training data samples as cutoff for maximum features extracted per iteration 
         self.verbosity = verbosity    # Verbosity of print statements; make positive to see detail.
         self.verbose_frequency = verbose_frequency
         self.local_mode = local_mode
@@ -180,7 +167,7 @@ class IFR:
         self.diagnostic_information_ = {}
         self._diagnostic_information_keys = ['train_scores', 'validation_scores', 'sorted_abs_weights', 'weight_ratios',
                                             'features', 'true_feature_count']
-        self._initialize_diagnostic_dictionary(self.diagnostic_information_)
+        
         self.diagnostic_information_['exit_reasons'] = []
         super(IFR, self).__init__()
     #
@@ -189,6 +176,7 @@ class IFR:
         for key in self._diagnostic_information_keys:
             diag_dict[key] = []
        
+
     def _add_diagnostic_info_for_current_iteration(self, diag_dict, train_score, validation_score,
         sorted_abs_weights, weight_ratios, features, true_feature_count):
 
@@ -208,6 +196,7 @@ class IFR:
         assert np.unique(arr).shape[0] == 1, 'Lenghts of lists for the diagnostic information do not match. They should be of same size' 
         if n_iters > 1:
             assert np.unique(arr)[0] == n_iters, 'diagnostic dictionary does not contain all the information'
+
 
     def _add_diagnostic_info_for_data_partition(self, diag_dict, n_data_partition, exit_reason):
         for key in self._diagnostic_information_keys:
@@ -242,6 +231,7 @@ class IFR:
                 iter_list = self.results_.loc[feature, 'selection_iteration']
                 iter_list.append(iteration)
 
+
     def _update_weights_in_results(self, features, weights):
         '''
         Appends the weight for passed features in the weights column in self.results_
@@ -251,7 +241,8 @@ class IFR:
             #append the weight to the list of weights for the current feature
             weights = self.results_.loc[feature, 'weights']
             weights.append(weight)
-            
+
+
     def fit(self, data, y):
         '''
         Args:
@@ -286,10 +277,8 @@ class IFR:
             print('repetition', self.repetition)
             print('partition_method', self.partition_method)
             print('nfolds', self.nfolds)
-            print('max_iters', self.max_iters)
             print('jumpratio', self.jumpratio)
             print('cutoff', self.cutoff)
-            print('max_features_per_iter_ratio', self.max_features_per_iter_ratio)
             print('verbosity', self.verbosity)
             print('\n')
         #
@@ -298,6 +287,7 @@ class IFR:
             raise ValueError("Number of folds have to be greater than 1")
 
         self._initialize_results(n)
+        self._initialize_diagnostic_dictionary(self.diagnostic_information_)
 
         n_data_partition = 0
         list_of_arguments = []
@@ -356,6 +346,7 @@ class IFR:
         # ray.shutdown()
         return self
 
+
     @ray.remote
     def select_features_for_data_partition(self, train_data, validation_data, train_labels, validation_labels):
         _, n = train_data.shape
@@ -372,8 +363,8 @@ class IFR:
         #on the current data partition
         diagnostic_info_dictionary = {}
         self._initialize_diagnostic_dictionary(diagnostic_info_dictionary)
-        exit_reason = "max_iters"
-        for i in range(self.max_iters):
+        i = 0
+        while(True):
             if self.verbosity > 1:
                 print("=====================================================")
                 print("beginning of inner loop iteration ", i+1)
@@ -505,7 +496,6 @@ class IFR:
 
             count += 1
             #check if the number of selected features is greater than the cap
-            # if count > int(self.max_features_per_iter_ratio * train_data.shape[0]):
             if count >= train_data.shape[0] - 1:
                 self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
                     score_train,
@@ -556,6 +546,8 @@ class IFR:
 
             #append the selection iterations for the features selected in the current iteration
             list_of_selection_iterations_for_current_fold.append(active_idxs[selected])
+
+            i+=1
         
         results = {}
         results['list_of_features'] = list_of_features_for_curr_fold
@@ -569,6 +561,7 @@ class IFR:
 
     def transform(self, features, **kwargs):
         return self.results_['frequency'] > 0
+
 
     def plot_basic_diagnostic_stats(self, validation_score_iteration_idx = None, n_random_exp = -1, exit_reason = ''):
         exit_reasons = self.diagnostic_information_['exit_reasons']
@@ -608,7 +601,8 @@ class IFR:
         
         axs[0][2].hist(exit_reasons, n_elements, histtype='stepfilled', facecolor='g', alpha=0.75)
         axs[0][2].set_title('Exit Reasons')
-
+        for tick in axs[0][2].get_xticklabels():
+            tick.set_rotation(90)
 
         #second row of plots
 
@@ -641,7 +635,7 @@ class IFR:
         else:
             idxs = np.where(np.array(self.diagnostic_information_['exit_reasons']) == exit_reason)[0]
             which = -1
-        print(idxs)
+
         random.shuffle(idxs)
         idxs = idxs[:n_random_exp]
         
