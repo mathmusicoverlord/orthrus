@@ -1,5 +1,5 @@
 # orthrus
-A collection of python classes and functions for automating pre-processing, visualization, classification, and features selection for generic data sets. Read the [docs](https://ekehoe32.github.io/orthrus/)!
+A collection of python classes and functions for automating pre-processing, visualization, classification, and features selection of generic data sets. Read the [docs](https://ekehoe32.github.io/orthrus/)!
 
 ## Installing the conda environment
 In order to ensure proper behavior of python classes and functions between platforms we recommend installing an isolated ```conda``` environment with the depedencies listed in [environment.yml](environment.yml). To create a new enviroment with these dependencies, from the shell run:
