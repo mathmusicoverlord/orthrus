@@ -33,13 +33,14 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Processes and Pipelines" href="processes_and_pipelines.html" />
+    <link rel="prev" title="Feature Selection using IFR" href="feature_selection.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,8 +86,14 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="advanced_topics.html">Advanced Topics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="feature_selection.html">Feature Selection using IFR</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Feature Set Size Reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="processes_and_pipelines.html">Processes and Pipelines</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
 </ul>
 
@@ -136,6 +143,8 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
+          <li><a href="advanced_topics.html">Advanced Topics</a> &raquo;</li>
+        
       <li>Feature Set Size Reduction</li>
     
     
@@ -157,21 +166,21 @@
             
   <div class="section" id="feature-set-size-reduction">
 <h1>Feature Set Size Reduction<a class="headerlink" href="#feature-set-size-reduction" title="Permalink to this headline">¶</a></h1>
-<p>In the <a class="reference external" href="feature_selection.html">previous tutorial</a>, we learnt how to select features using the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code></a> method
-in combination with <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR" title="orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR"><code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code></a>. However, these feature sets can often be quite large and are often not ready
+<p>In the <a class="reference external" href="feature_selection.html">previous tutorial</a>, we learnt how to select features using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code> method
+in combination with <code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code>. However, these feature sets can often be quite large and are often not ready
 to be used for classification just yet. For example, out of the 22,277 features in the GSE73072 dataset, the <code class="docutils literal notranslate"><span class="pre">IFR</span></code> algorithm may extract around 5000-8000 features,
-i.e. features with <code class="docutils literal notranslate"><span class="pre">frequency</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>. So, in this step we are aiming to reduce the size of this feature set using <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.helper.reduce_feature_set_size" title="orthrus.sparse.feature_selection.helper.reduce_feature_set_size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code></a> method</p>
+i.e. features with <code class="docutils literal notranslate"><span class="pre">frequency</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>. So, in this step we are aiming to reduce the size of this feature set using <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method</p>
 <p>LOAD THE DATASET OBJECT AND DEFINE THE QUERIES AGAIN</p>
-<p>Let’s first load the object we saved to the disk in the last tutorial using <a class="reference internal" href="orthrus.core.html#orthrus.core.helper.load_object" title="orthrus.core.helper.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object</span></code></a> method.</p>
+<p>Let’s first load the object we saved to the disk in the last tutorial using <code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object</span></code> method.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">load_object</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">feature_selection_results</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="s1">&#39;path/to/dst/dir/control_vs_shedders/feature_selection_results.pickle&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The feature set size reduction is essentially a grid search on the number of features. In this we first rank our features by a method, as we will see below. Then, we
 define a grid of values for the number of top ranked features to use in the upcoming step. Next, for each sampled value <cite>n</cite> from the grid, we use the top <cite>n</cite> feature to train and evaluate a new model.
-Please check the method docomentation for <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.helper.reduce_feature_set_size" title="orthrus.sparse.feature_selection.helper.reduce_feature_set_size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code></a> method to see how to use <code class="docutils literal notranslate"><span class="pre">partitioners</span></code> and/or <code class="docutils literal notranslate"><span class="pre">train/validation</span></code> partition splits.
+Please check the method docomentation for <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method to see how to use <code class="docutils literal notranslate"><span class="pre">partitioners</span></code> and/or <code class="docutils literal notranslate"><span class="pre">train/validation</span></code> partition splits.
 These settings control on which partition the score is evaluated on.</p>
-<p>To use <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.helper.reduce_feature_set_size" title="orthrus.sparse.feature_selection.helper.reduce_feature_set_size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code></a> method, we need to define a <code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">scorer</span></code>, and <code class="docutils literal notranslate"><span class="pre">partitioner</span></code> and the grid itself.</p>
+<p>To use <code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce_feature_set_size</span></code> method, we need to define a <code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">scorer</span></code>, and <code class="docutils literal notranslate"><span class="pre">partitioner</span></code> and the grid itself.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
@@ -184,8 +193,8 @@ These settings control on which partition the score is evaluated on.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>Next, we are going need a ranking scheme to rank for our features. <a class="reference internal" href="orthrus.sparse.feature_selection.html#module-orthrus.sparse.feature_selection.helper" title="orthrus.sparse.feature_selection.helper"><code class="xref py py-mod docutils literal notranslate"><span class="pre">feature_helper</span></code></a> module
-provides a few ranking methods. In this tutorial, we are going to use <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.helper.rank_features_by_attribute" title="orthrus.sparse.feature_selection.helper.rank_features_by_attribute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rank_features_by_attribute</span></code></a> to
+<p>Next, we are going need a ranking scheme to rank for our features. <code class="xref py py-mod docutils literal notranslate"><span class="pre">feature_helper</span></code> module
+provides a few ranking methods. In this tutorial, we are going to use <code class="xref py py-meth docutils literal notranslate"><span class="pre">rank_features_by_attribute</span></code> to
 rank our features. This method provides the functionality to rank features by a numeric column in <code class="docutils literal notranslate"><span class="pre">feature_selection_results['f_results']</span></code> in ascending or descending order.
 As discussed briefly in the <a class="reference external" href="feature_selection.html">previous tutorial</a>, <code class="docutils literal notranslate"><span class="pre">IFR's</span></code> result contains three columns and one of them is <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, which we are going to use
 to rank our features. A feature with higher frequency is ranked higher.</p>
@@ -225,6 +234,10 @@ num_gpus_per_worker=num_gpus_per_worker)</p>
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="processes_and_pipelines.html" class="btn btn-neutral float-right" title="Processes and Pipelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="feature_selection.html" class="btn btn-neutral float-left" title="Feature Selection using IFR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

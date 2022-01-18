@@ -1,0 +1,512 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Processes and Pipelines &mdash; orthrus 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="example_pipeline.html" />
+    <link rel="prev" title="Feature Set Size Reduction" href="feature_set_size_reduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> orthrus
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="advanced_topics.html">Advanced Topics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="feature_selection.html">Feature Selection using IFR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_set_size_reduction.html">Feature Set Size Reduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Processes and Pipelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#processes">Processes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#partitioning">Partitioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#train-validation-test-made-easy">Train/Validation/Test Made Easy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automated-fit-and-transform">Automated Fit and Transform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parallel-processing">Parallel Processing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">orthrus</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">orthrus</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="advanced_topics.html">Advanced Topics</a> &raquo;</li>
+        
+      <li>Processes and Pipelines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/rst/processes_and_pipelines.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="processes-and-pipelines">
+<h1>Processes and Pipelines<a class="headerlink" href="#processes-and-pipelines" title="Permalink to this headline">¶</a></h1>
+<p>For more involved machine learning experiments we require methods outside
+of those provided by the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class,
+e.g., <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a>
+and <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select()</span></code></a>.
+The orthrus package provides two base classes which enable more advanced and
+automated workflows.</p>
+<div class="section" id="processes">
+<h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> class is an abstract base class which wraps around
+<a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like objects and makes them directly applicable to
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> objects—doing away with much of the boilerplate
+code for extracting labels, transforming data, etc. A simple example would be using the
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> subclass to log transform a dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Transform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define log transform process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">retain_f_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># keep the original feature names (non-latent)</span>
+<span class="gp">... </span>                <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># use resulting transform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch&#39;</span><span class="p">][</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="go">----------------------------------------------------------</span>
+<span class="go">Fitting log...</span>
+<span class="go">Transforming the data using log...</span>
+<span class="go">        sepal_length  sepal_width  petal_length  petal_width</span>
+<span class="go">0        1.629241     1.252763      0.336472    -1.609438</span>
+<span class="go">1        1.589235     1.098612      0.336472    -1.609438</span>
+<span class="go">2        1.547563     1.163151      0.262364    -1.609438</span>
+<span class="go">3        1.526056     1.131402      0.405465    -1.609438</span>
+<span class="go">4        1.609438     1.280934      0.336472    -1.609438</span>
+<span class="go">..            ...          ...           ...          ...</span>
+<span class="go">145      1.902108     1.098612      1.648659     0.832909</span>
+<span class="go">146      1.840550     0.916291      1.609438     0.641854</span>
+<span class="go">147      1.871802     1.098612      1.648659     0.693147</span>
+<span class="go">148      1.824549     1.223775      1.686399     0.832909</span>
+<span class="go">149      1.774952     1.098612      1.629241     0.587787</span>
+<span class="go">[150 rows x 4 columns]</span>
+</pre></div>
+</div>
+<p>It may seem like over-kill for such a simple task, but for pipelines involving
+manys steps the overhead is worth it. You may have noticed that the result returned by
+the process above is a dictionary of dictionaries. The key in the outer dictionary determines
+the <strong>batch</strong> of the dataset, while the inner key determines the type of object returned, e.g.,
+a function to transform our data with. In our example
+we do not have any train/test splits of the dataset and hence we only have one batch.
+In other cases, where we do have multiple train/test splits, each batch will yield a transform fit
+to the training samples of that batch.</p>
+<div class="section" id="partitioning">
+<h3>Partitioning<a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class is used to generate the batches described
+above. This class wraps <a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like paritioners and generates
+train/test labels according to the parititoning scheme. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define kfold partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="p">),</span>
+<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">])</span>
+<span class="go">---------------------------------------------</span>
+<span class="go">Generating 5-fold-CV splits...</span>
+<span class="go">0      Train</span>
+<span class="go">1       Test</span>
+<span class="go">2      Train</span>
+<span class="go">3       Test</span>
+<span class="go">4      Train</span>
+<span class="go">       ...</span>
+<span class="go">145    Train</span>
+<span class="go">146    Train</span>
+<span class="go">147    Train</span>
+<span class="go">148    Train</span>
+<span class="go">149    Train</span>
+<span class="go">Name: 5-fold-CV_0, Length: 150, dtype: object</span>
+</pre></div>
+</div>
+<p>We can see that for each batch we can extract a set of train/test labels which are indexed by the samples
+in the dataset. We can also collect all of the train/test labels across all batches by using the
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process.collapse_results" title="orthrus.core.pipeline.Process.collapse_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code></a> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># collapse train/test labels across batches</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span><span class="o">.</span><span class="n">collapse_results</span><span class="p">()[</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">]</span>
+<span class="go">--------------------------------------------------------------------------------------</span>
+<span class="go">5-fold-CV splits batch_0_split batch_1_split batch_2_split batch_3_split batch_4_split</span>
+<span class="go">0                        Train          Test         Train         Train         Train</span>
+<span class="go">1                         Test         Train         Train         Train         Train</span>
+<span class="go">2                        Train         Train         Train          Test         Train</span>
+<span class="go">3                         Test         Train         Train         Train         Train</span>
+<span class="go">4                        Train         Train          Test         Train         Train</span>
+<span class="go">..                         ...           ...           ...           ...           ...</span>
+<span class="go">145                      Train          Test         Train         Train         Train</span>
+<span class="go">146                      Train          Test         Train         Train         Train</span>
+<span class="go">147                      Train         Train          Test         Train         Train</span>
+<span class="go">148                      Train         Train         Train          Test         Train</span>
+<span class="go">149                      Train         Train          Test         Train         Train</span>
+<span class="go">[150 rows x 5 columns]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="train-validation-test-made-easy">
+<h3>Train/Validation/Test Made Easy<a class="headerlink" href="#train-validation-test-made-easy" title="Permalink to this headline">¶</a></h3>
+<p>In some experiments it useful to generate validation data within your training data, e.g.,
+hyperparameter tuning. The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class can acheive
+this task by nesting two of its instances. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run shuffle-&gt;kfold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">shuffle</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;batch_0_0 tvt_labels:</span><span class="se">\\</span><span class="s2">n</span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;</span> <span class="o">%</span>\\
+<span class="gp">... </span>      <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">],))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># print train/valid/test counts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;batch_0_0 tvt_labels counts:</span><span class="se">\\</span><span class="s2">n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>\\
+<span class="gp">... </span>      <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_0_0&#39;</span><span class="p">][</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(),))</span>
+<span class="go">---------------------</span>
+<span class="go">batch_0_0 tvt_labels:</span>
+<span class="go">0      Train</span>
+<span class="go">1      Valid</span>
+<span class="go">2       Test</span>
+<span class="go">3      Train</span>
+<span class="go">4      Valid</span>
+<span class="go">       ...</span>
+<span class="go">145    Train</span>
+<span class="go">146    Train</span>
+<span class="go">147     Test</span>
+<span class="go">148    Train</span>
+<span class="go">149    Train</span>
+<span class="go">Name: 80-20-tr-tst_0_5-fold-CV_0, Length: 150, dtype: object</span>
+<span class="go">----------------------------</span>
+<span class="go">batch_0_0 tvt_labels counts:</span>
+<span class="go">Train    96</span>
+<span class="go">Test     30</span>
+<span class="go">Valid    24</span>
+<span class="go">Name: 80-20-tr-tst_0_5-fold-CV_0, dtype: int64</span>
+</pre></div>
+</div>
+<p>In short, the first parititioning process breaks the dataset into train/test splits, then
+the second partitioning process further splits each training set into train/validation splits. This
+allows for any sophisticated partitioning of the data into train/validation/test splits. Since each
+batch in the original partition will be partitioned itself, we require a 2D index to keep track of
+the batches, i.e., <strong>batch_i_j</strong> indicates the <strong>jth</strong> split using partitioner two of the <strong>ith</strong>
+split using partitioner one.</p>
+</div>
+<div class="section" id="automated-fit-and-transform">
+<h3>Automated Fit and Transform<a class="headerlink" href="#automated-fit-and-transform" title="Permalink to this headline">¶</a></h3>
+<p>Now we can observe the real power of using processes vs. directly applying
+<a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like objects. Say for example we have a situtation where we would
+like to perform dimension reduction on our dataset as an intermediate step in a downstream model, e.g., neural net, support vector machines.
+Also suppose that we would like to cross-validate our model, but want to adhere to the strictess standards in not allowing
+any test data to participate in the dimension reduction process—orthrus has you covered. In this example we will generate train/test splits for
+a cross-validation experiment and then train a PCA embedding on each training batch to be used downstream:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Transform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ORTHRUS_PATH&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                         <span class="s2">&quot;test_data/GSE73072/Data/GSE73072.ds&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define kfold partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="p">),</span>
+<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define PCA embedding</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pca</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run kfold-&gt;pca</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+<span class="go">------------------------------</span>
+<span class="go">Generating 5-fold-CV splits...</span>
+<span class="go">batch_0:</span>
+<span class="go">Fitting pca...</span>
+
+<span class="go">batch_1:</span>
+<span class="go">Fitting pca...</span>
+
+<span class="go">batch_2:</span>
+<span class="go">Fitting pca...</span>
+
+<span class="go">batch_3:</span>
+<span class="go">Fitting pca...</span>
+
+<span class="go">batch_4:</span>
+<span class="go">Fitting pca...</span>
+<span class="go">-------------------------------</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># transform data with PCA embedding</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># learned from the second batch of training data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;batch_1&#39;</span><span class="p">][</span><span class="s1">&#39;transform&#39;</span><span class="p">](</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="go">--------------------------------------------------</span>
+<span class="go">Transforming the data using pca...</span>
+<span class="go">               pca_0     pca_1     pca_2     pca_3</span>
+<span class="go">GSM1881744 -0.909890 -1.055641  0.131840 -0.349795</span>
+<span class="go">GSM1881745 -0.897809 -0.777336  0.115019 -0.889299</span>
+<span class="go">GSM1881746 -1.148015 -0.976102  0.264118 -0.383004</span>
+<span class="go">GSM1881747 -1.000370 -0.820823  0.026971 -0.696007</span>
+<span class="go">GSM1881748 -0.980170 -0.542912  0.121559 -0.677571</span>
+<span class="gp">... </span>             <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>
+<span class="go">GSM1884625  1.179928 -1.233515  0.262225  0.451030</span>
+<span class="go">GSM1884626  2.965154 -0.131978  1.119863  0.282289</span>
+<span class="go">GSM1884627  0.233108  0.600465  1.285934 -0.129189</span>
+<span class="go">GSM1884628  0.422696 -1.272085  0.866244  0.789034</span>
+<span class="go">GSM1884629  0.649333 -0.078723  2.377741 -0.040473</span>
+<span class="go">[2886 rows x 4 columns]</span>
+<span class="go">--------------------------------------------------</span>
+</pre></div>
+</div>
+<p>We can even transform the dataset across the transforms generated for each batch with one
+call of <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform.transform" title="orthrus.core.pipeline.Transform.transform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transform()</span></code></a>, e.g.,</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># transfrom dataset using each batch-transform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_pca_dict</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">-------------------------------------------------------------</span>
+<span class="go">{&#39;batch_0&#39;: &lt;orthrus.core.dataset.DataSet at 0x7f834ea11ac0&gt;,</span>
+<span class="go"> &#39;batch_1&#39;: &lt;orthrus.core.dataset.DataSet at 0x7f834e948250&gt;,</span>
+<span class="go"> &#39;batch_2&#39;: &lt;orthrus.core.dataset.DataSet at 0x7f834e9e5700&gt;,</span>
+<span class="go"> &#39;batch_3&#39;: &lt;orthrus.core.dataset.DataSet at 0x7f834ea11dc0&gt;,</span>
+<span class="go"> &#39;batch_4&#39;: &lt;orthrus.core.dataset.DataSet at 0x7f83be31aee0&gt;}</span>
+<span class="go">--------------------------------------------------------------</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parallel-processing">
+<h3>Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="example_pipeline.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="feature_set_size_reduction.html" class="btn btn-neutral float-left" title="Feature Set Size Reduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Eric Kehoe, Kartikay Sharma.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
