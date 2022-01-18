@@ -34,7 +34,7 @@ the plot by the ``virus`` attribute::
     ...              alpha=.8)
 
 
-.. figure:: ../../../figures/gse73073_mds_viz_example_1.png
+.. figure:: ../figures/gse73073_mds_viz_example_1.png
    :width: 800px
    :align: center
    :alt: alternate text
@@ -59,7 +59,7 @@ markers::
     ...              alpha=.8,
     ...              attr='virus')
 
-.. figure:: ../../../figures/gse73073_mds_viz_example_2.png
+.. figure:: ../figures/gse73073_mds_viz_example_2.png
    :width: 800px
    :align: center
    :alt: alternate text
@@ -87,7 +87,7 @@ use different markers for virus types via the ``cross_attr`` argument, and embed
     ...              palette="magma",
     ...              subtitle='')
 
-.. figure:: ../../../figures/gse73073_mds_viz_example_3.png
+.. figure:: ../figures/gse73073_mds_viz_example_3.png
    :width: 800px
    :align: center
    :alt: alternate text
