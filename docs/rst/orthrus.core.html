@@ -3033,23 +3033,19 @@ scores for each sample type: “Train”, “Valid”, “Test”.</p></li>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define balance accuracy score process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">Report</span><span class="p">(</span><span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># run partition and classification processes</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run partition and classification processes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results_0</span> <span class="o">=</span> <span class="n">shuffle</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results_1</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">results_0</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># carry over tvt_labels, use Pipeline for chaining processes instead!</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># carry over tvt_labels, use Pipeline for chaining processes instead!</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">results_1</span><span class="p">[</span><span class="n">batch</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results_0</span><span class="p">[</span><span class="n">batch</span><span class="p">])</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results_1</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># score classification results</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># score classification results</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">results_1</span><span class="p">)</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p>Now we can plot the statistics of our report. For example we will plot the test scores
+<p>Now we can plot the statistics of our report. For example we will plot the test scores
 attained using our random forest classifier.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -3064,24 +3060,9 @@ attained using our random forest classifier.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span> <span class="s2">&quot;docsrc/figures/iris_rf_test_scores.png&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="figure align-default">
-<img alt="../_images/iris_rf_test_scores.png" src="../_images/iris_rf_test_scores.png" />
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../_images/iris_rf_test_scores.png"><img alt="alternate text" src="../_images/iris_rf_test_scores.png" style="width: 800px;" /></a>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">width</dt>
-<dd class="field-odd"><p>800px</p>
-</dd>
-<dt class="field-even">align</dt>
-<dd class="field-even"><p>center</p>
-</dd>
-<dt class="field-odd">alt</dt>
-<dd class="field-odd"><p>alternate text</p>
-</dd>
-<dt class="field-even">figclass</dt>
-<dd class="field-even"><p>align-center</p>
-</dd>
-</dl>
-</div></blockquote>
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Report.report">
 <code class="sig-name descname">report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Report.report" title="Permalink to this definition">¶</a></dt>
