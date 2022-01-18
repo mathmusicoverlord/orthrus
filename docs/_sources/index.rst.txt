@@ -11,6 +11,7 @@ Welcome to orthrus's documentation!
    :caption: Contents:
 
    /rst/getting_started
+   /rst/advanced_topics
    /rst/modules
 
 

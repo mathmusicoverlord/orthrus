@@ -10,7 +10,5 @@ Getting Started
    classify_data
    add_new_attributes_using_queries
    normalization_and_imputation
-   feature_selection
-   feature_set_size_reduction
    
 
