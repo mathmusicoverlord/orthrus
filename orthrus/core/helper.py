@@ -516,6 +516,8 @@ def scatter_plotly(df: pd.DataFrame,
                          color=grp_colors,
                          labels={str(col0): xlabel,
                                  str(col1): ylabel},
+                         width=figsize[0],
+                         height=figsize[1],
                          **{k: kwargs[k] for k in plotly.express.scatter.__code__.co_varnames if k in kwargs})
 
     elif dim == 3:
@@ -529,18 +531,21 @@ def scatter_plotly(df: pd.DataFrame,
                             labels={str(col0): xlabel,
                                     str(col1): ylabel,
                                     str(col2): zlabel},
+                            width=figsize[0],
+                            height=figsize[1],
                             **{k: kwargs[k] for k in plotly.express.scatter.__code__.co_varnames if k in kwargs})
     else:
         raise ValueError("Embedding dimension must be 2 or 3!")
-
-    # update marker size
-    fig.update_traces(marker=dict(size=mrkr_size))
 
     # update markers
     if not (mrkr_list is None):
         for i, label in enumerate(df[grp_mrkrs].unique()):
             fig.for_each_trace(
                 lambda trace: trace.update(marker=dict(symbol=mrkr_list[i])) if str(label) in trace.name else ())
+
+    # update marker size
+    fig.update_traces(marker=dict(size=mrkr_size), selector=dict(mode='markers'), showlegend=True)
+
 
     # set title height
     fig.update_layout(title={'y': .92, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top'}, coloraxis_colorbar=dict(yanchor="top", y=1, x=-.2,
@@ -555,7 +560,8 @@ def scatter_plotly(df: pd.DataFrame,
                        text=subtitle)
 
     # resize figure
-    fig.update_layout(width=figsize[0], height=figsize[1])
+    fig.update_layout(legend=dict(font=dict(size=kwargs.get('legend_size', 20)), itemsizing='constant'),
+                      legend_title=dict(font=dict(size=kwargs.get('legend_title_size', 20))))
 
     if use_dash:
         import dash
