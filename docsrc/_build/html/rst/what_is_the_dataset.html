@@ -33,7 +33,6 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -178,7 +177,7 @@
             
   <div class="section" id="what-is-the-dataset-object">
 <h1>What is the DataSet object?<a class="headerlink" href="#what-is-the-dataset-object" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is a data container designed to automate statistical, machine learning,
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object is a data container designed to automate statistical, machine learning,
 and manifold learning tasks including, but not limited to:</p>
 <ul class="simple">
 <li><p>Data pre-processing, e.g., batch correction, normalization, imputation</p></li>
@@ -190,13 +189,13 @@ Uniform Manifold Projection and Approximation (UMAP)</p></li>
 </ul>
 <div class="section" id="dataset-structure">
 <h2>DataSet Structure<a class="headerlink" href="#dataset-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is primarily composed of three
-data structures: <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a>, <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>,
-and <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a>, each of which is a
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object is primarily composed of three
+data structures: <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code>,
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code>, each of which is a
 <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas.DataFrame</a> object containing an indexed rectangular array of values.
 These dataframes are described as follows:</p>
 <ul>
-<li><p><a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> respresent samples, e.g., participants in a clinical study.
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> respresent samples, e.g., participants in a clinical study.
 The columns represent the features, or observations, of each sample e.g., RNA seq expression values, metabolite peak areas for given <em>m/z</em> s
 and retention times, or shedding scores across multiple virus and bacteria. The rows of the data are labeled via the <code class="docutils literal notranslate"><span class="pre">index</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
 and the columns are labeled via the <code class="docutils literal notranslate"><span class="pre">columns</span></code> of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
@@ -226,7 +225,7 @@ and the columns are labeled via the <code class="docutils literal notranslate"><
 </pre></div>
 </div>
 </li>
-<li><p><a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent samples. The columns represent
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent samples. The columns represent
 decriptive data for each sample, e.g., class label, age, time point, species.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># print metadata</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">metadata</span>
@@ -244,7 +243,7 @@ decriptive data for each sample, e.g., class label, age, time point, species.</p
 </pre></div>
 </div>
 </li>
-<li><p><a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.vardata" title="orthrus.core.dataset.DataSet.vardata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code></a> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent features, or observations. The columns represent
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">vardata</span></code> : The rows of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> represent features, or observations. The columns represent
 descriptive data for each feature, e.g., location on a chromosome of a gene (gene locus), retention time of a measured metabolite, description of a measured bacteria.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
@@ -271,7 +270,7 @@ descriptive data for each feature, e.g., location on a chromosome of a gene (gen
 </div>
 </li>
 </ul>
-<p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> instance.
+<p>See the <a class="reference external" href="create_dataset.html">Creating a DataSet</a> tutorial for an depth guide to constructing a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> instance.
 Note: In order to run the code above you must first <code class="docutils literal notranslate"><span class="pre">export</span></code> your orthrus repository path, e.g., <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ORTHRUS_PATH=/path/to/orthrus/</span></code>, and run the script
 <a class="reference external" href="../../../../test_data/GSE73072/Scripts/generate_dataset.py">generate_dataset.py</a> located in the <a class="reference external" href="../../../../test_data/GSE73072">GSE73072 project directory</a>.
 If you are a part of the CSU team and want access to the full GSE73072 <code class="docutils literal notranslate"><span class="pre">DataSet</span></code>, roughly 20000 genes, download the DataSet object by accessing <code class="docutils literal notranslate"><span class="pre">/data4/kehoe/workspace/datasets/GSE73072.ds</span></code>
@@ -279,11 +278,11 @@ on katrina’s racecar, or download it by accessing <a class="reference external
 </div>
 <div class="section" id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
-<p>The main goal of the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object is promote modularity and compatibility with other
+<p>The main goal of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object is promote modularity and compatibility with other
 data science and machine learning packages, e.g., <a class="reference external" href="https://scikit-learn.org/stable/">sklearn</a>. For example, if a user wishes to visualize their dataset,
-rather than hard code or wrap a specific visualization algorithm into the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class to make it available to them,
+rather than hard code or wrap a specific visualization algorithm into the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class to make it available to them,
 they would pass an embedding object, such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">PCA</a>, to the
-<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method which will apply the specific visualization method for the user. The main utility of
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code> method which will apply the specific visualization method for the user. The main utility of
 the visualization method is to take care of the boiler plate code associated with applying the embedding class, such as generating labels and grabbing the
 data matrix, and plot generation. See the example below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
@@ -308,7 +307,7 @@ data matrix, and plot generation. See the example below:</p>
 </pre></div>
 </div>
 <div class="align-center figure" id="id1">
-<a class="reference internal image-reference" href="rst/../../../figures/iris_viz_example.png"><img alt="alternate text" src="rst/../../../figures/iris_viz_example.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/iris_viz_example.png"><img alt="alternate text" src="../_images/iris_viz_example.png" style="width: 800px;" /></a>
 <p class="caption"><span class="caption-text">2D PCA embedding of the Iris dataset</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
 <p>Visit the <a class="reference external" href="visualize_data.html">Visualizing Data</a> tutorial for more examples related to data visualization.</p>
