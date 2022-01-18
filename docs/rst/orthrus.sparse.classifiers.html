@@ -318,6 +318,47 @@ in the fit() docstring). New X is classified using</p>
 <p>sign(f(x)) = sign( w’*x - b ).</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="orthrus.sparse.classifiers.svm.SSVMClassifier.solver">
+<em class="property">property </em><code class="sig-name descname">solver</code><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMClassifier.solver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="orthrus.sparse.classifiers.svm.SSVMSelect">
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.sparse.classifiers.svm.</code><code class="sig-name descname">SSVMSelect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">tol</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">solver</span><span class="p">:</span> <span class="n">object</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">errorTrace</span><span class="p">:</span> <span class="n">object</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">debug</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">jump_ratio</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">5.0</span></em>, <em class="sig-param"><span class="n">n_features</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_plot</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">corr_threshold</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#orthrus.sparse.classifiers.svm.SSVMClassifier" title="orthrus.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.sparse.classifiers.svm.SSVMClassifier</span></code></a></p>
+<dl class="py method">
+<dt id="orthrus.sparse.classifiers.svm.SSVMSelect.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMSelect.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit/training step for Sparse Support Vector Machines (SSVM). A model function</p>
+<p>f(x)=w’*x - b</p>
+<p>is found for vector w=len(x) and scalar b which optimally classify the
+training X, in the sense of solving the L1 minimization problem</p>
+<p>min ||w||_1 + C*sum( xi_j ) s.t. y_j*(w’*x_j -b) &lt;= 1-xi_j, j=1,…,n,</p>
+<p>where x_j are vector input X, y_j are {-1,+1} class labels for each x_j,
+xi_j are scalar slack variables.</p>
+<p>This code only supports binary classification right now.</p>
+<p>The weight vector w and bias b are stored in <a class="reference internal" href="#orthrus.sparse.classifiers.svm.SSVMClassifier.weights_" title="orthrus.sparse.classifiers.svm.SSVMClassifier.weights_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVMClassifier.weights_</span></code></a> and
+<a class="reference internal" href="#orthrus.sparse.classifiers.svm.SSVMClassifier.bias_" title="orthrus.sparse.classifiers.svm.SSVMClassifier.bias_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SSVMClassifier.bias_</span></code></a> respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="orthrus.sparse.classifiers.svm.SSVMSelect.plot_weights">
+<code class="sig-name descname">plot_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMSelect.plot_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="orthrus.sparse.classifiers.svm.SSVMSelect.select_features">
+<code class="sig-name descname">select_features</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMSelect.select_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="orthrus.sparse.classifiers.svm.SSVMSelect.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.sparse.classifiers.svm.SSVMSelect.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>

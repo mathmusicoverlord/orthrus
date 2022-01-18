@@ -33,6 +33,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -174,8 +175,8 @@
   <div class="section" id="classification">
 <h1>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will learn how to setup and perform classification experiments using the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code> method of the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class. We start by loading the Iris dataset
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a> method of the
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. We start by loading the Iris dataset
 provided in the orthrus package:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
@@ -275,7 +276,7 @@ this is reflected in the rank of the feature.</p>
 <div class="section" id="gse7302-k-fold-cross-validation-with-ssvm-on-gpu">
 <h2>GSE7302: k-Fold Cross-Validation with SSVM on GPU<a class="headerlink" href="#gse7302-k-fold-cross-validation-with-ssvm-on-gpu" title="Permalink to this headline">¶</a></h2>
 <p>In this example we will run a k-fold cross-validation experiment with the GSE73072 dataset
-using <code class="xref py py-class docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">Support</span> <span class="pre">Vector</span> <span class="pre">Machines</span></code> (SSVM)
+using <a class="reference internal" href="orthrus.sparse.classifiers.html#orthrus.sparse.classifiers.svm.SSVMClassifier" title="orthrus.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">Support</span> <span class="pre">Vector</span> <span class="pre">Machines</span></code></a> (SSVM)
 on a GPU to distguish between shedding and non-shedding individuals infected with HRV in the
 first 24 hours of exposure. First we load the dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>

@@ -33,6 +33,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -156,8 +157,8 @@
             
   <div class="section" id="feature-selection-using-ifr">
 <h1>Feature Selection using IFR<a class="headerlink" href="#feature-selection-using-ifr" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet's</span></code> through its modular design makes it really easy to perform feature selection using a variety of feature selection methods. This
-tutorial provides an in depth look of using <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code> method in combination with <code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code>.</p>
+<p><a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet's</span></code></a> through its modular design makes it really easy to perform feature selection using a variety of feature selection methods. This
+tutorial provides an in depth look of using <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code></a> method in combination with <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR" title="orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR"><code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code></a>.</p>
 <p>The first step is to load the dataset and make sure we have the right attribute in the metadata. For this example we are going to work with the GSE730732 dataset and select features for
 controls vs shedders in hour 1 to 8. We resolved the issues with datatypes in GSE73072 dataset in <a class="reference external" href="create_dataset.html">creating a dataset</a>, learnt how to <a class="reference external" href="normalization_and_imputation.html">normalize the data</a>
 , and created a new attribute <code class="docutils literal notranslate"><span class="pre">response</span></code> in the <a class="reference external" href="add_new_attributes_using_queries.html">adding new attributes to metadata</a>, please check these tutorial first.</p>
@@ -189,14 +190,14 @@ So, we now want to extract features that can distinguish control and shedders fr
 </pre></div>
 </div>
 <p>Next, let’s define our feature selector, which is Iterative Feature Removal, for our example. First, we need to define a classifier that IFR will use. In this example we are going
-to use GPU based <code class="xref py py-class docutils literal notranslate"><span class="pre">SSVMClassifier</span></code> with <a class="reference external" href="https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/solvers/LPPrimalDualPy.py">LPPrimalDualPy</a> solver</p>
+to use GPU based <a class="reference internal" href="orthrus.sparse.classifiers.html#orthrus.sparse.classifiers.svm.SSVMClassifier" title="orthrus.sparse.classifiers.svm.SSVMClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">SSVMClassifier</span></code></a> with <a class="reference external" href="https://github.com/CSU-PAL-biology/calcom/blob/development/calcom/solvers/LPPrimalDualPy.py">LPPrimalDualPy</a> solver</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SSVMClassifier</span><span class="p">(</span><span class="n">C</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">solver</span> <span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">,</span> <span class="n">use_cuda</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">weights_handle</span><span class="o">=</span><span class="s2">&quot;weights_&quot;</span>
 </pre></div>
 </div>
-<p>Second, let’s create the <code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code> object. Please check the documentation to understand about the arguments to IFR.</p>
+<p>Second, let’s create the <a class="reference internal" href="orthrus.sparse.feature_selection.html#orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR" title="orthrus.sparse.feature_selection.IterativeFeatureRemoval.IFR"><code class="xref py py-class docutils literal notranslate"><span class="pre">IFR</span></code></a> object. Please check the documentation to understand about the arguments to IFR.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.feature_selection.IterativeFeatureRemoval</span> <span class="kn">import</span> <span class="n">IFR</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">feature_selector</span> <span class="o">=</span> <span class="n">IFR</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">weights_handle</span><span class="o">=</span><span class="n">weights_handle</span><span class="p">,</span>
@@ -211,7 +212,7 @@ to use GPU based <code class="xref py py-class docutils literal notranslate"><sp
 <span class="gp">... </span>                       <span class="p">)</span>
 </pre></div>
 </div>
-<p>Third, we now define the parameters for the <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code> method. Please check the method documentation to know the parameters in detail.
+<p>Third, we now define the parameters for the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code></a> method. Please check the method documentation to know the parameters in detail.
 Here, we are interested in the following attributes: <code class="docutils literal notranslate"><span class="pre">selector</span></code>, <code class="docutils literal notranslate"><span class="pre">attr</span></code>, <code class="docutils literal notranslate"><span class="pre">selector_name</span></code>, <code class="docutils literal notranslate"><span class="pre">sample_ids</span></code>, <code class="docutils literal notranslate"><span class="pre">fit_handle</span></code>, <code class="docutils literal notranslate"><span class="pre">f_results_handle</span></code>. So far we have defined all but <code class="docutils literal notranslate"><span class="pre">fit_handle</span></code> and <code class="docutils literal notranslate"><span class="pre">f_results_handle</span></code>.
 The purpose of these arguments is to provide alternate handle to the feature selectors <code class="docutils literal notranslate"><span class="pre">fit</span></code> or <code class="docutils literal notranslate"><span class="pre">run</span></code> method and the handle on how to access the results. Although the default values of
 <code class="docutils literal notranslate"><span class="pre">fit_handle</span></code>, which is ‘fit’, matches the fit handle of IFR, <code class="docutils literal notranslate"><span class="pre">f_results_handle</span></code> does not. We now show how to provide a different results handle.</p>
@@ -232,7 +233,7 @@ The purpose of these arguments is to provide alternate handle to the feature sel
 <span class="gp">... </span>                            <span class="p">)</span>
 </pre></div>
 </div>
-<p>The return of <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code> method is a dictionary that contains two elements:</p>
+<p>The return of <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select</span></code></a> method is a dictionary that contains two elements:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">selector</span></code> : This is <code class="docutils literal notranslate"><span class="pre">feature_selector</span></code> object and can be used now to access any information about the feature selection.</p></li>
@@ -240,7 +241,7 @@ The purpose of these arguments is to provide alternate handle to the feature sel
 instance, <code class="docutils literal notranslate"><span class="pre">f_results</span></code> for <code class="docutils literal notranslate"><span class="pre">IFR</span></code>  contains three columns <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">weights</span></code> and <code class="docutils literal notranslate"><span class="pre">selection_iteration</span></code> for each feature id.</p></li>
 </ol>
 </div></blockquote>
-<p>Finally, we can save these to disk using <code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object</span></code> method.</p>
+<p>Finally, we can save these to disk using <a class="reference internal" href="orthrus.core.html#orthrus.core.helper.save_object" title="orthrus.core.helper.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object</span></code></a> method.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">save_object</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">save_object</span><span class="p">(</span><span class="n">feature_selection_results</span><span class="p">,</span> <span class="s1">&#39;path/to/dst/dir/control_vs_shedders/feature_selection_results.pickle&#39;</span><span class="p">)</span>
 </pre></div>

@@ -130,7 +130,7 @@ data matrix, and plot generation. See the example below::
   ...              save=True,
   ...              save_name='iris_species_pca')
 
-.. figure:: ../../../figures/iris_viz_example.png
+.. figure:: ../figures/iris_viz_example.png
   :width: 800px
   :align: center
   :alt: alternate text
