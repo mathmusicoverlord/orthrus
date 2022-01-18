@@ -111,17 +111,20 @@ backend. Here is one where export the interative plotly figure to an ``.html`` f
 
     >>> # set figure directory
     >>> ds.path = os.path.join(os.environ["ORTHRUS_PATH"],
-    ...                        "docsrc/_build/html/figures")
+    ...                        "docsrc/figures")
 
     >>> # visualize data using plotly
-    >>> mds = MDS(n_components=2)
+    >>> mds = MDS(n_components=3)
     >>> ds.visualize(embedding=mds,
-    ...              backend='plotly',
-    ...              attr='virus',
-    ...              save=True,
-    ...              save_name='gse73073_mds_viz_example_4')
+    ...         backend='plotly',
+    ...         attr='virus',
+    ...         save=True,
+    ...         save_name='gse73073_mds_viz_example_4_3d',
+    ...         figsize=(1500, 1000),
+    ...         mrkr_size=5,
+    ...         subtitle='')
 
-Click to view output: `gse73073_mds_viz_example_4.html <gse73073_mds_viz_example_4.html>`_.
+Click to view output: `gse73073_mds_viz_example_4_3d.html <gse73073_mds_viz_example_4_3d.html>`_.
 
 Dash
 ^^^^
