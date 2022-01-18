@@ -121,7 +121,7 @@ backend. Here is one where export the interative plotly figure to an ``.html`` f
     ...              save=True,
     ...              save_name='gse73073_mds_viz_example_4')
 
-Click to view output: `gse73073_mds_viz_example_4.html <figures/gse73073_mds_viz_example_4.html>`_.
+Click to view output: `gse73073_mds_viz_example_4.html <../docsrc/figures/gse73073_mds_viz_example_4.html>`_.
 
 Dash
 ^^^^
