@@ -5,7 +5,10 @@ from orthrus.core.helper import batch_jobs_
 from sklearn.preprocessing import StandardScaler
 from typing import  Callable
 def reduce_feature_set_size(ds,
-                            features_dataframe, 
+from sklearn.preprocessing import StandardScaler
+
+def reduce_feature_set_size(ds,
+                            features_dataframe,
                             sample_ids,
                             attr:str,
                             classifier, 
@@ -176,7 +179,7 @@ def reduce_feature_set_size(ds,
         list_of_arguments.append(arguments)
 
     finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
     results = np.zeros((len(list_of_arguments), 2))
 
     for i, process in enumerate(finished_processes):
@@ -184,7 +187,7 @@ def reduce_feature_set_size(ds,
         results[i, 0] = feature_set_length
         results[i, 1] = score
     
-    # ray.shutdown()
+    ray.shutdown()
     #find the best n, i.e. smallest n that produced largest score
     results = results[results[:,1].argsort()[::-1]]
     max_bsr = np.max(results[:, 1])
@@ -366,7 +369,7 @@ def sliding_window_classification_on_ranked_features(ds,
         results[i, 0] = min_feature_index
         results[i, 1] = score
     results = results[results[:,0].argsort()]
-    # ray.shutdown()
+    ray.shutdown()
     
     return results
 
@@ -395,10 +398,17 @@ def run_single_classification_experiment_(model,
                 )
 
     if test_sample_ids is not None:
-        ds = ds.slice_dataset(feature_ids=features, sample_ids=test_sample_ids)
+        #code duplication. make it a function!
+        try:
+            data = ds.data[ds.vardata.index[test_sample_ids]]
+        except IndexError:
+            try:
+                data = ds.data[test_sample_ids]
+            except KeyError:
+                data = ds.data[ds.data.columns[test_sample_ids]]
 
-        data = ds.data.values
-        labels = ds.metadata[attr]
+        data = data[features].values
+        labels = ds.metadata[attr].loc[test_sample_ids]
 
         scores = []
         for classifier in classification_result['classifiers'].values:
@@ -807,3 +817,31 @@ class ReduceIFRFeatures(Transform):
             return ds_new
 
         return transform
+
+
+def get_correlates(S, X, c):
+    """
+    This function takes a list of feature indices and a data matrix and returns the features from ``X`` which have
+    correlation in absolute at least ``c``.
+
+    Args:
+        S (array-like of shape (n_important_features,): Feature indices of featues to be correlated to.
+        X (array-like of shape (n_samples, n_features)): Data matrix with features.
+        c (float): Correlation threshold.
+
+    Returns:
+        (ndarray) : Correlated features.
+    """
+
+    # convert indices to bool
+    s = (np.array(S).reshape(-1, 1) == np.arange(X.shape[1])).any(axis=0)
+    T = np.where(~s)[0]
+
+    # compute the correlation matrix
+    C = np.corrcoef(X.T)
+    C = C[s, :]
+    C = C[:, ~s]
+
+    # threshold the correlations
+    C = np.abs(C) >= c
+    return T[C.any(axis=0)]
