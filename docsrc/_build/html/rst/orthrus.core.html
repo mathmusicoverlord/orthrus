@@ -184,8 +184,411 @@
 <div class="section" id="orthrus-core-dataset-module">
 <h2>orthrus.core.dataset module<a class="headerlink" href="#orthrus-core-dataset-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="orthrus-core-helper-module">
-<h2>orthrus.core.helper module<a class="headerlink" href="#orthrus-core-helper-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-orthrus.core.helper">
+<span id="orthrus-core-helper-module"></span><h2>orthrus.core.helper module<a class="headerlink" href="#module-orthrus.core.helper" title="Permalink to this headline">¶</a></h2>
+<p>This module contains user-defined and general purpose helper functions use by the orthrus package.</p>
+<dl class="py function">
+<dt id="orthrus.core.helper.batch_jobs_">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">batch_jobs_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function_handle</span></em>, <em class="sig-param"><span class="n">list_of_arguments</span></em>, <em class="sig-param"><span class="n">verbose_frequency</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">num_cpus_per_worker</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">num_gpus_per_worker</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">local_mode</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.batch_jobs_" title="Permalink to this definition">¶</a></dt>
+<dd><p>This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
+which defines the worker, and a list of arguments for the jobs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function_handle</strong> – Handle of the function or job</p></li>
+<li><p><strong>of arguments</strong> (<em>list</em>) – It is a list of argument list (see example below).</p></li>
+<li><p><strong>verbose_frequency</strong> (<em>int</em>) – this parameter controls the frequency of progress outputs for the ray workers to console; an output is
+printed to console after every verbose_frequency number of processes complete execution. (default: 10)</p></li>
+<li><p><strong>num_cpus_per_worker</strong> (<em>float</em>) – Number of CPUs each worker needs. This can be a fraction, check
+<a class="reference external" href="https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources">ray specifying required resources</a> for more details. (default: 1.)</p></li>
+<li><p><strong>num_gpus_per_worker</strong> (<em>float</em>) – <p>Number of GPUs each worker needs. This can be fraction, check
+<a class="reference external" href="https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources">ray specifying required resources</a> for more details. (default: 0.)</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>a list of Ray process object references for the all jobs that were executed in parallel (all have finished execution).
+Note: This method calls ray.init() but doesn’t call ray.shutdown() to preseve object references. It must be done</p>
+<blockquote>
+<div><p>after the object references have been used</p>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">batch_jobs_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">job_handle</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_of_args</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">list_of_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">process_refs</span> <span class="o">=</span> <span class="n">batch_jobs_</span><span class="p">(</span><span class="n">job_handle</span><span class="p">,</span> <span class="n">list_of_args</span><span class="p">,</span> <span class="n">verbose_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_cpus_per_worker</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">process_refs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">process</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.default_val">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">default_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">attr</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">val</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.default_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a default value when a module doesn’t contain an attribute.
+:param module: Module in consideration
+:param attr: The name of the attribute whose existence is in question.
+:type attr: str
+:param val: The value to be used in the case this attribute doesn’t exist. The default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The value of the attribute or the default value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.generate_experiment">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">generate_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">proj_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.generate_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates the directory structure for an experiment and generates a parameters python file containing
+a template for experimental parameters to be exported for the experiment in mind. The experiment will automatically
+be placed in the Experiments directory of the project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the experiment.</p></li>
+<li><p><strong>proj_dir</strong> (<em>str</em>) – The file path of the project directory where the data is held. See <a class="reference internal" href="#orthrus.core.helper.generate_project" title="orthrus.core.helper.generate_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_project()</span></code></a>
+for auto-generation of a project directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.generate_project">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">generate_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.generate_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates the directory structure for a project— this includes a Data, Experiments, and scripts directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the project.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – The file path to the location where the project directory will be created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.generate_save_path">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">generate_save_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.generate_save_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes a file path, checks if the file exists, and then
+appends an integer in parentheses to the file name depending on the
+number of copies. This mimics the Linux functionality of making copies.
+If overwrite is True, then the function just returns the original path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The file path to be checked.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Flag indicating whether or not to overwrite the file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The modified file path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.get_close_matches_icase">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">get_close_matches_icase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">word</span></em>, <em class="sig-param"><span class="n">possibilities</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.get_close_matches_icase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Case-insensitive version of difflib.get_close_matches</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.load_object">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">load_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.load_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads and returns any object stored in pickle format at the file_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to load the instance from.</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – If False and the file is not found, the function will return None. The default is True, so
+the function will error when the file is not found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pickle object stored at the file_path.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ifr</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;./tol_vs_res_liver_ifr.pickle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.method_exists">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">method_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.method_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes a class instance and a method name and checks whether or not the method name
+is a method of the class instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<em>object</em>) – Instance of class to check for method.</p></li>
+<li><p><strong>method</strong> (<em>str</em>) – Name of method to check for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if method is a class method for the instance, false otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.module_from_path">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">module_from_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">module_path</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.module_from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function imports a module from a file path and returns the module object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_name</strong> (<em>string</em>) – Name of the module.</p></li>
+<li><p><strong>module_path</strong> (<em>string</em>) – Path of the module</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The module pointed to by the file path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.plot_scores">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">plot_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results_list</span></em>, <em class="sig-param"><span class="n">param_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">average</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">variation</span><span class="o">=</span><span class="default_value">'std'</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">20, 10</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.plot_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function plots the training and test scores from the results of classification experiments over a
+continuous range of hyper-parameters. It is helpful for these accuracy scores as one varies a continuous parameter
+for the classifier, or experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_list</strong> (<em>list</em>) – Each item in the list must be a dictionary which has a “scores” key pointing to a dataframe
+containing “Test” and “Train” rows of accuracy scores. See the output of <code class="xref py py-meth docutils literal notranslate"><span class="pre">DataSet.classify()</span></code>.</p></li>
+<li><p><strong>param_list</strong> (<em>list</em><em> or </em><em>ndarray</em>) – List of hyper-parameters used to generate each result in the <code class="docutils literal notranslate"><span class="pre">results_list</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> each result will be indexed as 1,2,3,…</p></li>
+<li><p><strong>average</strong> (<em>string</em>) – Method of averaging to use. So far there are only two options: “mean” and “median”. The
+deafult is “mean”.</p></li>
+<li><p><strong>variation</strong> (<em>string</em>) – Method of variation to use; provides error bars in the plot to see the variation of the
+scores across experiments. So far there are only two options: “std” and “minmax”, where “minmax” indicates
+using the minimum score and maximum score respectively. The default is “std”.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Size of the figure, e.g. (width, height). The default is (20, 10).</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – All keyword arguments are passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.update()</span></code> for plot customizations.
+See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_api.html">here</a> for all possible inputs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">orthrus.core.dataset</span> <span class="k">as</span> <span class="nn">dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.sparse.classifiers.svm</span> <span class="kn">import</span> <span class="n">SSVMClassifier</span> <span class="k">as</span> <span class="n">SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcom.solvers</span> <span class="kn">import</span> <span class="n">LPPrimalDualPy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span> <span class="k">as</span> <span class="n">bsr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">plot_scores</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;./test_data/GSE161731_tmm_log2.ds&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># setup classification experiment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">SSVM</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covid_healthy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;COVID-19&#39;</span><span class="p">,</span> <span class="s1">&#39;healthy&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run classification while varying C in SSVM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="n">C_range</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">ssvm</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># run classification</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">results</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">ssvm</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;cohort&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">sample_ids</span><span class="o">=</span><span class="n">covid_healthy</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">partitioner</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">scorer</span><span class="o">=</span><span class="n">bsr</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;covid_vs_healthy_SSVM_5-fold&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">results_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># plot scores across C_range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_scores</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">param_list</span><span class="o">=</span><span class="n">C_range</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Mean BSR of 5-fold SSVM /w Std. Dev. Err Bars&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">yticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">),</span>
+<span class="gp">... </span>            <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;balanced success rate&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.pop_first_element">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">pop_first_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.pop_first_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops and returns the first element from an iterator.
+If the object is not an iterator the object itself is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>object</em>) – object to be popped.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An element in x or x itself.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.save_object">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">save_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">object</span></em>, <em class="sig-param"><span class="n">file_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">overwrite</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.save_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method saves an an object in pickle format at the specified path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object</strong> (<em>object</em>) – Object to save to disk.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – Path of the file to save the instance to.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If True and the file_path already exists, then the associated file will be overwritten.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.scatter_plotly">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">scatter_plotly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zlabel</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">900, 800</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_dash</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.scatter_plotly" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses plotly to plot the numerical columns of a pandas dataframe against its categorical
+or numerical metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
+must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
+attribute resp. The grp_mrkrs attribute is optional.</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
+<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
+<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
+markers to such as .,+,x,etc..</p></li>
+<li><p><strong>mrkr_size</strong> (<em>int</em>) – The size to be used for the markers. Default is 10.</p></li>
+<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
+37 distinct markers.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – The x-axis label to use. The default is blank.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – The y-axis label to use. The default is blank.</p></li>
+<li><p><strong>zlabel</strong> (<em>str</em>) – The z-axis label to use. Only applies if dim = 2. The default is blank.</p></li>
+<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
+determines the height of the figure. The default is (900, 800).</p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
+<li><p><strong>use_dash</strong> (<em>bool</em>) – Flag indicating whether to host the figure through dash.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Passed directly to <code class="docutils literal notranslate"><span class="pre">plotly.express.scatter</span></code> and then to <code class="docutils literal notranslate"><span class="pre">dash.Dash.app.run_server</span></code> for
+configuring host server. See dash documentation for further details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The figure object for more advanced plots</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>fig</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">scatter_plotly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_plotly</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">use_dash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="orthrus.core.helper.scatter_pyplot">
+<code class="sig-prename descclassname">orthrus.core.helper.</code><code class="sig-name descname">scatter_pyplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dim</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">grp_colors</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">palette</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grp_mrkrs</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mrkr_list</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtitle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="p">:</span> <span class="n">tuple</span> <span class="o">=</span> <span class="default_value">14, 10</span></em>, <em class="sig-param"><span class="n">no_axes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.helper.scatter_pyplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses matplotlib’s pyplot to plot the numerical columns of a pandas dataframe against its categorical
+or numerical metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the numerical data and metadata for plotting. The first dim columns
+must contain the numerical data, while the last columns must contain the grp_color attribute and grp_mrkrs
+attribute resp. The grp_mrkrs attribute is optional.</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – The dimension to plot the data in, it can be 2 or 3.</p></li>
+<li><p><strong>grp_colors</strong> (<em>str</em>) – The name of the column to color the data by.</p></li>
+<li><p><strong>palette</strong> (<em>str</em>) – String signfying the seaborn palette to use. Default is ‘Accent’ for categorical metadata, and
+‘magma’ for numerical metadata.</p></li>
+<li><p><strong>grp_mrkrs</strong> (<em>str</em>) – The name of the column to mark the data by. Mark means to assign
+markers to such as .,+,x,etc..</p></li>
+<li><p><strong>mrkr_list</strong> (<em>int</em>) – List of markers to use for marking the data. The default is a list of
+37 distinct markers.</p></li>
+<li><p><strong>subtitle</strong> (<em>str</em>) – A custom subtitle to the plot. The default is blank.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Tuple whose x-coordinate determines the width of the figure and y-coordinate
+determines the height of the figure. The default is (14, 10).</p></li>
+<li><p><strong>no_axes</strong> (<em>bool</em>) – Flag indicating whether or not to show the axes in the plot.</p></li>
+<li><p><strong>save_name</strong> (<em>str</em>) – The path of where to save the figure. If not given the figure will not be saved.</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – Passed to pyplot’s show function. If True the user must close the pervious plot before
+another plot will appear.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – All keyword arguments are passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 2
+or <code class="docutils literal notranslate"><span class="pre">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</span></code> if <code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code> = 3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inplace method.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydataset</span> <span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">pydat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">scatter_pyplot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pydat</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scatter_pyplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">grp_colors</span><span class="o">=</span><span class="s1">&#39;Species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Iris Dataset&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Sepal Length (cm)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sepal Width (cm)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="orthrus-core-pipeline-module">
 <h2>orthrus.core.pipeline module<a class="headerlink" href="#orthrus-core-pipeline-module" title="Permalink to this headline">¶</a></h2>
