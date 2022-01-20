@@ -3033,7 +3033,6 @@ class Report(Score):
             the verbosity the larger the text output. Default is 1, indicating the standard text output with a
             :py:class:`Process` instance.
 
-        score_args (dict): Keyword arguments passed to :py:attr:`Score.process()`.
 
         pred_type (str): Can be either "class_labels", "class_scores", "reg_scores", currently. It indicates the
             type predictions made, i.e., classification labels, classification scores, or regression scores. The
@@ -3070,36 +3069,33 @@ class Report(Score):
     Examples:
             >>> # imports
             >>> import os
-            >>> from orthrus.core.pipeline import Score, Classify, Partition
+            >>> from orthrus.core.pipeline import Report, Classify, Partition
             >>> from sklearn.ensemble import RandomForestClassifier as RFC
             >>> from sklearn.model_selection import StratifiedShuffleSplit
-            >>> from sklearn.metrics import balanced_accuracy_score
             >>> from orthrus.core.dataset import load_dataset
             ...
             >>> # load dataset
             >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
-            ...                                'test_data/Iris/Data/iris.ds'))
+            ...                            'test_data/Iris/Data/iris.ds'))
             ...
             >>> # define 80-20 train/test partition
             >>> shuffle = Partition(process=StratifiedShuffleSplit(n_splits=1,
-            ...                                                    random_state=113,
-            ...                                                    train_size=.8),
-            ...                     process_name='80-20-tr-tst',
-            ...                     verbosity=1,
-            ...                     split_attr ='species',
-            ...                     )
+            ...                                                random_state=113,
+            ...                                                train_size=.8),
+            ...                    process_name='80-20-tr-tst',
+            ...                    verbosity=1,
+            ...                    split_attr='species',
+            ...                    )
             ...
             >>> # define random forest classify process
             >>> rf = Classify(process=RFC(),
-            ...                process_name='RF',
-            ...                class_attr='species',
-            ...                verbosity=1)
-            ...
+            ...            process_name='RF',
+            ...            class_attr='species',
+            ...            verbosity=1)
+
             >>> # define balance accuracy score process
-            >>> bsr = Score(process=balanced_accuracy_score,
-            ...             process_name='bsr',
-            ...             pred_attr='species',
-            ...             verbosity=2)
+            >>> report = Report(pred_attr='species',
+            ...                verbosity=2)
             ...
             >>> # run partition and classification processes
             >>> ds, results_0 = shuffle.run(ds)
@@ -3109,11 +3105,28 @@ class Report(Score):
             >>> [results_1[batch].update(results_0[batch]) for batch in results_1]
             ...
             >>> # score classification results
-            >>> ds, results = bsr.run(ds, results_1)
-            -----------
-            bsr scores:
-            Train: 100.00%
-            Test: 96.67%
+            >>> ds, results = report.run(ds, results_1)
+
+            Now we can plot the statistics of our report. For example we will plot the test scores
+            attained using our random forest classifier.
+
+            >>> # imports
+            >>> from matplotlib import pyplot as plt
+            >>> import numpy as np
+            ...
+            >>> # plot test scores
+            >>> test_scores = report.report()['train_test'].filter(regex="^((?!Support).)*$").filter(regex="Test")
+            >>> test_scores.columns = test_scores.columns.str.strip("Test_")
+            >>> test_scores.loc["batch_0_report_scores"].plot.bar(title="Iris Dataset Random Forest Test Scores",
+            ...                                                   rot=30, figsize=(15, 10), grid=True,
+            ...                                                   yticks=np.arange(0, 1.1, .1))
+            >>> plt.savefig(os.path.join(os.environ['ORTHRUS_PATH'], "docsrc/figures/iris_rf_test_scores.png"))
+
+            .. figure:: ../figures/iris_rf_test_scores.png
+                :width: 800px
+                :align: center
+                :alt: alternate text
+                :figclass: align-center
     """
 
     def __init__(self,
