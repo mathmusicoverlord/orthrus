@@ -1229,7 +1229,7 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 <span class="gp">&gt;&gt;&gt; </span><span class="n">covid_healthy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;COVID-19&#39;</span><span class="p">,</span> <span class="s1">&#39;healthy&#39;</span><span class="p">])</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run classification while varying C in SSVM</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">C_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">results_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="n">C_range</span><span class="p">:</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">ssvm</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
@@ -1248,7 +1248,7 @@ See <a class="reference external" href="https://matplotlib.org/3.3.3/api/axes_ap
 <span class="gp">... </span>            <span class="n">param_list</span><span class="o">=</span><span class="n">C_range</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Mean BSR of 5-fold SSVM /w Std. Dev. Err Bars&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-<span class="gp">... </span>            <span class="n">yticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">),</span>
+<span class="gp">... </span>            <span class="n">yticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">),</span>
 <span class="gp">... </span>            <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;balanced success rate&#39;</span><span class="p">)</span>
 </pre></div>
@@ -1628,7 +1628,7 @@ classifier.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
@@ -2274,7 +2274,7 @@ easily generate training/validation/test labels for a dataset by calling two par
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
@@ -2472,7 +2472,7 @@ of its results.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="p">)</span>
@@ -2972,9 +2972,6 @@ can be done.</p>
 <dt>verbosity (int): Number indicating the level of verbosity, i.e., text output to console to the user. The higher</dt><dd><p>the verbosity the larger the text output. Default is 1, indicating the standard text output with a
 <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> instance.</p>
 </dd>
-</dl>
-<p>score_args (dict): Keyword arguments passed to <a class="reference internal" href="#orthrus.core.pipeline.Score.process" title="orthrus.core.pipeline.Score.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Score.process()</span></code></a>.</p>
-<dl class="simple">
 <dt>pred_type (str): Can be either “class_labels”, “class_scores”, “reg_scores”, currently. It indicates the</dt><dd><p>type predictions made, i.e., classification labels, classification scores, or regression scores. The
 default is “class_labels”.</p>
 </dd>
@@ -3009,36 +3006,34 @@ scores for each sample type: “Train”, “Valid”, “Test”.</p></li>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Score</span><span class="p">,</span> <span class="n">Classify</span><span class="p">,</span> <span class="n">Partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Report</span><span class="p">,</span> <span class="n">Classify</span><span class="p">,</span> <span class="n">Partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span> <span class="k">as</span> <span class="n">RFC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">balanced_accuracy_score</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># load dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
-<span class="gp">... </span>                               <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
+<span class="gp">... </span>                           <span class="s1">&#39;test_data/Iris/Data/iris.ds&#39;</span><span class="p">))</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
-<span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="p">)</span>
+<span class="gp">... </span>                                               <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
+<span class="gp">... </span>                                               <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
+<span class="gp">... </span>                   <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="n">split_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define random forest classify process</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rf</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">RFC</span><span class="p">(),</span>
-<span class="gp">... </span>               <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define balance accuracy score process</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bsr</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">balanced_accuracy_score</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;bsr&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>           <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define balance accuracy score process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">Report</span><span class="p">(</span><span class="n">pred_attr</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># run partition and classification processes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results_0</span> <span class="o">=</span> <span class="n">shuffle</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -3048,12 +3043,26 @@ scores for each sample type: “Train”, “Valid”, “Test”.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">results_1</span><span class="p">[</span><span class="n">batch</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results_0</span><span class="p">[</span><span class="n">batch</span><span class="p">])</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results_1</span><span class="p">]</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># score classification results</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">bsr</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">results_1</span><span class="p">)</span>
-<span class="go">-----------</span>
-<span class="go">bsr scores:</span>
-<span class="go">Train: 100.00%</span>
-<span class="go">Test: 96.67%</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">results_1</span><span class="p">)</span>
 </pre></div>
+</div>
+<p>Now we can plot the statistics of our report. For example we will plot the test scores
+attained using our random forest classifier.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># plot test scores</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_scores</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">report</span><span class="p">()[</span><span class="s1">&#39;train_test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s2">&quot;^((?!Support).)*$&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">test_scores</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;Test_&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_scores</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;batch_0_report_scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Iris Dataset Random Forest Test Scores&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                                  <span class="n">rot</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                                                  <span class="n">yticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span> <span class="s2">&quot;docsrc/figures/iris_rf_test_scores.png&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../_images/iris_rf_test_scores.png"><img alt="alternate text" src="../_images/iris_rf_test_scores.png" style="width: 800px;" /></a>
 </div>
 <dl class="py method">
 <dt id="orthrus.core.pipeline.Report.report">
@@ -3254,7 +3263,7 @@ scores for each sample type: “Train”, “Valid”, “Test”.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>

@@ -33,6 +33,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -190,8 +191,8 @@
   <div class="section" id="visualizing-data">
 <h1>Visualizing Data<a class="headerlink" href="#visualizing-data" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will go over some of the finer points of using the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code> method
-of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class. For all
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method
+of the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class. For all
 of these examples we will use the GSE73072 dataset, as it contains enough
 complexity to demostrate the utitlity of the method, see the
 <a class="reference external" href="what_is_the_dataset.html">What is the DataSet class?</a> tutorial for
@@ -209,7 +210,7 @@ details on how to access this dataset. First we load the dataset:</p>
 <div class="section" id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
 <p>One can easily start plotting their data without any in-depth knowledge of the method. In this example we will
-plot the GSE73072 data in 2D using <code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code> and coloring
+plot the GSE73072 data in 2D using <a class="reference internal" href="orthrus.manifold.html#orthrus.manifold.mds.MDS" title="orthrus.manifold.mds.MDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multi-dimensional</span> <span class="pre">Scaling</span></code></a> and coloring
 the plot by the <code class="docutils literal notranslate"><span class="pre">virus</span></code> attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.manifold.mds</span> <span class="kn">import</span> <span class="n">MDS</span>
@@ -218,7 +219,7 @@ the plot by the <code class="docutils literal notranslate"><span class="pre">vir
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="o">.</span>
-<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="align-center figure">
@@ -229,7 +230,7 @@ is overlap of the colored classes.</p>
 </div>
 <div class="section" id="customizing-plots">
 <h2>Customizing Plots<a class="headerlink" href="#customizing-plots" title="Permalink to this headline">¶</a></h2>
-<p>By default the <code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code>
+<p>By default the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a>
 method uses <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.html">Pyplot</a> as a backend and the
 <a class="reference external" href="https://seaborn.pydata.org/tutorial/color_palettes.html">seaborn</a> palettes for coloring. For example we can
 specify <code class="docutils literal notranslate"><span class="pre">palette='bright'</span></code> and <code class="docutils literal notranslate"><span class="pre">mrkr_list=['o']</span></code> to use the bright seaborn color palette and circle Pyplot
@@ -238,7 +239,7 @@ markers:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">embedding</span><span class="o">=</span><span class="n">mds</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bright&#39;</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">mrkr_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">],</span>
-<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;virus&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -248,7 +249,7 @@ markers:</p>
 <p>In fact any keyword arguments that can be passed to
 <a class="reference external" href="https://matplotlib.org/3.2.2/api/_as_gen/matplotlib.axes.Axes.update.html">matplotlib.axes.Axes.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=2</span></code>) and
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.mplot3d.axes3d.Axes3D.html">mpl_toolkits.mplot3d.axes3d.Axes3D.update()</a> (<code class="docutils literal notranslate"><span class="pre">dim=3</span></code>) can also be
-passed to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code> method. This allows for a great deal of plot customization in the case that
+passed to the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. This allows for a great deal of plot customization in the case that
 the default arguments are not sufficient. Here is an example where we restrict the samples to only <code class="docutils literal notranslate"><span class="pre">H1N1</span></code> and <code class="docutils literal notranslate"><span class="pre">H3N2</span></code> virus types via the keyword argument <code class="docutils literal notranslate"><span class="pre">sample_ids</span></code>, color the samples by time point in hours,
 use different markers for virus types via the <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> argument, and embed into 3D rather than 2D via the <code class="docutils literal notranslate"><span class="pre">dim</span></code> argument:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># restrict the samples to H1N1 and H3N2</span>
@@ -274,7 +275,7 @@ use different markers for virus types via the <code class="docutils literal notr
 </div>
 <div class="section" id="saving-plots">
 <h2>Saving Plots<a class="headerlink" href="#saving-plots" title="Permalink to this headline">¶</a></h2>
-<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code> method. By default
+<p>In order to save a plot, one can specify <code class="docutils literal notranslate"><span class="pre">save=True</span></code> in the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.visualize" title="orthrus.core.dataset.DataSet.visualize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">visualize()</span></code></a> method. By default
 plots will save to the <code class="docutils literal notranslate"><span class="pre">DataSet.path</span></code> directory and with the name <code class="docutils literal notranslate"><span class="pre">DataSet.name</span></code> _ <code class="docutils literal notranslate"><span class="pre">viz_name</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.imputation_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">DataSet.normalization_method</span></code> _ <code class="docutils literal notranslate"><span class="pre">attr</span></code> _  <code class="docutils literal notranslate"><span class="pre">cross_attr</span></code> _ <code class="docutils literal notranslate"><span class="pre">dim</span></code>
 with the appropriate extension. Alternatively one can specify the keyword argument <code class="docutils literal notranslate"><span class="pre">save_name</span></code> without an extension, e.g., <code class="docutils literal notranslate"><span class="pre">save_name=gse73072_mds_dim3</span></code>.</p>
 </div>

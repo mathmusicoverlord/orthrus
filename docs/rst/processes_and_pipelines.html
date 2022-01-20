@@ -33,6 +33,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -176,18 +177,18 @@
   <div class="section" id="processes-and-pipelines">
 <h1>Processes and Pipelines<a class="headerlink" href="#processes-and-pipelines" title="Permalink to this headline">¶</a></h1>
 <p>For more involved machine learning experiments we require methods outside
-of those provided by the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class,
-e.g., <code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code>
-and <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select()</span></code>.
+of those provided by the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class,
+e.g., <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a>
+and <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select()</span></code></a>.
 The orthrus package provides two base classes which enable more advanced and
 automated workflows.</p>
 <div class="section" id="processes">
 <h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class is an abstract base class which wraps around
+<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> class is an abstract base class which wraps around
 <a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like objects and makes them directly applicable to
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> objects—doing away with much of the boilerplate
+<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> objects—doing away with much of the boilerplate
 code for extracting labels, transforming data, etc. A simple example would be using the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code> subclass to log transform a dataset:</p>
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> subclass to log transform a dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Transform</span>
@@ -242,7 +243,7 @@ In other cases, where we do have multiple train/test splits, each batch will yie
 to the training samples of that batch.</p>
 <div class="section" id="partitioning">
 <h3>Partitioning<a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code> class is used to generate the batches described
+<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class is used to generate the batches described
 above. This class wraps <a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like paritioners and generates
 train/test labels according to the parititoning scheme. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
@@ -287,7 +288,7 @@ train/test labels according to the parititoning scheme. For example:</p>
 </div>
 <p>We can see that for each batch we can extract a set of train/test labels which are indexed by the samples
 in the dataset. We can also collect all of the train/test labels across all batches by using the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code> method:</p>
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process.collapse_results" title="orthrus.core.pipeline.Process.collapse_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># collapse train/test labels across batches</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span><span class="o">.</span><span class="n">collapse_results</span><span class="p">()[</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">]</span>
 <span class="go">--------------------------------------------------------------------------------------</span>
@@ -310,7 +311,7 @@ in the dataset. We can also collect all of the train/test labels across all batc
 <div class="section" id="train-validation-test-made-easy">
 <h3>Train/Validation/Test Made Easy<a class="headerlink" href="#train-validation-test-made-easy" title="Permalink to this headline">¶</a></h3>
 <p>In some experiments it useful to generate validation data within your training data, e.g.,
-hyperparameter tuning. The <code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code> class can acheive
+hyperparameter tuning. The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class can acheive
 this task by nesting two of its instances. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
@@ -322,7 +323,7 @@ this task by nesting two of its instances. For example:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
@@ -441,7 +442,7 @@ a cross-validation experiment and then train a PCA embedding on each training ba
 </pre></div>
 </div>
 <p>We can even transform the dataset across the transforms generated for each batch with one
-call of <code class="xref py py-meth docutils literal notranslate"><span class="pre">transform()</span></code>, e.g.,</p>
+call of <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform.transform" title="orthrus.core.pipeline.Transform.transform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transform()</span></code></a>, e.g.,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># transfrom dataset using each batch-transform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds_pca_dict</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="go">-------------------------------------------------------------</span>
