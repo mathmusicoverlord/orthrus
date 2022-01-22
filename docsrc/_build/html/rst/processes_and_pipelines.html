@@ -530,7 +530,7 @@ replacing zero with half the non-zero minimum, and then log2 normalizing the dat
 <p>We can visualize the dataset using PCA by running the script
 <a class="reference external" href="https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py">visualize_dataset</a>
 to produce the plot shown here <a class="reference external" href="TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html">TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html</a>.
-We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:</p>
+We will run a 5-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:</p>
 <ul class="simple">
 <li><p>Data standardization</p></li>
 <li><p>Feature selection (dimension reduction) with <code class="xref py py-class docutils literal notranslate"><span class="pre">SSVMSelect</span></code></p></li>
@@ -554,11 +554,11 @@ We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumo
 <dt>and build the processes involved:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define kfold partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Partition</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="gp">... </span>                                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                                <span class="n">random_state</span><span class="o">=</span><span class="mi">3458</span><span class="p">,</span>
 <span class="gp">... </span>                                <span class="p">),</span>
-<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;10-fold-CV&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;5-fold-CV&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define standardization</span>
@@ -576,7 +576,7 @@ We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumo
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ssvm</span> <span class="o">=</span> <span class="n">FeatureSelect</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">SSVMSelect</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="n">LPPrimalDualPy</span><span class="p">),</span>
 <span class="gp">... </span>                     <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;ssvm&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="n">supervised_attr</span><span class="o">=</span><span class="s1">&#39;tumor_class&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                     <span class="n">f_ranks_handle</span><span class="o">=</span><span class="s1">&#39;weights_&#39;</span>
+<span class="gp">... </span>                     <span class="n">f_ranks_handle</span><span class="o">=</span><span class="s1">&#39;f_ranks&#39;</span>
 <span class="gp">... </span>                     <span class="p">)</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define classifier</span>
@@ -596,7 +596,118 @@ We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumo
 </pre></div>
 </div>
 </dd>
+<dt>We are now ready to build the pipeline:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="p">(</span><span class="n">kfold</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">ssvm</span><span class="p">,</span> <span class="n">svc</span><span class="p">,</span> <span class="n">report</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">pipeline_name</span><span class="o">=</span><span class="s1">&#39;kfold_std_ssvm_svc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                                 <span class="s2">&quot;test_data/TCGA-PANCAN-HiSeq-801x20531/&quot;</span> \
+<span class="gp">... </span>                                                 <span class="s2">&quot;Pipelines/kfold_std_ssvm_svc.pickle&quot;</span><span class="p">),</span>
+<span class="gp">... </span>                    <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
 </dl>
+<p>As we can see a pipeline is glorified tuple of processes,
+its primary job is to manage the assembly line and translate
+the results from one process to the next. One argument of note is the
+<a class="reference internal" href="orthrus.core.html#id16" title="orthrus.core.pipeline.Pipeline.checkpoint_path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">checkpoint_path</span></code></a>,
+which sets the path of the serialized (pickled) pipeline object on the disk,
+and enables the pipeline to be saved after the completion of each process. This
+is useful in the context of long training and possible interruptions in the computation.
+By saving the pipeline periodically, it can be interrupted and pickup after its
+last completed process. We can even stop the pipeline before its hits a certain process, and
+then pick it up later. We will demonstrate this now:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># start the ray server</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run the pipeline up until the reporting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and save the pipeline after each completed process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">stop_before</span><span class="o">=</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Notice that our pipeline has been saved to the disk in the location
+specified and that we can now start the pipeline again to complete
+the final reporting step:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># complete the pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the excution of this pipeline, we are ensured that all models are only
+ever trained on the training data, and we can be sure that our test scores
+are as unbiased as possible. We can now extract the test results of our experiment,
+this is a good point to show how one loads a pipeline from the disk:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># load the pipeline (not needed, just for example)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.helper</span> <span class="kn">import</span> <span class="n">load_object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ORTHRUS_PATH&#39;</span><span class="p">],</span>
+<span class="go">                                        &quot;test_data/TCGA-PANCAN-HiSeq-801x20531/&quot; \</span>
+<span class="go">                                        &quot;Pipelines/kfold_std_ssvm_svc.pickle&quot;))</span>
+</pre></div>
+</div>
+<p>We can now extract our report process from the pipeline to view the test statistics:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># report test statistics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_scores</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">report</span><span class="p">()[</span><span class="s1">&#39;train_test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s2">&quot;^((?!Support).)*$&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">test_scores</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;Test_&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Scores:&quot;</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="n">test_scores</span><span class="p">)</span>
+<span class="go">----------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+<span class="go">Test Scores:</span>
+<span class="go">                        Coad_Precision Coad_Recall Coad_F1-scor Luad_Precision  ... Macro avg_F1-scor Weighted avg_Precision Weighted avg_Recall Weighted avg_F1-scor</span>
+<span class="go">report prediction scores                                                         ...</span>
+<span class="go">batch_0_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0</span>
+<span class="go">batch_1_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0</span>
+<span class="go">batch_2_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0</span>
+<span class="go">batch_3_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0</span>
+<span class="go">batch_4_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0</span>
+<span class="go">[5 rows x 13 columns]</span>
+<span class="go">----------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+<p>If only every problem was that easy, but it demonstrates the process.
+We can also view the features that we found in our feature selection process:</p>
+<blockquote>
+<div><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># show top 10 features for batch 0 against the other batches</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_ranks</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">processes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">collapse_results</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;f_ranks&#39;</span><span class="p">)[</span><span class="s1">&#39;f_ranks&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">batch_0_ranks</span> <span class="o">=</span> <span class="n">feature_ranks</span><span class="p">[</span><span class="s2">&quot;batch_0_Ranks_f_ranks&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_ranks</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s1">&#39;Ranks&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">batch_0_ranks</span><span class="p">[:</span><span class="mi">10</span><span class="p">]]</span>
+<span class="go">-------------------------------------------------------------------------------------------------------------------------------</span>
+<span class="go">ssvm f_ranks  batch_0_Ranks_f_ranks  batch_1_Ranks_f_ranks  batch_2_Ranks_f_ranks  batch_3_Ranks_f_ranks  batch_4_Ranks_f_ranks</span>
+<span class="go">ssvm f_ranks</span>
+<span class="go">gene_3523                         0                      1                      4                     21                     11</span>
+<span class="go">gene_15899                        1                      0                      0                      6                      0</span>
+<span class="go">gene_4805                         2                      3                      6                     12                     35</span>
+<span class="go">gene_5829                         3                     25                      8                     39                      1</span>
+<span class="go">gene_15591                        4                      9                      3                      3                      8</span>
+<span class="go">gene_3                            5                     18                     17                    118                     19</span>
+<span class="go">gene_14034                        6                     13                      5                     15                     12</span>
+<span class="go">gene_6156                         7                     47                      9                      9                     82</span>
+<span class="go">gene_11349                        8                     17                      1                     61                      4</span>
+<span class="go">gene_10192                        9                     91                     39                     30                     50</span>
+<span class="go">-------------------------------------------------------------------------------------------------------------------------------</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># show attributes for batch 0 features</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">batch_0_attrs</span> <span class="o">=</span> <span class="n">feature_ranks</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s1">&#39;batch_0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">batch_0_ranks</span><span class="p">]</span>
+<span class="go">-----------------------------------------------------------------------------------------</span>
+<span class="go">ssvm f_ranks  batch_0_Ranks_f_ranks  batch_0_absWeights_f_ranks  batch_0_Selected_f_ranks</span>
+<span class="go">ssvm f_ranks</span>
+<span class="go">gene_3523                         0                1.516645e-01                         1</span>
+<span class="go">gene_15899                        1                1.362592e-01                         1</span>
+<span class="go">gene_4805                         2                1.117297e-01                         1</span>
+<span class="go">gene_5829                         3                6.269817e-02                         1</span>
+<span class="go">gene_15591                        4                5.880049e-02                         1</span>
+<span class="gp">... </span>                            <span class="o">...</span>                         <span class="o">...</span>                       <span class="o">...</span>
+<span class="go">gene_10510                    17717                1.801370e-13                         0</span>
+<span class="go">gene_5114                     17718                1.403558e-13                         0</span>
+<span class="go">gene_19791                    17719                1.339517e-13                         0</span>
+<span class="go">gene_13820                    17720                1.130697e-13                         0</span>
+<span class="go">gene_18571                    17721                8.205357e-14                         0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Every process in the pipeline can be accessed for the specific results. See the module
+<a class="reference internal" href="orthrus.core.html#module-orthrus.core.pipeline" title="orthrus.core.pipeline"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pipeline</span></code></a> for more specific details on each process and
+pipeline methods.</p>
 </div>
 </div>
 </div>

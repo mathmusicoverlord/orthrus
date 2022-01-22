@@ -350,7 +350,7 @@ replacing zero with half the non-zero minimum, and then log2 normalizing the dat
 We can visualize the dataset using PCA by running the script
 `visualize_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
 to produce the plot shown here `TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html <TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html>`_.
-We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:
+We will run a 5-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:
 
 * Data standardization
 * Feature selection (dimension reduction) with :py:class:`SSVMSelect <orthrus.sparse.classifiers.SSVMSelect>`
@@ -372,11 +372,11 @@ and build the processes involved:
     >>> # define kfold partition
     >>> from sklearn.model_selection import KFold
     >>> from orthrus.core.pipeline import Partition
-    >>> kfold = Partition(process=KFold(n_splits=10,
+    >>> kfold = Partition(process=KFold(n_splits=5,
     ...                                 shuffle=True,
     ...                                 random_state=3458,
     ...                                 ),
-    ...                   process_name='10-fold-CV',
+    ...                   process_name='5-fold-CV',
     ...                   )
     ...
     >>> # define standardization
@@ -394,7 +394,7 @@ and build the processes involved:
     >>> ssvm = FeatureSelect(process=SSVMSelect(solver=LPPrimalDualPy),
     ...                      process_name='ssvm',
     ...                      supervised_attr='tumor_class',
-    ...                      f_ranks_handle='weights_'
+    ...                      f_ranks_handle='f_ranks'
     ...                      )
     ...
     >>> # define classifier
@@ -411,9 +411,114 @@ including the final reporting:
     >>> from orthrus.core.pipeline import Report
     >>> report = Report(pred_attr='tumor_class')
 
+We are now ready to build the pipeline:
+    >>> # define pipeline
+    >>> from orthrus.core.pipeline import Pipeline
+    >>> pipeline = Pipeline(processes=(kfold, std, ssvm, svc, report),
+    ...                     pipeline_name='kfold_std_ssvm_svc',
+    ...                     checkpoint_path=os.path.join(os.environ['ORTHRUS_PATH'],
+    ...                                                  "test_data/TCGA-PANCAN-HiSeq-801x20531/" \
+    ...                                                  "Pipelines/kfold_std_ssvm_svc.pickle"),
+    ...                     parallel=True)
 
+As we can see a pipeline is glorified tuple of processes, 
+its primary job is to manage the assembly line and translate
+the results from one process to the next. One argument of note is the
+:py:attr:`checkpoint_path <orthrus.core.pipeline.Pipeline.checkpoint_path>`, 
+which sets the path of the serialized (pickled) pipeline object on the disk,
+and enables the pipeline to be saved after the completion of each process. This
+is useful in the context of long training and possible interruptions in the computation.
+By saving the pipeline periodically, it can be interrupted and pickup after its
+last completed process. We can even stop the pipeline before its hits a certain process, and
+then pick it up later. We will demonstrate this now:
 
+    >>> # start the ray server
+    >>> import ray
+    >>> ray.init()
+    ...
+    >>> # run the pipeline up until the reporting
+    >>> # and save the pipeline after each completed process
+    >>> pipeline.run(ds, stop_before='report', checkpoint=True)
 
+Notice that our pipeline has been saved to the disk in the location
+specified and that we can now start the pipeline again to complete
+the final reporting step:
 
+    >>> # complete the pipeline
+    >>> pipeline.run(ds, checkpoint=True)
 
+In the excution of this pipeline, we are ensured that all models are only
+ever trained on the training data, and we can be sure that our test scores
+are as unbiased as possible. We can now extract the test results of our experiment,
+this is a good point to show how one loads a pipeline from the disk:
 
+    >>> # load the pipeline (not needed, just for example)
+    >>> from orthrus.core.helper import load_object
+    >>> pipeline = load_object(os.path.join(os.environ['ORTHRUS_PATH'],
+                                            "test_data/TCGA-PANCAN-HiSeq-801x20531/" \
+                                            "Pipelines/kfold_std_ssvm_svc.pickle"))
+
+We can now extract our report process from the pipeline to view the test statistics:
+
+    >>> # report test statistics
+    >>> import numpy as np
+    >>> from matplotlib import pyplot as plt
+    >>> test_scores = report.report()['train_test'].filter(regex="^((?!Support).)*$").filter(regex="Test")
+    >>> test_scores.columns = test_scores.columns.str.strip("Test_")
+    >>> print("Test Scores:"); print(test_scores)
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    Test Scores:
+                            Coad_Precision Coad_Recall Coad_F1-scor Luad_Precision  ... Macro avg_F1-scor Weighted avg_Precision Weighted avg_Recall Weighted avg_F1-scor
+    report prediction scores                                                         ...
+    batch_0_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0
+    batch_1_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0
+    batch_2_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0
+    batch_3_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0
+    batch_4_report_scores               1.0         1.0          1.0            1.0  ...               1.0                    1.0                 1.0                  1.0
+    [5 rows x 13 columns]
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+If only every problem was that easy, but it demonstrates the process.
+We can also view the features that we found in our feature selection process:
+
+    >>> # show top 10 features for batch 0 against the other batches
+    >>> feature_ranks = pipeline.processes[2].collapse_results(which='f_ranks')['f_ranks']
+    >>> batch_0_ranks = feature_ranks["batch_0_Ranks_f_ranks"].argsort().values
+    >>> feature_ranks.filter(regex='Ranks').iloc[batch_0_ranks[:10]]
+    -------------------------------------------------------------------------------------------------------------------------------
+    ssvm f_ranks  batch_0_Ranks_f_ranks  batch_1_Ranks_f_ranks  batch_2_Ranks_f_ranks  batch_3_Ranks_f_ranks  batch_4_Ranks_f_ranks
+    ssvm f_ranks
+    gene_3523                         0                      1                      4                     21                     11
+    gene_15899                        1                      0                      0                      6                      0
+    gene_4805                         2                      3                      6                     12                     35
+    gene_5829                         3                     25                      8                     39                      1
+    gene_15591                        4                      9                      3                      3                      8
+    gene_3                            5                     18                     17                    118                     19
+    gene_14034                        6                     13                      5                     15                     12
+    gene_6156                         7                     47                      9                      9                     82
+    gene_11349                        8                     17                      1                     61                      4
+    gene_10192                        9                     91                     39                     30                     50
+    -------------------------------------------------------------------------------------------------------------------------------
+    >>> # show attributes for batch 0 features
+    >>> batch_0_attrs = feature_ranks.filter(regex='batch_0').iloc[batch_0_ranks]
+    ----------------------------------------------------------------------------------------- 
+    ssvm f_ranks  batch_0_Ranks_f_ranks  batch_0_absWeights_f_ranks  batch_0_Selected_f_ranks
+    ssvm f_ranks
+    gene_3523                         0                1.516645e-01                         1
+    gene_15899                        1                1.362592e-01                         1
+    gene_4805                         2                1.117297e-01                         1
+    gene_5829                         3                6.269817e-02                         1
+    gene_15591                        4                5.880049e-02                         1
+    ...                             ...                         ...                       ...
+    gene_10510                    17717                1.801370e-13                         0
+    gene_5114                     17718                1.403558e-13                         0
+    gene_19791                    17719                1.339517e-13                         0
+    gene_13820                    17720                1.130697e-13                         0
+    gene_18571                    17721                8.205357e-14                         0
+
+    [17722 rows x 3 columns]
+    -----------------------------------------------------------------------------------------
+
+Every process in the pipeline can be accessed for the specific results. See the module
+:py:mod:`pipeline <orthrus.core.pipeline>` for more specific details on each process and
+pipeline methods.
