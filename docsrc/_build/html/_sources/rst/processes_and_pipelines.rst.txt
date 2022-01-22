@@ -347,7 +347,71 @@ to produce the :py:class:`DataSet <orthrus.core.dataset.DataSet>` object. This s
 performs some standard preprocessing steps such as filtering out low expression genes,
 replacing zero with half the non-zero minimum, and then log2 normalizing the data.
 
-We can visualize the dataset by running the script
+We can visualize the dataset using PCA by running the script
 `visualize_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
-to produce the plot `TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html <TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html>`_
+to produce the plot shown here `TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html <TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html>`_.
+We will run a 10-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:
+
+* Data standardization
+* Feature selection (dimension reduction) with :py:class:`SSVMSelect <orthrus.sparse.classifiers.SSVMSelect>`
+* Classification with `LinearSVC <https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html>`_
+
+First we load our dataset object:
+    >>> # imports
+    >>> import os
+    >>> from orthrus.core.dataset import load_dataset
+    >>> ds = load_dataset(os.path.join(os.environ['ORTHRUS_PATH'],
+    ...                                "test_data\\TCGA-PANCAN-HiSeq-801x20531\\Data\\TCGA-PANCAN-HiSeq-801x20531-log2.ds"))
+
+We then restrict our samples to the COAD and LUAD tumor classes:
+    >>> # restrict samples
+    >>> sample_ids = ds.metadata.query("tumor_class in ['COAD', 'LUAD']").index
+    >>> ds = ds.slice_dataset(sample_ids=sample_ids)
+
+and build the processes involved:
+    >>> # define kfold partition
+    >>> from sklearn.model_selection import KFold
+    >>> from orthrus.core.pipeline import Partition
+    >>> kfold = Partition(process=KFold(n_splits=10,
+    ...                                 shuffle=True,
+    ...                                 random_state=3458,
+    ...                                 ),
+    ...                   process_name='10-fold-CV',
+    ...                   )
+    ...
+    >>> # define standardization
+    >>> from sklearn.preprocessing import StandardScaler
+    >>> from orthrus.core.pipeline import Transform
+    >>> std = Transform(process=StandardScaler(),
+    ...                 process_name='std',
+    ...                 retain_f_ids=True,
+    ...                 )
+    ...
+    >>> # define feature selector
+    >>> from orthrus.solvers.linear import LPPrimalDualPy
+    >>> from orthrus.sparse.classifiers.svm import SSVMSelect
+    >>> from orthrus.core.pipeline import FeatureSelect
+    >>> ssvm = FeatureSelect(process=SSVMSelect(solver=LPPrimalDualPy),
+    ...                      process_name='ssvm',
+    ...                      supervised_attr='tumor_class',
+    ...                      f_ranks_handle='weights_'
+    ...                      )
+    ...
+    >>> # define classifier
+    >>> from sklearn.svm import LinearSVC
+    >>> from orthrus.core.pipeline import Classify
+    >>> svc = Classify(process=LinearSVC(class_weight='balanced'),
+    ...                process_name='svc',
+    ...                class_attr='tumor_class',
+    ...                f_weights_handle='coef_'
+    ...                )
+
+including the final reporting:
+    >>> # define report
+    >>> from orthrus.core.pipeline import Report
+    >>> report = Report(pred_attr='tumor_class')
+
+
+
+
 

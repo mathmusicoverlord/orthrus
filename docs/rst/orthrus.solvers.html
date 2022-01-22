@@ -206,6 +206,56 @@
 
 </dd></dl>
 
+<dl class="py function">
+<dt id="orthrus.solvers.linear.LPPrimalDualPy">
+<code class="sig-prename descclassname">orthrus.solvers.linear.</code><code class="sig-name descname">LPPrimalDualPy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">A</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.solvers.linear.LPPrimalDualPy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a Python implementation of a code solving
+a linear program of the form:</p>
+<dl class="simple">
+<dt>max c’x</dt><dd><p>s.t. Ax&gt;=b, x&gt;=0.</p>
+</dd>
+</dl>
+<p>Note this may be a different <a href="#id1"><span class="problematic" id="id2">``</span></a>standard form” than seen elsewhere.
+Original version of this in calcom was named <a href="#id3"><span class="problematic" id="id4">``</span></a>rKKTxy” and lived in
+ssvmclassifier.py. Before that, it was a Matlab code by
+Sofya Chepushtanova and Michael Kirby, and later implemented in Python by
+Tomojit Ghosh.</p>
+<p>Inputs:</p>
+<blockquote>
+<div><p>c, np.ndarray of type float or double, with c.shape = (N,1)
+A, np.ndarray of type float or double, with A.shape = (M,N)
+b, np.ndarray of type float or double, with b.shape = (M,1)</p>
+</div></blockquote>
+<p>Optional inputs:</p>
+<blockquote>
+<div><p>output_flag     (integer, default 0, indicating form of the output)
+verbosity       (integer, default 0. Nonzero =&gt; print statements used)
+use_cuda        (boolean, default False. indicating whether to use CUDA or not)</p>
+<p>max_iters       (integer, default 200)
+delta           (float or double, default 0.1)
+tol             (float or double, default 10**-3)
+dtheta_min      (float or double, default 10**-9)</p>
+<p>debug           (boolean, default False. If True, immediately turns on the Python debugger.)</p>
+</div></blockquote>
+<p>Outputs: depends on the value of output_flag:</p>
+<blockquote>
+<div><dl>
+<dt>output_flag==0: (default)</dt><dd><p>The minimizer x, an np.ndarray with x.shape = (N,)</p>
+</dd>
+<dt>output_flag==1:</dt><dd><p>IP, a dictionary which has detailed information about the
+solver and solution. This is used by
+calcom.classifiers.SSVMClassifier(), as it has auxilliary
+information used in solving the sparse SVM optimization
+problem specifically.</p>
+<dl class="simple">
+<dt>NOTE: this may change in the future to make this code less beholden</dt><dd><p>to SSVM.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
 </div>
 </div>
 
