@@ -7,7 +7,7 @@ import torch as tc
 import numpy as np
 from matplotlib import pyplot as plt
 from orthrus.solvers.linear import LPNewton
-from orthrus.solvers.nonlinear import LPPrimalDualPy
+from orthrus.solvers.linear import LPPrimalDualPy
 from orthrus.sparse.feature_selection.helper import get_correlates
 from copy import copy
 import ray
