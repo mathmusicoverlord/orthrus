@@ -342,5 +342,5 @@ In this experiment we will be working with the PANCAN dataset downloaded from
 the `UCI Machine Learning Repository <http://archive.ics.uci.edu/ml/datasets/gene+expression+cancer+RNA-Seq#>`_.
 To follow along first download the dataset and store the ``data.csv`` and ``labels.csv``
 files into the ``$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data`` directory.
-Once the data is stored their run the script `generate_dataset <../test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
+Once the data is stored their run the script `generate_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
 
