@@ -23,5 +23,3 @@ if __name__ == "__main__":
                  mrkr_size=10,
                  opacity=.7,
                  subtitle='')
-
-    #
