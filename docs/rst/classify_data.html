@@ -206,7 +206,7 @@ on the left over 20%, and record the
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the partitioner</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">train_test_part</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># for reproducibility</span>
-<span class="gp">... </span>                               <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>   <span class="c1"># test_size=.2 implicitly,</span>
+<span class="gp">... </span>                               <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">,</span>   <span class="c1"># test_size=.2 implicitly,</span>
 <span class="gp">... </span>                               <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="p">)</span>
 
@@ -392,7 +392,7 @@ classification results:</p>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the partitioner</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">train_test_part</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="gp">... </span>                                         <span class="n">train_size</span><span class="o">=.</span><span class="mi">6</span><span class="p">,</span>
+<span class="gp">... </span>                                         <span class="n">train_size</span><span class="o">=</span><span class="mf">.6</span><span class="p">,</span>
 <span class="gp">... </span>                                         <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                         <span class="p">)</span>
 

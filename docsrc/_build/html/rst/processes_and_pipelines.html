@@ -100,6 +100,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#parallel-processing">Parallel Processing</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#pipelines">Pipelines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classifying-tumor-classes-from-rna-seq-hiseq-samples">Classifying Tumor Classes from RNA-seq (HiSeq) Samples</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -323,7 +327,7 @@ this task by nesting two of its instances. For example:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># define 80-20 train/test partition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">Partition</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                                                   <span class="n">random_state</span><span class="o">=</span><span class="mi">113</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=.</span><span class="mi">8</span><span class="p">),</span>
+<span class="gp">... </span>                                                   <span class="n">train_size</span><span class="o">=</span><span class="mf">.8</span><span class="p">),</span>
 <span class="gp">... </span>                    <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;80-20-tr-tst&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span>                    <span class="n">split_attr</span> <span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span>
@@ -379,6 +383,8 @@ a cross-validation experiment and then train a PCA embedding on each training ba
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.dataset</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Partition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Transform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="gp">...</span>
@@ -457,6 +463,67 @@ call of <a class="reference internal" href="orthrus.core.html#orthrus.core.pipel
 </div>
 <div class="section" id="parallel-processing">
 <h3>Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes training models can be significant cost in time, especially
+in a cross-validation experiment where many models needs to be trained, and
+they are done in sequence. Orthrus utilizes the python package
+<a class="reference external" href="https://www.ray.io/docs">ray</a>, a distributed computing library,
+which enables us to train our models in parallel with minimal code change.
+For example in PCA training step above we can start a ray server hosted on
+our local machine, and then provide the <code class="docutils literal notranslate"><span class="pre">parallel=True</span></code> flag to our
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># initialize the ray server</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>  <span class="c1"># specify resources here if needed, see docs.</span>
+<span class="go">----------------------------------------------------------------------</span>
+<span class="go">{&#39;node_ip_address&#39;: &#39;127.0.0.1&#39;,</span>
+<span class="go">&#39;raylet_ip_address&#39;: &#39;127.0.0.1&#39;,</span>
+<span class="go">&#39;redis_address&#39;: &#39;127.0.0.1:6379&#39;,</span>
+<span class="go">&#39;object_store_address&#39;: &#39;tcp://127.0.0.1:63452&#39;,</span>
+<span class="go">&#39;raylet_socket_name&#39;: &#39;tcp://127.0.0.1:63738&#39;,</span>
+<span class="go">&#39;webui_url&#39;: None,</span>
+<span class="go">&#39;metrics_export_port&#39;: 61226,</span>
+<span class="go">&#39;node_id&#39;: &#39;0912845b0dea2796c32db069295d89941ba31eb5aebe76cd53ac57f6&#39;}</span>
+<span class="go">----------------------------------------------------------------------</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define PCA embedding</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pca</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">process_name</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># run kfold-&gt;pca</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">kfold</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+<span class="go">-------------------------</span>
+<span class="go">(pid=22680) Fitting pca...</span>
+<span class="go">(pid=3396) Fitting pca...</span>
+<span class="go">(pid=8756) Fitting pca...</span>
+<span class="go">(pid=23980) Fitting pca...</span>
+<span class="go">(pid=15592) Fitting pca...</span>
+<span class="go">-------------------------</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># shutdown the server</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Checkout the processes <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Classify" title="orthrus.core.pipeline.Classify"><code class="xref py py-class docutils literal notranslate"><span class="pre">Classify</span></code></a>,
+<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Score" title="orthrus.core.pipeline.Score"><code class="xref py py-class docutils literal notranslate"><span class="pre">Score</span></code></a>,
+and <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Report" title="orthrus.core.pipeline.Report"><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></a> for more examples.</p>
+</div>
+</div>
+<div class="section" id="pipelines">
+<h2>Pipelines<a class="headerlink" href="#pipelines" title="Permalink to this headline">¶</a></h2>
+<p>For workflows involving more than 2 processes, chaining processes
+as above can be messy when trying to pass the results of each individual
+process along to the next. The
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code> class provides a way
+to seamlessly chain processes together along with the other helpful features,
+e.g., checkpointing in long pipelines.Here we provide a simple example of building
+a pipeline using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code> class.</p>
+<div class="section" id="classifying-tumor-classes-from-rna-seq-hiseq-samples">
+<h3>Classifying Tumor Classes from RNA-seq (HiSeq) Samples<a class="headerlink" href="#classifying-tumor-classes-from-rna-seq-hiseq-samples" title="Permalink to this headline">¶</a></h3>
+<p>In this experiment we will be working with the PANCAN dataset downloaded from
+the <a class="reference external" href="http://archive.ics.uci.edu/ml/datasets/gene+expression+cancer+RNA-Seq#">UCI Machine Learning Repository</a>.
+To follow along first download the dataset and store the <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">labels.csv</span></code>
+files into the <code class="docutils literal notranslate"><span class="pre">$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data</span></code> directory.
+Once the data is stored their run the script <a class="reference external" href="../../test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset">generate_dataset</a></p>
 </div>
 </div>
 </div>

@@ -17,7 +17,7 @@ github:
 	@rm -r ../docs/*
 	@touch ../docs/.nojekyll
 	@cp -a _build/html/. ../docs
-	@cp figures/gse73073_mds_viz_example_4_3d.html ../docs/rst/gse73073_mds_viz_example_4_3d.html
+	@cp figures/*.html ../docs/rst
 	@git add ../docs ../docsrc
 	@git commit -m "updated docs"
 	@git push

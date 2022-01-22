@@ -121,6 +121,7 @@ backend. Here is one where export the interative plotly figure to an ``.html`` f
     ...         save=True,
     ...         save_name='gse73073_mds_viz_example_4_3d',
     ...         figsize=(1500, 1000),
+    ...         opacity=.7,
     ...         mrkr_size=5,
     ...         subtitle='')
 

@@ -204,6 +204,8 @@ a cross-validation experiment and then train a PCA embedding on each training ba
     >>> # imports
     >>> import os
     >>> from orthrus.core.dataset import load_dataset
+    >>> from orthrus.core.pipeline import Partition
+    >>> from sklearn.model_selection import KFold
     >>> from orthrus.core.pipeline import Transform
     >>> from sklearn.decomposition import PCA
     ...
@@ -280,3 +282,65 @@ call of :py:meth:`transform() <orthrus.core.pipeline.Transform.transform>`, e.g.
 
 Parallel Processing
 ^^^^^^^^^^^^^^^^^^^
+Sometimes training models can be significant cost in time, especially 
+in a cross-validation experiment where many models needs to be trained, and
+they are done in sequence. Orthrus utilizes the python package
+`ray <https://www.ray.io/docs>`_, a distributed computing library,
+which enables us to train our models in parallel with minimal code change.
+For example in PCA training step above we can start a ray server hosted on
+our local machine, and then provide the ``parallel=True`` flag to our
+:py:class:`Transform <orthrus.core.pipeline.Transform>` class:
+
+    >>> # initialize the ray server
+    >>> import ray
+    >>> ray.init()  # specify resources here if needed, see docs.
+    ----------------------------------------------------------------------
+    {'node_ip_address': '127.0.0.1',
+    'raylet_ip_address': '127.0.0.1',
+    'redis_address': '127.0.0.1:6379',
+    'object_store_address': 'tcp://127.0.0.1:63452',
+    'raylet_socket_name': 'tcp://127.0.0.1:63738',
+    'webui_url': None,
+    'metrics_export_port': 61226,
+    'node_id': '0912845b0dea2796c32db069295d89941ba31eb5aebe76cd53ac57f6'}
+    ----------------------------------------------------------------------
+    >>> # define PCA embedding
+    >>> pca = Transform(process=PCA(n_components=4,
+    ...                             whiten=True),
+    ...                 process_name='pca',
+    ...                 parallel=True)
+    ...
+    >>> # run kfold->pca
+    >>> ds, results = pca.run(*kfold.run(ds))
+    -------------------------
+    (pid=22680) Fitting pca...
+    (pid=3396) Fitting pca...
+    (pid=8756) Fitting pca...
+    (pid=23980) Fitting pca...
+    (pid=15592) Fitting pca...
+    -------------------------
+    >>> # shutdown the server
+    >>> ray.shutdown()
+
+Checkout the processes :py:class:`Classify <orthrus.core.pipeline.Classify>`,
+:py:class:`Score <orthrus.core.pipeline.Score>`,
+and :py:class:`Report <orthrus.core.pipeline.Report>` for more examples.
+
+Pipelines
+---------
+For workflows involving more than 2 processes, chaining processes
+as above can be messy when trying to pass the results of each individual
+process along to the next. The 
+:py:class:`Pipeline <othrus.core.pipeline.Pipeline>` class provides a way
+to seamlessly chain processes together along with the other helpful features,
+e.g., checkpointing in long pipelines.Here we provide a simple example of building
+a pipeline using the :py:class:`Pipeline <othrus.core.pipeline.Pipeline>` class.
+
+Classifying Tumor Classes from RNA-seq (HiSeq) Samples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In this experiment we will be working with the PANCAN dataset downloaded from
+the `UCI Machine Learning Repository <http://archive.ics.uci.edu/ml/datasets/gene+expression+cancer+RNA-Seq#>`_.
+To follow along first download the dataset and store the ``data.csv`` and ``labels.csv``
+files into the ``$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data`` directory.
+Once the data is stored their run the script `generate_dataset <../../test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset>`_
+
