@@ -342,5 +342,12 @@ In this experiment we will be working with the PANCAN dataset downloaded from
 the `UCI Machine Learning Repository <http://archive.ics.uci.edu/ml/datasets/gene+expression+cancer+RNA-Seq#>`_.
 To follow along first download the dataset and store the ``data.csv`` and ``labels.csv``
 files into the ``$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data`` directory.
-Once the data is stored their run the script `generate_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
+Once the data is stored there run the script `generate_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
+to produce the :py:class:`DataSet <orthrus.core.dataset.DataSet>` object. This script
+performs some standard preprocessing steps such as filtering out low expression genes,
+replacing zero with half the non-zero minimum, and then log2 normalizing the data.
+
+We can visualize the dataset by running the script
+`visualize_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
+to produce the plot `TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html <TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html>`_
 

@@ -523,7 +523,13 @@ a pipeline using the <code class="xref py py-class docutils literal notranslate"
 the <a class="reference external" href="http://archive.ics.uci.edu/ml/datasets/gene+expression+cancer+RNA-Seq#">UCI Machine Learning Repository</a>.
 To follow along first download the dataset and store the <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">labels.csv</span></code>
 files into the <code class="docutils literal notranslate"><span class="pre">$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data</span></code> directory.
-Once the data is stored their run the script <a class="reference external" href="https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py">generate_dataset</a></p>
+Once the data is stored there run the script <a class="reference external" href="https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py">generate_dataset</a>
+to produce the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object. This script
+performs some standard preprocessing steps such as filtering out low expression genes,
+replacing zero with half the non-zero minimum, and then log2 normalizing the data.</p>
+<p>We can visualize the dataset by running the script
+<a class="reference external" href="https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py">visualize_dataset</a>
+to produce the plot <a class="reference external" href="TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html">TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html</a></p>
 </div>
 </div>
 </div>
