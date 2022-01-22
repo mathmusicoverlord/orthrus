@@ -3137,14 +3137,14 @@ class Report(Score):
                  sample_weight_attr: str = None,
                  infer_class_labels_on_output: bool = True,
                  classes: list = None,
+                 process=None,
+                 process_name=None,
+                 score_args=None,
                  ):
 
-        process = classification_report
-        process_name = "report"
-
         # init with Process class
-        super(Score, self).__init__(process=process,
-                                    process_name=process_name,
+        super(Score, self).__init__(process=classification_report,
+                                    process_name="report",
                                     parallel=parallel,
                                     verbosity=verbosity,
                                     )
