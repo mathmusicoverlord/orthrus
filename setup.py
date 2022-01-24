@@ -9,13 +9,13 @@ with open("requirements.txt", "r") as reqs_file:
 
 setuptools.setup(
     name="orthrus",  # Replace with your own username
-    version="0.0.5",
+    version="1.0.0",
     author="Eric Kehoe, Kartikay Sharma",
     author_email="ekehoe32@gmail.com",
-    description="A package for automating pre-processing, visualization, and classification of generic data sets",
+    description="A python package for scaling and automating pre-processing, visualization, classification, and features selection of generic data sets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    download_url="https://github.com/ekehoe32/orthrus/archive/refs/tags/v1.5-alpha.tar.gz",
+    download_url="https://github.com/ekehoe32/orthrus/archive/refs/tags/v1.0.0-beta.tar.gz",
     url="https://github.com/ekehoe32/orthrus",
     packages=setuptools.find_packages(),
     classifiers=[
