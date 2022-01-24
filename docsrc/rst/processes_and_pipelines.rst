@@ -348,7 +348,7 @@ performs some standard preprocessing steps such as filtering out low expression 
 replacing zero with half the non-zero minimum, and then log2 normalizing the data.
 
 We can visualize the dataset using PCA by running the script
-`visualize_dataset <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py>`_
+`visualize_data <https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/visualize_data.py>`_
 to produce the plot shown here `TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html <TCGA-PANCAN-HiSeq-801x20531_pca_viz_example_4_3d.html>`_.
 We will run a 5-fold cross-validation experiment classifying COAD vs. LUAD tumor classes using:
 
