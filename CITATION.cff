@@ -8,6 +8,6 @@ authors:
   - family-names: Sharma
     given-names: Kartik
 title: "Orthrus"
-version: v1.6-alpha
+version: v1.0.0-beta
 doi: 10.5281/zenodo.5875113
-date-released: 2022-01-19
+date-released: 2022-01-24
