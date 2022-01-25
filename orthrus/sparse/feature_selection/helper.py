@@ -748,8 +748,9 @@ class ReduceIFRFeatures(Transform):
                  verbose_frequency : int=10,
                  num_cpus_per_worker : float=1.,
                  num_gpus_per_worker : float=0.,
-                 local_mode=False):
-
+                 local_mode=False, 
+                 fit_args=None):
+        
         # init with Process class
         super(ReduceIFRFeatures, self).__init__(process=None,
                                         process_name='ReduceIFRFeatures',
@@ -771,6 +772,7 @@ class ReduceIFRFeatures(Transform):
         self.num_cpus_per_worker = num_cpus_per_worker
         self.num_gpus_per_worker = num_gpus_per_worker
         self.local_mode = local_mode
+        self.fit_args = fit_args
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
