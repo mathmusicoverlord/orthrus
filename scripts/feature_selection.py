@@ -51,7 +51,7 @@ append_to_meta = script_args.get('APPEND_TO_META',
                                     default_val(exp_params, 'APPEND_TO_META', False))
 
 training_transform = script_args.get('TRAINING_TRANSFORM',
-                                    default_val(exp_params, 'TRAINING_TRANSFORM', False))
+                                    default_val(exp_params, 'TRAINING_TRANSFORM', None))
 
 # define the script run function
 def run(ds,
