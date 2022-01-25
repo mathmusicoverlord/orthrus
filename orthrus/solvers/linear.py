@@ -347,7 +347,6 @@ def LPPrimalDualPy(c, A, b, **kwargs):
         w_t = w_t.cpu()
         p_t = p_t.cpu()
         z_t = z_t.cpu()
-
     x = x_t.numpy()
     w = w_t.numpy()
     p = p_t.numpy()
