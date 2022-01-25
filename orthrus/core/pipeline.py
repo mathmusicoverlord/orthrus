@@ -1010,6 +1010,11 @@ class Fit(Process, ABC):
             y = ds.metadata.loc[training_ids, self.supervised_attr]
             self.fit_args['y'] = y
 
+        #  add supervised labels to fit args
+        if self.fit_args.get('group_attr', None) is not None:
+            groups = ds.metadata.loc[training_ids, self.fit_args['group_attr']]
+            self.fit_args['groups'] = groups
+
         # fit the process
         if self.verbosity > 0:
             print(r"Fitting %s..." % (self.process_name,))
@@ -1227,6 +1232,11 @@ class Transform(Fit):
         if self.supervised_attr is not None:
             y = ds.metadata.loc[training_ids, self.supervised_attr]
             self.fit_args['y'] = y
+
+        #  add supervised labels to fit args
+        if self.fit_args['group_attr'] is not None:
+            groups = ds.metadata.loc[training_ids, self.fit_args['group_attr']]
+            self.fit_args['groups'] = groups
 
         # fit the process
         if self.verbosity > 0:
