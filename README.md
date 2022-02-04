@@ -9,7 +9,11 @@ conda env create -f environment.yml
 This will generate the conda environment orthrus and install any dependencies required by the orthrus module. If the user does not have a CUDA >=11 compatible graphics card, then the user can replace [environment.yml](environment.yml) with [environment_nocuda.yml](environment_nocuda.yml). The user can also use their own environment and install the packages listed in either [environment.yml](environment.yml) or [environment_nocuda.yml](environment_nocuda.yml).
 
 ## Installing the orthrus package
-To install the orthrus package first activate the orthrus environment and then navigate to your local orthrus directory:
+orthrus is now available through the PyPi just run
+```bash
+pip install orthrus
+```
+to install the orthrus package. To install the orthrus package from this repo, first activate the orthrus environment and then navigate to your local orthrus directory:
 ```bash
 conda activate orthrus
 cd /path/to/orthrus/
