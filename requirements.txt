@@ -1,3 +1,4 @@
+orthrus
 dash_core_components>=1.14.1
 dill>=0.3.4
 matplotlib>=3.3.3
