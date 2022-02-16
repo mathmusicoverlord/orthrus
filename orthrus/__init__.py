@@ -1,1 +1,1 @@
-from orthrus import *
+import orthrus
