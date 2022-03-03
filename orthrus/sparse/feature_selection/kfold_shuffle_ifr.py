@@ -98,6 +98,8 @@ class KFSIFR(BaseEstimator):
         self.jump_ratio = jump_ratio
         self.train_test_splits = train_test_splits
         self.n_splits_shuffle = n_splits_shuffle
+        self.n_splits_kfold = n_splits_kfold
+        self.random_state_kfold = random_state_kfold
         self.random_state_shuffle = random_state_shuffle
         self.train_prop_shuffle = train_prop_shuffle
         self.sort_freq_classes = sort_freq_classes
@@ -284,9 +286,6 @@ class KFSIFR(BaseEstimator):
         """
         # check for fit
         check_is_fitted(self)
-
-        # check array
-        X = check_array(X)
 
         # grab results
         if self.sort_freq_classes:
