@@ -58,23 +58,23 @@ def _collapse_dict_dict_pandas(kv: dict, inner_key: str, **kwargs) -> DataFrame:
 
     # grab the column suffix and prefix
     col_suffix = kwargs.get('col_suffix', None)
-    col_suffix = '' if col_suffix is None else '_' + col_suffix
+    col_suffix = '' if col_suffix is None else f"_{col_suffix}"
     col_prefix = kwargs.get('col_prefix', None)
-    col_prefix = '' if col_prefix is None else col_prefix + '_'
+    col_prefix = '' if col_prefix is None else f"{col_prefix}_"
 
     # infer Series or DataFrame
     pd_object = list(kv.values())[0][inner_key]
 
     # tuple comprehend the results based on type
     if type(pd_object) == Series:
-        out = tuple(v[inner_key].rename(col_prefix + k + col_suffix) for (k, v) in kv.items())
+        out = tuple(v[inner_key].rename(f"{col_prefix}{k}{col_suffix}") for (k, v) in kv.items())
     elif type(pd_object) == DataFrame:
         out = tuple(v[inner_key].rename(
-            columns={col: col_prefix + '_'.join([k, col]) + col_suffix for col in v[inner_key].columns}) for (k, v) in
+            columns={col: f"{col_prefix}{k}:{col}{col_suffix}" for col in v[inner_key].columns}) for (k, v) in
                     kv.items())
 
     out = pd.concat(out, axis=1)
-    out.index.name = kwargs.get('index_name', out.columns.name)
+    out.index.name = kwargs.get('index_name', out.index.name)
     out.columns.name = kwargs.get('columns_name', out.columns.name)
 
     return out
@@ -547,14 +547,16 @@ class Process(ABC):
                 :py:func:`orthrus.core.helper.generate_save_path`.
 
         Returns:
-            Inplace method.
+            File path of saved process.
         """
 
         # generate new save path in case you don't want to overwrite
         #save_path = generate_save_path(save_path, overwrite)
 
         # save instance of object
-        save_object(self, save_path, overwrite)
+        save_path = save_object(self, save_path, overwrite)
+
+        return save_path
 
 
 class Partition(Process):
@@ -782,6 +784,7 @@ class Partition(Process):
 
         # record training and test labels
         train_test_labels = pd.DataFrame(index=ds_new.metadata.index, columns=[i for i, (train_idx, test_idx) in enumerate(parts)])
+        train_test_labels.index.name = ds_new.data.index.name
         parts = split(ds_new.data.loc[train_samples], **label_dict, **self.split_args)  # iterator destroyed
 
         for i, (train_idx, test_idx) in enumerate(parts):
@@ -872,9 +875,7 @@ class Partition(Process):
         """
         # collapse the dict of dict of series to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
-                                             inner_key="tvt_labels",
-                                             columns_name=self.process_name + " splits",
-                                             col_suffix="split")
+                                             inner_key="tvt_labels")
         return results
 
 
@@ -1529,10 +1530,10 @@ class FeatureSelect(Transform):
 
         # check for f_ranks attribute
         if self._f_ranks_handle is not None:
-            f_ranks = eval("process." + self._f_ranks_handle)
+            f_ranks = eval(f"process.{self._f_ranks_handle}")
             if type(f_ranks) == DataFrame:
                 f_ranks.rename(index=dict(zip(f_ranks.index.tolist(), ds.vardata.index.tolist())), inplace=True)
-                f_ranks.columns.name = self.process_name + " f_ranks"
+                #f_ranks.columns.name = self.process_name + " f_ranks"
             else:
                 f_ranks = np.array(f_ranks)  # convert to ndarray
 
@@ -1540,11 +1541,11 @@ class FeatureSelect(Transform):
                 if len(f_ranks.shape) == 1:
                     f_ranks = Series(index=ds.vardata.index,
                                      data=f_ranks,
-                                     name=self.process_name + " f_ranks")
+                                     )
                 else:
                     f_ranks = DataFrame(index=ds.vardata.index,
                                         data=f_ranks)
-                    f_ranks.columns.name = self.process_name + " f_ranks"
+                    f_ranks.index.name = ds.vardata.index.name
 
             # update output
             out.update({'f_ranks': f_ranks})
@@ -1563,8 +1564,7 @@ class FeatureSelect(Transform):
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
                                              inner_key="f_ranks",
-                                             columns_name=self.process_name + " f_ranks",
-                                             col_suffix="f_ranks")
+                                             )
         return results
 
     def transform(self, ds: DataSet) -> dict:
@@ -2277,7 +2277,7 @@ class Score(Process):
             # check the dtype
             try:
                 if type(np.array(scores).reshape(-1,)[0:1].item()) == float:
-                    levels = ['\d+_\D', '\d+_\d+_\D']
+                    levels = ['\d+', '\d+_\d+']
                     for level in levels:
                         # compute first level scores
                         fl_scores = scores.filter(regex='batch_' + level)
@@ -2396,9 +2396,7 @@ class Score(Process):
         """
         # collapse the dict of dict of dataframe to dataframe
         results = _collapse_dict_dict_pandas(kv=self.results_,
-                                             inner_key="class_pred_scores",
-                                             columns_name=self.process_name + " prediction scores",
-                                             col_suffix=self.process_name + "_scores")
+                                             inner_key="class_pred_scores")
         return results
 
     def _format_ndarray_output_with_labels(self, score, labels: list) -> Union[Series, DataFrame]:
@@ -3165,7 +3163,7 @@ class Report(Score):
         scores = self._collapse_class_pred_scores()
 
         # generate levels
-        levels = ['\d+_\D', '\d+_\d+_\D']
+        levels = ['\d+', '\d+_\d+']
 
         # initialize output
         rep = dict()
@@ -3186,9 +3184,9 @@ class Report(Score):
             fl_scores = fl_scores.dropna()
 
             # fill in dataframe
-            if level == '\d+_\D':
+            if level == '\d+':
                 level_type = "train_test"
-            elif level == '\d+_\d+_\D':
+            elif level == '\d+_\d+':
                 level_type = "train_valid_test"
             rep[level_type] = pd.DataFrame(index=fl_scores.columns)
 
@@ -3201,7 +3199,7 @@ class Report(Score):
                 for key in score_dict.keys():
                     if score_dict[key] == []:
                         # fill in columns
-                        col = "_".join([score_type.capitalize(), key.capitalize()])
+                        col = ":".join([score_type.capitalize(), key])
                         rep[level_type][col] = pd.NA
                         for batch in fl_scores.columns:
                             rep[level_type].loc[batch, col] = s[batch][key]
@@ -3209,7 +3207,7 @@ class Report(Score):
                         for metric in score_dict[key]:
 
                             # fill in columns
-                            col = "_".join([score_type.capitalize(), key.capitalize(), metric.capitalize()])
+                            col = ":".join([score_type.capitalize(), key, metric.capitalize()])
                             rep[level_type][col] = pd.NA
                             for batch in fl_scores.columns:
                                 rep[level_type].loc[batch, col] = s[batch][key][metric]
