@@ -917,7 +917,7 @@ def save_object(object, file_path: str, overwrite: bool =False):
         overwrite (bool): If True and the file_path already exists, then the associated file will be overwritten.
 
     Returns:
-        inplace method.
+        File path of saved object.
 
     """
 
@@ -933,6 +933,8 @@ def save_object(object, file_path: str, overwrite: bool =False):
         #     # dill instead
         #     dill.dump(object, file=f)
         dill.dump(object, file=f)
+
+    return file_path
 
 def generate_save_path(file_path: str, overwrite: bool = False):
     """
