@@ -1,0 +1,34 @@
+name: Generic Orthrus Workflows
+
+conda_env: ../environment.yml
+
+entry_points:
+  tune:
+    parameters:
+      dataset_path:
+        type: path
+      sample_query:
+        type: string
+        default: ""
+      pipeline_path:
+        type: path
+      experiment_name:
+        type: string
+        default: "tune_test"
+    command: "python ./workflows/tune.py \
+      --dataset-path {dataset_path} --pipeline-path {pipeline_path} \
+      --sample-query {sample_query} --experiment-name {experiment_name}"     
+
+  classify:
+    parameters:
+      dataset_path:
+        type: path
+      sample_query:
+        type: string
+      pipeline_path:
+        type: path
+    command: "python ./workflows/classify.py \
+      --dataset-path {dataset_path} --pipeline-path {pipeline_path} \
+      --sample-query {sample_query}"
+  
+
