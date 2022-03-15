@@ -5,19 +5,23 @@ conda_env: ../environment.yml
 entry_points:
   tune:
     parameters:
-      dataset_path:
+      dataset-path:
         type: path
-      sample_query:
+      sample-query:
         type: string
         default: ""
-      pipeline_path:
+      pipeline-path:
         type: path
-      experiment_name:
+      num-samples:
+        type: float
+        default: 100
+      experiment-name:
         type: string
         default: "tune_test"
     command: "python ./workflows/tune.py \
-      --dataset-path {dataset_path} --pipeline-path {pipeline_path} \
-      --sample-query {sample_query} --experiment-name {experiment_name}"     
+      --dataset-path {dataset-path} --pipeline-path {pipeline-path} \
+      --sample-query {sample-query} --experiment-name {experiment-name} \
+      --num-samples {num-samples}"     
 
   classify:
     parameters:

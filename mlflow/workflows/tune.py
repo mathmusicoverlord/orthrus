@@ -10,6 +10,7 @@ import ray.tune
 from ray.tune.integration.mlflow import mlflow_mixin
 from orthrus.core.pipeline import Pipeline, Report
 from modules import utils
+import yaml
 import os
 import mlflow
 
@@ -25,6 +26,8 @@ parser.add_argument("--pipeline-path", dest="pipeline_path",
                                     "the example pipeline under orthrus/pipelines/svm.py")
 parser.add_argument("--experiment-name", dest="experiment_name",
                     type=str, help="Name of the MLFlow experiment.")
+parser.add_argument("--num-samples", dest="num_samples",
+                    type=int, help="Number of hyperparameters to sample.")
 
 args = parser.parse_args()
 
@@ -35,10 +38,16 @@ pipeline_module = module_from_path(pipeline_name, args.pipeline_path)
 
 # generate experiment
 experiment_name = args.experiment_name
+mlflow.set_experiment(experiment_name)
 
 # user defined functions
+@mlflow_mixin
+def set_description():
+    mlflow.set_tag('mlflow.note.content',
+                f"Tuning of pipeline {os.path.basename(args.pipeline_path)} on dataset {os.path.basename(args.dataset_path)} "\
+                f"restricted to samples queried by: {args.sample_query}. {args.num_samples} points were sampled in hyperparameter tuning.")
+
 def generate_dataset() -> DataSet:
-    
     # load the dataset
     ds: DataSet = load_dataset(args.dataset_path)
 
@@ -53,7 +62,6 @@ def generate_dataset() -> DataSet:
 
 @mlflow_mixin
 def trainable(config: dict) -> dict:
-    
     # generate the dataset
     ds = generate_dataset()
 
@@ -73,8 +81,26 @@ def trainable(config: dict) -> dict:
     mlflow.log_metric(key="score", value=score)
     ray.tune.report(score=score)
 
-def main():
+@mlflow_mixin
+def log_config(config_name: str, config: dict):
 
+    # set temp file path
+    temp_path = f'tmp/{config_name}.yml'
+
+    # drop mlflow key
+    del config['mlflow']
+
+    # save yaml file
+    with open(temp_path, 'w+') as config_file:
+        yaml.dump(config, config_file, default_flow_style=False)
+
+        # log the artifact
+        mlflow.log_artifact(temp_path)
+
+def main():
+    # set description
+    set_description()
+    
     # extract config and search algorithm
     config = pipeline_module.config()
     search_alg = pipeline_module.search_alg()
@@ -91,9 +117,13 @@ def main():
         config=config,
         search_alg=search_alg,
         scheduler=scheduler,
-        num_samples=1000,
+        num_samples=args.num_samples,
         fail_fast="raise",
         )
+    
+    # log best hyperparameters
+    best_config = analysis.get_best_config(mode=search_alg.mode, metric=search_alg.metric)
+    log_config('best_config', best_config)
 
 if __name__ == "__main__":
 

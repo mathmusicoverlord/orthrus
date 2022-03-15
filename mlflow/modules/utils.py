@@ -85,4 +85,3 @@ def log_report_scores(report: Report) -> None:
             mlflow.log_artifact(violin_path)
 
     return
-        

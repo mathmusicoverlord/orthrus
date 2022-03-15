@@ -66,8 +66,6 @@ def generate_pipeline(svm_C: float = 1, **kwargs) -> Pipeline:
                 process_name='bsr',
                 pred_attr='Shedding')
 
-
-
     # clear checkpoint path
     #checkpoint_path = os.path.join(os.environ['ORTHRUS_PATH'], "mlflow/tmp/svm.pickle")
     #os.system(f"rm -f {checkpoint_path}")
