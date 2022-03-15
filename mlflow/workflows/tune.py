@@ -98,9 +98,6 @@ def log_config(config_name: str, config: dict):
         mlflow.log_artifact(temp_path)
 
 def main():
-    # set description
-    set_description()
-    
     # extract config and search algorithm
     config = pipeline_module.config()
     search_alg = pipeline_module.search_alg()
@@ -124,6 +121,9 @@ def main():
     # log best hyperparameters
     best_config = analysis.get_best_config(mode=search_alg.mode, metric=search_alg.metric)
     log_config('best_config', best_config)
+
+    # set description
+    set_description()
 
 if __name__ == "__main__":
 
