@@ -1043,6 +1043,8 @@ class Transform(Fit):
             feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
             with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``.
 
+        vardata (DataFrame): Optional replacement variable (feature) metadata in the case that ``retain_f_ids`` is ``False``.
+
     Attributes:
         process (object): Object to tranform the data with, see for example this packages implementation of
             multi-dimensional scaling: :py:class:`MDS <orthrus.manifold.mds.MDS>`.
@@ -1073,8 +1075,10 @@ class Transform(Fit):
         retain_f_ids (bool): Flag indicating whether or not to retain the original feature labels. For example,
             some transforms may just transform each individual feature and we would like to keep the name of that
             feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
-            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``
-
+            with the orginal feature labels, e.g. PCA, MDS, UMAP, etc... The default is ``False``.
+        
+        vardata (DataFrame): Optional replacement variable (feature) metadata in the case that ``retain_f_ids`` is ``False``.
+        
         new_f_ids (list): New list of feature ids to replace to original feature ids. Optional.
 
         run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
@@ -1141,6 +1145,7 @@ class Transform(Fit):
                  parallel: bool = False,
                  verbosity: int = 1,
                  retain_f_ids: bool = False,
+                 vardata: DataFrame = None,
                  new_f_ids: list = None,
                  fit_handle: str = 'fit',
                  transform_handle: str = 'transform',
@@ -1161,13 +1166,14 @@ class Transform(Fit):
 
         # set parameters
         self.retain_f_ids = retain_f_ids
+        self.vardata = vardata
         self.new_f_ids = new_f_ids
         self.transform_args = transform_args
 
         # set private attributes
         self._transform_handle = transform_handle
         self._fit_transform_handle = fit_transform_handle
-        self._labels += ["retain_f_ids", "transform_args"]
+        self._labels += ["retain_f_ids", "transform_args", "vardata"]
 
         # check appropriate parameters
         if self._fit_handle is None or self._transform_handle is None:
@@ -1275,8 +1281,8 @@ class Transform(Fit):
                     
                 data_new = pd.DataFrame(data=data_new, index=ds.data.index,
                                         columns=columns)
-                # check if features are the same after transformation and use original feature ids for columns
-                ds_new = DataSet(data=data_new, metadata=ds.metadata)
+                # check if features are the same after transformation and use 6original feature ids for columns
+                ds_new = DataSet(data=data_new, metadata=ds.metadata, vardata=self.vardata)
 
             return ds_new
 
