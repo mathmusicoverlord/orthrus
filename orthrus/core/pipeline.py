@@ -904,6 +904,8 @@ class Fit(Process, ABC):
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
 
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
+
     Attributes:
         process (object): Object to fit on the data with, see for example scikit learn's
             `StandardScaler <https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html>`_.
@@ -921,6 +923,8 @@ class Fit(Process, ABC):
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
 
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
+
         run_status_ (int): Indicates whether or not the process has finished. A value of 0 indicates the process has not
             finished, a value of 1 indicated the process has finished.
 
@@ -936,6 +940,7 @@ class Fit(Process, ABC):
                  supervised_attr: str = None,
                  fit_handle: str = 'fit',
                  fit_args: dict = {},
+                 prefit: bool = False,
                  ):
 
         super(Fit, self).__init__(process=process,
@@ -947,6 +952,7 @@ class Fit(Process, ABC):
         # set parameters
         self.supervised_attr = supervised_attr
         self.fit_args = fit_args
+        self.prefit = prefit
 
         # set private attributes
         self._fit_handle = fit_handle
@@ -990,6 +996,12 @@ class Fit(Process, ABC):
             object : The fitted :py:attr:`Fit.process`.
 
         """
+
+        if self.prefit:
+            if self.verbosity > 0:
+                print(f"Already fit, no fitting performed.")
+            return deepcopy(self.process)
+
         # extract training ids
         training_ids = self._extract_training_ids(ds, **kwargs)
 
@@ -1002,6 +1014,7 @@ class Fit(Process, ABC):
         if self.verbosity > 0:
             print(r"Fitting %s..." % (self.process_name,))
         process = deepcopy(self.process)
+        if self.prefit
         process = eval("process." + self._fit_handle)(ds.data.loc[training_ids], **self.fit_args)
 
         return process
@@ -1030,6 +1043,8 @@ class Transform(Fit):
         fit_handle (string): Name of ``fit`` method used by :py:attr:`Transform.process`. Default is "fit".
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
 
         transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
 
@@ -1064,6 +1079,8 @@ class Transform(Fit):
         _fit_handle (string): Name of ``fit`` method used by :py:attr:`Transform.process`. Default is "fit".
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
 
         _transform_handle (str): Name of ``transform`` method used by :py:attr:`Transform.process`. Default is "transform".
 
@@ -1152,6 +1169,7 @@ class Transform(Fit):
                  fit_transform_handle: str = 'fit_transform',
                  supervised_attr: str = None,
                  fit_args: dict = {},
+                 prefit: bool = False,
                  transform_args: dict = {}):
 
         # init with Process class
@@ -1162,6 +1180,7 @@ class Transform(Fit):
                                         supervised_attr=supervised_attr,
                                         fit_handle=fit_handle,
                                         fit_args=fit_args,
+                                        prefit=prefit,
                                         )
 
         # set parameters
@@ -1331,6 +1350,8 @@ class FeatureSelect(Transform):
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
 
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
+
         transform_handle (str): Name of ``transform`` method used by :py:attr:`FeatureSelect.process`.
             Default is "transform".
 
@@ -1361,6 +1382,8 @@ class FeatureSelect(Transform):
         _fit_handle (string): Name of ``fit`` method used by :py:attr:`FeatureSelect.process`. Default is "fit".
 
         fit_args (dict): Keyword arguments passed to :py:meth:`process.fit()`.
+
+        prefit (bool): If ``True`` then the process is assumed to be already fit.
 
         _transform_handle (str): Name of ``transform`` method used by :py:attr:`FeatureSelect.process`.
             Default is "transform".
@@ -1455,6 +1478,7 @@ class FeatureSelect(Transform):
                  transform_handle: str = 'transform',
                  supervised_attr: str = None,
                  fit_args: dict = {},
+                 prefit: bool = False,
                  transform_args: dict = {},
                  f_ranks_handle: str = None):
 
@@ -1466,6 +1490,7 @@ class FeatureSelect(Transform):
                                             supervised_attr=supervised_attr,
                                             fit_handle=fit_handle,
                                             fit_args=fit_args,
+                                            prefit=prefit,
                                             transform_args=transform_args,
                                             transform_handle=transform_handle,
                                             )
