@@ -10,7 +10,7 @@ from orthrus.core.pipeline import *
 from ray.tune.suggest.hyperopt import HyperOptSearch
 from ray.tune.suggest import ConcurrencyLimiter
 from ray.tune.schedulers import AsyncHyperBandScheduler
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, ShuffleSplit
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC
 from sklearn.metrics import balanced_accuracy_score
@@ -32,21 +32,25 @@ def scheduler() -> ray.tune.schedulers.trial_scheduler.TrialScheduler:
 def score(pipeline: Pipeline) -> float:
     
     # extract mean bsr across folds
-    bsr: Score = pipeline.processes[-1]
-    scores: DataFrame = bsr.collapse_results()['class_pred_scores']
-    mean_bsr = scores.loc['Test'].mean()
+    report: Report = pipeline.processes[-1]
+    scores: DataFrame = report.report()['train_valid_test']
+    mean_bsr = scores['Valid:macro avg:Recall'].mean()
 
     return mean_bsr
 
 
 # set final hyperparamters
 def hyperparams() -> dict():
-    return {'svm_C': 1}
+    return {'svm_C': 0.005272486872910777}
 
 # build pipeline
 def generate_pipeline(svm_C: float = 1, **kwargs) -> Pipeline:
 
-    # set partitioner
+    # set train/test partitioner
+    shuffle = Partition(process=ShuffleSplit(n_splits=1, test_size=.2, random_state=8756),
+                        process_name='shuffle')
+
+    # set validation partitioner
     kfold = Partition(process=KFold(n_splits=5, shuffle=True, random_state=443),
                      process_name='5fold')
 
@@ -62,18 +66,20 @@ def generate_pipeline(svm_C: float = 1, **kwargs) -> Pipeline:
                    )
     
     # score
-    bsr = Score(process=balanced_accuracy_score,
-                process_name='bsr',
-                pred_attr='Shedding')
+    # bsr = Score(process=balanced_accuracy_score,
+    #             process_name='bsr',
+    #             pred_attr='Shedding')
 
-    # clear checkpoint path
-    #checkpoint_path = os.path.join(os.environ['ORTHRUS_PATH'], "mlflow/tmp/svm.pickle")
-    #os.system(f"rm -f {checkpoint_path}")
+    # report
+    report = Report(pred_attr='Shedding')
     
+    # grab checkpoint path
+    checkpoint_path = kwargs.get('checkpoint_path', None)
+
     # create pipeline
-    pipeline = Pipeline(processes=(kfold, std, svm, bsr),
+    pipeline = Pipeline(processes=(shuffle, kfold, std, svm, report),
                         pipeline_name='svm_classify',
-                        #checkpoint_path=checkpoint_path,
+                        checkpoint_path=checkpoint_path,
                         )
 
     return pipeline

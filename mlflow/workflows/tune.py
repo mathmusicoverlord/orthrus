@@ -7,6 +7,7 @@ from orthrus.core.helper import module_from_path
 from orthrus.core.dataset import load_dataset
 from orthrus.core.dataset import DataSet
 import ray.tune
+from  mlflow.tracking import MlflowClient
 from ray.tune.integration.mlflow import mlflow_mixin
 from orthrus.core.pipeline import Pipeline, Report
 from modules import utils
@@ -24,8 +25,8 @@ parser.add_argument("--pipeline-path", dest="pipeline_path",
                     type=str, help="File path to the pipeline python file. This module must contain the "\
                                     "methods: config(), search_alg(), scheduler(), score(), and generate_pipeline(). See "\
                                     "the example pipeline under orthrus/pipelines/svm.py")
-parser.add_argument("--experiment-name", dest="experiment_name",
-                    type=str, help="Name of the MLFlow experiment.")
+# parser.add_argument("--experiment-name", dest="experiment_name",
+#                     type=str, help="Name of the MLFlow experiment.")
 parser.add_argument("--num-samples", dest="num_samples",
                     type=int, help="Number of hyperparameters to sample.")
 
@@ -35,10 +36,8 @@ args = parser.parse_args()
 pipeline_name = os.path.basename(args.pipeline_path).rstrip('.py')
 pipeline_module = module_from_path(pipeline_name, args.pipeline_path)
 
-
-# generate experiment
-experiment_name = args.experiment_name
-mlflow.set_experiment(experiment_name)
+# extract experiment id
+experiment_id = os.environ['MLFLOW_EXPERIMENT_ID']
 
 # user defined functions
 @mlflow_mixin
@@ -74,7 +73,6 @@ def trainable(config: dict) -> dict:
 
     # run the pipeline on the data
     pipeline.run(ds)
-    #mlflow.log_artifact(pipeline.checkpoint_path)
 
     # return score
     score = pipeline_module.score(pipeline)
@@ -98,6 +96,7 @@ def log_config(config_name: str, config: dict):
         mlflow.log_artifact(temp_path)
 
 def main():
+
     # extract config and search algorithm
     config = pipeline_module.config()
     search_alg = pipeline_module.search_alg()
@@ -105,7 +104,7 @@ def main():
 
     # update config with mlflow
     tracking_uri = mlflow.get_tracking_uri()
-    config['mlflow'] = {'experiment_name': experiment_name,
+    config['mlflow'] = {'experiment_id': experiment_id,
                         'tracking_uri': tracking_uri}
 
     # start tuning

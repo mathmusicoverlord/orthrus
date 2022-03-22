@@ -15,24 +15,19 @@ entry_points:
       num-samples:
         type: float
         default: 100
-      experiment-name:
-        type: string
-        default: "tune_test"
     command: "python ./workflows/tune.py \
       --dataset-path {dataset-path} --pipeline-path {pipeline-path} \
-      --sample-query {sample-query} --experiment-name {experiment-name} \
-      --num-samples {num-samples}"     
+      --sample-query {sample-query} --num-samples {num-samples}"     
 
   classify:
     parameters:
-      dataset_path:
+      dataset-path:
         type: path
-      sample_query:
+      sample-query:
         type: string
-      pipeline_path:
+      pipeline-path:
         type: path
     command: "python ./workflows/classify.py \
-      --dataset-path {dataset_path} --pipeline-path {pipeline_path} \
-      --sample-query {sample_query}"
-  
+      --dataset-path {dataset-path} --pipeline-path {pipeline-path} \
+      --sample-query {sample-query}"
 

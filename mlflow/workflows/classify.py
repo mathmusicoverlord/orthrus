@@ -25,6 +25,12 @@ parser.add_argument("--pipeline-path", dest="pipeline_path",
                                     "among classification metrics.")
 args = parser.parse_args()
 
+# user defined functions
+def set_description():
+    mlflow.set_tag('mlflow.note.content',
+                f"Classification results of pipeline {os.path.basename(args.pipeline_path)} on dataset {os.path.basename(args.dataset_path)} "\
+                f"restricted to samples queried by: {args.sample_query}.")
+
 if __name__=="__main__":
 
     # load the dataset
@@ -33,21 +39,21 @@ if __name__=="__main__":
     # slice the dataset
     sample_ids = ds.metadata.query(args.sample_query).index
     ds = ds.slice_dataset(sample_ids=sample_ids)
-
-    # load the pipeline
-    pipeline_name = os.path.basename(args.pipeline_path).rstrip('.py')
-    pipeline_module = module_from_path(pipeline_name, args.pipeline_path)
-    pipeline: Pipeline = pipeline_module.PIPELINE
+    ds.metadata = ds.metadata.astype(str)
 
     # start mlflow run
     with mlflow.start_run():
+        # load the pipeline module
+        pipeline_name = os.path.basename(args.pipeline_path).rstrip('.py')
+        pipeline_module = module_from_path(pipeline_name, args.pipeline_path)
+
         # extract hyperparams from pipeline
-        hyperparams = pipeline_module.HYPERPARAMS
-        hyperparams_condensed = {}  # acts like a pointer
-        utils.condense_nested_dict(hyperparams, hyperparams_condensed)
+        hyperparams: dict = pipeline_module.hyperparams()
+        os.system("rm -f /tmp/pipeline.pickle")
+        pipeline: Pipeline = pipeline_module.generate_pipeline(**hyperparams, checkpoint_path='/tmp/pipeline.pickle')
 
         # log the parameters
-        mlflow.log_params(hyperparams_condensed)
+        mlflow.log_params(hyperparams)
 
         # run the pipeline on the data
         pipeline.run(ds, checkpoint=True)
@@ -58,3 +64,6 @@ if __name__=="__main__":
 
         # save pipeline artifact
         mlflow.log_artifact(pipeline.checkpoint_path)
+    
+        # set description
+        set_description()

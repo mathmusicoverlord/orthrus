@@ -80,7 +80,7 @@ def log_report_scores(report: Report) -> None:
         # store violin plot
         if split_scores.size > 0:
             fig: go.Figure = score_violin_plot(split_scores)
-            violin_path = f"cache/{split_type}.violin.html"
+            violin_path = f"tmp/{split_type}.violin.html"
             fig.write_html(violin_path)
             mlflow.log_artifact(violin_path)
 
