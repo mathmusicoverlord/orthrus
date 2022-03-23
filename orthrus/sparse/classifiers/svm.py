@@ -476,7 +476,7 @@ class SSVMSelect(SSVMClassifier):
         # compute ranks
         self.f_ranks = pd.DataFrame(index=S.reshape(-1,), data=np.arange(len(f_weights)), columns=["Ranks"])
         self.f_ranks.sort_index(inplace=True)
-        self.f_ranks["absWeights"] = f_weights_sorted
+        self.f_ranks["absWeights"] = f_weights
 
         # select the features
         self.features = self.select_features(X)

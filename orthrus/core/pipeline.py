@@ -1014,7 +1014,6 @@ class Fit(Process, ABC):
         if self.verbosity > 0:
             print(r"Fitting %s..." % (self.process_name,))
         process = deepcopy(self.process)
-        if self.prefit
         process = eval("process." + self._fit_handle)(ds.data.loc[training_ids], **self.fit_args)
 
         return process
@@ -3168,7 +3167,6 @@ class Report(Score):
                  classes: list = None,
                  process=None,
                  process_name=None,
-                 score_args=None,
                  ):
 
         # init with Process class
@@ -3233,7 +3231,10 @@ class Report(Score):
                         col = ":".join([score_type.capitalize(), key])
                         rep[level_type][col] = pd.NA
                         for batch in fl_scores.columns:
-                            rep[level_type].loc[batch, col] = s[batch][key]
+                            try:
+                                rep[level_type].loc[batch, col] = s[batch][key]
+                            except KeyError:
+                                pass
                     else:
                         for metric in score_dict[key]:
 
@@ -3241,7 +3242,10 @@ class Report(Score):
                             col = ":".join([score_type.capitalize(), key, metric.capitalize()])
                             rep[level_type][col] = pd.NA
                             for batch in fl_scores.columns:
-                                rep[level_type].loc[batch, col] = s[batch][key][metric]
+                                try:
+                                    rep[level_type].loc[batch, col] = s[batch][key][metric]
+                                except KeyError:
+                                    pass
                                 
         return rep
 
