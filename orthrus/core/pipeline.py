@@ -2327,6 +2327,32 @@ class Score(Process):
 
         return ds, results
 
+    def condense_scores(self) -> dict:
+        """Condenses scores a dictionary of dataframes which contains scores for split types."""
+        
+        # generate scores
+        scores = self._collapse_class_pred_scores()
+
+        # generate levels
+        levels = ['\d+', '\d+_\d+']
+
+        # initialize output
+        rep = dict()
+
+        for level in levels:
+            # compute first level scores
+            fl_scores = scores.filter(regex='batch_' + level)
+            fl_scores = fl_scores.dropna()
+
+            # fill in dataframe
+            if level == '\d+':
+                level_type = "train_test"
+            elif level == '\d+_\d+':
+                level_type = "train_valid_test"
+            rep[level_type] = fl_scores.transpose()
+                                        
+        return rep
+
     def _process_classification_labels(self, score_process: Callable) -> Callable:
         """
         Private method to generate a scoring metric on classification labels which
