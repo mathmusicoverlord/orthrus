@@ -20,28 +20,28 @@ def config() -> dict:
     return {'svm_C': ray.tune.loguniform(1e-4, 1e2)}
 
 def searcher() -> ray.tune.suggest.suggestion.Searcher:
-    return HyperOptSearch(metric='score', mode='max')
+    return HyperOptSearch(metric='mean_valid_bsr', mode='max')
 
 def search_alg() -> ray.tune.suggest.suggestion.Searcher:
      return ConcurrencyLimiter(searcher(), max_concurrent=4)
 
 def scheduler() -> ray.tune.schedulers.trial_scheduler.TrialScheduler:
-     return AsyncHyperBandScheduler(metric='score', mode='max')
+     return AsyncHyperBandScheduler(metric='mean_valid_bsr', mode='max')
 
 # set the score function
-def score(pipeline: Pipeline) -> float:
+def score(pipeline: Pipeline) -> dict:
     
     # extract mean bsr across folds
     report: Report = pipeline.processes[-1]
     scores: DataFrame = report.report()['train_valid_test']
     mean_bsr = scores['Valid:macro avg:Recall'].mean()
 
-    return mean_bsr
+    return {'mean_valid_bsr': mean_bsr}
 
 
 # set final hyperparamters
 def hyperparams() -> dict():
-    return {'svm_C': 0.005272486872910777}
+    return {'svm_C': 0.0033588966840458474}
 
 # build pipeline
 def generate_pipeline(svm_C: float = 1, **kwargs) -> Pipeline:

@@ -75,9 +75,9 @@ def trainable(config: dict) -> dict:
     pipeline.run(ds)
 
     # return score
-    score = pipeline_module.score(pipeline)
-    mlflow.log_metric(key="score", value=score)
-    ray.tune.report(score=score)
+    scores = pipeline_module.score(pipeline)
+    mlflow.log_metrics(scores)
+    ray.tune.report(**scores)
 
 @mlflow_mixin
 def log_config(config_name: str, config: dict):

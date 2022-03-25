@@ -7,6 +7,7 @@ import mlflow
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+from pivottablejs import pivot_ui
 
 def condense_nested_dict(in_dict: dict, out_dict:dict, prev_key=None) -> None:
     """Extracts nested dictionary values into a condensed dictionary"""
@@ -83,5 +84,11 @@ def log_report_scores(report: Report) -> None:
             violin_path = f"tmp/{split_type}.violin.html"
             fig.write_html(violin_path)
             mlflow.log_artifact(violin_path)
+        
+            # store html table of scores
+            scores_path = f"tmp/{split_type}.scores.html"
+            pivot_ui(split_scores, scores_path)
+            mlflow.log_artifact(scores_path)
+        
 
     return
