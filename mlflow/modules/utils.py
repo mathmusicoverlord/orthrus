@@ -31,7 +31,7 @@ def score_violin_plot(score_frame: DataFrame) -> None:
     
     # generate box plot for each feature
     for score in score_frame:
-        fig.add_trace(go.Violin(y=score_frame[score].values, name=score, visible='legendonly'))
+        fig.add_trace(go.Violin(y=score_frame[score].values, name=score, visible='legendonly', box_visible=True, meanline_visible=True))
     
     return fig
 
