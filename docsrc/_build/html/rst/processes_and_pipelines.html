@@ -40,7 +40,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="example_pipeline.html" />
+    <link rel="next" title="orthrus" href="modules.html" />
     <link rel="prev" title="Feature Set Size Reduction" href="feature_set_size_reduction.html" /> 
 </head>
 
@@ -181,18 +181,18 @@
   <div class="section" id="processes-and-pipelines">
 <h1>Processes and Pipelines<a class="headerlink" href="#processes-and-pipelines" title="Permalink to this headline">¶</a></h1>
 <p>For more involved machine learning experiments we require methods outside
-of those provided by the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class,
-e.g., <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.classify" title="orthrus.core.dataset.DataSet.classify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code></a>
-and <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.feature_select" title="orthrus.core.dataset.DataSet.feature_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select()</span></code></a>.
+of those provided by the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class,
+e.g., <code class="xref py py-meth docutils literal notranslate"><span class="pre">classify()</span></code>
+and <code class="xref py py-meth docutils literal notranslate"><span class="pre">feature_select()</span></code>.
 The orthrus package provides two base classes which enable more advanced and
 automated workflows.</p>
 <div class="section" id="processes">
 <h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> class is an abstract base class which wraps around
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class is an abstract base class which wraps around
 <a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like objects and makes them directly applicable to
-<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> objects—doing away with much of the boilerplate
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> objects—doing away with much of the boilerplate
 code for extracting labels, transforming data, etc. A simple example would be using the
-<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> subclass to log transform a dataset:</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code> subclass to log transform a dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.core.pipeline</span> <span class="kn">import</span> <span class="n">Transform</span>
@@ -247,7 +247,7 @@ In other cases, where we do have multiple train/test splits, each batch will yie
 to the training samples of that batch.</p>
 <div class="section" id="partitioning">
 <h3>Partitioning<a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h3>
-<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class is used to generate the batches described
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code> class is used to generate the batches described
 above. This class wraps <a class="reference external" href="https://scikit-learn.org">scikit-learn</a>-like paritioners and generates
 train/test labels according to the parititoning scheme. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
@@ -292,7 +292,7 @@ train/test labels according to the parititoning scheme. For example:</p>
 </div>
 <p>We can see that for each batch we can extract a set of train/test labels which are indexed by the samples
 in the dataset. We can also collect all of the train/test labels across all batches by using the
-<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Process.collapse_results" title="orthrus.core.pipeline.Process.collapse_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code></a> method:</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">collapse_results()</span></code> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># collapse train/test labels across batches</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfold</span><span class="o">.</span><span class="n">collapse_results</span><span class="p">()[</span><span class="s1">&#39;tvt_labels&#39;</span><span class="p">]</span>
 <span class="go">--------------------------------------------------------------------------------------</span>
@@ -315,7 +315,7 @@ in the dataset. We can also collect all of the train/test labels across all batc
 <div class="section" id="train-validation-test-made-easy">
 <h3>Train/Validation/Test Made Easy<a class="headerlink" href="#train-validation-test-made-easy" title="Permalink to this headline">¶</a></h3>
 <p>In some experiments it useful to generate validation data within your training data, e.g.,
-hyperparameter tuning. The <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Partition" title="orthrus.core.pipeline.Partition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code></a> class can acheive
+hyperparameter tuning. The <code class="xref py py-class docutils literal notranslate"><span class="pre">Partition</span></code> class can acheive
 this task by nesting two of its instances. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
@@ -448,7 +448,7 @@ a cross-validation experiment and then train a PCA embedding on each training ba
 </pre></div>
 </div>
 <p>We can even transform the dataset across the transforms generated for each batch with one
-call of <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform.transform" title="orthrus.core.pipeline.Transform.transform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transform()</span></code></a>, e.g.,</p>
+call of <code class="xref py py-meth docutils literal notranslate"><span class="pre">transform()</span></code>, e.g.,</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># transfrom dataset using each batch-transform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds_pca_dict</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="go">-------------------------------------------------------------</span>
@@ -470,7 +470,7 @@ they are done in sequence. Orthrus utilizes the python package
 which enables us to train our models in parallel with minimal code change.
 For example in PCA training step above we can start a ray server hosted on
 our local machine, and then provide the <code class="docutils literal notranslate"><span class="pre">parallel=True</span></code> flag to our
-<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class:</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code> class:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># initialize the ray server</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>  <span class="c1"># specify resources here if needed, see docs.</span>
@@ -503,9 +503,9 @@ our local machine, and then provide the <code class="docutils literal notranslat
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Checkout the processes <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Classify" title="orthrus.core.pipeline.Classify"><code class="xref py py-class docutils literal notranslate"><span class="pre">Classify</span></code></a>,
-<a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Score" title="orthrus.core.pipeline.Score"><code class="xref py py-class docutils literal notranslate"><span class="pre">Score</span></code></a>,
-and <a class="reference internal" href="orthrus.core.html#orthrus.core.pipeline.Report" title="orthrus.core.pipeline.Report"><code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code></a> for more examples.</p>
+<p>Checkout the processes <code class="xref py py-class docutils literal notranslate"><span class="pre">Classify</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Score</span></code>,
+and <code class="xref py py-class docutils literal notranslate"><span class="pre">Report</span></code> for more examples.</p>
 </div>
 </div>
 <div class="section" id="pipelines">
@@ -524,7 +524,7 @@ the <a class="reference external" href="http://archive.ics.uci.edu/ml/datasets/g
 To follow along first download the dataset and store the <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">labels.csv</span></code>
 files into the <code class="docutils literal notranslate"><span class="pre">$ORTHRUS_PATH/test_data/TCGA-PANCAN-HiSeq-801x20531/Data</span></code> directory.
 Once the data is stored there run the script <a class="reference external" href="https://github.com/ekehoe32/orthrus/blob/main/test_data/TCGA-PANCAN-HiSeq-801x20531/generate_dataset.py">generate_dataset</a>
-to produce the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> object. This script
+to produce the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> object. This script
 performs some standard preprocessing steps such as filtering out low expression genes,
 replacing zero with half the non-zero minimum, and then log2 normalizing the data.</p>
 <p>We can visualize the dataset using PCA by running the script
@@ -611,7 +611,7 @@ We will run a 5-fold cross-validation experiment classifying COAD vs. LUAD tumor
 <p>As we can see a pipeline is glorified tuple of processes,
 its primary job is to manage the assembly line and translate
 the results from one process to the next. One argument of note is the
-<a class="reference internal" href="orthrus.core.html#id16" title="orthrus.core.pipeline.Pipeline.checkpoint_path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">checkpoint_path</span></code></a>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">checkpoint_path</span></code>,
 which sets the path of the serialized (pickled) pipeline object on the disk,
 and enables the pipeline to be saved after the completion of each process. This
 is useful in the context of long training and possible interruptions in the computation.
@@ -706,7 +706,7 @@ We can also view the features that we found in our feature selection process:</p
 </div>
 </div></blockquote>
 <p>Every process in the pipeline can be accessed for the specific results. See the module
-<a class="reference internal" href="orthrus.core.html#module-orthrus.core.pipeline" title="orthrus.core.pipeline"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pipeline</span></code></a> for more specific details on each process and
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">pipeline</span></code> for more specific details on each process and
 pipeline methods.</p>
 </div>
 </div>
@@ -718,7 +718,7 @@ pipeline methods.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="example_pipeline.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="orthrus" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="feature_set_size_reduction.html" class="btn btn-neutral float-left" title="Feature Set Size Reduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

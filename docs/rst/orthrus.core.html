@@ -1286,7 +1286,7 @@ If the object is not an iterator the object itself is returned.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>inplace method.</p>
+<dd class="field-even"><p>File path of saved object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1693,7 +1693,7 @@ classifier.</p></li>
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.FeatureSelect">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">FeatureSelect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">f_ranks_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">FeatureSelect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">prefit</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">f_ranks_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Transform</span></code></a></p>
 <p><a class="reference internal" href="#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> subclass used to select and restrict features in a dataset.</p>
 <dl class="field-list simple">
@@ -1712,6 +1712,7 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <li><p><strong>supervised_attr</strong> (<em>str</em>) – Supervision attribute in the dataset’s metadata to fit with respect to.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>. Default is “fit”.</p></li>
 <li><p><strong>fit_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.fit()</span></code>.</p></li>
+<li><p><strong>prefit</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p></li>
 <li><p><strong>transform_handle</strong> (<em>str</em>) – Name of <code class="docutils literal notranslate"><span class="pre">transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.FeatureSelect.process" title="orthrus.core.pipeline.FeatureSelect.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FeatureSelect.process</span></code></a>.
 Default is “transform”.</p></li>
 <li><p><strong>transform_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.transform()</span></code>.</p></li>
@@ -1800,6 +1801,17 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.FeatureSelect.prefit">
+<code class="sig-name descname">prefit</code><a class="headerlink" href="#orthrus.core.pipeline.FeatureSelect.prefit" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1964,7 +1976,7 @@ datasets given by <code class="xref py py-attr docutils literal notranslate"><sp
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Fit">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Fit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">prefit</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Process</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>Base class used for any sub-class of <a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> implementing a <code class="docutils literal notranslate"><span class="pre">fit</span></code> method, e.g., <a class="reference internal" href="#orthrus.core.pipeline.Transform" title="orthrus.core.pipeline.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a>,
 <a class="reference internal" href="#orthrus.core.pipeline.Classify" title="orthrus.core.pipeline.Classify"><code class="xref py py-class docutils literal notranslate"><span class="pre">Classify</span></code></a>.</p>
@@ -1984,6 +1996,7 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <li><p><strong>supervised_attr</strong> (<em>str</em>) – Supervision attribute in the dataset’s metadata to fit with respect to.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Fit.process" title="orthrus.core.pipeline.Fit.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Fit.process</span></code></a>. Default is “fit”.</p></li>
 <li><p><strong>fit_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.fit()</span></code>.</p></li>
+<li><p><strong>prefit</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2053,6 +2066,17 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Fit.prefit">
+<code class="sig-name descname">prefit</code><a class="headerlink" href="#orthrus.core.pipeline.Fit.prefit" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2901,7 +2925,7 @@ possible batch specific transforms, labels, etc… from <code class="docutils li
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Inplace method.</p>
+<dd class="field-even"><p>File path of saved process.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2932,7 +2956,7 @@ to save the individual results.</p></li>
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Report">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pred_attr</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>list<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pred_type</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'class_labels'</span></em>, <em class="sig-param"><span class="n">sample_weight_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">infer_class_labels_on_output</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">classes</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">process</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">score_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Report" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Report</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pred_attr</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>list<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pred_type</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'class_labels'</span></em>, <em class="sig-param"><span class="n">sample_weight_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">infer_class_labels_on_output</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">classes</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">process</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Report" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Score" title="orthrus.core.pipeline.Score"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Score</span></code></a></p>
 <p><a class="reference internal" href="#orthrus.core.pipeline.Process" title="orthrus.core.pipeline.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></a> subclass used to generate a classification report. See sklearn classification_report.</p>
 <dl class="field-list simple">
@@ -3297,6 +3321,12 @@ scores for each sample type: “Train”, “Valid”, “Test”.</p></li>
 </pre></div>
 </div>
 <dl class="py method">
+<dt id="orthrus.core.pipeline.Score.condense_scores">
+<code class="sig-name descname">condense_scores</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#orthrus.core.pipeline.Score.condense_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Condenses scores a dictionary of dataframes which contains scores for split types.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="orthrus.core.pipeline.Score.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a></span></em>, <em class="sig-param"><span class="n">batch_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet">orthrus.core.dataset.DataSet</a><span class="p">, </span>dict<span class="p">]</span><a class="headerlink" href="#orthrus.core.pipeline.Score.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>The primary run method. This method calls a sub-classes <code class="docutils literal notranslate"><span class="pre">_run</span></code> method on <code class="xref py py-attr docutils literal notranslate"><span class="pre">ds</span></code> with keyword arguments
@@ -3330,7 +3360,7 @@ possible batch specific transforms, labels, etc… from <code class="docutils li
 
 <dl class="py class">
 <dt id="orthrus.core.pipeline.Transform">
-<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">retain_f_ids</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">new_f_ids</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">fit_transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit_transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Transform" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">orthrus.core.pipeline.</code><code class="sig-name descname">Transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process</span><span class="p">:</span> <span class="n">object</span></em>, <em class="sig-param"><span class="n">process_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">retain_f_ids</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">vardata</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_f_ids</span><span class="p">:</span> <span class="n">list</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit'</span></em>, <em class="sig-param"><span class="n">transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'transform'</span></em>, <em class="sig-param"><span class="n">fit_transform_handle</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'fit_transform'</span></em>, <em class="sig-param"><span class="n">supervised_attr</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fit_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">prefit</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">transform_args</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#orthrus.core.pipeline.Transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#orthrus.core.pipeline.Fit" title="orthrus.core.pipeline.Fit"><code class="xref py py-class docutils literal notranslate"><span class="pre">orthrus.core.pipeline.Fit</span></code></a></p>
 <p><a class="reference internal" href="#orthrus.core.pipeline.Fit" title="orthrus.core.pipeline.Fit"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fit</span></code></a> subclass used to transform a dataset, e.g. normalization, imputation, log transformation, etc…</p>
 <dl class="field-list simple">
@@ -3349,6 +3379,7 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 <li><p><strong>supervised_attr</strong> (<em>str</em>) – Supervision attribute in the dataset’s metadata to fit with respect to.</p></li>
 <li><p><strong>fit_handle</strong> (<em>string</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>. Default is “fit”.</p></li>
 <li><p><strong>fit_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.fit()</span></code>.</p></li>
+<li><p><strong>prefit</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p></li>
 <li><p><strong>transform_handle</strong> (<em>str</em>) – Name of <code class="docutils literal notranslate"><span class="pre">transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>. Default is “transform”.</p></li>
 <li><p><strong>transform_args</strong> (<em>dict</em>) – Keyword arguments passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">process.transform()</span></code>.</p></li>
 <li><p><strong>fit_transform_handle</strong> (<em>str</em>) – Name of <code class="docutils literal notranslate"><span class="pre">fit_transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>.
@@ -3357,6 +3388,7 @@ Default is “fit_transform”.</p></li>
 some transforms may just transform each individual feature and we would like to keep the name of that
 feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
 with the orginal feature labels, e.g. PCA, MDS, UMAP, etc… The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>vardata</strong> (<em>DataFrame</em>) – Optional replacement variable (feature) metadata in the case that <code class="docutils literal notranslate"><span class="pre">retain_f_ids</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3443,6 +3475,17 @@ the verbosity the larger the text output. Default is 1, indicating the standard 
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="orthrus.core.pipeline.Transform.prefit">
+<code class="sig-name descname">prefit</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.prefit" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the process is assumed to be already fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="orthrus.core.pipeline.Transform._transform_handle">
 <code class="sig-name descname">_transform_handle</code><a class="headerlink" href="#orthrus.core.pipeline.Transform._transform_handle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of <code class="docutils literal notranslate"><span class="pre">transform</span></code> method used by <a class="reference internal" href="#orthrus.core.pipeline.Transform.process" title="orthrus.core.pipeline.Transform.process"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Transform.process</span></code></a>. Default is “transform”.</p>
@@ -3482,10 +3525,21 @@ Default is “fit_transform”.</p>
 <dd><p>Flag indicating whether or not to retain the original feature labels. For example,
 some transforms may just transform each individual feature and we would like to keep the name of that
 feature, e.g. log transformation, other transforms will generate latent features which can not be labeled
-with the orginal feature labels, e.g. PCA, MDS, UMAP, etc… The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+with the orginal feature labels, e.g. PCA, MDS, UMAP, etc… The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="orthrus.core.pipeline.Transform.vardata">
+<code class="sig-name descname">vardata</code><a class="headerlink" href="#orthrus.core.pipeline.Transform.vardata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional replacement variable (feature) metadata in the case that <code class="docutils literal notranslate"><span class="pre">retain_f_ids</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>DataFrame</p>
 </dd>
 </dl>
 </dd></dl>

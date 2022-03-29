@@ -174,9 +174,9 @@
             
   <div class="section" id="data-normalization-and-imputation">
 <h1>Data Normalization and Imputation<a class="headerlink" href="#data-normalization-and-imputation" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet" title="orthrus.core.dataset.DataSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code></a> class makes it convinient to normalize and impute data by providing methods such as
-<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.normalize" title="orthrus.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> and
-<a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.impute" title="orthrus.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a>. These methods are compatible with various normalization and imputation methods available
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataSet</span></code> class makes it convinient to normalize and impute data by providing methods such as
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code>. These methods are compatible with various normalization and imputation methods available
 in <a class="reference external" href="https://scikit-learn.org/stable/index.html">sklearn</a> package. Please check the method documentation for more details and how to write custom
 normalization and imputation methods</p>
 <div class="section" id="normalization">
@@ -198,9 +198,9 @@ normalization method. Let’s take a look on how to use it.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;normalized data&#39;</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.normalize" title="orthrus.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method updates the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> after performing the normalization operation. Next,
-let’s take a look a look at how to use a batch correction normalization method, say Limma. Since these methods are supervised, in addition to the data matrix <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.normalize" title="orthrus.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a>
-method takes <cite>supervised_attr</cite> parameter (the name of attribute in <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.metadata" title="orthrus.core.dataset.DataSet.metadata"><code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code></a>) as additional input; the label information for this attribute is used for normalization.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code> method updates the <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code> after performing the normalization operation. Next,
+let’s take a look a look at how to use a batch correction normalization method, say Limma. Since these methods are supervised, in addition to the data matrix <code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code>
+method takes <cite>supervised_attr</cite> parameter (the name of attribute in <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code>) as additional input; the label information for this attribute is used for normalization.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">orthrus.preprocessing.batch_corrections</span> <span class="kn">import</span> <span class="n">Limma</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">limma</span> <span class="o">=</span> <span class="n">Limma</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">limma</span><span class="p">,</span> <span class="n">norm_name</span><span class="o">=</span><span class="s1">&#39;Limma&#39;</span><span class="p">,</span> <span class="n">supervised_attr</span><span class="o">=</span><span class="s1">&#39;BatchID&#39;</span><span class="p">)</span> <span class="c1">#ds.metadata must contain BatchID attribute</span>
@@ -209,7 +209,7 @@ method takes <cite>supervised_attr</cite> parameter (the name of attribute in <a
 </div>
 <div class="section" id="imputation">
 <h2>Imputation<a class="headerlink" href="#imputation" title="Permalink to this headline">¶</a></h2>
-<p>Similar to <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.normalize" title="orthrus.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.impute" title="orthrus.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a> method may be used to impute missing values. As described
+<p>Similar to <code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code> method the <code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code> method may be used to impute missing values. As described
 at the beginning of the document, this method can work with a variety of imputation methods from packages like <a class="reference external" href="https://scikit-learn.org/stable/index.html">sklearn</a> . Please see the method documentation
 on the restrictions and how to write custom imputation methods.</p>
 <p>Let’s look at an example. Suppose that our data contains missing values, which are represented as zero in this case, and we want to impute them using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html">KNNImputer</a> from
@@ -219,7 +219,7 @@ on the restrictions and how to write custom imputation methods.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="n">imputer</span><span class="p">,</span> <span class="n">impute_name</span><span class="o">=</span><span class="n">impute_name</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Similar to <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.normalize" title="orthrus.core.dataset.DataSet.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code></a> method, the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.impute" title="orthrus.core.dataset.DataSet.impute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code></a> method updates the <a class="reference internal" href="orthrus.core.html#orthrus.core.dataset.DataSet.data" title="orthrus.core.dataset.DataSet.data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code></a> after performing the normalization operation.</p>
+<p>Similar to <code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize</span></code> method, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">impute</span></code> method updates the <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code> after performing the normalization operation.</p>
 </div>
 </div>
 
