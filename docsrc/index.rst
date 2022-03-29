@@ -12,7 +12,6 @@ Welcome to orthrus's documentation!
 
    /rst/getting_started
    /rst/advanced_topics
-   /rst/projects_and_experiment
    /rst/modules
 
 

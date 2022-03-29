@@ -8,3 +8,4 @@ Advanced Topics
    feature_set_size_reduction
    processes_and_pipelines
    example_pipeline
+   integrating_mlflow
