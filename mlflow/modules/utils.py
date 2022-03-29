@@ -1,8 +1,9 @@
 """Module for utility functions"""
 
 # imports
-from orthrus.core.pipeline import Report
+from orthrus.core.pipeline import Report, Score
 from pandas import DataFrame
+from numpy import ndarray
 import mlflow
 import pandas as pd
 import numpy as np
@@ -92,3 +93,90 @@ def log_report_scores(report: Report) -> None:
         
 
     return
+
+def log_confusion_stats(confusion_mats: Score) -> None:
+    """Logs classification metrics from an orthrus Score class instance containing a confusion matrix."""
+
+    # extract scores from report
+    split_scores = confusion_mats.condense_scores()
+
+    for split in split_scores.keys():
+
+        # extract dataframe of confusion mats
+        cms = split_scores[split]
+
+        if cms.size > 0:
+
+            # initialize outer report
+            outer_report = pd.DataFrame()
+
+            # loop through split type
+            for split_type in cms.columns:
+
+                # initialize inner report
+                inner_report = pd.DataFrame()
+            
+                # loop through the batches
+                for batch in cms.index:
+            
+                    # grab the confusion matrix
+                    cm = cms.loc[batch, split_type]
+
+                    # get stats
+                    stats = stats_from_conf_mat(cm.values)
+                    stat_scores = np.array(list(stats.values())).reshape(1, -1)
+
+                    # append to output report
+                    report_columns = [f"{split_type}.{k}" for k in stats.keys()]
+                    report_row = pd.DataFrame(index=[batch], columns=report_columns, data=stat_scores)
+                    inner_report = pd.concat((inner_report, report_row), axis=0)
+
+                    # log the stats
+                    stats = {f"{split}.{split_type}.{batch}.{k}": v for k, v in stats.items()}
+                    mlflow.log_metrics(stats)
+                
+                # append inner report
+                outer_report = pd.concat((outer_report, inner_report), axis=1)
+
+                # sum across batches
+                cm = sum([cms.loc[batch, split_type] for batch in cms.index])
+
+                # get stats
+                stats = stats_from_conf_mat(cm.values)
+
+                # log the stats
+                stats = {f"{split}.{split_type}.Mean.{k}": v for k, v in stats.items()}
+                mlflow.log_metrics(stats)
+
+
+            # store violin plot
+            fig: go.Figure = score_violin_plot(outer_report.dropna(axis=1))
+            violin_path = f"temp/{split}.violin.html"
+            fig.write_html(violin_path)
+            mlflow.log_artifact(violin_path)
+
+    return
+
+def stats_from_conf_mat(cm: ndarray):
+    """Computes basic classification stats from a binary confusion matrix."""
+
+    # extract tp, tn, fp, tn
+    tn, fp, fn, tp = cm.ravel()
+
+    # initialize output
+    stats = {}
+
+    # compute stats
+    stats['TPR'] = tp / (tp + fn) if (tp + fn) > 0 else np.nan
+    stats['TNR'] = tn / (tn + fp) if (tn + fp) > 0 else np.nan
+    stats['PPV'] = tp / (tp + fp) if (tp + fp) > 0 else np.nan
+    stats['NPV'] = tn / (tn + fn) if (tn + fn) > 0 else np.nan
+    stats['FPR'] = fp / (fp + tn) if (fp + tn) > 0 else np.nan
+    stats['FNR'] = fn / (fn + tp) if (fn + tp) > 0 else np.nan
+    stats['FDR'] = fp / (fp + tp) if (fp + tp) > 0 else np.nan
+    stats['FOR'] = fn / (fn + tn) if (fn + tn) > 0 else np.nan
+    stats['ACC'] = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else np.nan
+    stats['BSR'] = (stats['TPR'] + stats['TNR']) / 2
+    stats['F1'] = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else np.nan
+
+    return stats
