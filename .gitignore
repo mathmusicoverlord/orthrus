@@ -74,6 +74,13 @@ docs/_build/
 # PyBuilder
 target/
 
+# mlflow
+mlflow/mlruns
+mlflow/tmp
+
+# test_data
+test_data/GSE73072/Data
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

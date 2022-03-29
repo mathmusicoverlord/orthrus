@@ -38,7 +38,6 @@ def score(pipeline: Pipeline) -> dict:
 
     return {'mean_valid_bsr': mean_bsr}
 
-
 # set final hyperparamters
 def hyperparams() -> dict():
     return {'svm_C': 0.0033588966840458474}
