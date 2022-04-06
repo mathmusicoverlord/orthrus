@@ -12,10 +12,6 @@ import copy
 
 class IFR:
 
-    # Update documentation
-    # Add / remove / change argument names
-    # update the example
-
     """
     The Iterative Feature Removal algorithms is used to extract ordered disctiminatory feature sets for classification problems. The feature are ranked
     is 'frequency', which marks marks how important a feature is. Internally, IFR randomly partitions the data many times, and computes 
@@ -170,7 +166,6 @@ class IFR:
             self.partitioner = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
         else:
             partitioner.shuffle = True
-            _ = partitioner.random_state
             self.partitioner =  partitioner 
 
 
@@ -188,7 +183,7 @@ class IFR:
 
         self.diagnostic_information_ = {}
         self._diagnostic_information_keys = ['train_scores', 'validation_scores', 'sorted_abs_weights', 'weight_ratios',
-                                            'features', 'true_feature_count']
+                                            'features', 'true_feature_count', 'num_training_samples']
         
         self.diagnostic_information_['stopping_conditions'] = []
 
@@ -201,7 +196,7 @@ class IFR:
        
 
     def _add_diagnostic_info_for_current_iteration(self, diag_dict, train_score, validation_score,
-        sorted_abs_weights, weight_ratios, features, true_feature_count):
+        sorted_abs_weights, weight_ratios, features, true_feature_count, n_training_samples):
 
         diag_dict.get('train_scores', []).append(train_score)
         diag_dict.get('validation_scores', []).append(validation_score)
@@ -209,6 +204,7 @@ class IFR:
         diag_dict.get('weight_ratios', []).append(weight_ratios)
         diag_dict.get('features', []).append(features)
         diag_dict.get('true_feature_count', []).append(true_feature_count)
+        diag_dict.get('num_training_samples', []).append(n_training_samples)
 
 
     def _sanity_check_diagnostics(self, diag_dict, n_iters):
@@ -247,11 +243,12 @@ class IFR:
 
         self.diagnostic_information_['number_of_iters_per_run'] = pd.Series([
                 self.diagnostic_information_['train_scores'][i].count() 
-                for i in range(len(self.diagnostic_information_['train_scores']))
+                    for i in range(len(self.diagnostic_information_['train_scores'].columns))
                 ])
 
         self.diagnostic_information_['weight_ratios'] = pd.DataFrame(self.diagnostic_information_['weight_ratios']).transpose()
         self.diagnostic_information_['sorted_abs_weights'] = pd.DataFrame(self.diagnostic_information_['sorted_abs_weights']).transpose()
+        self.diagnostic_information_['num_training_samples'] = pd.DataFrame(self.diagnostic_information_['num_training_samples']).transpose()
 
 
     def _initialize_results(self, n_attributes):
@@ -342,6 +339,7 @@ class IFR:
             print("=====================================================")
             print("Finishing Execution. %d features out of a total of %d features were selected."% ((self.results_['frequency'] > 0).sum(), X.shape[1]))
             print("=====================================================")
+
         # ray.shutdown()
 
         self._reformat_diagnostic_information()
@@ -393,7 +391,8 @@ class IFR:
                         None,
                         None,
                         None,
-                        None)
+                        None,
+                        tr_d.shape[0])
                     stopping_condition = "Exception in model fitting"
                 break
             
@@ -446,7 +445,8 @@ class IFR:
                         sorted_abs_weights,
                         weight_ratios,
                         None,
-                        None)
+                        None,
+                        tr_d.shape[0])
 
                     #break out of current loop if score is below cutoff
                     stopping_condition = "Validation score cutoff"
@@ -467,7 +467,8 @@ class IFR:
                         sorted_abs_weights,
                         weight_ratios,
                         None,
-                        None)
+                        None,
+                        tr_d.shape[0])
                     stopping_condition = "Jump not found"
             
             
@@ -489,7 +490,8 @@ class IFR:
                         sorted_abs_weights,
                         weight_ratios,
                         None,
-                        None)
+                        None,
+                        tr_d.shape[0])
                     stopping_condition = "Small weight at jump"
                 if self.verbosity>1:
                     print('Weight at the jump(', sorted_abs_weights[count] ,')  smaller than weight cutoff(1e-6).')
@@ -506,7 +508,8 @@ class IFR:
                         sorted_abs_weights,
                         weight_ratios,
                         None,
-                        None)
+                        None,
+                        tr_d.shape[0])
                     stopping_condition = "More features than cutoff"
                 if self.verbosity>1:
                     print('More features selected (%d) than the cutoff (%d)'%(count, train_X.shape[0]))
@@ -543,7 +546,8 @@ class IFR:
                     sorted_abs_weights,
                     weight_ratios,
                     active_idxs[selected],
-                    count)
+                    count,
+                    tr_d.shape[0])
 
             if self.verbosity>1:
                 print('Removing %i features from training and validation matrices.'%len(selected))
@@ -571,7 +575,10 @@ class IFR:
         for n_rep in range(self.repetition):
             
                 partitions = partitioner.split(X, y, groups)
-                partitioner.random_state += 1
+                try:
+                    partitioner.random_state += 1
+                except:
+                    pass
                 for i, partition in enumerate(partitions):
 
                     n_data_partition +=1
@@ -591,32 +598,31 @@ class IFR:
                                 save_diagnostic]
 
                     list_of_arguments.append(arguments)
+ 
+        finished_processes = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
+                                        num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)
 
+        for process in finished_processes:
+            results = ray.get(process)
+            # update the feature set dictionary based on the features collected for current fold
+            list_of_features_for_curr_fold = results['list_of_features']
+            self._update_frequency_in_results(list_of_features_for_curr_fold)
             
-                finished_processes = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
-                                                num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)
+            list_of_weights_for_curr_fold = results['list_of_weights']
+            self._update_weights_in_results(list_of_features_for_curr_fold, list_of_weights_for_curr_fold) 
 
-                for process in finished_processes:
-                    results = ray.get(process)
-                    # update the feature set dictionary based on the features collected for current fold
-                    list_of_features_for_curr_fold = results['list_of_features']
-                    self._update_frequency_in_results(list_of_features_for_curr_fold)
-                    
-                    list_of_weights_for_curr_fold = results['list_of_weights']
-                    self._update_weights_in_results(list_of_features_for_curr_fold, list_of_weights_for_curr_fold) 
+            list_of_selection_iterations_for_current_fold = results['list_of_selection_iteration']
+            self._update_selection_iteration_in_results(list_of_selection_iterations_for_current_fold)               
+            #`
 
-                    list_of_selection_iterations_for_current_fold = results['list_of_selection_iteration']
-                    self._update_selection_iteration_in_results(list_of_selection_iterations_for_current_fold)               
-                    #`
-
-                    if save_diagnostic:
-                        n_iters = results['n_iters']
-                        diagnostic_info_dictionary = results['diagnostic_info_dictionary']
-                        stopping_condition = results['stopping_condition']
-                                        
-                        self._sanity_check_diagnostics(diagnostic_info_dictionary, n_iters)
-                        #save the diagnostic information for this data partition
-                        self._add_diagnostic_info_for_data_partition(diagnostic_info_dictionary, n_data_partition, stopping_condition)
+            if save_diagnostic:
+                n_iters = results['n_iters']
+                diagnostic_info_dictionary = results['diagnostic_info_dictionary']
+                stopping_condition = results['stopping_condition']
+                                
+                self._sanity_check_diagnostics(diagnostic_info_dictionary, n_iters)
+                #save the diagnostic information for this data partition
+                self._add_diagnostic_info_for_data_partition(diagnostic_info_dictionary, n_data_partition, stopping_condition)
 
 
     def determine_frequency_cutoff(self, X, y, groups):
@@ -630,17 +636,39 @@ class IFR:
         y_copy = copy.deepcopy(y)
         if groups is not None:
             groups_copy = copy.deepcopy(groups)
+        else:
+            groups_copy = None
         partitioner = copy.deepcopy(self.partitioner)
 
         for j in range(self.null_model_repetitions):
             
             #randomize labels and groups
-            idxs = np.arange(y.shape[0])
-            np.random.shuffle(idxs)
-            y_copy = y_copy[idxs]
             if groups is not None:
-                groups_copy = groups_copy[idxs]
-        
+                #shuffle groups
+                np.random.shuffle(groups_copy)
+
+                # generate new labels for each group
+                unique_y = np.unique(y)
+                unique_groups = np.unique(groups)
+
+                # get probability of class at index 1
+                p = np.where(y == unique_y[1])[0].shape[0] / y.shape[0]
+                new_label_idxs = np.random.binomial(1, p, size=unique_groups.shape[0])
+                new_labels = [unique_y[x] for x in new_label_idxs]
+
+                #assign new label for each group
+                for group, label in zip(unique_groups, new_labels):
+                    #for all samples of the current group, randomly assign a new label
+                    new_idx_for_group = np.where(groups_copy == group)[0]
+
+                    old_idx_for_group = np.where(groups == group)[0]
+                    old_label = y[old_idx_for_group][0]
+                    y_copy[new_idx_for_group] = label
+                    # print(old_label, label, y_copy[new_idx_for_group])
+
+            else:
+                np.random.shuffle(y_copy)
+
             if self.verbosity>0:
                 print("=====================================================")
                 print("Null model run #: %d"%j)
@@ -1248,13 +1276,12 @@ class IFR:
             #     bins = 'auto'
             # y, xx = np.histogram(series[-series.isna()], bins=bins)
             # x = (xx[1:] + xx[:-1]) / 2
-            # xx = ['{:.2f}'.format(i) for i in x]
             
             freq_series = series.value_counts()
             x = freq_series.index
             x = pd.Series(x)
             y = freq_series.values
-            xx = x
+            xx = ['{:.2f}'.format(i) for i in x]
 
             if fig is None:
                 fig = go.Figure()
@@ -1262,8 +1289,7 @@ class IFR:
                                     title_x=0.5,
                                     xaxis=dict(
                                         tickmode='array',
-                                        tickvals=xx),
-                                    bargap=0.01)
+                                        tickvals=xx))
                 fig.update_yaxes(title=y_axis_title, type='linear' if yaxis_type == 'linear' else 'log')
                 fig.update_layout(margin=dict(t=30))
             
@@ -1390,7 +1416,10 @@ class IFR:
                                     'title_text': 'Weight Ratios for the current selection', 'title_x':0.5})
 
             ratio_fig.update_layout(margin=dict(b=20), height = 300) 
-            xlim = self.diagnostic_information_['true_feature_count'][slider_value].iloc[idx] + 20
+            xlim = self.diagnostic_information_['true_feature_count'][slider_value].iloc[idx]
+            if xlim is np.nan:
+                xlim = 0
+            xlim =  + 20
             xticks = np.arange(xlim)
             ratio_fig.update(layout_xaxis_range = [-1, xlim])   
 
