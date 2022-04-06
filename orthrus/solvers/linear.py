@@ -220,8 +220,8 @@ def LPPrimalDualPy(c, A, b, **kwargs):
             print('Iteration:', i + 1)
         b1_t = torch.addmm(b_t, A_t, x_t, alpha=-1)
         b2_t = torch.addmm(c_t, A_t.t(), p_t, alpha=-1)
-        rho_t = torch.add(b1_t, -1, w_t)
-        sig_t = torch.add(b2_t, z_t)
+        rho_t = torch.add(b1_t, w_t, alpha=-1)
+        sig_t = torch.add(b2_t, z_t, alpha=1)
         gamma = (torch.mm(z_t.t(), x_t) + torch.mm(p_t.t(), w_t))[0]
         mu = (delta * gamma) / (M + N)
         a1_t = x_t * z_t
