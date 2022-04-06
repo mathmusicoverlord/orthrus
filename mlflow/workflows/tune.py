@@ -7,10 +7,8 @@ from orthrus.core.helper import module_from_path
 from orthrus.core.dataset import load_dataset
 from orthrus.core.dataset import DataSet
 import ray.tune
-from  mlflow.tracking import MlflowClient
 from ray.tune.integration.mlflow import mlflow_mixin
-from orthrus.core.pipeline import Pipeline, Report
-from modules import utils
+from orthrus.core.pipeline import Pipeline
 import yaml
 import os
 import mlflow
@@ -87,6 +85,9 @@ def log_config(config_name: str, config: dict):
 
     # drop mlflow key
     del config['mlflow']
+
+    # convert to float
+    config = {k: float(v) for k, v in config.items()}
 
     # save yaml file
     with open(temp_path, 'w+') as config_file:
