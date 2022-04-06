@@ -3218,7 +3218,7 @@ class Report(Score):
         scores = self._collapse_class_pred_scores()
 
         # generate levels
-        levels = ['\d+', '\d+_\d+']
+        levels = ['\d+$', '\d+_\d+$']
 
         # initialize output
         rep = dict()
