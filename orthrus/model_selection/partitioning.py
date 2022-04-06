@@ -28,6 +28,9 @@ class StratifiedGroupKFoldForEachUniqueY():
             self.n_splits = n_splits
             self.shuffle = shuffle
             self.random_state = random_state
+
+        def __str__(self):
+            return "StratifiedGroupKFoldForEachUniqueY(n_splits=%d, shuffle=%r, random_state=%d"%(self.n_splits, self.shuffle, self.random_state)
         
         def split(self, X, y, groups):
                 train = {}
