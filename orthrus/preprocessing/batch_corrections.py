@@ -92,3 +92,24 @@ class Limma():
         # whose contribution is due to batch effect.
         return X - np.dot(design_matrix,coefficients[-(nbatches-1):])
     #
+
+
+class Combat():
+    def fit_transform(self, X, y):
+        """
+        A wrapper of Combat algorithm implmented in pyCombat package
+        see: https://epigenelabs.github.io/pyComBat/
+
+        Args:
+            X (ndarray of shape (m, n))): array of data, with m the number of observations in R^n.
+            
+            y(ndarray of shape (m)): vector of labels for the data. Assumed to be discrete; string or
+            other labels are handled cleanly.
+        Return:
+            (ndarray of shape (m, n))): Modified data matrix.
+        """
+
+        from combat.pycombat import pycombat
+        import pandas as pd
+
+        return pycombat(pd.DataFrame(X.T), y).values.T
