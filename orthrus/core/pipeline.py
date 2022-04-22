@@ -2317,7 +2317,7 @@ class Score(Process):
             # check the dtype
             try:
                 if type(np.array(scores).reshape(-1,)[0:1].item()) == float:
-                    levels = ['\d+', '\d+_\d+']
+                    levels = ['\d+$', '\d+_\d+$']
                     for level in levels:
                         # compute first level scores
                         fl_scores = scores.filter(regex='batch_' + level)
@@ -2344,7 +2344,7 @@ class Score(Process):
         scores = self._collapse_class_pred_scores()
 
         # generate levels
-        levels = ['\d+', '\d+_\d+']
+        levels = ['\d+$', '\d+_\d+$']
 
         # initialize output
         rep = dict()
@@ -2355,9 +2355,9 @@ class Score(Process):
             fl_scores = fl_scores.dropna()
 
             # fill in dataframe
-            if level == '\d+':
+            if level == '\d+$':
                 level_type = "train_test"
-            elif level == '\d+_\d+':
+            elif level == '\d+_\d+$':
                 level_type = "train_valid_test"
             rep[level_type] = fl_scores.transpose()
                                         
@@ -3249,9 +3249,9 @@ class Report(Score):
             fl_scores = fl_scores.dropna()
 
             # fill in dataframe
-            if level == '\d+':
+            if level == '\d+$':
                 level_type = "train_test"
-            elif level == '\d+_\d+':
+            elif level == '\d+_\d+$':
                 level_type = "train_valid_test"
             rep[level_type] = pd.DataFrame(index=fl_scores.columns)
 
