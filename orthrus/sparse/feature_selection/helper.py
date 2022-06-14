@@ -1,10 +1,11 @@
+from re import L
 import numpy as np
 import ray
 import copy
 from orthrus.core.helper import batch_jobs_
 from sklearn.preprocessing import StandardScaler
 from typing import  Callable
-def reduce_feature_set_size(ds,
+def reduce_feature_set_size_by_classification(ds,
                             features_dataframe, 
                             sample_ids,
                             attr:str,
@@ -133,7 +134,7 @@ def reduce_feature_set_size(ds,
 
             >>> import orthrus.sparse.feature_selection.helper as fhelper
 
-            >>> reduced_feature_results = fhelper.reduce_feature_set_size(x, 
+            >>> reduced_feature_results = fhelper.reduce_feature_set_size_by_classification(x, 
                                     features_df, 
                                     sample_ids_training,
                                     attrname,
@@ -153,17 +154,14 @@ def reduce_feature_set_size(ds,
     ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
 
     #create subset of features, from "start" to "end" in increments of "step"
-    if end == -1:
-        end = ranked_features.shape[0] + 1
-
-    n_attrs = np.arange(start, end+ 1, step)
+    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step)
 
     list_of_arguments = []
     #for each subset of top features
     for i, n  in enumerate(n_attrs):
         classifier_copy = copy.deepcopy(classifier)
         arguments = [classifier_copy, 
-                        ds, 
+                        copy.deepcopy(ds), 
                         attr, 
                         ranked_features,
                         0,
@@ -175,27 +173,14 @@ def reduce_feature_set_size(ds,
                         kwargs]
         list_of_arguments.append(arguments)
 
-    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
-    results = np.zeros((len(list_of_arguments), 2))
-
-    for i, process in enumerate(finished_processes):
-        score, feature_set_length , _ = ray.get(process)
-        results[i, 0] = feature_set_length
-        results[i, 1] = score
-    
-    # ray.shutdown()
-    #find the best n, i.e. smallest n that produced largest score
-    results = results[results[:,1].argsort()[::-1]]
-    max_bsr = np.max(results[:, 1])
-    max_bsr_idxs = np.where(results[:, 1] == max_bsr)[0]
-    n = int(np.min(results[max_bsr_idxs, 0]))
-
-    reduced_features = features_dataframe.loc[ranked_features[:n]]
-
-    returns = {}
-    returns = {'reduced_feature_ids': reduced_features.index.values,
-                'optimal_n_results': results}
+    returns = run_batch_jobs_for_fset_size_reduction(run_single_classification_experiment_,
+                                            list_of_arguments, 
+                                            verbose_frequency,
+                                            num_cpus_per_worker,
+                                            num_gpus_per_worker,
+                                            features_dataframe,
+                                            ranked_features,
+                                            local_mode)
 
     return returns
 
@@ -385,6 +370,26 @@ def run_single_classification_experiment_(model,
     
     features = features[feature_start_index: feature_end_index]
     
+    score = perform_classiciation(model, 
+                        ds, 
+                        attr, 
+                        features,
+                        sample_ids, 
+                        scorer, 
+                        partitioner, 
+                        test_sample_ids,
+                        **kwargs)
+    return score, feature_end_index-feature_start_index, feature_start_index
+
+def perform_classiciation(model, 
+                        ds, 
+                        attr, 
+                        features,
+                        sample_ids, 
+                        scorer, 
+                        partitioner, 
+                        test_sample_ids,
+                        **kwargs):
     classification_result = ds.classify(model,
                 attr,
                 feature_ids=features,
@@ -410,11 +415,9 @@ def run_single_classification_experiment_(model,
         if partitioner is not None:
             score = np.mean(classification_result['scores'].loc['Test'].values)
         else:
-            score = np.mean(classification_result['scores'].loc['Training'].values)
+            score = np.mean(classification_result['scores'].loc['Train'].values)
 
-
-    return score, feature_end_index-feature_start_index, feature_start_index
-
+    return score
 
 def rank_features_by_attribute(features_df, args):
     """
@@ -731,9 +734,8 @@ def plot_feature_frequency(f_ranks, attr):
 
 from orthrus.core.pipeline import Transform
 from orthrus.core.dataset import DataSet
-class ReduceIFRFeatures(Transform):
+class ReduceIFRFeaturesByClassification(Transform):
     def __init__(self,
-                #  process: object,
                  supervised_attr:str,
                  classifier,
                  scorer,
@@ -742,6 +744,7 @@ class ReduceIFRFeatures(Transform):
                  parallel: bool = False,
                  verbosity: int = 1,
                  partitioner=None,
+                 group=None,
                  start : int = 5,
                  end : int = 100,
                  step : int = 5,
@@ -749,11 +752,11 @@ class ReduceIFRFeatures(Transform):
                  num_cpus_per_worker : float=1.,
                  num_gpus_per_worker : float=0.,
                  local_mode=False, 
-                 fit_args=None):
+                 validation_set_label=None):
         
         # init with Process class
-        super(ReduceIFRFeatures, self).__init__(process=None,
-                                        process_name='ReduceIFRFeatures',
+        super(ReduceIFRFeaturesByClassification, self).__init__(process=None,
+                                        process_name='ReduceIFRFeaturesByClassification',
                                         parallel=False,
                                         verbosity=verbosity,
                                         )
@@ -772,15 +775,27 @@ class ReduceIFRFeatures(Transform):
         self.num_cpus_per_worker = num_cpus_per_worker
         self.num_gpus_per_worker = num_gpus_per_worker
         self.local_mode = local_mode
-        self.fit_args = fit_args
+        self.group = group
+        self.validation_set_label = validation_set_label
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
         ds = self._preprocess(ds, **kwargs)
         features_df = kwargs['f_ranks']
+        feature_idxs = kwargs['selector'].transform(features_df)
+        features_df = features_df.loc[feature_idxs]
 
         sample_ids =  self._extract_training_ids(ds, **kwargs)
-        results_ = reduce_feature_set_size(ds,
+        if self.validation_set_label=='Valid':
+            test_sample_ids = kwargs['tvt_labels'] == 'Valid'
+            if test_sample_ids.sum() == 0:
+                test_sample_ids = None
+        elif self.validation_set_label=='Test':
+            test_sample_ids = kwargs['tvt_labels'] == 'Test'
+        else:
+            test_sample_ids = None
+
+        results_ = reduce_feature_set_size_by_classification(ds,
                             features_df,
                             sample_ids,
                             self.supervised_attr,
@@ -789,13 +804,15 @@ class ReduceIFRFeatures(Transform):
                             self.ranking_method_handle,
                             self.ranking_method_args,
                             partitioner=self.partitioner,
+                            test_sample_ids=test_sample_ids,
                             start=self.start,
                             end=self.end,
                             step=self.step,
                             verbose_frequency=self.verbose_frequency,
                             num_cpus_per_worker = self.num_cpus_per_worker,
                             num_gpus_per_worker = self.num_gpus_per_worker,
-                            local_mode=self.local_mode
+                            local_mode=self.local_mode,
+                            group=self.group
                             )
         results_['transform'] = self._generate_transform(self, results_['reduced_feature_ids'])
         return results_
@@ -809,3 +826,316 @@ class ReduceIFRFeatures(Transform):
             return ds_new
 
         return transform
+
+
+class ReduceIFRFeaturesByFishersMetric(Transform):
+    def __init__(self,
+                #  process: object,
+                 supervised_attr:str,
+                 embedding,
+                 ranking_method_handle,
+                 ranking_method_args: dict,
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 start : int = 5,
+                 end : int = 100,
+                 step : int = 5,
+                 verbose_frequency : int=10,
+                 num_cpus_per_worker : float=1.,
+                 num_gpus_per_worker : float=0.,
+                 local_mode=False, 
+                 use_validation_set=False,
+                 process_name='ReduceIFRFeaturesByFishersMetric'):
+        
+        # init with Process class
+        super(ReduceIFRFeaturesByFishersMetric, self).__init__(process=None,
+                                        process_name=process_name,
+                                        parallel=False,
+                                        verbosity=verbosity,
+                                        )
+        self.supervised_attr = supervised_attr
+        self.embedding = embedding
+        self.ranking_method_handle = ranking_method_handle
+        self.ranking_method_args = ranking_method_args
+        self.parallel = parallel
+        self.verbosity = verbosity
+        self.start  = start
+        self.end = end
+        self.step = step        
+        self.verbose_frequency = verbose_frequency
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+        self.local_mode = local_mode
+        self.use_validation_set = use_validation_set
+
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+
+        ds = self._preprocess(ds, **kwargs)
+        features_df = kwargs['f_ranks']
+        feature_idxs = kwargs['selector'].transform(features_df)
+        features_df = features_df.loc[feature_idxs]
+
+
+        if self.use_validation_set:
+            sample_ids = kwargs['tvt_labels'] == 'Valid'
+        else:
+            sample_ids =  self._extract_training_ids(ds, **kwargs)
+
+        results_ = reduce_feature_set_size_by_fishers_metric(ds,
+                            features_df,
+                            sample_ids,
+                            self.supervised_attr,
+                            self.embedding,
+                            self.ranking_method_handle,
+                            self.ranking_method_args,
+                            start=self.start,
+                            end=self.end,
+                            step=self.step,                            
+                            verbose_frequency=self.verbose_frequency,
+                            num_cpus_per_worker = self.num_cpus_per_worker,
+                            num_gpus_per_worker = self.num_gpus_per_worker,
+                            local_mode=self.local_mode,
+                            )
+        results_['transform'] = self._generate_transform(self, results_['reduced_feature_ids'])
+        return results_
+    # def _fit_transform(self, ds: DataSet, **kwargs) -> Tuple[object, DataSet]:
+
+    def _generate_transform(self, process: object, reduced_feature_ids) -> Callable:
+
+        # define transform
+        def transform(ds: DataSet):
+            ds_new = ds.slice_dataset(feature_ids=reduced_feature_ids)
+            return ds_new
+
+        return transform
+
+
+def reduce_feature_set_size_by_fishers_metric(ds,
+                            features_dataframe, 
+                            sample_ids,
+                            attr:str,
+                            embedding,
+                            ranking_method_handle,
+                            ranking_method_args: dict,
+                            start : int = 5, 
+                            end : int = 100, 
+                            step : int = 5,                             
+                            verbose_frequency : int=10, 
+                            num_cpus_per_worker : float=1., 
+                            num_gpus_per_worker : float=0.,
+                            local_mode=False):
+    """
+
+
+    Args:
+        features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
+                                        (check orthrus.core.dataset.DataSet.feature_select method for details)
+
+        sample_ids (like-like): List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
+            ['human1', 'human3'], etc..., can also be pandas series or numpy array.
+
+        attr (string): Name of metadata attribute to classify on.
+
+        embedding:
+
+        ranking_method_handle (method handle) : handle of the feature ranking method
+
+        ranking_method_args (dict): argument dictionary for the feature ranking method
+
+        start (int): starting point of the grid search. (default: 5)
+        
+        end (int) :  end point of the grid search. Use -1 to set end as the size of features (default: 100)
+        
+        step (int) : gap between each sampled point in the grid (default: 5)
+
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
+            printed to console after every verbose_frequency number of processes complete execution. (default: 10)
+        
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
+
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+            `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
+
+    Return:
+    
+        (dict): contains 2 key-value pairs:
+            'optimal_n_results': ndarray of shape (m, 2), with m being the total values sampled from the grid in the search. 
+            The first column contains the number of top features (different values sampled from the grid search),  and the second 
+            column contains the score.  The array is sorted by score in descending order.
+        
+            'reduced_feature_ids' : ndarray of shape (n, ), n is the smallest number of features, out of the m sampled values, 
+            that produced the highest score. It contains reduced features ids (index of features_df).
+
+    Example:
+            >>> import orthrus.core.dataset as DS
+            >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
+            
+            >>> x = DS.load_dataset(file_path)
+            >>> ifr = IFR.IFR(
+            ...         verbosity = 2,
+            ...         nfolds = 4,
+            ...         repetition = 500,
+            ...         cutoff = .6,
+            ...         jumpratio = 5,
+            ...         max_iters = 100,
+            ...         max_features_per_iter_ratio = 2
+            ...         )
+            >>> result = x.feature_select(ifr,
+                        attrname,
+                        selector_name='IFR',
+                        f_results_handle='results',
+                        append_to_meta=False,
+                        )
+            >>> features_df = results['f_results']
+
+            >>> ranking_method_args = {'attr': 'frequency'}
+
+            >>> import orthrus.sparse.feature_selection.helper as fhelper
+
+            >>> reduced_feature_results = fhelper.reduce_feature_set_size_by_classification(x, 
+                                    features_df, 
+                                    sample_ids_training,
+                                    attrname,
+                                    classifier, 
+                                    bsr, 
+                                    fhelper.rank_features_by_attribute,
+                                    ranking_method_args,
+                                    patitioner=partitioner,
+                                    start = 5, 
+                                    end = 100, 
+                                    step = 1,
+                                    verbose_frequency=10,
+                                    num_cpus_per_worker=2.)
+
+            >>> print(reduced_feature_results)
+    """
+    ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
+
+    #create subset of features, from "start" to "end" in increments of "step"
+    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step)
+
+    list_of_arguments = []
+    #for each subset of top features
+    for i, n  in enumerate(n_attrs):
+        arguments = [embedding, 
+                        copy.deepcopy(ds), 
+                        attr, 
+                        ranked_features[0:n],
+                        sample_ids]
+        list_of_arguments.append(arguments)
+
+    returns = run_batch_jobs_for_fset_size_reduction(compute_fisher_score,
+                                            list_of_arguments, 
+                                            verbose_frequency,
+                                            num_cpus_per_worker,
+                                            num_gpus_per_worker,
+                                            features_dataframe,
+                                            ranked_features,
+                                            local_mode)
+
+    return returns
+
+@ray.remote
+def compute_fisher_score(embedding,
+                        ds,
+                        attr,
+                        feature_ids,
+                        sample_ids):
+    
+    ds = ds.slice_dataset(sample_ids = sample_ids, feature_ids = feature_ids)
+    x_transformed = embedding.fit_transform(ds.data)
+
+    labels = ds.metadata[attr]
+
+    scatters = []
+    #compute class scatter
+    for label in labels.unique():
+        #get samples for current class label
+        idxs = (labels == label)
+        idxs = np.where(idxs)[0]
+
+        #get data for current class label
+        tr_x_label = x_transformed[idxs]
+
+        #computer centeroid
+        mean_tr_x_label = np.mean(tr_x_label, axis=0)
+        
+        #compute distance of each sample of the current the class label from its centroid
+        distance_from_means = np.linalg.norm(x_transformed[idxs] - mean_tr_x_label, axis=1)
+        assert distance_from_means.shape[0] == idxs.shape[0], 'mistake in computing distances for scatter.'
+        scatters.append(np.mean(distance_from_means))
+
+    #compute mean scatter
+    mean_scatter = np.mean(np.array(scatters))
+
+    #compute class separation
+    label_class_1, label_class_2 = labels.unique()
+    
+    idxs_class_1 = (labels == label_class_1)
+    idxs_class_2 = (labels == label_class_2)
+
+    idxs_class_1 = np.where(idxs_class_1)[0]
+    idxs_class_2 = np.where(idxs_class_2)[0]
+
+    mean_distances_to_other_class = []
+    for idx_c1 in idxs_class_1:
+
+        # Compute distance between the current sample from class c1 and all samples of class c2
+        distances_between_sample_c1_class_c2 = np.linalg.norm(x_transformed[idxs_class_2] - x_transformed[idx_c1], axis=1)
+
+        #Take the mean
+        assert distances_between_sample_c1_class_c2.shape[0] == idxs_class_2.shape[0], 'mistake in computing distances for separation.'
+        mean_distances_to_other_class.append(np.mean(distances_between_sample_c1_class_c2))
+    
+    #Take mean
+    class_separation = np.mean(np.array(mean_distances_to_other_class))
+
+    return class_separation / mean_scatter, feature_ids.shape[0], 0
+
+
+def get_num_attr_array(ds, ranked_features, start, end, step):
+    if end == -1 or end > ranked_features.shape[0]:
+        end = ranked_features.shape[0]
+
+    if start > ranked_features.shape[0]:
+        start = 1 if ranked_features.shape[0] > 0 else 0
+        # raise Exception('start value greater than the number of features present in the feature set')
+
+    return np.arange(start, end+ 1, step)
+
+
+def run_batch_jobs_for_fset_size_reduction(method_handle,
+                                            list_of_arguments, 
+                                            verbose_frequency,
+                                            num_cpus_per_worker,
+                                            num_gpus_per_worker,
+                                            features_dataframe,
+                                            ranked_features,
+                                            local_mode=False):
+    finished_processes = batch_jobs_(method_handle, list_of_arguments, verbose_frequency=verbose_frequency,
+                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
+    results = np.zeros((len(list_of_arguments), 2))
+
+    for i, process in enumerate(finished_processes):
+        score, feature_set_length , _ = ray.get(process)
+        results[i, 0] = feature_set_length
+        results[i, 1] = score
+    
+    # ray.shutdown()
+    #find the best n, i.e. smallest n that produced largest score
+    results = results[results[:,1].argsort()[::-1]]
+    max_bsr = np.max(results[:, 1])
+    max_bsr_idxs = np.where(results[:, 1] == max_bsr)[0]
+    n = int(np.min(results[max_bsr_idxs, 0]))
+
+    reduced_features = features_dataframe.loc[ranked_features[:n]]
+
+    returns = {}
+    returns = {'reduced_feature_ids': reduced_features.index.values,
+                'optimal_n_results': results}
+
+    return returns
+
+class ReduceIFRFeatures:
+    pass
