@@ -2945,8 +2945,11 @@ class Pipeline(Process):
             if self.verbosity > 0:
                 print("Starting %dth process %s...\n" % (self._current_process, self.process_name))
 
-            # run process
-            _, next_results = process.run(ds, self.results_)
+            if process.run_status_ == 0:
+                # run process
+                _, next_results = process.run(ds, self.results_)
+            else:
+                next_results = process.results_
 
             # check for None type initial results
             if self.results_ is None:
@@ -3249,9 +3252,9 @@ class Report(Score):
             fl_scores = fl_scores.dropna()
 
             # fill in dataframe
-            if level == '\d+':
+            if level == '\d+$':
                 level_type = "train_test"
-            elif level == '\d+_\d+':
+            elif level == '\d+_\d+$':
                 level_type = "train_valid_test"
             rep[level_type] = pd.DataFrame(index=fl_scores.columns)
 
