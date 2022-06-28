@@ -3,7 +3,7 @@ import numpy as np
 import ray
 import copy
 from orthrus.core.helper import batch_jobs_
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
 from typing import  Callable
 def reduce_feature_set_size_by_classification(ds,
                             features_dataframe, 
@@ -828,7 +828,7 @@ class ReduceIFRFeaturesByClassification(Transform):
         return transform
 
 
-class ReduceIFRFeaturesByFishersMetric(Transform):
+class  ReduceIFRFeaturesByFishersMetric(Transform):
     def __init__(self,
                 #  process: object,
                  supervised_attr:str,
@@ -878,6 +878,8 @@ class ReduceIFRFeaturesByFishersMetric(Transform):
 
         if self.use_validation_set:
             sample_ids = kwargs['tvt_labels'] == 'Valid'
+            if sample_ids.sum() == 0:
+                raise Exception('No validation labels found!')
         else:
             sample_ids =  self._extract_training_ids(ds, **kwargs)
 
@@ -908,27 +910,25 @@ class ReduceIFRFeaturesByFishersMetric(Transform):
             return ds_new
 
         return transform
-
-
 def reduce_feature_set_size_by_fishers_metric(ds,
-                            features_dataframe, 
+                            features_dataframe,
                             sample_ids,
                             attr:str,
                             embedding,
                             ranking_method_handle,
                             ranking_method_args: dict,
-                            start : int = 5, 
-                            end : int = 100, 
-                            step : int = 5,                             
-                            verbose_frequency : int=10, 
-                            num_cpus_per_worker : float=1., 
+                            start : int = 5,
+                            end : int = 100,
+                            step : int = 5,
+                            verbose_frequency : int=10,
+                            num_cpus_per_worker : float=1.,
                             num_gpus_per_worker : float=0.,
                             local_mode=False):
     """
 
 
     Args:
-        features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection. 
+        features_df (pandas.DataFrame): This is a features dataframe that contains result of a feature selection.
                                         (check orthrus.core.dataset.DataSet.feature_select method for details)
 
         sample_ids (like-like): List of indicators for the samples to use for training. e.g. [1,3], [True, False, True],
@@ -943,34 +943,34 @@ def reduce_feature_set_size_by_fishers_metric(ds,
         ranking_method_args (dict): argument dictionary for the feature ranking method
 
         start (int): starting point of the grid search. (default: 5)
-        
+
         end (int) :  end point of the grid search. Use -1 to set end as the size of features (default: 100)
-        
+
         step (int) : gap between each sampled point in the grid (default: 5)
 
-        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
+        verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
-        
-        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+
+        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
 
-        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
-    
+
         (dict): contains 2 key-value pairs:
-            'optimal_n_results': ndarray of shape (m, 2), with m being the total values sampled from the grid in the search. 
-            The first column contains the number of top features (different values sampled from the grid search),  and the second 
+            'optimal_n_results': ndarray of shape (m, 2), with m being the total values sampled from the grid in the search.
+            The first column contains the number of top features (different values sampled from the grid search),  and the second
             column contains the score.  The array is sorted by score in descending order.
-        
-            'reduced_feature_ids' : ndarray of shape (n, ), n is the smallest number of features, out of the m sampled values, 
+
+            'reduced_feature_ids' : ndarray of shape (n, ), n is the smallest number of features, out of the m sampled values,
             that produced the highest score. It contains reduced features ids (index of features_df).
 
     Example:
             >>> import orthrus.core.dataset as DS
             >>> import orthrus.sparse.feature_selection.IterativeFeatureRemoval as IFR
-            
+
             >>> x = DS.load_dataset(file_path)
             >>> ifr = IFR.IFR(
             ...         verbosity = 2,
@@ -993,17 +993,17 @@ def reduce_feature_set_size_by_fishers_metric(ds,
 
             >>> import orthrus.sparse.feature_selection.helper as fhelper
 
-            >>> reduced_feature_results = fhelper.reduce_feature_set_size_by_classification(x, 
-                                    features_df, 
+            >>> reduced_feature_results = fhelper.reduce_feature_set_size_by_classification(x,
+                                    features_df,
                                     sample_ids_training,
                                     attrname,
-                                    classifier, 
-                                    bsr, 
+                                    classifier,
+                                    bsr,
                                     fhelper.rank_features_by_attribute,
                                     ranking_method_args,
                                     patitioner=partitioner,
-                                    start = 5, 
-                                    end = 100, 
+                                    start = 5,
+                                    end = 100,
                                     step = 1,
                                     verbose_frequency=10,
                                     num_cpus_per_worker=2.)
@@ -1018,15 +1018,15 @@ def reduce_feature_set_size_by_fishers_metric(ds,
     list_of_arguments = []
     #for each subset of top features
     for i, n  in enumerate(n_attrs):
-        arguments = [embedding, 
-                        copy.deepcopy(ds), 
-                        attr, 
+        arguments = [embedding,
+                        copy.deepcopy(ds),
+                        attr,
                         ranked_features[0:n],
                         sample_ids]
         list_of_arguments.append(arguments)
 
     returns = run_batch_jobs_for_fset_size_reduction(compute_fisher_score,
-                                            list_of_arguments, 
+                                            list_of_arguments,
                                             verbose_frequency,
                                             num_cpus_per_worker,
                                             num_gpus_per_worker,
@@ -1035,6 +1035,8 @@ def reduce_feature_set_size_by_fishers_metric(ds,
                                             local_mode)
 
     return returns
+
+
 
 @ray.remote
 def compute_fisher_score(embedding,
@@ -1131,11 +1133,211 @@ def run_batch_jobs_for_fset_size_reduction(method_handle,
 
     reduced_features = features_dataframe.loc[ranked_features[:n]]
 
+    results_df = pd.DataFrame(results, columns=['size', 'score'])
+    results_df['size'] = results_df['size'].astype(int)
+    results_df = results_df.set_index('size')
+
     returns = {}
     returns = {'reduced_feature_ids': reduced_features.index.values,
-                'optimal_n_results': results}
+                'optimal_n_results': results_df}
 
     return returns
 
 class ReduceIFRFeatures:
     pass
+
+
+class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
+    def __init__(self,
+                 #  process: object,
+                 supervised_attr: str,
+                 embedding,
+                 ranking_method_handle,
+                 ranking_method_args: dict,
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 start: int = 5,
+                 end: int = 100,
+                 step: int = 5,
+                 verbose_frequency: int = 10,
+                 num_cpus_per_worker: float = 1.,
+                 num_gpus_per_worker: float = 0.,
+                 local_mode: bool = False,
+                 use_validation_set: bool = False,
+                 process_name: str = 'ReduceIFRFeaturesByFishersMetricIteratively',
+                 reps: int = 10):
+
+        # init with Process class
+        super(ReduceIFRFeaturesByFishersMetricIteratively, self).__init__(process=None,
+                                                               process_name=process_name,
+                                                               parallel=False,
+                                                               verbosity=verbosity,
+                                                               )
+        self.supervised_attr = supervised_attr
+        self.embedding = embedding
+        self.ranking_method_handle = ranking_method_handle
+        self.ranking_method_args = ranking_method_args
+        self.parallel = parallel
+        self.verbosity = verbosity
+        self.start = start
+        self.end = end
+        self.step = step
+        self.verbose_frequency = verbose_frequency
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+        self.local_mode = local_mode
+        self.use_validation_set = use_validation_set
+        self.reps = reps
+
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+
+        # ds = self._preprocess(ds, **kwargs)
+        features_df = kwargs['f_ranks']
+        feature_idxs = kwargs['selector'].transform(features_df)
+        features_df = features_df.loc[feature_idxs]
+
+        self.results_list = []
+        results_ = {}
+        for rep in range(self.reps):
+            
+            if features_df.shape[0] < self.start:
+                break
+
+            rfs = ReduceIFRFeaturesByFishersMetric(supervised_attr=self.supervised_attr,
+                                                    embedding=self.embedding,
+                                                    ranking_method_handle=self.ranking_method_handle,
+                                                    ranking_method_args=self.ranking_method_args,
+                                                    parallel=self.parallel,
+                                                    verbosity=self.verbosity,
+                                                    start=self.start,
+                                                    end=self.end,
+                                                    step=self.step,
+                                                    verbose_frequency=self.verbose_frequency,
+                                                    num_cpus_per_worker=self.num_cpus_per_worker,
+                                                    num_gpus_per_worker=self.num_gpus_per_worker,
+                                                    local_mode=self.local_mode,
+                                                    use_validation_set=self.use_validation_set)
+
+            args_copy = copy.deepcopy(kwargs)
+            args_copy['f_ranks'] = features_df
+
+            _, results = rfs.run(ds, {'batch': args_copy})
+
+            results = results['batch']
+            
+            # remove selected features
+            features_df = features_df.loc[~features_df.index.isin(results['reduced_feature_ids'])]
+
+            self.results_list.append([rep+1, results['reduced_feature_ids'], results['optimal_n_results']])
+
+        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature set', 'Optimal n results'])
+
+        return results_
+
+
+class ReduceIFRFeaturesByClassificationIteratively(Transform):
+    def __init__(self,
+                 supervised_attr: str,
+                 classifier,
+                 scorer,
+                 ranking_method_handle,
+                 ranking_method_args: dict,
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 partitioner=None,
+                 group=None,
+                 start: int = 5,
+                 end: int = 100,
+                 step: int = 5,
+                 verbose_frequency: int = 10,
+                 num_cpus_per_worker: float = 1.,
+                 num_gpus_per_worker: float = 0.,
+                 local_mode: bool = False,
+                 validation_set_label=None,
+                 process_name: str = 'ReduceIFRFeaturesByClassificationIteratively',
+                 score_cutoff: float = .60):
+
+        # init with Process class
+        super(ReduceIFRFeaturesByClassificationIteratively, self).__init__(process=None,
+                                                               process_name=process_name,
+                                                               parallel=False,
+                                                               verbosity=verbosity,
+                                                               )
+        self.supervised_attr = supervised_attr
+        self.classifier = classifier
+        self.scorer = scorer
+        self.ranking_method_handle = ranking_method_handle
+        self.ranking_method_args = ranking_method_args
+        self.parallel = parallel
+        self.verbosity = verbosity
+        self.partitioner = partitioner
+        self.group = group
+        self.start = start
+        self.end = end
+        self.step = step
+        self.verbose_frequency = verbose_frequency
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+        self.local_mode = local_mode
+        self.validation_set_label = validation_set_label
+        self.score_cutoff = score_cutoff
+
+
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+
+        # ds = self._preprocess(ds, **kwargs)
+        features_df = kwargs['f_ranks']
+        feature_idxs = kwargs['selector'].transform(features_df)
+        features_df = features_df.loc[feature_idxs]
+
+        self.results_list = []
+        results_ = {}
+
+        last_score = np.inf
+        rep = 0
+        while True:
+            
+            if features_df.shape[0] < self.start:
+                break
+
+            rfs = ReduceIFRFeaturesByClassification(supervised_attr=self.supervised_attr,
+                                                    classifier=self.classifier,
+                                                    scorer=self.scorer,
+                                                    ranking_method_handle=self.ranking_method_handle,
+                                                    ranking_method_args=self.ranking_method_args,
+                                                    parallel=self.parallel,
+                                                    verbosity=self.verbosity,
+                                                    partitioner=self.partitioner,
+                                                    group=self.group,
+                                                    start=self.start,
+                                                    end=self.end,
+                                                    step=self.step,
+                                                    verbose_frequency=self.verbose_frequency,
+                                                    num_cpus_per_worker=self.num_cpus_per_worker,
+                                                    num_gpus_per_worker=self.num_gpus_per_worker,
+                                                    local_mode=self.local_mode,
+                                                    validation_set_label=self.validation_set_label)
+
+            args_copy = copy.deepcopy(kwargs)
+            args_copy['f_ranks'] = features_df
+
+            _, results = rfs.run(ds, {'batch': args_copy})
+
+            results = results['batch']
+
+            n = len(results['reduced_feature_ids'])
+            last_score = results['optimal_n_results'].loc[n, 'score']
+            
+            if last_score < self.score_cutoff:
+                break
+
+            # remove selected features
+            features_df = features_df.loc[~features_df.index.isin(results['reduced_feature_ids'])]
+
+            rep+=1
+            self.results_list.append([rep, results['reduced_feature_ids'], results['optimal_n_results']])
+
+
+        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature set', 'Optimal n results'])
+
+        return results_
