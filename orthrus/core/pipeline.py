@@ -3288,6 +3288,113 @@ class Report(Score):
                                 
         return rep
 
+
+class ClassifyEmsemble(Classify):
+    """
+        
+        """
+    def __init__(self,
+                 process: object,
+                 class_attr: str,
+                 feature_ids = 'previous_process',
+                 process_name: str = None,
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 fit_handle: str = 'fit',
+                 predict_handle: str = 'predict',
+                 fit_args: dict = {},
+                 predict_args: dict = {},
+                 classes_handle: str = 'classes_',
+                 f_weights_handle: str = None,
+                 s_weights_handle: str = None,
+                 n_classifiers = None
+                 ):
+
+        # init with Process class
+        super(ClassifyEmsemble, self).__init__(process=process,
+                                       process_name=process_name,
+                                       parallel=parallel,
+                                       verbosity=verbosity,
+                                       class_attr=class_attr,
+                                       fit_handle=fit_handle,
+                                       fit_args=fit_args,
+                                       )
+
+        # set parameters
+        self.predict_args = predict_args
+        self.class_attr = self.supervised_attr  # shadows supervised_attr
+
+        self.features_ids = feature_ids
+        self.n_classifiers = n_classifiers
+
+        # set private attributes
+        self._predict_handle = predict_handle
+        self._classes_handle = classes_handle
+        self._f_weights_handle = f_weights_handle
+        self._s_weights_handle = s_weights_handle
+        self._labels += ["class_attr", "predict_args"]
+        self._classifiers = []
+
+        # check appropriate parameters
+        if self._fit_handle is None or self._predict_handle is None:
+            raise ValueError("Classify process must have both a fit method and a predict method!")
+
+    def _run(self, ds: DataSet, **kwargs) -> dict:
+
+        if self.features_ids == None:
+            # use all features
+            self.feature_ids_df = pd.DataFrame([[ds.vardata.index.values]], columns=['Features'])
+
+        elif self.features_ids == 'previous_process':
+            self.feature_ids_df = kwargs['features_df']
+            if 'Feature set' not in self.feature_ids_df.columns:
+                raise Exception('"Feature set" columns not present in pandas.DataFrame created by the previous process in the pipeline.')
+
+        elif type(self.features_ids) == pd.DataFrame:
+            if 'Feature set' not in self.feature_ids.columns:
+                raise Exception('"Feature set" columns not present in self.feature_ids pandas.DataFrame')
+            self.feature_ids_df = self.feature_ids
+
+        elif type(self.feature_ids) == list:
+            self.feature_ids_df = pd.DataFrame([[self.feature_ids]], columns=['Features'])
+
+        else:
+            raise AttributeError('feature_ids must be either 1. None or, 2. "previous_process" or, 3. a list or, 4. a pandas.DataFrame')
+
+        if self.feature_ids_df.shape[0] == 1:
+            assert type(self.n_classifiers) == int, 'n_classifiers must be an integer when using one set of features \
+                                                                                            for all classifiers in the ensemble, check method documentation.'
+
+        labels_df = pd.DataFrame()                                                                                                                                                                    
+        # initialize output
+        result = dict()
+
+
+        for i, features in enumerate(self.feature_ids_df['Feature set']):
+
+            # run the super's _preprocess method
+            ds_new = self._preprocess(deepcopy(ds), **kwargs)
+            ds_new = ds.slice_dataset(feature_ids = features)
+
+            # fit the classifier
+            process = self._fit(ds_new, **kwargs)            
+            self._classifiers.append(process)
+
+            # store resulting transform
+            labels = self._generate_labels_or_scores(process, ds_new)
+            labels[i] = labels['class_labels']
+            labels.pop('class_labels')
+
+            labels_df = pd.concat([labels_df, pd.DataFrame(labels)], axis=1)      
+            # grab potential feature and sample weights
+            # weights = self._generate_f_s_weights(process, ds_new)
+
+        # store the fit process
+        result.update({'classifier': self._classifiers})
+        result.update({'class_labels': labels_df.mode(axis=1)[0]})
+        return result
+
+
 # TODO: Add Regress Class
 
 # TODO: Add _collapse_reg_pred_scores in Score
