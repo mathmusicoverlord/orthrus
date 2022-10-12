@@ -11,8 +11,7 @@ import numpy as np
 from numpy import ndarray
 from pandas import DataFrame, Series
 from orthrus.core.dataset import DataSet
-from orthrus.core.helper import generate_save_path
-from orthrus.core.helper import save_object, load_object
+from orthrus.core.helper import generate_save_path, save_object, load_object, batch_jobs_
 from sklearn.metrics import classification_report
 import warnings
 from copy import copy, deepcopy
@@ -845,6 +844,10 @@ class Partition(Process):
             labels = {k: dict(tvt_labels=v.rename('_'.join([orig_name,
                                                             self.process_name, str(i)]
                                                            ).lstrip('_'))) for i, (k, v) in enumerate(labels.items())}
+
+            for k, v in labels.items():
+                v['batch_id'] = k
+
             results.update(labels)
 
         # append original labels
@@ -3307,8 +3310,12 @@ class ClassifyEmsemble(Classify):
                  classes_handle: str = 'classes_',
                  f_weights_handle: str = None,
                  s_weights_handle: str = None,
-                 n_classifiers = None
-                 ):
+                 n_classifiers : int = 1,
+                 features_column_name: str = 'Feature Set',
+                 num_cpus_per_worker: int = 1.,
+                 num_gpus_per_worker: int = 0.,
+                 local_mode=False
+                ):
 
         # init with Process class
         super(ClassifyEmsemble, self).__init__(process=process,
@@ -3324,7 +3331,7 @@ class ClassifyEmsemble(Classify):
         self.predict_args = predict_args
         self.class_attr = self.supervised_attr  # shadows supervised_attr
 
-        self.features_ids = feature_ids
+        self.feature_ids = feature_ids
         self.n_classifiers = n_classifiers
 
         # set private attributes
@@ -3334,6 +3341,11 @@ class ClassifyEmsemble(Classify):
         self._s_weights_handle = s_weights_handle
         self._labels += ["class_attr", "predict_args"]
         self._classifiers = []
+        self.features_column_name = features_column_name
+
+        self.num_cpus_per_worker = num_cpus_per_worker
+        self.num_gpus_per_worker = num_gpus_per_worker
+        self.local_mode = local_mode
 
         # check appropriate parameters
         if self._fit_handle is None or self._predict_handle is None:
@@ -3341,60 +3353,91 @@ class ClassifyEmsemble(Classify):
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
-        if self.features_ids == None:
+        if self.feature_ids == None:
             # use all features
-            self.feature_ids_df = pd.DataFrame([[ds.vardata.index.values]], columns=['Features'])
+            feature_ids_df = pd.DataFrame([[ds.vardata.index.values]], columns=['Features'])
 
-        elif self.features_ids == 'previous_process':
-            self.feature_ids_df = kwargs['features_df']
-            if 'Feature set' not in self.feature_ids_df.columns:
-                raise Exception('"Feature set" columns not present in pandas.DataFrame created by the previous process in the pipeline.')
+        elif self.feature_ids == 'previous_process':
+            # if the preceding process in the pipeline computes the features, it must be present in kwargs
+            try:
+                feature_ids_df = kwargs['features_df']
+            except Exception as e:
+                print('features_ids was set to "self.feature_ids", but the kwargs dictionary does not contain the key "features_df"')
+                import sys
+                sys.exit(0)
 
-        elif type(self.features_ids) == pd.DataFrame:
-            if 'Feature set' not in self.feature_ids.columns:
-                raise Exception('"Feature set" columns not present in self.feature_ids pandas.DataFrame')
-            self.feature_ids_df = self.feature_ids
+        elif type(self.feature_ids) == pd.DataFrame:
+            # to be used when you want to suppy your own features (In a single partition case)
+            feature_ids_df = self.feature_ids
 
-        elif type(self.feature_ids) == list:
-            self.feature_ids_df = pd.DataFrame([[self.feature_ids]], columns=['Features'])
+        elif type(self.feature_ids) == dict:
+            # to be used when you want to suppy your own features (In partitioned case)
+
+            feature_ids_df = self.feature_ids[kwargs['batch_id']]
 
         else:
-            raise AttributeError('feature_ids must be either 1. None or, 2. "previous_process" or, 3. a list or, 4. a pandas.DataFrame')
+            raise AttributeError('feature_ids must be either 1. None or, 2. "previous_process" or, 3. a pandas.DataFrame or, 4. a dict')
 
-        if self.feature_ids_df.shape[0] == 1:
-            assert type(self.n_classifiers) == int, 'n_classifiers must be an integer when using one set of features \
-                                                                                            for all classifiers in the ensemble, check method documentation.'
-
+        if feature_ids_df.shape[0] == 0:
+            raise Exception('No features in found in feature_ids')
+        
         labels_df = pd.DataFrame()                                                                                                                                                                    
         # initialize output
         result = dict()
 
+        args = []
 
-        for i, features in enumerate(self.feature_ids_df['Feature set']):
+        for i, features in enumerate(feature_ids_df[self.features_column_name]):
 
-            # run the super's _preprocess method
-            ds_new = self._preprocess(deepcopy(ds), **kwargs)
-            ds_new = ds.slice_dataset(feature_ids = features)
+            for j in range(self.n_classifiers):
 
-            # fit the classifier
-            process = self._fit(ds_new, **kwargs)            
+
+                args.append([self,
+                            deepcopy(ds),
+                            kwargs,
+                            features,
+                            i,
+                            j])
+   
+        all_results = batch_jobs_(self.train_classifers, args, verbose_frequency=10,
+                                num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)  
+        
+        for (process, labels) in all_results:
             self._classifiers.append(process)
+            labels_df = pd.concat([labels_df, pd.DataFrame(labels).T], axis=0)    
 
-            # store resulting transform
-            labels = self._generate_labels_or_scores(process, ds_new)
-            labels[i] = labels['class_labels']
-            labels.pop('class_labels')
+        
+        # grab potential feature and sample weights
+        # weights = self._generate_f_s_weights(process, ds_new)
 
-            labels_df = pd.concat([labels_df, pd.DataFrame(labels)], axis=1)      
-            # grab potential feature and sample weights
-            # weights = self._generate_f_s_weights(process, ds_new)
-
-        # store the fit process
+        self.predictions = labels_df
         result.update({'classifier': self._classifiers})
-        result.update({'class_labels': labels_df.mode(axis=1)[0]})
+        result.update({'class_labels': labels_df.T.drop(['feature set id', 'repetition']).mode(axis=1)[0]})
         return result
 
+    @ray.remote
+    def train_classifers(self, 
+                        ds, 
+                        kwargs, 
+                        features, 
+                        feature_set_id, 
+                        repetition):
 
+        # run the super's _preprocess method
+        ds_new = self._preprocess(deepcopy(ds), **kwargs)
+        if type(features) == list:
+            features = np.array(features)
+        ds_new = ds.slice_dataset(feature_ids = features)
+
+        # fit the classifier
+        process = self._fit(ds_new, **kwargs)   
+
+        # store resulting transform
+        labels = self._generate_labels_or_scores(process, ds_new)['class_labels']
+        labels.loc['feature set id'] = feature_set_id
+        labels.loc['repetition'] = repetition
+
+        return process, labels  
 # TODO: Add Regress Class
 
 # TODO: Add _collapse_reg_pred_scores in Score
