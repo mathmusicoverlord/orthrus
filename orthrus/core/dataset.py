@@ -1641,8 +1641,8 @@ def from_ccd(file_path: str, name: str = None, index_col: str = '_id'):
         index_vals = ccd.get_attrs('_id')
 
     # check index column values are unique
-    assert np.unique(index_vals).shape[0] == index_vals.shape[
-        0], '%s cannot be used as index, it contains duplicate values for samples.' % index_col
+    assert np.unique(index_vals).shape[0] == index_vals.shape[0], \
+            '%s cannot be used as index, it contains duplicate values for samples.' % index_col
 
     # if filename not provided
     if name is None:
@@ -1658,12 +1658,18 @@ def from_ccd(file_path: str, name: str = None, index_col: str = '_id'):
     data_df.index = index_vals
 
     metadata = None
+    cols = []
     for attr in ccd.attrs:
+        try:
+            values = ccd.get_attrs(attr).reshape(-1, 1)
+        except AttributeError:
+            continue
         if metadata is None:
-            metadata = ccd.get_attrs(attr).reshape(-1, 1)
+                metadata = values
         else:
-            metadata = np.hstack((metadata, ccd.get_attrs(attr).reshape(-1, 1)))
-    metadata_df = pd.DataFrame(metadata, columns=ccd.attrs)
+            metadata = np.hstack((metadata, values))
+        cols.append(attr)
+    metadata_df = pd.DataFrame(metadata, columns=cols)
     metadata_df.index = index_vals
 
     # create and return DS object
