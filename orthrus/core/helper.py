@@ -976,10 +976,12 @@ def generate_save_path(file_path: str, overwrite: bool = False):
 
 def batch_jobs_(function_handle, 
                 list_of_arguments, 
+                num_cpus_for_job = -1,
+                num_gpus_for_job = -1,
+                local_mode=False,
                 verbose_frequency : int=10,
-                num_cpus_per_worker : float=1., 
-                num_gpus_per_worker : float=0.,
-                local_mode=False):
+                num_cpus_per_task : float=1., 
+                num_gpus_per_task : float=0.):
 
     """
     This methods creates and manages batch jobs to be run in parallel. The method takes a function_handle,
@@ -1022,62 +1024,95 @@ def batch_jobs_(function_handle,
         ...     print(ray.get(process))
         >>> ray.shutdown()
     """
+    #change resource requirements of the task
+    #function_handle.options(num_cpus=num_cpus_per_task, num_gpus=num_gpus_per_task)
+    #options call is not working, setting them directly
+    function_handle._num_cpus = num_cpus_per_task
+    function_handle._num_gpus = num_gpus_per_task
+
+    
+    # temporarily initialize ray to get number of cpus and gpus available
     import ray
     ray.init(ignore_reinit_error=True, local_mode=local_mode)
 
-    #calculate the max number of processes to run at one time
-    import multiprocessing
-    from math import floor
-    num_cpus = ray.available_resources()['CPU']
-    max_cpu_workers = floor(num_cpus / num_cpus_per_worker)
-
-    try:
-        num_gpus = ray.available_resources()['GPU']
-    except: 
-        num_gpus = 0
-
-    if num_gpus_per_worker!=0:
-        max_gpu_workers = floor(num_gpus / num_gpus_per_worker)
-    else:
-        max_gpu_workers = np.inf
+    # available resources will return the correct number of cpus and gpus on both single machines and clusters with SLURM
+    available_resources = ray.available_resources()
     
-    max_processes = max_cpu_workers if max_cpu_workers < max_gpu_workers else max_gpu_workers
-    total_processes = len(list_of_arguments)
-    num_running=0
-    num_finished=0
-    processes = []
-    all_processes = []
-    i = 1
+    # set number of cpus for job
+    num_cpus_available = available_resources['CPU']
+    if num_cpus_for_job <= 0 or num_cpus_for_job > num_cpus_available:
+        num_cpus_for_job = num_cpus_available
 
-    #change resource requirements of the worker
-    #function_handle.options(num_cpus=num_cpus_per_worker, num_gpus=num_gpus_per_worker)
-    #options call is not working, setting them manually
-    function_handle._num_cpus = num_cpus_per_worker
-    function_handle._num_gpus = num_gpus_per_worker
+    # set number of gpus for job
+    if num_gpus_per_task <= 0:
+        # don't need gpus
+        num_gpus_for_job = 0
+    else:
+        # get number of gpus available on the machine / cluster
+        num_gpus_available = available_resources.get('GPU', 0)
+
+        #Make sure that there infact are GPUs available to run the job
+        assert num_gpus_available > 0, "Job requires GPU(s), but they are not available."
+
+        if num_gpus_for_job < 0 or num_gpus_for_job > num_gpus_available:
+            num_gpus_for_job = num_gpus_available
+
+
+    #calculate the max number of processes to run simultaneously
+    from math import floor
+    max_cpu_tasks = floor(num_cpus_for_job / num_cpus_per_task)
+    max_gpu_tasks = floor(num_gpus_for_job / num_gpus_per_task) if num_gpus_for_job>0 else np.inf
+
+    print('max_cpu_tasks', max_cpu_tasks)
+    print('max_gpu_tasks', max_gpu_tasks)
+    # set max_processes to be the smaller of max_cpu_tasks and max_gpu_tasks
+    max_processes = max_cpu_tasks if max_cpu_tasks < max_gpu_tasks else max_gpu_tasks
+
+    print(f'max of {max_processes} processes will execute at one time')
+
+    # set variables for the main loop
+    all_processes = []
+    all_finished_processes = []
+    
+    num_total_processes = len(list_of_arguments)
+    num_running_processes=0
+    num_finished_processes=0
+
+    running_processes = []
+    i = 1
     for arguments in list_of_arguments:
-        if num_finished >= i * verbose_frequency:
-            print('%d of %d processes finished'%(num_finished, total_processes))
+        if num_finished_processes >= i * verbose_frequency:
+            print('%d of %d processes finished'%(num_finished_processes, num_total_processes))
             i = i+1
-        if num_running == max_processes:
-            finished_processes, processes = ray.wait(processes)
-            num_running -=len(finished_processes)
-            num_finished +=len(finished_processes)
+
+        if num_running_processes == max_processes:
+            finished_processes, running_processes = ray.wait(running_processes, num_returns=1)
+            all_finished_processes.extend(finished_processes)
+            num_running_processes -=len(finished_processes)
+            num_finished_processes +=len(finished_processes)
 
         future = function_handle.remote(*arguments)
-        processes.append(future)
+        running_processes.append(future)
         all_processes.append(future)
-        num_running+=1
+        num_running_processes+=1
 
-    #wait for all remaining processes to finish
-    finished_processes, processes = ray.wait(processes, num_returns=len(processes))
-    num_running -=len(finished_processes)
-    num_finished +=len(finished_processes)
-    print('%d of %d processes finished'%(num_finished, total_processes))
+    # wait for all remaining processes to finish
+    finished_processes, running_processes = ray.wait(running_processes, num_returns=len(running_processes))
+    all_finished_processes.extend(finished_processes)
 
-    assert num_finished == total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
-                                        % (total_processes - num_finished)
-    assert num_running == 0, '%d processes still running' % num_running
-    return all_processes
+    # get results
+    results = ray.get(all_finished_processes)
+
+    # make sure all processes have finished
+    num_running_processes -=len(finished_processes)
+    num_finished_processes +=len(finished_processes)
+
+    print('%d of %d processes finished'%(num_finished_processes, num_total_processes))
+
+    assert num_finished_processes == num_total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
+                                        % (num_total_processes - num_finished_processes)
+    assert num_running_processes == 0, '%d processes still running' % num_running_processes
+    return results
 
 
 def pop_first_element(x):
