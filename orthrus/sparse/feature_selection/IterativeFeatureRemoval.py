@@ -599,11 +599,10 @@ class IFR:
 
                     list_of_arguments.append(arguments)
  
-        finished_processes = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
+        all_results = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
                                         num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)
 
-        for process in finished_processes:
-            results = ray.get(process)
+        for results in all_results:
             # update the feature set dictionary based on the features collected for current fold
             list_of_features_for_curr_fold = results['list_of_features']
             self._update_frequency_in_results(list_of_features_for_curr_fold)

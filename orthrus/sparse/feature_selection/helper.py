@@ -343,11 +343,10 @@ def sliding_window_classification_on_ranked_features(ds,
                         kwargs]
         list_of_arguments.append(arguments)
 
-    finished_processes = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
+    all_results = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
                                                 num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
     results = np.zeros((len(list_of_arguments), 2))
-    for i, process in enumerate(finished_processes):
-        score, _ , min_feature_index = ray.get(process)
+    for i, (score, _ , min_feature_index) in enumerate(all_results):
         results[i, 0] = min_feature_index
         results[i, 1] = score
     results = results[results[:,0].argsort()]
@@ -660,12 +659,11 @@ def get_batch_correction_matric_for_ranked_features(ds,
                     batch_correction_metric_args]
         list_of_arguments.append(arguments)
 
-    finished_processes = batch_jobs_(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
+    all_results = batch_jobs_(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
                                                 num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
     results = np.zeros((len(list_of_arguments), 2))
     n_features = features.shape[0]
-    for i, process in enumerate(finished_processes):
-        n, _ , _, rejection_rate = ray.get(process)
+    for i, (n, _ , _, rejection_rate) in enumerate(all_results):
         results[i, 0] = n_features - n
         results[i, 1] = rejection_rate
     
@@ -1101,7 +1099,7 @@ def get_num_attr_array(ds, ranked_features, start, end, step):
         end = ranked_features.shape[0]
 
     if start > ranked_features.shape[0]:
-        start = 1 if ranked_features.shape[0] > 0 else 0
+        start = 3 if ranked_features.shape[0] > 0 else 0
         # raise Exception('start value greater than the number of features present in the feature set')
 
     return np.arange(start, end+ 1, step)
@@ -1115,12 +1113,11 @@ def run_batch_jobs_for_fset_size_reduction(method_handle,
                                             features_dataframe,
                                             ranked_features,
                                             local_mode=False):
-    finished_processes = batch_jobs_(method_handle, list_of_arguments, verbose_frequency=verbose_frequency,
+    all_results = batch_jobs_(method_handle, list_of_arguments, verbose_frequency=verbose_frequency,
                                                 num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
     results = np.zeros((len(list_of_arguments), 2))
 
-    for i, process in enumerate(finished_processes):
-        score, feature_set_length , _ = ray.get(process)
+    for i, (score, feature_set_length , _) in enumerate(all_results):
         results[i, 0] = feature_set_length
         results[i, 1] = score
     
@@ -1230,7 +1227,7 @@ class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
 
             self.results_list.append([rep+1, results['reduced_feature_ids'], results['optimal_n_results']])
 
-        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature set', 'Optimal n results'])
+        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature Set', 'Optimal n results'])
 
         return results_
 
@@ -1255,7 +1252,8 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
                  local_mode: bool = False,
                  validation_set_label=None,
                  process_name: str = 'ReduceIFRFeaturesByClassificationIteratively',
-                 score_cutoff: float = .60):
+                 score_cutoff: float = .60,
+                 max_reps: int = 10):
 
         # init with Process class
         super(ReduceIFRFeaturesByClassificationIteratively, self).__init__(process=None,
@@ -1281,6 +1279,7 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
         self.local_mode = local_mode
         self.validation_set_label = validation_set_label
         self.score_cutoff = score_cutoff
+        self.max_reps = max_reps
 
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
@@ -1328,7 +1327,7 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
             n = len(results['reduced_feature_ids'])
             last_score = results['optimal_n_results'].loc[n, 'score']
             
-            if last_score < self.score_cutoff:
+            if last_score < self.score_cutoff or rep + 1 > self.max_reps:
                 break
 
             # remove selected features
@@ -1338,6 +1337,6 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
             self.results_list.append([rep, results['reduced_feature_ids'], results['optimal_n_results']])
 
 
-        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature set', 'Optimal n results'])
+        results_['features_df'] = pd.DataFrame(self.results_list, columns=['Fset ID', 'Feature Set', 'Optimal n results'])
 
         return results_
