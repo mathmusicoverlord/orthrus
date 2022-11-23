@@ -2,13 +2,14 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
-import random
+import os
 from orthrus.solvers.linear import LPPrimalDualPy
 import copy 
 from sklearn.metrics import balanced_accuracy_score
-from orthrus.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs_, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
 import ray
 import copy
+import logging 
 
 class IFR:
 
@@ -35,7 +36,7 @@ class IFR:
 
         classifier (object): Classifier to run the classification experiment with; must have the sklearn equivalent
                 of a ``fit`` and ``predict`` method. Default classifier is orthrus.sparse.classifiers.svm .SSVMClassifier, it will
-                be a CPU based classifier if ``num_gpus_per_worker`` is 0, otherwise it will be a GPU classifier.
+                be a CPU based classifier if ``num_gpus_per_task`` is 0, otherwise it will be a GPU classifier.
         
         weights_handle (str) : Name of ``classifier`` attribute containing feature weights. Default is 'weights_'.
 
@@ -61,10 +62,10 @@ class IFR:
         verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
 
-        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+        num_cpus_per_task (float) : Number of CPUs each worker needs. This can be a fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
 
-        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+        num_gpus_per_task (float) : Number of GPUs each worker needs. This can be fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
                 
         local_mode (bool) : A flag to set whether to initialize Ray in local mode. (default: False)
@@ -119,8 +120,8 @@ class IFR:
             ...     validation_score_cutoff = .80,
             ...     jumpratio = 5,
             ...     verbosity = 2,
-            ...     num_cpus_per_worker=1,
-            ...     num_gpus_per_worker=.2,
+            ...     num_cpus_per_task=1,
+            ...     num_gpus_per_task=.2,
             ...     null_model_repetitions=10,
             ...     local_mode=False
             ...     )
@@ -142,22 +143,27 @@ class IFR:
                 scorer = balanced_accuracy_score,
                 repetition: int=10,
                 validation_score_cutoff: float=0.75,
-                jumpratio: float=100.,
+                jumpratio: float=100,
                 verbosity: int=0,
                 verbose_frequency: int=10,
-                num_cpus_per_worker: float=1.,
-                num_gpus_per_worker: float=0.,
+                num_cpus_per_task: float=1.,
+                num_gpus_per_task: float=0.,
+                num_cpus_for_job: float=-1,
+                num_gpus_for_job: float=-1,
                 local_mode=False,
                 null_model_repetitions = 0):
 
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+
+        self.num_cpus_for_job = num_cpus_for_job
+        self.num_gpus_for_job = num_gpus_for_job
 
         if classifier == None:
             from orthrus.sparse.classifiers.svm import SSVMClassifier
-            if self.num_gpus_per_worker == 0:
+            if self.num_gpus_per_task == 0:
                 use_cuda = False
-            elif self.num_gpus_per_worker > 0:
+            elif self.num_gpus_per_task > 0:
                 use_cuda  = True
             classifier = SSVMClassifier(C=1, solver=LPPrimalDualPy, use_cuda=use_cuda)
         
@@ -186,6 +192,8 @@ class IFR:
                                             'features', 'true_feature_count', 'num_training_samples']
         
         self.diagnostic_information_['stopping_conditions'] = []
+
+        self.logger_info =  extract_reconstruction_details_from_logger(logging.getLogger())
 
         super(IFR, self).__init__()
     #
@@ -240,6 +248,7 @@ class IFR:
                                                 return_counts=True)
 
         self.diagnostic_information_['stopping_conditions'] = pd.DataFrame({'Stopping Conditions': stopping_conditions, 'Frequency': counts})
+        self.diagnostic_information_['stopping_conditions'].set_index('Stopping Conditions', inplace=True)
 
         self.diagnostic_information_['number_of_iters_per_run'] = pd.Series([
                 self.diagnostic_information_['train_scores'][i].count() 
@@ -290,6 +299,7 @@ class IFR:
 
 
     def fit(self, X, y, groups=None, **kwargs):
+        logger = logging.getLogger( f'{__name__}_pid-{os.getpid()}')
         '''
         Args:
         X (ndarray of shape (m, n))): array of data, with m the number of observations in R^n.
@@ -316,15 +326,15 @@ class IFR:
             X  = X.values
         
         if self.verbosity>0:
-            print('IFR parameters:\n')
-            print('classifier', type(self.classifier))
-            print('scorer', type(self.scorer))
-            print('partitioner', type(self.partitioner))
-            print('repetition', self.repetition)
-            print('jumpratio', self.jumpratio)
-            print('validation score cutoff', self.validation_score_cutoff)
-            print('verbosity', self.verbosity)
-            print('\n')
+            logger.info('IFR parameters:')
+            logger.info(f'classifier {type(self.classifier)}')
+            logger.info(f'scorer {type(self.scorer)}')
+            logger.info(f'partitioner {type(self.partitioner)}')
+            logger.info(f'repetition {self.repetition}')
+            logger.info(f'jumpratio {self.jumpratio}')
+            logger.info(f'validation score cutoff {self.validation_score_cutoff}')
+            logger.info(f'verbosity{self.verbosity}')
+
         #
 
         if self.null_model_repetitions > 0:
@@ -336,17 +346,20 @@ class IFR:
         self.compute_features(X, y, groups, self.partitioner, save_diagnostic=True)
 
         if self.verbosity>0:
-            print("=====================================================")
-            print("Finishing Execution. %d features out of a total of %d features were selected."% ((self.results_['frequency'] > 0).sum(), X.shape[1]))
-            print("=====================================================")
-
-        # ray.shutdown()
+            logger.info("=====================================================")
+            logger.info(f"Finishing Execution. {(self.results_['frequency'] > 0).sum()} features out of a total of {X.shape[1]} features were selected.")
+            logger.info("=====================================================")
 
         self._reformat_diagnostic_information()
         return self
 
     @ray.remote
-    def select_features_for_data_partition(self, train_X, validation_X, train_y, validation_y, save_diagnostic=True):
+    def select_features_for_data_partition(self, train_X, validation_X, train_y, validation_y, logger_info, save_diagnostic=True):
+        
+        # This method runs in a new process, and so, this process's root logger does not have any file handles attached to it.
+        # Therefore, we need to create the logger for this method using logger_info which will add the file handlers, if there are any, to this logger.
+        logger = reconstruct_logger_from_details(logger_info, __name__, add_pid='always')
+
         _, n = train_X.shape
         list_of_features_for_curr_fold = np.array([], dtype=np.int64)
         list_of_weights_for_curr_fold = np.array([], dtype=np.int64)  
@@ -365,10 +378,10 @@ class IFR:
         i = 0
         while(True):
             if self.verbosity > 1:
-                print("=====================================================")
-                print("beginning of inner loop iteration ", i+1)
-                print("Number of features selected for this fold: %i of %i"%(len(list_of_features_for_curr_fold), n))
-                print("Checking score of complementary problem... ",end="")
+                logger.info("=====================================================")
+                logger.info(f"beginning of inner loop iteration {i+1}")
+                logger.info(f"Number of features selected for this fold: {len(list_of_features_for_curr_fold)} of {n}")
+                logger.info("Checking score of complementary problem... ")
             #
 
             #create a copy of the classifier
@@ -380,9 +393,9 @@ class IFR:
                 model.fit(tr_d, train_y)
             except Exception as e:
                 if self.verbosity>0:
-                    print("Warning: during the training process the following exception occurred:\n")
-                    print(str(e))
-                    print("\nBreaking the execution for the current data fold")
+                    logger.error("Exception occurred during fitting the model in IFR:")
+                    logger.error(e, exc_info=True)
+                    logger.error("Breaking the execution for the current data fold")
                     #save the diagnostic information
                 if save_diagnostic:    
                     self._add_diagnostic_info_for_current_iteration(diagnostic_info_dictionary,
@@ -419,22 +432,19 @@ class IFR:
             jumpidxs = np.where(weight_ratios > self.jumpratio)[0]
 
             if self.verbosity>1:
-                print('')
-                print("Training Score %.3f. "%score_train)
-                print("")
+                logger.info("Training Score %.3f. "%score_train)
 
             #calculate score for validation data
             pred_validation = model.predict(te_d)
             score_validation = self.scorer(validation_y, pred_validation)
 
             if self.verbosity>1:
-                print("Validation Score %.3f. "%score_validation)
-                print("")
+                logger.info("Validation Score %.3f. "%score_validation)
 
             #Check if score is above cutoff
             if (score_validation < self.validation_score_cutoff):
                 if self.verbosity>1:
-                    print("Validation score below cutoff, exiting inner loop.")
+                    logger.info("Validation score below cutoff, exiting inner loop.")
 
                 if save_diagnostic:
                     #save the diagnostic information for this iteration
@@ -474,8 +484,8 @@ class IFR:
             
                 #break out of the loop
                 if self.verbosity>1:
-                    print('There was no jump of sufficient size between ratios of successive coefficients in the weight vector.')
-                    print("Discarding iteration..")
+                    logger.info('There was no jump of sufficient size between ratios of successive coefficients in the weight vector.')
+                    logger.info("Discarding iteration..")
                 break
 
             else:
@@ -494,8 +504,8 @@ class IFR:
                         tr_d.shape[0])
                     stopping_condition = "Small weight at jump"
                 if self.verbosity>1:
-                    print('Weight at the jump(', sorted_abs_weights[count] ,')  smaller than weight cutoff(1e-6).')
-                    print("Discarding iteration..")
+                    logger.info(f'Weight at the jump({sorted_abs_weights[count]})  smaller than weight cutoff(1e-6).')
+                    logger.info("Discarding iteration..")
                 break
 
             count += 1
@@ -512,8 +522,8 @@ class IFR:
                         tr_d.shape[0])
                     stopping_condition = "More features than cutoff"
                 if self.verbosity>1:
-                    print('More features selected (%d) than the cutoff (%d)'%(count, train_X.shape[0]))
-                    print("Discarding iteration..")
+                    logger.info(f'More features selected ({count}) than the cutoff ({train_X.shape[0]})')
+                    logger.info("Discarding iteration..")
                 
                 break
 
@@ -522,9 +532,8 @@ class IFR:
             selected = order[:count]
 
             if self.verbosity>1:
-                print("\nSelected features on this iteration:")
-                print(selected)
-                print("\n")
+                logger.info("Selected features on this iteration:")
+                logger.info(str(selected))
             #
 
             # Selected indices are relative to the current active set.
@@ -550,8 +559,7 @@ class IFR:
                     tr_d.shape[0])
 
             if self.verbosity>1:
-                print('Removing %i features from training and validation matrices.'%len(selected))
-                print("\n")
+                logger.info(f'Removing {len(selected)} features from training and validation matrices.')
 
             #append the selection iterations for the features selected in the current iteration
             list_of_selection_iterations_for_current_fold.append(active_idxs[selected])
@@ -570,6 +578,8 @@ class IFR:
 
 
     def compute_features(self, X, y, groups, partitioner, save_diagnostic=True):
+        logger = logging.getLogger( f'{__name__}_pid-{os.getpid()}')
+        logger.info('Starting feature selection.')
         n_data_partition = 0
         list_of_arguments = []
         for n_rep in range(self.repetition):
@@ -595,12 +605,19 @@ class IFR:
                                 validation_X,
                                 train_y,
                                 validation_y,
+                                self.logger_info,
                                 save_diagnostic]
 
                     list_of_arguments.append(arguments)
  
-        all_results = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
-                                        num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)
+        all_results = batch_jobs_(self.select_features_for_data_partition, 
+                                list_of_arguments, 
+                                verbose_frequency=self.verbose_frequency,
+                                num_cpus_per_task=self.num_cpus_per_task, 
+                                num_gpus_per_task=self.num_gpus_per_task, 
+                                num_gpus_for_job=self.num_gpus_for_job,
+                                num_cpus_for_job=self.num_cpus_for_job,
+                                local_mode=self.local_mode)
 
         for results in all_results:
             # update the feature set dictionary based on the features collected for current fold
@@ -625,11 +642,11 @@ class IFR:
 
 
     def determine_frequency_cutoff(self, X, y, groups):
-
+        logger = logging.getLogger( f'{__name__}_pid-{os.getpid()}')
         if self.verbosity>0:
-            print("=====================================================")
-            print("Determining optimal frequency cutoff value. Running IFR on random variables.")
-            print("=====================================================")
+            logger.info("=====================================================")
+            logger.info("Determining optimal frequency cutoff value. Running IFR on random variables.")
+            logger.info("=====================================================")
 
         self._initialize_results(X.shape[1])
         y_copy = copy.deepcopy(y)
@@ -669,9 +686,9 @@ class IFR:
                 np.random.shuffle(y_copy)
 
             if self.verbosity>0:
-                print("=====================================================")
-                print("Null model run #: %d"%j)
-                print("=====================================================")
+                logger.info("=====================================================")
+                logger.info(f"Null model run #: {j}")
+                logger.info("=====================================================")
             #
 
             # start processing
@@ -684,9 +701,9 @@ class IFR:
         self.feature_frequency_cutoff_ = self.frequency_cutoff_results_['frequency'].max()
 
         if self.verbosity>0:
-            print("=====================================================")
-            print("Optimal value for frequency cutoff determined to be %d. Now running the feature selection for the actual problem."%self.feature_frequency_cutoff_)
-            print("=====================================================")
+            logger.info("=====================================================")
+            logger.info(f"Optimal value for frequency cutoff determined to be {self.feature_frequency_cutoff_}. Now running the feature selection for the actual problem.")
+            logger.info("=====================================================")
         # ray.shutdown()
 
         return self
@@ -705,6 +722,7 @@ class IFR:
         import plotly.graph_objects as go
         import plotly.express as px
         import dash_bootstrap_components as dbc
+        logger = logging.getLogger(__name__)
 
         #for old saved ifr objects, diagnostic information needs to be reformatted
         if type(self.diagnostic_information_['train_scores']) == list:
@@ -1343,7 +1361,8 @@ class IFR:
                     legend='Null Model')
 
             except AttributeError:
-                print('Null model information not found!')
+                
+                logger.error('Null model information not found!')
 
             return fig
 
