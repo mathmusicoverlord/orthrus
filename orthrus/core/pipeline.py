@@ -6,16 +6,20 @@ from abc import ABC, abstractmethod
 from typing import Union, Callable, Tuple
 import os
 import inspect
+from urllib.parse import urlparse
 import pandas as pd
 import numpy as np
 from numpy import ndarray
 from pandas import DataFrame, Series
 from orthrus.core.dataset import DataSet
-from orthrus.core.helper import generate_save_path, save_object, load_object, batch_jobs_
+from orthrus.core.helper import generate_save_path, module_from_path, save_object, load_object, batch_jobs_, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
 from sklearn.metrics import classification_report
 import warnings
 from copy import copy, deepcopy
 import ray
+import mlflow
+from pathlib import Path
+import logging
 
 
 # module functions
@@ -2921,7 +2925,10 @@ class Pipeline(Process):
             if self.verbosity > 0:
                 print("Pipeline %s already finished running!" % (self.pipeline_name,))
             return ds, self.results_
-
+        
+        if checkpoint and not os.path.exists(self._checkpoint_path):
+            self.save(self._checkpoint_path, overwrite=True)
+            
         # store stop_before point
         self._stop_before = stop_before
 
@@ -3447,3 +3454,179 @@ class ClassifyEmsemble(Classify):
 # TODO: Implement batch restriction, .e.g, Process.run(..., batches:list = [...])
 
 # TODO: Implement parallel pipelines
+
+
+
+# 
+
+class WorkflowManager(Process):
+    def __init__(self, 
+                    process_name,
+                    experiment_module_path,
+                    workflow_method_handle,
+                    workflow_method_args:dict = None,
+                    workflow_evaluation_handle=None,
+                    workflow_evaluation_args:dict = {},
+                    evaluation_policy : str = 'weak',
+                    parent_mlflow_run_id: str = None,
+                    max_trials : int = 1,
+                    parallel: bool = False,
+                    verbosity: int = 1
+                    ):
+        '''
+        
+        workflow_handle:
+        - return a dict with 3 k-v pairs: 1. "verdict": "pass/warn/fail"
+                                          2, "message", str
+                                          3. "params" : 
+
+        '''
+        # init with Process class
+        super(WorkflowManager, self).__init__(process=None,
+                                       process_name=process_name,
+                                       parallel=parallel,
+                                       verbosity=verbosity)
+
+        self.max_trials = max_trials
+        self.evaluation_policy = evaluation_policy
+
+        self.experiment_module_path = experiment_module_path
+        
+        self.workflow_method_handle = workflow_method_handle
+        self.workflow_method_args = workflow_method_args.copy()
+        self.workflow_method_args['workflow_name'] = process_name
+        
+        self.workflow_evaluation_handle = workflow_evaluation_handle
+        if workflow_evaluation_args is None:
+            workflow_evaluation_args = {}
+
+
+        self.workflow_evaluation_args = workflow_evaluation_args.copy()
+        self.workflow_evaluation_args['max_trials'] = max_trials
+    
+
+        self.results = {}
+
+        self.mlflow_run_id = None
+        # don't start a new run if parent_mlfllow_run_id is not None
+        # if this condition is true, it means that this process was run previously and this process in the pipeline will
+        # have its self.mlflow_run_id set when reloaded from the disk. 
+        if parent_mlflow_run_id is  None:
+            self.mlflow_run_id = self._set_mlflow_experiment_and_run(restart_existing_mlflow_run = True)
+
+        self.current_iter = 0
+
+
+    def _set_mlflow_experiment_and_run(self, restart_existing_mlflow_run=False):
+
+        # check if experiment_exists
+        experiment = mlflow.get_experiment_by_name(self.process_name)
+        if experiment is None:
+        # start a new mlflow experiment for the current workflow
+            self.experiment_id = mlflow.create_experiment(self.process_name)
+        else:   
+            self.experiment_id = experiment.experiment_id
+
+        
+        active_run = mlflow.active_run()
+        if active_run:
+            mlflow.end_run()
+        
+        mlflow.set_experiment(experiment_id=self.experiment_id)
+        new_run = mlflow.start_run(run_id = self.mlflow_run_id)
+
+        if restart_existing_mlflow_run and active_run is not None:
+            mlflow.end_run()
+            mlflow.set_experiment(experiment_id=active_run.info.experiment_id)
+            mlflow.start_run(run_id=active_run.info.run_id)
+
+        return new_run.info.run_id
+
+
+    def _run(self, ds: DataSet, **kwargs):
+
+        
+        mlflow_run_to_restore = mlflow.active_run()
+        if mlflow_run_to_restore is not None:
+            mlflow.end_run()
+        self.mlflow_run_id = self._set_mlflow_experiment_and_run()
+
+        base_logger = logging.getLogger()
+        handler = logging.FileHandler(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'workflow_execution.log'), 'a')
+        handler.setFormatter(base_logger.handlers[0].formatter)
+        base_logger.addHandler(handler)
+        logger = logging.getLogger(self.process_name)
+
+        if os.path.exists(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl')):
+            self = load_object(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'))
+            logger.info(f'An run for {self.process_name} was found at its mlflow run directory. Loading the old state and continuing run.')
+        else:
+            logger.info(f'Beginning run for {self.process_name}')
+
+        experiment_module = module_from_path(Path(self.experiment_module_path).stem, self.experiment_module_path)
+
+        self.workflow_method_args.update(kwargs)
+        recommended_param_updates = None
+        while self.current_iter < self.max_trials:
+            self.workflow_method_args['iter'] = self.current_iter
+            
+            pipeline, result = self.workflow_method_handle(experiment_module, **self.workflow_method_args)
+            self.results[self.current_iter] = {'pipeline': pipeline, 'result': result, 'recommended_params_update':recommended_param_updates}
+
+            if self.workflow_evaluation_handle is None:
+                logger.info(f'No evaluation method provided, so skipping the evaluation.')
+                evaluation_verdict = 'pass'
+                break
+            
+            logger.info(f'Evaluating workflow: {self.process_name}')
+            evaluation_result = self.workflow_evaluation_handle(self.results, **self.workflow_method_args, **self.workflow_evaluation_args)
+            
+            evaluation_verdict = evaluation_result['verdict'] 
+            recommended_param_updates = evaluation_result['params']
+
+            if evaluation_verdict == 'pass':
+                # evaluation is satisfactory, break out of the loop
+                logger.info(f'Evaluation for the {self.process_name} workflow passed!')
+                break
+            
+            elif evaluation_verdict == 'warn':
+                logger.info(f'Evaluation for the {self.process_name} workflow returned warning')
+                if self.current_iter == self.max_trials - 1:
+                    break
+
+                if self.evaluation_policy == 'weak':
+                    # the evaluation is good enough to not rerun the workflow with updated params
+                    logger.info(f'Since the evaluation policy is weak, the evaluation result will be considered a pass')
+                    break
+                else:
+                    logger.warn(f'Since the evaluation policy is strong, the evaluation result will be considered a fail. Starting another run with updated parameters')
+                    self.workflow_method_args.update(recommended_param_updates)
+            
+            elif evaluation_verdict == 'fail':
+                logger.warn(f'The evaluation verdict was fail. Starting another run with updated parameters')
+                self.workflow_method_args.update(recommended_param_updates)
+            
+            else:
+                msg = f'Evaluation result must be one of pass, warn and fail, but instead {evaluation_verdict} was received.'
+                logger.error(msg)
+                raise ValueError(msg)
+
+            self.current_iter += 1
+            save_object(self, os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'), overwrite=True)
+        if evaluation_verdict == 'fail':
+            # log message
+            import sys
+            logger.error(f'the process did not pass the test for {self.process_name}')
+            sys.exit(0)
+
+        logger.info(f'Finishing run for {self.process_name}')
+
+        mlflow.end_run()
+        if mlflow_run_to_restore is not None:
+            mlflow.set_experiment(experiment_id=mlflow_run_to_restore.info.experiment_id)
+            mlflow.start_run(mlflow_run_to_restore.info.run_id)
+
+        base_logger.removeHandler(handler)
+
+        # return the last result
+        return {self.process_name: self.results[len(self.results)-1]}
