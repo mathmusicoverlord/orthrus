@@ -9,6 +9,11 @@ import os
 import pickle
 import dill
 from flask import request
+import ray
+from copy import deepcopy
+import logging
+import re 
+
 
 
 def method_exists(instance: object, method: str):
@@ -1024,6 +1029,8 @@ def batch_jobs_(function_handle,
         ...     print(ray.get(process))
         >>> ray.shutdown()
     """
+    logger = logging.getLogger(f'{__name__}_pid-{os.getpid()}' if ray.is_initialized() else __name__)
+
     #change resource requirements of the task
     #function_handle.options(num_cpus=num_cpus_per_task, num_gpus=num_gpus_per_task)
     #options call is not working, setting them directly
@@ -1032,57 +1039,25 @@ def batch_jobs_(function_handle,
 
     
     # temporarily initialize ray to get number of cpus and gpus available
-    import ray
     ray.init(ignore_reinit_error=True, local_mode=local_mode)
 
-    # available resources will return the correct number of cpus and gpus on both single machines and clusters with SLURM
-    available_resources = ray.available_resources()
-    
-    # set number of cpus for job
-    num_cpus_available = available_resources['CPU']
-    if num_cpus_for_job <= 0 or num_cpus_for_job > num_cpus_available:
-        num_cpus_for_job = num_cpus_available
+    num_cpus_for_job, num_gpus_for_job = process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, num_gpus_per_task)
 
-    # set number of gpus for job
-    if num_gpus_per_task <= 0:
-        # don't need gpus
-        num_gpus_for_job = 0
-    else:
-        # get number of gpus available on the machine / cluster
-        num_gpus_available = available_resources.get('GPU', 0)
-
-        #Make sure that there infact are GPUs available to run the job
-        assert num_gpus_available > 0, "Job requires GPU(s), but they are not available."
-
-        if num_gpus_for_job < 0 or num_gpus_for_job > num_gpus_available:
-            num_gpus_for_job = num_gpus_available
-
-
-    #calculate the max number of processes to run simultaneously
-    from math import floor
-    max_cpu_tasks = floor(num_cpus_for_job / num_cpus_per_task)
-    max_gpu_tasks = floor(num_gpus_for_job / num_gpus_per_task) if num_gpus_for_job>0 else np.inf
-
-    print('max_cpu_tasks', max_cpu_tasks)
-    print('max_gpu_tasks', max_gpu_tasks)
-    # set max_processes to be the smaller of max_cpu_tasks and max_gpu_tasks
-    max_processes = max_cpu_tasks if max_cpu_tasks < max_gpu_tasks else max_gpu_tasks
-
-    print(f'max of {max_processes} processes will execute at one time')
+    max_processes = get_max_process_limit_(num_cpus_for_job, num_gpus_for_job, num_cpus_per_task, num_gpus_per_task)
 
     # set variables for the main loop
     all_processes = []
+    running_processes = []
     all_finished_processes = []
     
     num_total_processes = len(list_of_arguments)
     num_running_processes=0
     num_finished_processes=0
 
-    running_processes = []
     i = 1
     for arguments in list_of_arguments:
         if num_finished_processes >= i * verbose_frequency:
-            print('%d of %d processes finished'%(num_finished_processes, num_total_processes))
+            logger.info('%d of %d processes finished'%(num_finished_processes, num_total_processes))
             i = i+1
 
         if num_running_processes == max_processes:
@@ -1107,13 +1082,96 @@ def batch_jobs_(function_handle,
     num_running_processes -=len(finished_processes)
     num_finished_processes +=len(finished_processes)
 
-    print('%d of %d processes finished'%(num_finished_processes, num_total_processes))
+    logger.info('%d of %d processes finished'%(num_finished_processes, num_total_processes))
 
     assert num_finished_processes == num_total_processes, 'All processes were not processed. %d processes are unaccounted for.' \
                                         % (num_total_processes - num_finished_processes)
     assert num_running_processes == 0, '%d processes still running' % num_running_processes
     return results
 
+
+def get_max_process_limit_(num_cpus_for_job, num_gpus_for_job, num_cpus_per_task, num_gpus_per_task):
+    logger = logging.getLogger(f'{__name__}_pid-{os.getpid()}' if ray.is_initialized() else __name__)
+    #calculate the max number of processes to run simultaneously
+    from math import floor
+    max_cpu_tasks = floor(num_cpus_for_job / num_cpus_per_task)
+    max_gpu_tasks = floor(num_gpus_for_job / num_gpus_per_task) if num_gpus_per_task>0 else np.inf
+
+    logger.info(f'max_cpu_tasks {max_cpu_tasks}')
+    logger.info(f'max_gpu_tasks {max_gpu_tasks}')
+    # set max_processes to be the smaller of max_cpu_tasks and max_gpu_tasks
+    max_processes = max_cpu_tasks if max_cpu_tasks < max_gpu_tasks else max_gpu_tasks
+
+    logger.info(f'max of {max_processes} processes will execute at one time')
+
+    return max_processes
+
+
+def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, num_gpus_per_task):
+    logger = logging.getLogger(f'{__name__}_pid-{os.getpid()}' if ray.is_initialized() else __name__)
+    ray.init(ignore_reinit_error=True)
+
+    # available resources will return the correct number of cpus and gpus on both single machines and clusters with SLURM
+    available_resources = ray.available_resources()
+    
+
+    def get_matching_keys(p, dictionary):
+        keys = []
+        for k in dictionary.keys():
+            # logger.warning(k)
+            if p.match(k):
+                keys.append(k)
+        return keys
+    # set number of cpus for job
+
+    p = re.compile('^CPU_group_[^_\W]+$')    
+    keys = get_matching_keys(p, available_resources)
+
+    if len(keys) == 0:
+        num_cpus_available = available_resources.get('CPU', 0)
+    else:
+        num_cpus_available = available_resources[keys[0]]
+    
+    try:
+        assert num_cpus_available > 0
+    except AssertionError as err:
+        msg = "No CPUs available to run the job"
+        logger.error(msg)
+        raise(AssertionError(msg))
+
+    if num_cpus_for_job > num_cpus_available:
+        logger.info(f'There are less CPUs({num_cpus_available}) available than requested {num_cpus_for_job}.')
+
+    if num_cpus_for_job <= 0 or num_cpus_for_job > num_cpus_available:
+        num_cpus_for_job = num_cpus_available
+    logger.info(f'The job is going to use {num_cpus_for_job} CPUs')
+
+    
+    p = re.compile('^GPU_group_[^_\W]+$')    
+    keys = get_matching_keys(p, available_resources)
+
+    if len(keys) == 0:
+        num_gpus_available = available_resources.get('GPU', 0)
+    else:
+        num_gpus_available = available_resources[keys[0]]
+
+    if not(num_gpus_for_job == 0 and num_gpus_per_task == 0):
+        #Make sure that there infact are GPUs available to run the job
+        try:
+            assert num_gpus_available > 0
+        except AssertionError as err:
+            msg = f"Job requires GPU(s), but they are not available. (num_gpus_for_job = {num_gpus_for_job}, num_gpus_per_task={num_gpus_per_task}, num_gpus_available={num_gpus_available})"
+            logger.error(msg)
+            raise(AssertionError(f"Job requires GPU(s), but they are not available. (num_gpus_for_job = {num_gpus_for_job}, num_gpus_per_task={num_gpus_per_task}, num_gpus_available={num_gpus_available})"))
+
+    if num_gpus_for_job > num_gpus_available:
+        logger.info(f'There are less GPUs({num_gpus_available}) available than requested {num_gpus_for_job}.')
+
+    if num_gpus_for_job < 0: # or num_gpus_for_job > num_gpus_available:
+        num_gpus_for_job = num_gpus_available
+    logger.info(f'The job is going to use {num_gpus_for_job} GPUs')
+        
+    return num_cpus_for_job, num_gpus_for_job
 
 def pop_first_element(x):
     """
@@ -1133,3 +1191,37 @@ def pop_first_element(x):
         pass
 
     return x
+
+
+def extract_reconstruction_details_from_logger(logger):
+    logger_info = {}
+    logger_info['handler_filenames'] = [x.baseFilename for x in logger.handlers if type(x) == logging.FileHandler]
+    if len(logger.handlers) > 0:
+        logger_info['formatter'] = logger.handlers[-1].formatter
+    else:
+        format_string = '%(asctime)s - %(name)s - %(levelname)s : \t %(message)s'
+        logger_info['formatter'] = logging.Formatter(format_string)
+    logger_info['name'] = logger.name
+
+    return logger_info
+
+def reconstruct_logger_from_details(logger_info, name, add_pid='no'):
+    base_logger = logging.getLogger()
+    base_logger.setLevel(logging.INFO)
+
+    if  (add_pid=='ray_init' and ray.is_initialized()) or add_pid == 'always':
+        pid = os.getpid()
+        name = f'{name}_pid-{pid}'
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+
+    existing_handles = [x.baseFilename for x in logger.handlers if type(x) == logging.FileHandler]
+    # config need to be set again if this method is used by a new ray process.
+    logging.basicConfig(level=logging.INFO, format=logger_info['formatter']._fmt, datefmt=logger_info['formatter'].datefmt)
+    for handler_path in logger_info['handler_filenames']:
+        if handler_path not in existing_handles:
+            handler = logging.FileHandler(handler_path, 'a')
+            handler.setFormatter(logger_info['formatter'])
+            logger.addHandler(handler)
+    return logger
