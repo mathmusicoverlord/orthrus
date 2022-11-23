@@ -3565,7 +3565,7 @@ class WorkflowManager(Process):
 
         experiment_module = module_from_path(Path(self.experiment_module_path).stem, self.experiment_module_path)
 
-        self.workflow_method_args.update(kwargs)
+        self.workflow_method_args.update({'results_from_previous_workflows': kwargs})
         recommended_param_updates = None
         while self.current_iter < self.max_trials:
             self.workflow_method_args['iter'] = self.current_iter
@@ -3612,6 +3612,8 @@ class WorkflowManager(Process):
                 raise ValueError(msg)
 
             self.current_iter += 1
+            # these may be large objects, save time and space
+            del self.workflow_method_args['results_from_previous_workflows']
             save_object(self, os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'), overwrite=True)
         if evaluation_verdict == 'fail':
             # log message
