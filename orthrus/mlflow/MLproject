@@ -1,0 +1,59 @@
+name: Generic Orthrus Workflowss
+
+entry_points:
+  tune:
+    parameters:
+      pipeline_path:
+        type: path
+      num_samples:
+        type: float
+        default: 5
+    command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/tune.py \
+      --pipeline_path {pipeline_path} --num_samples {num_samples}"     
+
+  run_pipeline:
+    parameters:
+      pipeline_path:
+        type: path
+      pipeline_type:
+        type: str
+      module_name:
+        type: str
+    command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/run_pipeline.py \
+             --pipeline_path {pipeline_path} --pipeline_type {pipeline_type} --module_name {module_name}"
+
+
+  run_workflow_pipeline:
+    parameters:
+      experiment-module-path:
+        type: path
+      local-mode: {type: boolean, default: False}
+    command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/run_workflow_pipeline.py \
+             --experiment_module_path {experiment-module-path} --local_mode {local-mode}"
+
+
+
+  # run_pipeline_modules:
+  #   parameters:
+  #     pipeline_path:
+  #       type: path
+  #     pipeline_type:
+  #       type: str
+  #     module_name:
+  #       type: str
+  #   command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/run_pipeline_modules.py \
+  #            --pipeline_path {pipeline_path} --pipeline_type {pipeline_type} --module_name {module_name}"
+
+  # ifr_ssvm_c_tuning:
+  #   parameters:
+  #     pipeline_path:
+  #       type: path
+  #   command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/ifr_ssvm_c_tuning.py \
+  #            --pipeline_path {pipeline_path} "
+
+  # rfs_svm_c_tuning:
+  #   parameters:
+  #     pipeline_path:
+  #       type: path
+  #   command: "/usr/local/python3.8.2/bin/python3.8 ./workflows/rfs_svm_c_tuning.py \
+  #            --pipeline_path {pipeline_path} "
