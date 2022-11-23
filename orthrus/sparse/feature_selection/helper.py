@@ -19,8 +19,10 @@ def reduce_feature_set_size_by_classification(ds,
                             end : int = 100, 
                             step : int = 5, 
                             verbose_frequency : int=10, 
-                            num_cpus_per_worker : float=1., 
-                            num_gpus_per_worker : float=0.,
+                            num_cpus_per_task : float=1., 
+                            num_gpus_per_task : float=0.,
+                            num_cpus_for_job: int=-1,
+                            num_gpus_for_job: int = 0,                             
                             local_mode=False,
                             **kwargs):
     """
@@ -86,10 +88,10 @@ def reduce_feature_set_size_by_classification(ds,
         verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
         
-        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+        num_cpus_per_task (float) : Number of CPUs each worker needs. This can be a fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
 
-        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+        num_gpus_per_task (float) : Number of GPUs each worker needs. This can be fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
@@ -147,7 +149,7 @@ def reduce_feature_set_size_by_classification(ds,
                                     end = 100, 
                                     step = 1,
                                     verbose_frequency=10,
-                                    num_cpus_per_worker=2.)
+                                    num_cpus_per_task=2.)
 
             >>> print(reduced_feature_results)
     """
@@ -174,13 +176,15 @@ def reduce_feature_set_size_by_classification(ds,
         list_of_arguments.append(arguments)
 
     returns = run_batch_jobs_for_fset_size_reduction(run_single_classification_experiment_,
-                                            list_of_arguments, 
-                                            verbose_frequency,
-                                            num_cpus_per_worker,
-                                            num_gpus_per_worker,
-                                            features_dataframe,
-                                            ranked_features,
-                                            local_mode)
+                                                    list_of_arguments,
+                                                    verbose_frequency,
+                                                    features_dataframe,
+                                                    ranked_features,
+                                                    num_cpus_per_task=num_cpus_per_task,
+                                                    num_gpus_per_task=num_gpus_per_task,
+                                                    num_cpus_for_job=num_cpus_for_job,
+                                                    num_gpus_for_job=num_gpus_for_job,
+                                                    local_mode=local_mode)
 
     return returns
 
@@ -198,8 +202,8 @@ def sliding_window_classification_on_ranked_features(ds,
                             window_size = 50, 
                             stride = 5,
                             verbose_frequency : int=10, 
-                            num_cpus_per_worker : float=1., 
-                            num_gpus_per_worker : float=0.,
+                            num_cpus_per_task : float=1., 
+                            num_gpus_per_task : float=0.,
                             **kwargs):
     """
     This method takes a features dataframe (output of a feature selection), ranks them by a ranking method and performs 
@@ -262,10 +266,10 @@ def sliding_window_classification_on_ranked_features(ds,
         verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is 
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
         
-        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check 
+        num_cpus_per_task (float) : Number of CPUs each worker needs. This can be a fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
 
-        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check 
+        num_gpus_per_task (float) : Number of GPUs each worker needs. This can be fraction, check 
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
@@ -317,7 +321,7 @@ def sliding_window_classification_on_ranked_features(ds,
                                     window_size = 50, 
                                     stride = 5,
                                     verbose_limit=10,
-                                    num_cpus_per_worker=2.0)
+                                    num_cpus_per_task=2.0)
 
             >>> print(sliding_window_results)
     """
@@ -344,7 +348,7 @@ def sliding_window_classification_on_ranked_features(ds,
         list_of_arguments.append(arguments)
 
     all_results = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
+                                                num_cpus_per_task=num_cpus_per_task, num_gpus_per_task=num_gpus_per_task)
     results = np.zeros((len(list_of_arguments), 2))
     for i, (score, _ , min_feature_index) in enumerate(all_results):
         results[i, 0] = min_feature_index
@@ -637,8 +641,8 @@ def get_batch_correction_matric_for_ranked_features(ds,
                             batch_correction_metric_args: dict,
                             sample_ids: None,
                             verbose_frequency : int=10, 
-                            num_cpus_per_worker : float=1., 
-                            num_gpus_per_worker : float=0.,):
+                            num_cpus_per_task : float=1., 
+                            num_gpus_per_task : float=0.,):
     
     ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
 
@@ -660,7 +664,7 @@ def get_batch_correction_matric_for_ranked_features(ds,
         list_of_arguments.append(arguments)
 
     all_results = batch_jobs_(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker)
+                                                num_cpus_per_task=num_cpus_per_task, num_gpus_per_task=num_gpus_per_task)
     results = np.zeros((len(list_of_arguments), 2))
     n_features = features.shape[0]
     for i, (n, _ , _, rejection_rate) in enumerate(all_results):
@@ -716,20 +720,6 @@ def get_correlates(S, X, c):
     C = np.abs(C) >= c
     return T[C.any(axis=0)]
 
-def plot_feature_frequency(f_ranks, attr):
-    import matplotlib.pyplot as plt
-    ranked_feature_ids = rank_features_by_attribute(f_ranks, {'attr': attr, 'order': 'desc'})
-    f_ranks = f_ranks.loc[ranked_feature_ids]
-    f_ranks = f_ranks.loc[f_ranks[attr] > 0]
-    fig, axs = plt.subplots(1,1)
-    axs.plot(np.arange(len(f_ranks)), f_ranks[attr].values)
-    axs.set_ylabel("Frequency")
-    axs.set_xlabel("Feature index")
-    # axs.set_title(labels[tranfrom_id])
-    plt.show()
-
-
-
 from orthrus.core.pipeline import Transform
 from orthrus.core.dataset import DataSet
 class ReduceIFRFeaturesByClassification(Transform):
@@ -747,8 +737,10 @@ class ReduceIFRFeaturesByClassification(Transform):
                  end : int = 100,
                  step : int = 5,
                  verbose_frequency : int=10,
-                 num_cpus_per_worker : float=1.,
-                 num_gpus_per_worker : float=0.,
+                 num_cpus_per_task : float=1.,
+                 num_gpus_per_task : float=0.,
+                 num_cpus_for_job: int=-1,
+                 num_gpus_for_job: int = 0,
                  local_mode=False, 
                  validation_set_label=None):
         
@@ -770,8 +762,10 @@ class ReduceIFRFeaturesByClassification(Transform):
         self.end = end
         self.step = step
         self.verbose_frequency = verbose_frequency
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+        self.num_cpus_for_job = num_cpus_for_job
+        self.num_gpus_for_job = num_gpus_for_job
         self.local_mode = local_mode
         self.group = group
         self.validation_set_label = validation_set_label
@@ -807,8 +801,10 @@ class ReduceIFRFeaturesByClassification(Transform):
                             end=self.end,
                             step=self.step,
                             verbose_frequency=self.verbose_frequency,
-                            num_cpus_per_worker = self.num_cpus_per_worker,
-                            num_gpus_per_worker = self.num_gpus_per_worker,
+                            num_cpus_per_task = self.num_cpus_per_task,
+                            num_gpus_per_task = self.num_gpus_per_task,
+                            num_cpus_for_job = self.num_cpus_for_job,
+                            num_gpus_for_job = self.num_gpus_for_job,  
                             local_mode=self.local_mode,
                             group=self.group
                             )
@@ -835,12 +831,14 @@ class  ReduceIFRFeaturesByFishersMetric(Transform):
                  ranking_method_args: dict,
                  parallel: bool = False,
                  verbosity: int = 1,
-                 start : int = 5,
-                 end : int = 100,
-                 step : int = 5,
-                 verbose_frequency : int=10,
-                 num_cpus_per_worker : float=1.,
-                 num_gpus_per_worker : float=0.,
+                 start: int = 5,
+                 end: int = 100,
+                 step: int = 5,
+                 verbose_frequency: int=10,
+                 num_cpus_per_task: float=1.,
+                 num_gpus_per_task: float=0.,
+                 num_cpus_for_job: int=-1,
+                 num_gpus_for_job: int = 0,
                  local_mode=False, 
                  use_validation_set=False,
                  process_name='ReduceIFRFeaturesByFishersMetric'):
@@ -861,8 +859,10 @@ class  ReduceIFRFeaturesByFishersMetric(Transform):
         self.end = end
         self.step = step        
         self.verbose_frequency = verbose_frequency
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+        self.num_cpus_for_job = num_cpus_for_job
+        self.num_gpus_for_job = num_gpus_for_job
         self.local_mode = local_mode
         self.use_validation_set = use_validation_set
 
@@ -892,8 +892,10 @@ class  ReduceIFRFeaturesByFishersMetric(Transform):
                             end=self.end,
                             step=self.step,                            
                             verbose_frequency=self.verbose_frequency,
-                            num_cpus_per_worker = self.num_cpus_per_worker,
-                            num_gpus_per_worker = self.num_gpus_per_worker,
+                            num_cpus_per_task = self.num_cpus_per_task,
+                            num_gpus_per_task = self.num_gpus_per_task,
+                            num_cpus_for_job = self.num_cpus_for_job,
+                            num_gpus_for_job = self.num_gpus_for_job,                            
                             local_mode=self.local_mode,
                             )
         results_['transform'] = self._generate_transform(self, results_['reduced_feature_ids'])
@@ -919,8 +921,10 @@ def reduce_feature_set_size_by_fishers_metric(ds,
                             end : int = 100,
                             step : int = 5,
                             verbose_frequency : int=10,
-                            num_cpus_per_worker : float=1.,
-                            num_gpus_per_worker : float=0.,
+                            num_cpus_per_task : float=1.,
+                            num_gpus_per_task : float=0.,
+                            num_cpus_for_job: int=-1,
+                            num_gpus_for_job: int = 0,                            
                             local_mode=False):
     """
 
@@ -949,10 +953,10 @@ def reduce_feature_set_size_by_fishers_metric(ds,
         verbose_frequency (int) : this parameter controls the frequency of progress outputs for the ray workers to console; an output is
             printed to console after every verbose_frequency number of processes complete execution. (default: 10)
 
-        num_cpus_per_worker (float) : Number of CPUs each worker needs. This can be a fraction, check
+        num_cpus_per_task (float) : Number of CPUs each worker needs. This can be a fraction, check
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 1.)
 
-        num_gpus_per_worker (float) : Number of GPUs each worker needs. This can be fraction, check
+        num_gpus_per_task (float) : Number of GPUs each worker needs. This can be fraction, check
             `ray specifying required resources <https://docs.ray.io/en/master/walkthrough.html#specifying-required-resources>`_ for more details. (default: 0.)
 
     Return:
@@ -1004,7 +1008,7 @@ def reduce_feature_set_size_by_fishers_metric(ds,
                                     end = 100,
                                     step = 1,
                                     verbose_frequency=10,
-                                    num_cpus_per_worker=2.)
+                                    num_cpus_per_task=2.)
 
             >>> print(reduced_feature_results)
     """
@@ -1024,13 +1028,15 @@ def reduce_feature_set_size_by_fishers_metric(ds,
         list_of_arguments.append(arguments)
 
     returns = run_batch_jobs_for_fset_size_reduction(compute_fisher_score,
-                                            list_of_arguments,
-                                            verbose_frequency,
-                                            num_cpus_per_worker,
-                                            num_gpus_per_worker,
-                                            features_dataframe,
-                                            ranked_features,
-                                            local_mode)
+                                                    list_of_arguments,
+                                                    verbose_frequency,
+                                                    features_dataframe,
+                                                    ranked_features,
+                                                    num_cpus_per_task=num_cpus_per_task,
+                                                    num_gpus_per_task=num_gpus_per_task,
+                                                    num_cpus_for_job=num_cpus_for_job,
+                                                    num_gpus_for_job=num_gpus_for_job,
+                                                    local_mode=local_mode)
 
     return returns
 
@@ -1108,13 +1114,21 @@ def get_num_attr_array(ds, ranked_features, start, end, step):
 def run_batch_jobs_for_fset_size_reduction(method_handle,
                                             list_of_arguments, 
                                             verbose_frequency,
-                                            num_cpus_per_worker,
-                                            num_gpus_per_worker,
                                             features_dataframe,
                                             ranked_features,
+                                            num_cpus_per_task : float=1.,
+                                            num_gpus_per_task : float=0.,
+                                            num_cpus_for_job: int=-1,
+                                            num_gpus_for_job: int = 0,   
                                             local_mode=False):
-    all_results = batch_jobs_(method_handle, list_of_arguments, verbose_frequency=verbose_frequency,
-                                                num_cpus_per_worker=num_cpus_per_worker, num_gpus_per_worker=num_gpus_per_worker, local_mode=local_mode)
+    all_results = batch_jobs_(method_handle, 
+                             list_of_arguments, 
+                             verbose_frequency=verbose_frequency,
+                             num_cpus_per_task=num_cpus_per_task, 
+                             num_gpus_per_task=num_gpus_per_task, 
+                             local_mode=local_mode, 
+                             num_cpus_for_job=num_cpus_for_job, 
+                             num_gpus_for_job=num_gpus_for_job)
     results = np.zeros((len(list_of_arguments), 2))
 
     for i, (score, feature_set_length , _) in enumerate(all_results):
@@ -1157,8 +1171,10 @@ class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
                  end: int = 100,
                  step: int = 5,
                  verbose_frequency: int = 10,
-                 num_cpus_per_worker: float = 1.,
-                 num_gpus_per_worker: float = 0.,
+                 num_cpus_per_task: float = 1.,
+                 num_gpus_per_task: float = 0.,
+                 num_cpus_for_job: int=-1,
+                 num_gpus_for_job: int = 0,
                  local_mode: bool = False,
                  use_validation_set: bool = False,
                  process_name: str = 'ReduceIFRFeaturesByFishersMetricIteratively',
@@ -1180,8 +1196,10 @@ class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
         self.end = end
         self.step = step
         self.verbose_frequency = verbose_frequency
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+        self.num_cpus_for_job = num_cpus_for_job
+        self.num_gpus_for_job = num_gpus_for_job
         self.local_mode = local_mode
         self.use_validation_set = use_validation_set
         self.reps = reps
@@ -1210,8 +1228,10 @@ class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
                                                     end=self.end,
                                                     step=self.step,
                                                     verbose_frequency=self.verbose_frequency,
-                                                    num_cpus_per_worker=self.num_cpus_per_worker,
-                                                    num_gpus_per_worker=self.num_gpus_per_worker,
+                                                    num_cpus_per_task = self.num_cpus_per_task,
+                                                    num_gpus_per_task = self.num_gpus_per_task,
+                                                    num_cpus_for_job = self.num_cpus_for_job,
+                                                    num_gpus_for_job = self.num_gpus_for_job,  
                                                     local_mode=self.local_mode,
                                                     use_validation_set=self.use_validation_set)
 
@@ -1247,8 +1267,10 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
                  end: int = 100,
                  step: int = 5,
                  verbose_frequency: int = 10,
-                 num_cpus_per_worker: float = 1.,
-                 num_gpus_per_worker: float = 0.,
+                 num_cpus_per_task: float = 1.,
+                 num_gpus_per_task: float = 0.,
+                 num_cpus_for_job: int=-1,
+                 num_gpus_for_job: int = 0,
                  local_mode: bool = False,
                  validation_set_label=None,
                  process_name: str = 'ReduceIFRFeaturesByClassificationIteratively',
@@ -1274,8 +1296,10 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
         self.end = end
         self.step = step
         self.verbose_frequency = verbose_frequency
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+        self.num_cpus_for_job = num_cpus_for_job
+        self.num_gpus_for_job = num_gpus_for_job
         self.local_mode = local_mode
         self.validation_set_label = validation_set_label
         self.score_cutoff = score_cutoff
@@ -1312,8 +1336,10 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
                                                     end=self.end,
                                                     step=self.step,
                                                     verbose_frequency=self.verbose_frequency,
-                                                    num_cpus_per_worker=self.num_cpus_per_worker,
-                                                    num_gpus_per_worker=self.num_gpus_per_worker,
+                                                    num_cpus_per_task = self.num_cpus_per_task,
+                                                    num_gpus_per_task = self.num_gpus_per_task,
+                                                    num_cpus_for_job = self.num_cpus_for_job,
+                                                    num_gpus_for_job = self.num_gpus_for_job,  
                                                     local_mode=self.local_mode,
                                                     validation_set_label=self.validation_set_label)
 
