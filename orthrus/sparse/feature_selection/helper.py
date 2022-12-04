@@ -2,7 +2,7 @@ from re import L
 import numpy as np
 import ray
 import copy
-from orthrus.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs
 import pandas as pd
 from typing import  Callable
 def reduce_feature_set_size_by_classification(ds,
@@ -347,7 +347,7 @@ def sliding_window_classification_on_ranked_features(ds,
                         kwargs]
         list_of_arguments.append(arguments)
 
-    all_results = batch_jobs_(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
+    all_results = batch_jobs(run_single_classification_experiment_, list_of_arguments, verbose_frequency=verbose_frequency,
                                                 num_cpus_per_task=num_cpus_per_task, num_gpus_per_task=num_gpus_per_task)
     results = np.zeros((len(list_of_arguments), 2))
     for i, (score, _ , min_feature_index) in enumerate(all_results):
@@ -663,7 +663,7 @@ def get_batch_correction_matric_for_ranked_features(ds,
                     batch_correction_metric_args]
         list_of_arguments.append(arguments)
 
-    all_results = batch_jobs_(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
+    all_results = batch_jobs(batch_correction_metric_handle, list_of_arguments, verbose_frequency=verbose_frequency,
                                                 num_cpus_per_task=num_cpus_per_task, num_gpus_per_task=num_gpus_per_task)
     results = np.zeros((len(list_of_arguments), 2))
     n_features = features.shape[0]
@@ -1121,7 +1121,7 @@ def run_batch_jobs_for_fset_size_reduction(method_handle,
                                             num_cpus_for_job: int=-1,
                                             num_gpus_for_job: int = 0,   
                                             local_mode=False):
-    all_results = batch_jobs_(method_handle, 
+    all_results = batch_jobs(method_handle, 
                              list_of_arguments, 
                              verbose_frequency=verbose_frequency,
                              num_cpus_per_task=num_cpus_per_task, 

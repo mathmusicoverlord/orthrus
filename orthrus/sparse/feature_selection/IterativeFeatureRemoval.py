@@ -6,7 +6,7 @@ import os
 from orthrus.solvers.linear import LPPrimalDualPy
 import copy 
 from sklearn.metrics import balanced_accuracy_score
-from orthrus.core.helper import batch_jobs_, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
+from orthrus.core.helper import batch_jobs, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
 import ray
 import copy
 import logging 
@@ -610,7 +610,7 @@ class IFR:
 
                     list_of_arguments.append(arguments)
  
-        all_results = batch_jobs_(self.select_features_for_data_partition, 
+        all_results = batch_jobs(self.select_features_for_data_partition, 
                                 list_of_arguments, 
                                 verbose_frequency=self.verbose_frequency,
                                 num_cpus_per_task=self.num_cpus_per_task, 

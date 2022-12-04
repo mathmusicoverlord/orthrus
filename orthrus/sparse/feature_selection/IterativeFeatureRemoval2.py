@@ -6,7 +6,7 @@ import random
 from calcom.solvers import LPPrimalDualPy
 import copy 
 from sklearn.metrics import balanced_accuracy_score
-from orthrus.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs
 import ray
 
 class IFR:
@@ -326,7 +326,7 @@ class IFR:
                 list_of_arguments.append(arguments)
 
         
-        finished_processes = batch_jobs_(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
+        finished_processes = batch_jobs(self.select_features_for_data_partition, list_of_arguments, verbose_frequency=self.verbose_frequency,
                                         num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)
 
         for process in finished_processes:
