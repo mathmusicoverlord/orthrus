@@ -153,17 +153,16 @@ def generate_placement_group_for_nested_parallelization(max_cuncurrent_trials,
 
 #         return [cpus_available_to_tasks_of_one_ray_trainable, gpus_available_to_tasks_of_one_ray_trainable], tune.PlacementGroupFactory(placement_group_list)
 
-# user defined functions
-@mlflow_mixin
-def set_description(path):
-    mlflow.set_tag('mlflow.note.content',
-                f"Tuning of pipeline {path}")
+def set_description(description):
+    mlflow.set_tag('mlflow.note.content', description)
 
 
 
 def trainable(config):
         from ray.air import session 
         args = ray.get(config['args_ref'])
+        del config['args_ref']
+        # add the search space sample(config) to args
         args.update(config)
 
         name = session.get_trial_name()
@@ -176,18 +175,16 @@ def trainable(config):
         # So, we need to add the ofile handlers to the root logger, so that all logs get logged to respective files
         # when they are propagated to the root logger
         rootlogger =  helper.reconstruct_logger_from_details(logger_info, None)
-
         logger = logging.getLogger(f'{name}_pid-{os.getpid()}')
         
+        # get and slice dataset
+        ds = args['ds']
+        ds = ds.slice_dataset(sample_ids = args.get('sample_ids', None),
+                              feature_ids = args.get('feature_ids', None))
+
         experiment_module = module_from_path(args['experiment_module_name'], args['experiment_module_path'])
         
-        #get environment variables
-        experiment_variables : dict = experiment_module.get_experiment_variables()
-
-        # load and slice dataset
-        ds = utils.slice_dataset(experiment_variables)
-
-        # generate pipeline from config
+        # generate pipeline from args
         pipeline: Pipeline = experiment_module.generate_pipeline(**args)
         sess = session._get_session().__dict__['_status_reporter'].__dict__
         pipeline.checkpoint_path = os.path.join(sess['_logdir'], 'pipeline.pkl')
@@ -202,74 +199,48 @@ def trainable(config):
         logger.info(scores)
         
         # return score
-        return scores
+        session.report(scores)
 
 
 
-def run(experiment_module, **kwargs):
-    # check if an earlier execution exists!
-    artifacts_dir = urlparse(mlflow.get_artifact_uri()).path
+def run(experiment_module_path, 
+        tune_config,
+        num_samples,
+        placement_group,
+        tune_search_alg=None,
+        tune_scheduler=None,
+        resume_unfinished = True,
+        restart_errored = True,
+        max_failures=1,
+        workflow_name: str=None, 
+        n_iter=None, 
+        experiment_description: str=None,
+        workflow_process_results_handle=None,
+        **kwargs):
 
-    iter_num = kwargs.get("iter", None)
-    if iter_num is None:
-        run_dir = artifacts_dir
-        log_key = f'workflow_method_args'
-    else:
-        run_dir = os.path.join(artifacts_dir, f'run_{iter_num}')
-        os.makedirs(run_dir, exist_ok=True)
-        log_key = f'workflow_method_args_run_{iter_num}'
+    # generate module
+    experiment_module = module_from_path(Path(experiment_module_path).stem, experiment_module_path)
 
-    # temoprarily remove the results while parameters are logged
-    try:
-        p = kwargs.pop('results_from_previous_workflows')
-    except KeyError as e:
-        p = None    
-    
-    mlflow.log_param(log_key,  yaml.dump(kwargs, allow_unicode=True, default_flow_style=False).replace('\n- ', '\n\n- '))
-
-    if p is not None:
-        kwargs['results_from_previous_workflows'] = p
-
-    # only for mlflow logging
-    experiment_variables : dict = experiment_module.get_experiment_variables()
-    #remove ds before logging the params
-    experiment_variables.pop('ds')
-    #log experiment variables
-    mlflow.log_params(experiment_variables)
-
-    
-
-    # update config with mlflow
-    tracking_uri = mlflow.get_tracking_uri()
-    active_run = mlflow.active_run()
-    if active_run:
-        experiment_id = active_run.info.experiment_id
-    else:
-        experiment_id = 0   
-    kwargs['mlflow'] = {'experiment_id': experiment_id,
-                        'tracking_uri': tracking_uri,
-                        'workflow_artifacts_dir_path': run_dir}
-
+    run_dir, _, log_key = utils.get_results_dir_and_file_name(workflow_name, experiment_module, n_iter)
+    utils.reformat_kwargs_about_results_from_previous_process(kwargs, log_key)
 
     # for some reason passing the experiment_module here causes a runtime exception with no message
+    # so the solution that works is to pass experiment module's details and recreate it in the trainable
     kwargs['experiment_module_path'] = experiment_module.__file__
     kwargs['experiment_module_name'] = experiment_module.__name__
     kwargs['logger_info'] = helper.extract_reconstruction_details_from_logger(logging.getLogger())
     
+    # extract the search space definition (config)
+    config = tune_config.copy()
+
+    #put the kwargs on ray store, this will be accessed in the trainable using kwargs_ref
     kwargs_ref = ray.put(kwargs)
     
-    # extract config 
-    config = kwargs['tune_config'].copy()
+    # add ray reference to config
     config['args_ref'] = kwargs_ref
 
-
-    if kwargs.get('tune_search_alg', None) is None:
-        search_alg = experiment_module.search_alg(kwargs)
-
-    else:
-        search_alg = deepcopy(kwargs['tune_search_alg'])
-
-    reg_compile = re.compile("TuneTrainable_*")
+    # find if a tune trainable directory already exists, if it does it means that a previous run failed which can be restored
+    reg_compile = re.compile("trainable_*")
     dirs = []
     for dirname in next(os.walk(run_dir))[1]:
         if reg_compile.match(dirname):
@@ -282,22 +253,20 @@ def run(experiment_module, **kwargs):
     if len(dirs) == 1:
         path = os.path.join(run_dir, dirs[0])
         logger.info(f'Restoring Ray Tune run from the following location: {path}')
-        tuner = tune.Tuner.restore(path=path, resume_unfinished = kwargs.get('resume_unfinished', True), restart_errored=kwargs.get('restart_errored', True))
+        tuner = tune.Tuner.restore(path=path, resume_unfinished = resume_unfinished, restart_errored=restart_errored)
     
     elif len(dirs) == 0: 
         logger.info(f'Starting a new Ray Tune run')        
 
-        scheduler = experiment_module.scheduler(kwargs)
-
-        tuner = tune.Tuner(tune.with_resources(trainable, kwargs['placement_group']),
+        tuner = tune.Tuner(tune.with_resources(trainable, placement_group),
                         param_space=config,
-                        tune_config=tune.TuneConfig( num_samples=kwargs['num_samples'],
-                                                        scheduler=scheduler,
-                                                        search_alg=search_alg), 
+                        tune_config=tune.TuneConfig( num_samples=num_samples,
+                                                        scheduler=tune_scheduler,
+                                                        search_alg=tune_search_alg), 
                         run_config=air.RunConfig(local_dir = run_dir,
-                                                stop={"training_iteration": kwargs.get('stopping_iteration', 1)},
+                                                # stop={"training_iteration": kwargs.get('stopping_iteration', 1)},
                                                 # log_to_file=(os.path.join(run_dir, "my_stdout.log"), os.path.join(run_dir, "my_stderr.log")),
-                                                failure_config=air.FailureConfig(max_failures=1))
+                                                failure_config=air.FailureConfig(max_failures=max_failures))
                                 )    
 
 
@@ -306,50 +275,40 @@ def run(experiment_module, **kwargs):
         logger.error(err_msg)
         raise Exception(err_msg)
     
+    # run tuner
     results = tuner.fit()
-    best_results = results.get_best_result(mode=search_alg.mode, metric=search_alg.metric)    
+
+    #get best results
+    best_results = results.get_best_result(mode=tune_search_alg.mode, metric=tune_search_alg.metric)    
     best_config = best_results.config
 
-    if search_alg.mode == 'min':
-        ascending = True
-    else:
-        ascending = False
-    
+    # sort results
+    ascending = True if tune_search_alg.mode == 'min' else False
+    sorted_results = results.get_dataframe().sort_values(by=tune_search_alg.metric, ascending= ascending)
 
-    sorted_results = results.get_dataframe().sort_values(by=search_alg.metric, ascending= ascending)
-
-    # tune_dir = tuner._local_tuner._experiment_checkpoint_dir
+    # save the sorted results
     sorted_results.to_csv(os.path.join(run_dir, 'results_df.csv'))
 
 
-    # remove keys
+    # remove keys that we added for our convenience
     del kwargs['experiment_module_name']
     del kwargs['experiment_module_path']
-    del kwargs['mlflow']
     del kwargs['logger_info']
-    del best_config['args_ref']
+
     # log best hyperparameters
     with open(os.path.join(run_dir, 'best_config.json'), "w") as config_file:
         json.dump(best_config, config_file)
-
-
-    args = {'results_location': run_dir,
-            'tune_results': sorted_results,
-            'tuner': tuner}
     
-    try:
-        experiment_module.process_results(**args)
-    except AttributeError as e:
-        logger.error(e, exc_info=True)
-        # logger.error('The experiment module does not contain "process_results" method.')
-    except:
-        logger.error(e, exc_info=True)
+    # process the results
+    if workflow_process_results_handle is not None:
+        workflow_process_results_handle(results_location = run_dir, results = sorted_results)
 
     # set description
-    set_description(experiment_module.__file__)
+    if experiment_description is not None:
+        set_description(experiment_description)
 
     try:
-        mlflow.log_param(f'best_config_for_run_{iter_num}', best_config)
+        mlflow.log_param(f'best_config_for_run_{n_iter}', best_config)
     except Exception as e:
         logger.error(f'Exception occured while trying to log the following parameters to MLFlow, {best_config}')
         logger.error(e, exc_info=True)
@@ -362,24 +321,25 @@ def run(experiment_module, **kwargs):
 
 if __name__ == "__main__":
 
+    # process command line args
     parser = utils.get_workflow_parser()
-    args = utils.process_args(parser)
+    args = vars(utils.process_args(parser))
     
-    experiment_module = module_from_path(Path(args.experiment_module_path).stem, args.experiment_module_path)
-    
-    args = vars(args)
-    logger = utils.setup_workflow_execution(args, log_filename = 'execution.log')
-    args.pop('experiment_module_path')
+    # setup logger, mlflow and ray runs
+    logger = utils.setup_workflow_execution(**args, log_filename = 'execution.log')
 
-    experiment_workflow_args = experiment_module.get_tuning_workflow_args(args)
-    
-    run(experiment_module, **experiment_workflow_args)
+    # load module and get workflow args
+    experiment_module_path=args.pop('experiment_module_path')
+    experiment_module = module_from_path(Path(experiment_module_path).stem, experiment_module_path)
+    experiment_workflow_args = experiment_module.get_workflow_args(**args)
+    utils.add_missing_kv_pairs(experiment_workflow_args, args)
+
+    # run the workflow
+    run(experiment_module_path, **args)
 
 
 
-# How to leverage fault tolerance in trial runner
 
-# How does checkpointing work in Ray Tune: https://docs.ray.io/en/master/tune/tutorials/tune-checkpoints.html
 
 
 
@@ -421,66 +381,6 @@ if __name__ == "__main__":
 #         if trial in self._trial_files:
 #             self._trial_files[trial].close()
 #             del self._trial_files[trial]
-
-
-
-
-# class TuneTrainable(tune.Trainable):
-#     def setup(self, config, args=None):
-#         # config (dict): A dict of hyperparameters
-#         self.config = config
-#         if args is None:
-#             self.args = {}
-#         else:
-#             self.args = args
-#         self.args.update(self.config)
-#         self.name = 'TuneTrainable' + '_' + self._experiment_id + '_' + self._trial_info._trial_id
-
-#         # need to reconstruct logger
-#         # ray tunable are new processes (they do not have access to root logger that was created in the main process)
-#         self.logger_info = args['logger_info']
-
-#         # we are now running in a new process, the base logger in this new process does not have the file handlers.
-#         # So, make changes to the base logger
-#         baselogger =  helper.reconstruct_logger_from_details(self.logger_info, None)
-
-#     def step(self):  # This is called iteratively.
-
-        
-#         logger = logging.getLogger( f'{self.name}_pid-{os.getpid()}')
-        
-#         experiment_module = module_from_path(self.config['pipeline_name'], self.config['pipeline_path'])
-        
-#         #get environment variables
-#         experiment_variables : dict = experiment_module.get_experiment_variables()
-
-#         # load and slice dataset
-#         ds = slice_dataset(experiment_variables)
-
-#         # generate pipeline from config
-#         pipeline: Pipeline = experiment_module.generate_pipeline(**self.args)
-#         pipeline.checkpoint_path = os.path.join(self._logdir, 'pipeline.pkl')
-
-#         # run the pipeline on the data
-#         logger.info(f'Starting execution for trainable with id: {self._experiment_id}')
-
-#         pipeline.run(ds, checkpoint=self.args.get('checkpoint_trainables', False))
-        
-#         logger.info('='*50)
-#         scores = experiment_module.score(pipeline, **self.args.get('score_args', {}))
-#         logger.info(scores)
-#         # return score
-#         return scores
-
-    
-#     # This class is not designed for checkpointing, the methods implemented here only exist to avoid runtime NotImplemented Exception
-#     def save_checkpoint(self, tmp_checkpoint_dir):
-#         return tmp_checkpoint_dir
-    
-#     def load_checkpoint(self, tmp_checkpoint_dir):
-#         logger = logging.getLogger( f'{self.name}_pid-{os.getpid()}')
-#         logger.info('called load_checkpoint')
-
 
 
 

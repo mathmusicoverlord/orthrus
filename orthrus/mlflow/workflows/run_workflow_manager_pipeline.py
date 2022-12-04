@@ -13,21 +13,22 @@ import orthrus.mlflow.modules.utils as utils
 
 if __name__ == '__main__':
 
+        # process command line arguments
         parser = utils.get_workflow_parser()
-        args = utils.process_args(parser)
+        args = vars(utils.process_args(parser))
 
-        logger = utils.setup_workflow_execution(vars(args))
+        # setup logger, mlflow and ray runs
+        logger = utils.setup_workflow_execution(**args)
         
-        #generate module
-        experiment_name = Path(args.experiment_module_path).stem
-        experiment_module = module_from_path(experiment_name, args.experiment_module_path)
+        # generate module
+        experiment_name = Path(args['experiment_module_path']).stem
+        experiment_module = module_from_path(experiment_name, args['experiment_module_path'])
 
-        workflow_args  = {}
         #get pipeline of workflows
-        pipeline = experiment_module.generate_pipeline_of_workflows(mlflow_run_id = args.run_id, **workflow_args)
+        pipeline = experiment_module.generate_pipeline_of_workflows(**args)
 
-        #log mlflow run ids and experiment module path of each workflow in the main experiment
-        from collections import OrderedDict
+        # log mlflow run ids and experiment module path of each workflow in the main experiment
+        # also create soflinks of workflow experiment directories in the main or default experiment's artifacts directory
         params = {}
         process_list = []
         
@@ -50,10 +51,13 @@ if __name__ == '__main__':
                 except AttributeError as e:
                         logger.error(e, exc_info=True)
 
-
+        # log mlflow parameters
         mlflow.log_param('Sequence of workflows', '\n------>\n'.join(process_list))
-
         mlflow.log_params(params)
 
         #run pipeline
-        pipeline.run(None, checkpoint=True)
+        pipeline.run(None, checkpoint=True, batch_args={'batch':args})
+        
+        logger.info(f'Finishing execution of the run_workflow_manager_pipeline workflow for the module located at path {args["experiment_module_path"]}.') 
+        logger.info(f'The mlflow run_id for the run was: {mlflow.active_run().info.run_id}')
+
