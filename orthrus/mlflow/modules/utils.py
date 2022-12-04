@@ -1,22 +1,107 @@
 """Module for utility functions"""
 
 # imports
+import ast
+import os
+import ray
 import logging
 import mlflow
 import numpy as np
 from orthrus.core.pipeline import Report, Score
+from orthrus.core.helper import save_object
 import pandas as pd
 from pivottablejs import pivot_ui
 import plotly.graph_objects as go
 from urllib.parse import urlparse
 import argparse
+import yaml
 
+def get_results_dir_and_file_name(workflow_name, experiment_module, iter_num):
+    '''
+    this method returns results directory path, name of pipeline pkl file and a key for logging 
+    parameters in mlflow
+    '''
+    if workflow_name is None:
+        filename = experiment_module.__name__
+    else:
+        filename = workflow_name
+    
+    artifacts_dir = urlparse(mlflow.get_artifact_uri()).path
+    if iter_num is None:
+        run_dir = artifacts_dir
+        log_key = f'workflow_method_args'
+    else:
+        run_dir = os.path.join(artifacts_dir, f'run_{iter_num}')
+        os.makedirs(run_dir, exist_ok=True)
+        filename = f'{filename}_{iter_num}_.pickle'
+        log_key = f'workflow_method_args_run_{iter_num}'
+    
+    return run_dir, filename, log_key
 
-def get_workflow_parser():
+def reformat_kwargs_about_results_from_previous_process(kwargs, log_key):
+    '''
+    if :py:attr:`kwargs` contains a 'results_from_previous_workflows' key, this method\\
+        1. pops the dictionary in 'results_from_previous_workflows' key\\
+        2. logs the :py:attr:`kwargs` to mlflow with key=:py:attr:`log_key`\\
+        3. updates :py:attr:`kwargs` with the dictionary that was originally in 'results_from_previous_workflows' key\\
+        i.e. all the k-v pairs that were present in 'results_from_previous_workflows' dict are now\\
+        available directly in :py:attr:`kwargs`.
+    '''
+    
+    # remove the results_from_previous_workflows before parameters are logged
+    try:
+        old_results = kwargs.pop('results_from_previous_workflows')
+    except KeyError as e:
+        old_results = None    
+    
+    if kwargs.contains('ds'):
+        ds = kwargs.pop('ds')
+    else:
+        ds = None    
+
+    
+    if log_key is not None:
+        mlflow.log_param(log_key,  yaml.dump(kwargs, allow_unicode=True, default_flow_style=False).replace('\n- ', '\n\n- '))
+
+    if old_results is not None:
+        # add the keys of results_from_previous_workflows directly back to kwargs 
+        kwargs.update(old_results)    
+
+    if ds is not None:
+        kwargs['ds'] = ds 
+
+    
+
+    
+def add_missing_kv_pairs(source, target):
+    '''
+    Adds the unique key-value pairs from source dict to target dict
+    '''
+    remaining_kwargs_keys = [x for x in list(source.keys()) if x not in target.keys()]
+    for k in list(remaining_kwargs_keys):
+            target[k] = source[k]
+
+def get_workflow_parser(parser_name, parser_description):
+    '''
+    Returns a argmument parser object. Ths parser 'knows' about the most critical arguments which are required for 
+    all experiments. The known arguments are:
+    1. experiment_module_path
+
+    2. run_id 
+
+    3. experiment_id 
+
+    4. num_cpus_for_job 
+
+    5. num_gpus_for_job 
+
+    6. local_mode
+    '''
+
     # command line arguments
-    parser = argparse.ArgumentParser("Run Pipeline", description="Runs a pre-defined pipeline.")
+    parser = argparse.ArgumentParser(parser_name, description=parser_description)
     parser.add_argument("--experiment_module_path",
-                        type=str, help="File path to the python file which defines a pipeline of WorkflowManager processes")
+                        type=str, help="File path to the python module. Please check the documentation of the main method of the script to see the requirements for the python module to be valid.")
 
     parser.add_argument("--run_id",  default=None,
                         type=str, help="In case of a re-run, this argument provides the mlflow run id of the experiment to be re-run.")
@@ -28,75 +113,101 @@ def get_workflow_parser():
 
     parser.add_argument("--num_gpus_for_job", type=int, default=None, help="How many gpus to use for the whole job")
 
-    # Workaround: type of local_mode is string instead of boolean because the run command in the mlflow project file will always add a -P local_mode={local_mode}
-    # argument, and that (presence of any value) is interpreted as True by ArgumentParse. Setting local_mode to False is done by not providing  any value in the 
-    # command line argument, i.e. an absense of this flag means False. 
-    parser.add_argument("--local_mode", default='False', help="Whether to run ray in local mode. Any value other than 'False' is considered True.")
+    parser.add_argument("--local_mode", default='False', help="Whether to run ray in local mode. Only 'True' is considered True, all other values will be considered False.")
 
     return parser
 
 
 def process_args(parser):
+    '''
+    This method processes the known and unknown command line arguments in the parser object. Amongst the unknown arguments,
+    any argument with the 'key=value' format is added to the arguments 'known' to the parser.
+
+    Returns:
+        All command line arguments that are either known to the parser or matches the 'key=value' format
+    '''
+
+
     args, unknown = parser.parse_known_args()
 
     remaining_args = {}
     unknown = (x for x in (a.split('=') for a in unknown) if len(x) >1)
     for k, v in ((k.lstrip('-'), v) for k,v in unknown):
-        remaining_args[k] = v
+        remaining_args[k] = ast.literal_eval(v)
 
     args_dict = vars(args)
     args_dict.update(remaining_args)
 
     return args
 
-def setup_workflow_execution(args, log_filename = 'global.log'):
-        import os
-        import ray
+def setup_workflow_execution(experiment_module_path,
+                            experiment_id:str="0",
+                            run_id:str = None,
+                            local_mode:bool=False,
+                            num_cpus_for_job:int=None,
+                            num_gpus_for_job:int=None,
+                            log_filename:str = 'global.log',
+                            **kwargs):
+    '''
+    This method is responsible for 
+        1. Starting the correctly mlflow run
+        2. Setting up and formatting the root logger. A file handler is added to the root logger, 
+           the location of the log file is the artifacts directory of the mlflow run, and it's name is
+           determined by :py:attr::`log_filename`
+        3. starting ray tune
+
+    Args:
+        :py:attr::`experiment_module_path`(str): Path of the python module which defines the experiment and pipeline
+        :py:attr::`experiment_id` (str): mlflow expeirment_id of the experiment. defaults to 0.
+        :py:attr::`run_ud` (str): mlflow run_id of the experiment. Defaults to None, which means start a new run. 
+        :py:attr::`local_mode` (bool): whether to start ray in local_mode
+        :py:attr::`num_cpus_for_job`: How many cpus to use initialize ray with. Defaults to None, which means use all available CPUs.
+        :py:attr::`num_gpus_for_job`: How many gpus to use initialize ray with. Defaults to None, which means use all available GPUs
+        :py:attr::`log_filename`: Name of the log file.
+
+    Returns:
+        Instance of the root logger
+    '''
         
-        # if this environment variable is set, it means that this script was run using mlflow run command.
-        # In this case we simple need to start the mlflow run and it automatically knows which run to start
-        experiment_id = os.environ.get('MLFLOW_EXPERIMENT_ID', None)
+    msg = ''
+    # if this environment variable is set, it means that this script was run using mlflow run command.
+    # In this case we simple need to start the mlflow run and it automatically knows which run to start
+    if os.environ.get('MLFLOW_EXPERIMENT_ID', None) is not None:
+            msgs = ['The script execution was started from "mlflow run" command, experiment and run id provided by mlflow cli.']
+            active_run =  mlflow.start_run()
+    else:
+            msgs = ['Mlflow experiment_id and run_id information was passed by command-line argument to python script with values:',
+                    f'experiment_id: {experiment_id}',
+                    f'run_id: {run_id}']
+            mlflow.set_experiment(experiment_id=experiment_id)
+            active_run =  mlflow.start_run(run_id = run_id, experiment_id=experiment_id)
 
-        msg = ''
-        if experiment_id is not None:
-                msgs = ['The script execution was started from "mlflow run" command, experiment and run id provided by mlflow cli.']
-                active_run =  mlflow.start_run()
-        else:
-                msgs = ['Mlflow experiment_id and run_id information was passed by command-line argument to python script with values:',
-                        f'experiment_id: {args["experiment_id"]}',
-                        f'run_id: {args["run_id"]}']
-                mlflow.set_experiment(experiment_id=args['experiment_id'])
-                active_run =  mlflow.start_run(run_id = args['run_id'], experiment_id=args['experiment_id'])
 
+    format_string = '%(asctime)s - %(name)s - %(levelname)s : \t %(message)s'
+    logging.basicConfig(level=logging.INFO, format=format_string, datefmt='%m/%d/%Y %H:%M:%S')
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(os.path.join(urlparse(mlflow.get_artifact_uri()).path, log_filename), 'a')
+    handler.setFormatter(logging.Formatter(format_string))
+    logger.addHandler(handler)
+    for msg in msgs: 
+        logger.info(msg) 
+
+    if run_id is None:
         run_id = active_run.info.run_id
+        logger.info(f'Starting workflow execution, with new mlflow run_id: {run_id}, for module located at path {experiment_module_path}')
+    else:
+        logger.info(f'Restarting workflow execution, with run_id {run_id}, for module located at path {experiment_module_path}')
 
-        format_string = '%(asctime)s - %(name)s - %(levelname)s : \t %(message)s'
-        logging.basicConfig(level=logging.INFO, format=format_string, datefmt='%m/%d/%Y %H:%M:%S')
-        logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
-        handler = logging.FileHandler(os.path.join(urlparse(mlflow.get_artifact_uri()).path, log_filename), 'a')
-        handler.setFormatter(logging.Formatter(format_string))
-        logger.addHandler(handler)
-        for msg in msgs: 
-            logger.info(msg) 
-        logger.info(f'Starting workflow execution for module located at path {args["experiment_module_path"]}')
-       
-        local_mode=False
-        if args['local_mode'] != 'False':
-            logger.info('"local_mode" commandline argument value True passed, starting ray in local mode')
-            local_mode=True
+    
+    local_mode=ast.literal_eval(str(local_mode))
+    if local_mode:
+        logger.info('"local_mode" commandline argument value True passed, starting ray in local mode')
 
-        address = os.environ.get("ip_head", None)
-        # num_cpus = args.get('num_cpus', None)
-        # if num_cpus is not None: 
-        #     num_cpus = int(num_cpus) 
-
-        # num_gpus = args.get('num_gpus', None)
-        # if num_gpus is not None: 
-        #     num_gpus = int(num_gpus) 
-        ray.init(address=address, local_mode = local_mode, num_cpus = args.get('num_cpus_for_job', None), num_gpus = args.get('num_gpus_for_job', None))
-        
-        return logger
+    address = os.environ.get("ip_head", None)
+    ray.init(address=address, local_mode = local_mode, num_cpus = num_cpus_for_job, num_gpus = num_gpus_for_job)
+    
+    return logger
 
         
 
@@ -279,31 +390,33 @@ import os
 import json
 import mlflow
 
-def slice_dataset(experiment_variables):
-    # load and slice dataset
-    ds = experiment_variables['ds']
-    if experiment_variables['sample_id_query'] is not None:
-        if type(experiment_variables['sample_id_query'])==str:
-            sample_ids = ds.metadata.query(experiment_variables['sample_id_query']).index
-        else:
-            sample_ids = experiment_variables['sample_id_query']
-    else:
-        sample_ids = None
+# def slice_dataset(ds, sample_ids=None, feature_ids=None, **kwargs):
+#     '''
+#     This method slices the datasets using sample_ids and feature_ids
+#     Args:
+#         samples_ids: must be a valid pandas query or be comatible with sample_ids of orthrus.core.dataset.slice_dataset method
 
-    if experiment_variables['feature_id_query'] is not None:
-        if type(experiment_variables['feature_id_query'])==str:
-            feature_ids = ds.vardata.query(experiment_variables['feature_id_query']).index
-        else:
-            feature_ids = experiment_variables['feature_id_query']
-    else:
-        feature_ids = None
+#         feature_ids: must be a valid pandas query or be comatible with feature_ids of orthrus.core.dataset.slice_dataset method 
+#     '''
+#     # load and slice dataset
+#     if sample_ids is not None:
+#         if type(sample_ids)==str:
+#             sample_ids = ds.metadata.query(sample_ids).index
+
+#     if feature_ids is not None:
+#         if type(feature_ids)==str:
+#             feature_ids = ds.vardata.query(feature_ids).index
     
-    ds = ds.slice_dataset(sample_ids = sample_ids, feature_ids = feature_ids)
+#     ds = ds.slice_dataset(sample_ids = sample_ids, feature_ids = feature_ids)
 
-    return ds
+#     return ds
 
 
-def log_pipeline_processes(pipeline):
+def log_pipeline_processes(dir, pipeline):
+    '''
+    this methods logs the processes of an orthrus pipeline (and their attrs) as an 
+    json artifact file
+    '''
     all_processes_params = {}
     for process in pipeline.processes:
         current_process_params = {}
@@ -318,9 +431,5 @@ def log_pipeline_processes(pipeline):
 
         all_processes_params[process.process_name] = current_process_params
 
-    file_path = '/tmp/process_params.json'
-    with open(file_path, 'w') as f:
-        json.dump(all_processes_params, f)
-
-    mlflow.log_artifact(file_path)
-    os.remove(file_path)
+    filepath = os.path.join(dir, 'process_params.json')
+    save_object(json.dumps(all_processes_params), filepath, overwrite=True)
