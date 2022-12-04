@@ -624,11 +624,17 @@ class DataSet:
         This method slices a DataSet at the prescribed sample and features ids.
 
         Args:
-            feature_ids (list-like): List of indicators for the features to use. e.g. [1,3], [True, False, True],
-                ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. Defaults to use all features.
+            feature_ids (list-like or string):  Defaults to use all features. There are two options for the argument value:
 
-            sample_ids (like-like): List of indicators for the samples to use. e.g. [1,3], [True, False, True],
-                ['human1', 'human3'], etc..., can also be pandas series or numpy array. Defaults to use all samples.
+                Option 1: List of indicators for the features to use. e.g. [1,3], [True, False, True], ['gene1', 'gene3'], etc..., can also be pandas series or numpy array. 
+                
+                Option 2: a valid pandas query string.
+
+            sample_ids (like-like or string): Defaults to use all samples.  There are two options for the argument value:
+                
+                Option 1: List of indicators for the samples to use. e.g. [1,3], [True, False, True], ['human1', 'human3'], etc..., can also be pandas series or numpy array. 
+            
+                Option 2: a valid pandas query string. 
 
             name (str): Reference name for slice DataSet. Defaults to :py:attr:`DataSet.name` _slice
 
@@ -648,8 +654,16 @@ class DataSet:
         # set defaults
         if feature_ids is None:
             feature_ids = self.data.columns
+        
+        elif type(feature_ids)==str:
+            feature_ids = self.vardata.query(feature_ids).index      
+        
         if sample_ids is None:
             sample_ids = self.data.index
+        
+        elif type(sample_ids)==str:
+            sample_ids = self.metadata.query(sample_ids).index
+
         if name is None:
             name = self.name + '_slice'
 
