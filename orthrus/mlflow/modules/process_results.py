@@ -14,16 +14,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def process_ifr_tuning_results(**kwargs):
-    results_location = kwargs['results_location']
-    tune_results = kwargs['tune_results']
-    logger.info(f'Processing results for IFR execution now.')
-
+def process_ifr_tuning_results(results_location, results):
 
     main_figure = make_subplots(rows=1, cols=2, subplot_titles=("Mean Training Score", "Mean Validation Score"))
     iterations_scatter_fig = make_subplots(rows=1, cols=1)
 
-    for i, (index, row) in enumerate(tune_results.iterrows()):
+    for i, (index, row) in enumerate(results.iterrows()):
         try:
             pipeline: Pipeline = load_object(os.path.join(row['logdir'],  'pipeline.pkl'))
         except FileNotFoundError:
@@ -164,11 +160,9 @@ def process_ifr_tuning_results(**kwargs):
 
 
 
-def process_ifr_results(**kwargs):
+def process_ifr_results(results_location, results):
 
-    results_location = kwargs['results_location']
-    pipeline = kwargs['pipeline']
-
+    pipeline = results
     csv_location = os.path.join(results_location, 'ifr_feature_sets', 'csv')
     plot_location = os.path.join(results_location, 'ifr_feature_sets', 'plots')
     os.makedirs(csv_location, exist_ok=True)
@@ -213,10 +207,9 @@ def plot_feature_frequency(f_ranks, path, attr='frequency'):
     # axs.set_title(labels[tranfrom_id])
     plt.savefig(path)     
     
-def process_rfs_results(**kwargs):
-    results_location = kwargs['results_location']
-    pipeline = kwargs['pipeline']
-
+def process_rfs_results(results_location, results):
+    
+    pipeline = results
     csv_location = os.path.join(results_location, 'rfs_feature_sets', 'csv')
     plot_location = os.path.join(results_location, 'rfs_feature_sets', 'plots')
     os.makedirs(csv_location, exist_ok=True)
@@ -255,23 +248,23 @@ def process_rfs_results(**kwargs):
     all_features.to_csv(os.path.join(csv_location, f'all_features.csv'))
     summary.to_csv(os.path.join(csv_location, f'rfs_feature_counts.csv'))
 
-def process_classification_results(**kwargs):
-    pipeline = kwargs['pipeline']
+def process_classification_results(results_location, results):
     from orthrus.core.pipeline import Report
     import orthrus.mlflow.modules.utils as utils
+    pipeline = results
     report: Report = pipeline.processes[-1]
     utils.log_report_scores(report)
 
-def process_svm_c_tuning_results(**kwargs):
+def process_svm_c_tuning_results(results_location, results):
         import matplotlib.pyplot as plt
         
         fig, axs = plt.subplots(1,1)
-        svm_c = kwargs['tune_results']['config/svm_C'].values
-        valid_bsrs = kwargs['tune_results']['mean_valid_bsr'].values
+        svm_c =results['config/svm_C'].values
+        valid_bsrs = results['mean_valid_bsr'].values
 
         axs.scatter(svm_c[1:], valid_bsrs[1:])
         axs.scatter(svm_c[0], valid_bsrs[0], color='green', label='best run')
         axs.set_xlabel("SVM C parameter value")
         axs.set_ylabel("Mean validation BSR across batches")
         plt.legend()
-        plt.savefig(os.path.join(kwargs['results_location'], 'scatter_plot.png'))
+        plt.savefig(os.path.join(results_location, 'scatter_plot.png'))
