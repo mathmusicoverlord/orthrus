@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def evaluate_ssvm_ifr_tune(result, **kwargs):
-    last_iter = kwargs['iter']
+    last_iter = kwargs['n_iter']
     best_config_from_last_iteration = result[last_iter]['result']
 
     verdict = 'pass'
@@ -81,7 +81,7 @@ def evaluate_ssvm_ifr_tune(result, **kwargs):
 
 def evaluate_svm_c_tune(result, **kwargs):
 
-    last_iter = kwargs['iter']
+    last_iter = kwargs['n_iter']
     best_config_from_last_iteration = result[last_iter]['result']
 
     verdict = 'pass'
