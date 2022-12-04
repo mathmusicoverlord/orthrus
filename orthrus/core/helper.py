@@ -979,7 +979,7 @@ def generate_save_path(file_path: str, overwrite: bool = False):
     return file_path
 
 
-def batch_jobs_(function_handle, 
+def batch_jobs(function_handle, 
                 list_of_arguments, 
                 num_cpus_for_job = -1,
                 num_gpus_for_job = -1,
@@ -1013,7 +1013,7 @@ def batch_jobs_(function_handle,
 
     Example:
         >>> import ray
-        >>> from orthrus.core.helper import batch_jobs_
+        >>> from orthrus.core.helper import batch_jobs
         >>> import numpy as np
         >>> @ray.remote
         ... def job_handle(a: int, b: int):
@@ -1024,7 +1024,7 @@ def batch_jobs_(function_handle,
         ...     b = np.random.randint(200)
         ...     args = [a, b]
         ...     list_of_args.append(args)
-        >>> process_refs = batch_jobs_(job_handle, list_of_args, verbose_frequency=10, num_cpus_per_worker=0.5)
+        >>> process_refs = batch_jobs(job_handle, list_of_args, verbose_frequency=10, num_cpus_per_worker=0.5)
         >>> for process in process_refs:
         ...     print(ray.get(process))
         >>> ray.shutdown()
