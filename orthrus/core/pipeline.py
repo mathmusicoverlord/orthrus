@@ -12,7 +12,7 @@ import numpy as np
 from numpy import ndarray
 from pandas import DataFrame, Series
 from orthrus.core.dataset import DataSet
-from orthrus.core.helper import generate_save_path, module_from_path, save_object, load_object, batch_jobs_, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
+from orthrus.core.helper import generate_save_path, module_from_path, save_object, load_object, batch_jobs, reconstruct_logger_from_details, extract_reconstruction_details_from_logger
 from sklearn.metrics import classification_report
 import warnings
 from copy import copy, deepcopy
@@ -3406,7 +3406,7 @@ class ClassifyEmsemble(Classify):
                             i,
                             j])
    
-        all_results = batch_jobs_(self.train_classifers, args, verbose_frequency=10,
+        all_results = batch_jobs(self.train_classifers, args, verbose_frequency=10,
                                 num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)  
         
         for (process, labels) in all_results:
@@ -3464,9 +3464,9 @@ class WorkflowManager(Process):
                     process_name,
                     experiment_module_path,
                     workflow_method_handle,
-                    workflow_method_args:dict = None,
                     workflow_evaluation_handle=None,
                     workflow_evaluation_args:dict = {},
+                    workflow_process_results_handle=None,
                     evaluation_policy : str = 'weak',
                     parent_mlflow_run_id: str = None,
                     max_trials : int = 1,
@@ -3493,8 +3493,7 @@ class WorkflowManager(Process):
         self.experiment_module_path = experiment_module_path
         
         self.workflow_method_handle = workflow_method_handle
-        self.workflow_method_args = workflow_method_args.copy()
-        self.workflow_method_args['workflow_name'] = process_name
+        # self.workflow_method_args = workflow_method_args.copy()
         
         self.workflow_evaluation_handle = workflow_evaluation_handle
         if workflow_evaluation_args is None:
@@ -3504,6 +3503,7 @@ class WorkflowManager(Process):
         self.workflow_evaluation_args = workflow_evaluation_args.copy()
         self.workflow_evaluation_args['max_trials'] = max_trials
     
+        self.workflow_process_results_handle = workflow_process_results_handle
 
         self.results = {}
 
@@ -3545,45 +3545,64 @@ class WorkflowManager(Process):
 
     def _run(self, ds: DataSet, **kwargs):
 
-        
+        # start a mlflow run for current flow
         mlflow_run_to_restore = mlflow.active_run()
         if mlflow_run_to_restore is not None:
             mlflow.end_run()
         self.mlflow_run_id = self._set_mlflow_experiment_and_run()
 
+        # add filehandler to the logger
         base_logger = logging.getLogger()
         handler = logging.FileHandler(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'workflow_execution.log'), 'a')
         handler.setFormatter(base_logger.handlers[0].formatter)
         base_logger.addHandler(handler)
         logger = logging.getLogger(self.process_name)
 
+        # load checkpoint
         if os.path.exists(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl')):
             self = load_object(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'))
             logger.info(f'An run for {self.process_name} was found at its mlflow run directory. Loading the old state and continuing run.')
         else:
             logger.info(f'Beginning run for {self.process_name}')
 
-        experiment_module = module_from_path(Path(self.experiment_module_path).stem, self.experiment_module_path)
 
-        self.workflow_method_args.update({'results_from_previous_workflows': kwargs})
+        # generate module
+        experiment_module = module_from_path(Path(self.experiment_module_path).stem, self.experiment_module_path)
+        
+        # get and update worklfow method args
+        self.workflow_method_args = experiment_module.get_workflow_args(**kwargs)
+        self.workflow_method_args['workflow_name'] = self.process_name
+
+        
         recommended_param_updates = None
         while self.current_iter < self.max_trials:
-            self.workflow_method_args['iter'] = self.current_iter
+            # add kwargs to a copy of self.workflow_method_args_copy
+            # this lets the workflow_method to alter workflow_method_args_copy without affecting self.workflow_method_args
+            self.workflow_method_args['n_iter'] = self.current_iter
+            workflow_method_args_copy = self.workflow_method_args.copy()
+            workflow_method_args_copy['results_from_previous_workflows'] = kwargs
+            workflow_method_args_copy['workflow_process_results_handle'] = self.workflow_process_results_handle
             
-            pipeline, result = self.workflow_method_handle(experiment_module, **self.workflow_method_args)
+            # run workflow
+            pipeline, result = self.workflow_method_handle(self.experiment_module_path, **workflow_method_args_copy)
             self.results[self.current_iter] = {'pipeline': pipeline, 'result': result, 'recommended_params_update':recommended_param_updates}
 
+            # check if evaluation is needed
             if self.workflow_evaluation_handle is None:
                 logger.info(f'No evaluation method provided, so skipping the evaluation.')
                 evaluation_verdict = 'pass'
                 break
             
+            # evaluate the workflow
             logger.info(f'Evaluating workflow: {self.process_name}')
-            evaluation_result = self.workflow_evaluation_handle(self.results, **self.workflow_method_args, **self.workflow_evaluation_args)
+            workflow_method_args_copy = self.workflow_method_args.copy()
+            workflow_method_args_copy['results_from_previous_workflows'] = kwargs
+            evaluation_result = self.workflow_evaluation_handle(self.results, **workflow_method_args_copy, **self.workflow_evaluation_args)
             
             evaluation_verdict = evaluation_result['verdict'] 
             recommended_param_updates = evaluation_result['params']
 
+            # process the results of the evaluation
             if evaluation_verdict == 'pass':
                 # evaluation is satisfactory, break out of the loop
                 logger.info(f'Evaluation for the {self.process_name} workflow passed!')
@@ -3612,9 +3631,10 @@ class WorkflowManager(Process):
                 raise ValueError(msg)
 
             self.current_iter += 1
-            # these may be large objects, save time and space
-            del self.workflow_method_args['results_from_previous_workflows']
+            
+            #save checkpoint
             save_object(self, os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'), overwrite=True)
+        
         if evaluation_verdict == 'fail':
             # log message
             import sys
@@ -3623,12 +3643,14 @@ class WorkflowManager(Process):
 
         logger.info(f'Finishing run for {self.process_name}')
 
+        # restore mlflow run that was running previously
         mlflow.end_run()
         if mlflow_run_to_restore is not None:
             mlflow.set_experiment(experiment_id=mlflow_run_to_restore.info.experiment_id)
             mlflow.start_run(mlflow_run_to_restore.info.run_id)
 
+        # remove file handler for the current workflow
         base_logger.removeHandler(handler)
 
-        # return the last result
+        # return the latest result
         return {self.process_name: self.results[len(self.results)-1]}
