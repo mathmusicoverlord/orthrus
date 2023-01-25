@@ -3319,8 +3319,10 @@ class ClassifyEmsemble(Classify):
                  s_weights_handle: str = None,
                  n_classifiers : int = 1,
                  features_column_name: str = 'Feature Set',
-                 num_cpus_per_worker: int = 1.,
-                 num_gpus_per_worker: int = 0.,
+                 num_cpus_per_task: int = 1.,
+                 num_gpus_per_task: int = 0.,
+                 num_cpus_per_job: int = None,
+                 num_gpus_per_job: int = 0,
                  local_mode=False
                 ):
 
@@ -3350,8 +3352,11 @@ class ClassifyEmsemble(Classify):
         self._classifiers = []
         self.features_column_name = features_column_name
 
-        self.num_cpus_per_worker = num_cpus_per_worker
-        self.num_gpus_per_worker = num_gpus_per_worker
+        self.num_cpus_per_task = num_cpus_per_task
+        self.num_gpus_per_task = num_gpus_per_task
+        self.num_gpus_per_job = num_gpus_per_job
+        self.num_cpus_per_job = num_cpus_per_job
+
         self.local_mode = local_mode
 
         # check appropriate parameters
@@ -3406,8 +3411,14 @@ class ClassifyEmsemble(Classify):
                             i,
                             j])
    
-        all_results = batch_jobs(self.train_classifers, args, verbose_frequency=10,
-                                num_cpus_per_worker=self.num_cpus_per_worker, num_gpus_per_worker=self.num_gpus_per_worker, local_mode=self.local_mode)  
+        all_results = batch_jobs(self.train_classifers, 
+                                args, 
+                                verbose_frequency=10,
+                                num_cpus_per_task=self.num_cpus_per_task, 
+                                num_gpus_per_task=self.num_gpus_per_task, 
+                                num_cpus_for_job=self.num_cpus_per_job,
+                                num_gpus_for_job=self.num_gpus_per_job,
+                                local_mode=self.local_mode)  
         
         for (process, labels) in all_results:
             self._classifiers.append(process)
@@ -3462,11 +3473,9 @@ class ClassifyEmsemble(Classify):
 class WorkflowManager(Process):
     def __init__(self, 
                     process_name,
-                    experiment_module_path,
-                    workflow_method_handle,
+                    workflow,
                     workflow_evaluation_handle=None,
                     workflow_evaluation_args:dict = {},
-                    workflow_process_results_handle=None,
                     evaluation_policy : str = 'weak',
                     parent_mlflow_run_id: str = None,
                     max_trials : int = 1,
@@ -3490,10 +3499,7 @@ class WorkflowManager(Process):
         self.max_trials = max_trials
         self.evaluation_policy = evaluation_policy
 
-        self.experiment_module_path = experiment_module_path
-        
-        self.workflow_method_handle = workflow_method_handle
-        # self.workflow_method_args = workflow_method_args.copy()
+        self.workflow = workflow
         
         self.workflow_evaluation_handle = workflow_evaluation_handle
         if workflow_evaluation_args is None:
@@ -3503,8 +3509,6 @@ class WorkflowManager(Process):
         self.workflow_evaluation_args = workflow_evaluation_args.copy()
         self.workflow_evaluation_args['max_trials'] = max_trials
     
-        self.workflow_process_results_handle = workflow_process_results_handle
-
         self.results = {}
 
         self.mlflow_run_id = None
@@ -3515,6 +3519,9 @@ class WorkflowManager(Process):
             self.mlflow_run_id = self._set_mlflow_experiment_and_run(restart_existing_mlflow_run = True)
 
         self.current_iter = 0
+
+        #initialize to None
+        self.workflow_method_args = None
 
 
     def _set_mlflow_experiment_and_run(self, restart_existing_mlflow_run=False):
@@ -3561,19 +3568,17 @@ class WorkflowManager(Process):
         # load checkpoint
         if os.path.exists(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl')):
             self = load_object(os.path.join(urlparse(mlflow.get_artifact_uri()).path, 'process.pkl'))
-            logger.info(f'An run for {self.process_name} was found at its mlflow run directory. Loading the old state and continuing run.')
+            logger.info(f'An run for {self.process_name} was found in its mlflow run directory. Loading the old state and continuing run.')
         else:
             logger.info(f'Beginning run for {self.process_name}')
 
 
-        # generate module
-        experiment_module = module_from_path(Path(self.experiment_module_path).stem, self.experiment_module_path)
-        
-        # get and update worklfow method args
-        self.workflow_method_args = experiment_module.get_workflow_args(**kwargs)
-        self.workflow_method_args['workflow_name'] = self.process_name
-
-        
+        # a failure of this condition means that a checkpoint has been loaded and the self.workflow_method_args are already set,
+        # and have most likely been updated by evaluation methods. So don't reset them.
+        if self.workflow_method_args is None:
+            # get and update worklfow method args
+            self.workflow_method_args = self.workflow.get_workflow_args(**kwargs)
+       
         recommended_param_updates = None
         while self.current_iter < self.max_trials:
             # add kwargs to a copy of self.workflow_method_args_copy
@@ -3581,10 +3586,12 @@ class WorkflowManager(Process):
             self.workflow_method_args['n_iter'] = self.current_iter
             workflow_method_args_copy = self.workflow_method_args.copy()
             workflow_method_args_copy['results_from_previous_workflows'] = kwargs
-            workflow_method_args_copy['workflow_process_results_handle'] = self.workflow_process_results_handle
             
+            # args have already been generated, do not generate them again in the workflow
+            self.workflow.initialize_args = False
+
             # run workflow
-            pipeline, result = self.workflow_method_handle(self.experiment_module_path, **workflow_method_args_copy)
+            pipeline, result = self.workflow.run(**workflow_method_args_copy)
             self.results[self.current_iter] = {'pipeline': pipeline, 'result': result, 'recommended_params_update':recommended_param_updates}
 
             # check if evaluation is needed
@@ -3595,9 +3602,7 @@ class WorkflowManager(Process):
             
             # evaluate the workflow
             logger.info(f'Evaluating workflow: {self.process_name}')
-            workflow_method_args_copy = self.workflow_method_args.copy()
-            workflow_method_args_copy['results_from_previous_workflows'] = kwargs
-            evaluation_result = self.workflow_evaluation_handle(self.results, **workflow_method_args_copy, **self.workflow_evaluation_args)
+            evaluation_result = self.workflow_evaluation_handle(self.results, **self.workflow_method_args.copy(), **self.workflow_evaluation_args)
             
             evaluation_verdict = evaluation_result['verdict'] 
             recommended_param_updates = evaluation_result['params']
