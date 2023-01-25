@@ -15,17 +15,48 @@ import plotly.graph_objects as go
 from urllib.parse import urlparse
 import argparse
 import yaml
+from mlflow.exceptions import MlflowException
 
-def get_results_dir_and_file_name(workflow_name, experiment_module, iter_num):
+logger = logging.getLogger(__name__)
+
+def log_mlflow_params_and_add_softlinks(pipeline):
+        # log mlflow run ids and experiment module path of each workflow in the main experiment
+        # also create soflinks of workflow experiment directories in the main or default experiment's artifacts directory
+        params = {}
+        process_list = []
+        
+        artifact_dir_for_default_process = urlparse(mlflow.active_run()._info.artifact_uri).path
+        for process in pipeline.processes:
+                params[f'Run id - {process.process_name}'] = process.mlflow_run_id
+                
+                process_list.append(f'{process.process_name}')
+
+                #add softlinks of the  WorkflowManagerProcess(s) to the 'default' process
+                try:    
+                        experiment_dir_path_for_process = urlparse(mlflow.get_experiment_by_name(process.process_name).artifact_location).path
+                        run_dir_path_for_process = os.path.join(experiment_dir_path_for_process, process.mlflow_run_id)
+                        
+                        dst  = os.path.join(artifact_dir_for_default_process, process.process_name)
+                        
+                        if not os.path.exists(os.path.join(artifact_dir_for_default_process, process.process_name)):
+                                os.symlink(src = run_dir_path_for_process, dst = dst, target_is_directory=True)
+                        
+                        # os.link(src = run_dir_path_for_process, dst = os.path.join(artifact_dir_for_default_process, process.process_name))
+                except AttributeError as e:
+                        logger.error(e, exc_info=True)
+
+        # log mlflow parameters
+        mlflow.log_param('Sequence of workflows', '\n------>\n'.join(process_list))
+        mlflow.log_params(params)
+
+
+def get_results_dir_and_file_name(workflow_name, iter_num):
     '''
     this method returns results directory path, name of pipeline pkl file and a key for logging 
     parameters in mlflow
     '''
-    if workflow_name is None:
-        filename = experiment_module.__name__
-    else:
-        filename = workflow_name
-    
+
+    filename = workflow_name
     artifacts_dir = urlparse(mlflow.get_artifact_uri()).path
     if iter_num is None:
         run_dir = artifacts_dir
@@ -38,7 +69,19 @@ def get_results_dir_and_file_name(workflow_name, experiment_module, iter_num):
     
     return run_dir, filename, log_key
 
-def reformat_kwargs_about_results_from_previous_process(kwargs, log_key):
+def log_kwargs_as_yaml(kwargs, log_key):
+    ds = kwargs.pop('ds') if 'ds' in kwargs else None
+    
+    try:
+        mlflow.log_param(log_key,  yaml.dump(kwargs, allow_unicode=True, default_flow_style=False).replace('\n- ', '\n\n- '))
+    except MlflowException as e:
+        logger.error(e, exc_info=True)
+
+    if ds is not None:
+        kwargs['ds'] = ds 
+
+
+def reformat_kwargs(kwargs):
     '''
     if :py:attr:`kwargs` contains a 'results_from_previous_workflows' key, this method\\
         1. pops the dictionary in 'results_from_previous_workflows' key\\
@@ -48,29 +91,15 @@ def reformat_kwargs_about_results_from_previous_process(kwargs, log_key):
         available directly in :py:attr:`kwargs`.
     '''
     
-    # remove the results_from_previous_workflows before parameters are logged
-    try:
-        old_results = kwargs.pop('results_from_previous_workflows')
-    except KeyError as e:
-        old_results = None    
-    
-    if kwargs.contains('ds'):
-        ds = kwargs.pop('ds')
-    else:
-        ds = None    
-
-    
-    if log_key is not None:
-        mlflow.log_param(log_key,  yaml.dump(kwargs, allow_unicode=True, default_flow_style=False).replace('\n- ', '\n\n- '))
-
+    old_results = kwargs.pop('results_from_previous_workflows') if 'results_from_previous_workflows' in kwargs else None
+    kwargs_copy = kwargs.copy()
     if old_results is not None:
-        # add the keys of results_from_previous_workflows directly back to kwargs 
-        kwargs.update(old_results)    
-
-    if ds is not None:
-        kwargs['ds'] = ds 
-
+        kwargs_copy.update(old_results)
     
+    return kwargs_copy
+
+
+
 
     
 def add_missing_kv_pairs(source, target):
@@ -81,7 +110,14 @@ def add_missing_kv_pairs(source, target):
     for k in list(remaining_kwargs_keys):
             target[k] = source[k]
 
-def get_workflow_parser(parser_name, parser_description):
+
+def check_type(x):
+    # throw exception if x is not integer or none type
+    if not (isinstance(x, int) or x is None or x == 'None'):
+        raise TypeError(f'{x} is not an integer or None type')
+
+
+def get_workflow_parser(parser_name, parser_description, add_exp_module_path=False):
     '''
     Returns a argmument parser object. Ths parser 'knows' about the most critical arguments which are required for 
     all experiments. The known arguments are:
@@ -100,7 +136,8 @@ def get_workflow_parser(parser_name, parser_description):
 
     # command line arguments
     parser = argparse.ArgumentParser(parser_name, description=parser_description)
-    parser.add_argument("--experiment_module_path",
+    if add_exp_module_path:
+        parser.add_argument("--experiment_module_path",
                         type=str, help="File path to the python module. Please check the documentation of the main method of the script to see the requirements for the python module to be valid.")
 
     parser.add_argument("--run_id",  default=None,
@@ -109,9 +146,9 @@ def get_workflow_parser(parser_name, parser_description):
     parser.add_argument("--experiment_id", default="0",
                         type=str, help="In case of a re-run, this argument provides the mlflow experiment id of the experiment to be re-run.")
 
-    parser.add_argument("--num_cpus_for_job", type=int, default=None, help="How many cpus to use for the whole job")
+    parser.add_argument("--num_cpus_for_job", type=check_type, default=None, help="How many cpus to use for the whole job")
 
-    parser.add_argument("--num_gpus_for_job", type=int, default=None, help="How many gpus to use for the whole job")
+    parser.add_argument("--num_gpus_for_job", type=check_type, default=0, help="How many gpus to use for the whole job")
 
     parser.add_argument("--local_mode", default='False', help="Whether to run ray in local mode. Only 'True' is considered True, all other values will be considered False.")
 
@@ -140,8 +177,7 @@ def process_args(parser):
 
     return args
 
-def setup_workflow_execution(experiment_module_path,
-                            experiment_id:str="0",
+def setup_workflow_execution(experiment_id:str="0",
                             run_id:str = None,
                             local_mode:bool=False,
                             num_cpus_for_job:int=None,
@@ -157,7 +193,6 @@ def setup_workflow_execution(experiment_module_path,
         3. starting ray tune
 
     Args:
-        :py:attr::`experiment_module_path`(str): Path of the python module which defines the experiment and pipeline
         :py:attr::`experiment_id` (str): mlflow expeirment_id of the experiment. defaults to 0.
         :py:attr::`run_ud` (str): mlflow run_id of the experiment. Defaults to None, which means start a new run. 
         :py:attr::`local_mode` (bool): whether to start ray in local_mode
@@ -195,9 +230,9 @@ def setup_workflow_execution(experiment_module_path,
 
     if run_id is None:
         run_id = active_run.info.run_id
-        logger.info(f'Starting workflow execution, with new mlflow run_id: {run_id}, for module located at path {experiment_module_path}')
+        logger.info(f'Starting workflow execution, with new mlflow run_id: {run_id}')
     else:
-        logger.info(f'Restarting workflow execution, with run_id {run_id}, for module located at path {experiment_module_path}')
+        logger.info(f'Restarting workflow execution, with run_id {run_id}')
 
     
     local_mode=ast.literal_eval(str(local_mode))
