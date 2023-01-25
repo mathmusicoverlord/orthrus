@@ -30,7 +30,7 @@ from inspect import signature
 import sys
 from tqdm import tqdm
 from copy import deepcopy
-from orthrus.core.helper import batch_jobs_
+from orthrus.core.helper import batch_jobs
 from orthrus.core.helper import module_from_path
 import csv
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     # run the remote processes
     run_args = [[deepcopy(sys.argv), script_path, *option] for option in combos]
-    futures = batch_jobs_(run,
+    futures = batch_jobs(run,
                           run_args,
                           num_cpus_per_worker=product_args.cpus_per_worker,
                           num_gpus_per_worker=product_args.gpus_per_worker,
