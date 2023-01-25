@@ -981,8 +981,8 @@ def generate_save_path(file_path: str, overwrite: bool = False):
 
 def batch_jobs(function_handle, 
                 list_of_arguments, 
-                num_cpus_for_job = -1,
-                num_gpus_for_job = -1,
+                num_cpus_for_job = None,
+                num_gpus_for_job = 0,
                 local_mode=False,
                 verbose_frequency : int=10,
                 num_cpus_per_task : float=1., 
@@ -1036,7 +1036,7 @@ def batch_jobs(function_handle,
     #options call is not working, setting them directly
     function_handle._num_cpus = num_cpus_per_task
     function_handle._num_gpus = num_gpus_per_task
-
+    function_handle.__dict__['_default_options'] = {'num_gpus': num_gpus_per_task, 'max_calls':1}
     
     # temporarily initialize ray to get number of cpus and gpus available
     ray.init(ignore_reinit_error=True, local_mode=local_mode)
@@ -1048,13 +1048,15 @@ def batch_jobs(function_handle,
     # set variables for the main loop
     all_processes = []
     running_processes = []
-    all_finished_processes = []
+    # all_finished_processes = []
     
     num_total_processes = len(list_of_arguments)
     num_running_processes=0
     num_finished_processes=0
 
     i = 1
+    logger.info(f'Starting {len(list_of_arguments)} jobs')
+    results = []
     for arguments in list_of_arguments:
         if num_finished_processes >= i * verbose_frequency:
             logger.info('%d of %d processes finished'%(num_finished_processes, num_total_processes))
@@ -1062,9 +1064,10 @@ def batch_jobs(function_handle,
 
         if num_running_processes == max_processes:
             finished_processes, running_processes = ray.wait(running_processes, num_returns=1)
-            all_finished_processes.extend(finished_processes)
+            results.extend(ray.get(finished_processes))
             num_running_processes -=len(finished_processes)
             num_finished_processes +=len(finished_processes)
+            finished_processes = None
 
         future = function_handle.remote(*arguments)
         running_processes.append(future)
@@ -1073,14 +1076,17 @@ def batch_jobs(function_handle,
 
     # wait for all remaining processes to finish
     finished_processes, running_processes = ray.wait(running_processes, num_returns=len(running_processes))
-    all_finished_processes.extend(finished_processes)
+    # all_finished_processes.extend(finished_processes)
 
     # get results
-    results = ray.get(all_finished_processes)
+    # results = ray.get(all_finished_processes)
+    results.extend(ray.get(finished_processes))
+
 
     # make sure all processes have finished
     num_running_processes -=len(finished_processes)
     num_finished_processes +=len(finished_processes)
+    finished_processes = None
 
     logger.info('%d of %d processes finished'%(num_finished_processes, num_total_processes))
 
@@ -1109,6 +1115,16 @@ def get_max_process_limit_(num_cpus_for_job, num_gpus_for_job, num_cpus_per_task
 
 def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, num_gpus_per_task):
     logger = logging.getLogger(f'{__name__}_pid-{os.getpid()}' if ray.is_initialized() else __name__)
+
+    if num_cpus_for_job is not None and num_cpus_for_job < 0:
+        msg = 'num_cpus_for_job must be None (to use all CPUs) or greater than 0. Use num_cpus_per_task to specify the number of cpus for the whole job.'
+        logger.error(msg)
+        raise ValueError(msg)
+    if num_gpus_for_job is not None and num_gpus_for_job < 0:
+        msg = 'num_gpus_for_job must be None (to use all GPUs) or greater than 0. Use num_gpus_per_task to specify the number of gpus for the whole job.'
+        logger.error(msg)
+        raise ValueError(msg)
+
     ray.init(ignore_reinit_error=True)
 
     # available resources will return the correct number of cpus and gpus on both single machines and clusters with SLURM
@@ -1132,6 +1148,7 @@ def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, n
     else:
         num_cpus_available = available_resources[keys[0]]
     
+    # make sure there are enough cpus to run the job
     try:
         assert num_cpus_available > 0
     except AssertionError as err:
@@ -1139,11 +1156,12 @@ def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, n
         logger.error(msg)
         raise(AssertionError(msg))
 
-    if num_cpus_for_job > num_cpus_available:
-        logger.info(f'There are less CPUs({num_cpus_available}) available than requested {num_cpus_for_job}.')
-
-    if num_cpus_for_job <= 0 or num_cpus_for_job > num_cpus_available:
+    # update the number of cpus for job if not specified or if more cpus are requested than available
+    if num_cpus_for_job is None or num_cpus_for_job > num_cpus_available:
         num_cpus_for_job = num_cpus_available
+        if num_cpus_for_job > num_cpus_available:
+            logger.info(f'There are less CPUs({num_cpus_available}) available than requested {num_cpus_for_job}.')
+
     logger.info(f'The job is going to use {num_cpus_for_job} CPUs')
 
     
@@ -1155,8 +1173,8 @@ def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, n
     else:
         num_gpus_available = available_resources[keys[0]]
 
+    #Make sure that there infact are GPUs available to run the job
     if not(num_gpus_for_job == 0 and num_gpus_per_task == 0):
-        #Make sure that there infact are GPUs available to run the job
         try:
             assert num_gpus_available > 0
         except AssertionError as err:
@@ -1164,11 +1182,12 @@ def process_resource_requirements_for_job_(num_cpus_for_job, num_gpus_for_job, n
             logger.error(msg)
             raise(AssertionError(f"Job requires GPU(s), but they are not available. (num_gpus_for_job = {num_gpus_for_job}, num_gpus_per_task={num_gpus_per_task}, num_gpus_available={num_gpus_available})"))
 
-    if num_gpus_for_job > num_gpus_available:
-        logger.info(f'There are less GPUs({num_gpus_available}) available than requested {num_gpus_for_job}.')
-
-    if num_gpus_for_job < 0: # or num_gpus_for_job > num_gpus_available:
+    # update the number of gpus for job if not specified or if more gpus are requested than available
+    if num_gpus_for_job is None or num_gpus_for_job > num_gpus_available:
         num_gpus_for_job = num_gpus_available
+        if num_gpus_for_job > num_gpus_available:
+            logger.info(f'There are less GPUs({num_gpus_available}) available than requested {num_gpus_for_job}.')
+
     logger.info(f'The job is going to use {num_gpus_for_job} GPUs')
         
     return num_cpus_for_job, num_gpus_for_job
