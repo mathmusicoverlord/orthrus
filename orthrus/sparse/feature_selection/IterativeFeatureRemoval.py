@@ -148,8 +148,8 @@ class IFR:
                 verbose_frequency: int=10,
                 num_cpus_per_task: float=1.,
                 num_gpus_per_task: float=0.,
-                num_cpus_for_job: float=-1,
-                num_gpus_for_job: float=-1,
+                num_cpus_for_job: float=None,
+                num_gpus_for_job: float=0,
                 local_mode=False,
                 null_model_repetitions = 0):
 
@@ -353,7 +353,7 @@ class IFR:
         self._reformat_diagnostic_information()
         return self
 
-    @ray.remote
+    @ray.remote(max_retries=0, max_calls=1)
     def select_features_for_data_partition(self, train_X, validation_X, train_y, validation_y, logger_info, save_diagnostic=True):
         
         # This method runs in a new process, and so, this process's root logger does not have any file handles attached to it.
