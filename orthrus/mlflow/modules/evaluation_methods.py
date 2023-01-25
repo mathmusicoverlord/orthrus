@@ -42,17 +42,21 @@ def evaluate_ssvm_ifr_tune(result, **kwargs):
         # check jump ratio values (for this parameter, we only increase the values)
 
         jumpratio_search_space = tune_config['ifr_jumpratio']
-        value_range = jumpratio_search_space.upper - jumpratio_search_space.lower
+        try:
+            value_range = jumpratio_search_space.upper - jumpratio_search_space.lower
 
-        if best_config_from_last_iteration['ifr_jumpratio'] == jumpratio_search_space.upper-1:
-            logger.warn(f'The ifr_jumpratio parameter value ({best_config_from_last_iteration["ifr_jumpratio"]}) was found by tuning ' \
-                f'is very close to the upper end of search space [{jumpratio_search_space.lower}, {jumpratio_search_space.upper-1}]')
-            # move the search space to the left
-            jumpratio_search_space.lower += (value_range - int(.4 * value_range))
-            jumpratio_search_space.upper += (value_range - int(.4 * value_range))
-            logger.info(f'New jumpratio search space [{jumpratio_search_space.lower}, {jumpratio_search_space.upper-1}]')
+            if best_config_from_last_iteration['ifr_jumpratio'] == jumpratio_search_space.upper-1:
+                logger.warn(f'The ifr_jumpratio parameter value ({best_config_from_last_iteration["ifr_jumpratio"]}) was found by tuning ' \
+                    f'is very close to the upper end of search space [{jumpratio_search_space.lower}, {jumpratio_search_space.upper-1}]')
+                # move the search space to the left
+                jumpratio_search_space.lower += (value_range - int(.4 * value_range))
+                jumpratio_search_space.upper += (value_range - int(.4 * value_range))
+                logger.info(f'New jumpratio search space [{jumpratio_search_space.lower}, {jumpratio_search_space.upper-1}]')
 
-            verdict = 'warn'
+                verdict = 'warn'
+        except AttributeError:
+            # there is no search space to update
+            pass
 
         params['tune_config'] = tune_config
         num_selected_features = best_config_from_last_iteration['all_results'].iloc[0]['total_features_extracted']
