@@ -207,7 +207,64 @@ def plot_feature_frequency(f_ranks, path, attr='frequency'):
     # axs.set_title(labels[tranfrom_id])
     plt.savefig(path)     
     
-def process_rfs_results(results_location, results):
+def process_iterative_rfs_results(results_location, results):
+    
+    pipeline = results
+    csv_location = os.path.join(results_location, 'rfs_feature_sets', 'csv')
+    plot_location = os.path.join(results_location, 'rfs_feature_sets', 'plots')
+    os.makedirs(csv_location, exist_ok=True)
+    os.makedirs(plot_location, exist_ok=True)
+
+    summary = pd.DataFrame(columns=['batch_id'])
+    summary.set_index('batch_id', inplace=True)
+
+    all_features = pd.DataFrame(columns=['batch_id'])
+    all_features.set_index('batch_id', inplace=True)
+
+    for batch_id, batch_results in pipeline.results_.items():
+
+        features_df = batch_results['features_df']
+        # get number of rows in the df 
+        num_feature_sets = len(features_df)
+        
+        # update summary df
+        cols = ['batch_id']
+        cols.extend([f'num features in set #{i}' for i in range(num_feature_sets)])
+        values = [batch_id]
+        values.extend([len(x) for x in features_df['Feature Set']])
+        df = pd.DataFrame([values], columns=cols)
+        df.set_index('batch_id', inplace=True)
+        summary= pd.concat([summary, df])
+
+        # update all_features df
+        cols = ['batch_id']
+        cols.extend([f'Features in set #{i}' for i in range(num_feature_sets)])
+        values = [batch_id]
+        values.extend(list(features_df['Feature Set']))
+        df = pd.DataFrame([values], columns=cols)
+        df.set_index('batch_id', inplace=True)
+        all_features= pd.concat([all_features, df])
+
+        # iterate each row in features_df and print the row 
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(1,1)
+        for index, row in features_df.iterrows():
+            n_features = len(row['Feature Set']) 
+            df = row['Optimal n results'].sort_values('size')
+            
+            axs.plot(df.index, df['score'], label=f'feature_set{row["Fset ID"]}')
+            axs.plot(n_features, df.loc[n_features,'score'], 'ro')
+            axs.set_ylabel("Score")
+            axs.set_xlabel("Num Features")
+            # axs.set_title(labels[tranfrom_id])
+            axs.legend()
+        plt.savefig(os.path.join(plot_location, f'{batch_id}.png'))
+
+    save_object(all_features,os.path.join(csv_location, f'all_features.pkl'))
+    all_features.to_csv(os.path.join(csv_location, f'all_features.csv'))
+    summary.to_csv(os.path.join(csv_location, f'rfs_feature_counts.csv'))
+
+def process_single_rfs_results(results_location, results):
     
     pipeline = results
     csv_location = os.path.join(results_location, 'rfs_feature_sets', 'csv')
