@@ -21,7 +21,7 @@ def reduce_feature_set_size_by_classification(ds,
                             verbose_frequency : int=10, 
                             num_cpus_per_task : float=1., 
                             num_gpus_per_task : float=0.,
-                            num_cpus_for_job: int=-1,
+                            num_cpus_for_job: int= None,
                             num_gpus_for_job: int = 0,                             
                             local_mode=False,
                             **kwargs):
@@ -156,7 +156,7 @@ def reduce_feature_set_size_by_classification(ds,
     ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
 
     #create subset of features, from "start" to "end" in increments of "step"
-    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step)
+    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step, sample_ids)
 
     list_of_arguments = []
     #for each subset of top features
@@ -739,7 +739,7 @@ class ReduceIFRFeaturesByClassification(Transform):
                  verbose_frequency : int=10,
                  num_cpus_per_task : float=1.,
                  num_gpus_per_task : float=0.,
-                 num_cpus_for_job: int=-1,
+                 num_cpus_for_job: int= None,
                  num_gpus_for_job: int = 0,
                  local_mode=False, 
                  validation_set_label=None):
@@ -837,7 +837,7 @@ class  ReduceIFRFeaturesByFishersMetric(Transform):
                  verbose_frequency: int=10,
                  num_cpus_per_task: float=1.,
                  num_gpus_per_task: float=0.,
-                 num_cpus_for_job: int=-1,
+                 num_cpus_for_job: int=None,
                  num_gpus_for_job: int = 0,
                  local_mode=False, 
                  use_validation_set=False,
@@ -923,7 +923,7 @@ def reduce_feature_set_size_by_fishers_metric(ds,
                             verbose_frequency : int=10,
                             num_cpus_per_task : float=1.,
                             num_gpus_per_task : float=0.,
-                            num_cpus_for_job: int=-1,
+                            num_cpus_for_job: int=None,
                             num_gpus_for_job: int = 0,                            
                             local_mode=False):
     """
@@ -1015,7 +1015,7 @@ def reduce_feature_set_size_by_fishers_metric(ds,
     ranked_features = ranking_method_handle(features_dataframe, ranking_method_args)
 
     #create subset of features, from "start" to "end" in increments of "step"
-    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step)
+    n_attrs = get_num_attr_array(ds, ranked_features, start, end, step, sample_ids)
 
     list_of_arguments = []
     #for each subset of top features
@@ -1100,9 +1100,9 @@ def compute_fisher_score(embedding,
     return class_separation / mean_scatter, feature_ids.shape[0], 0
 
 
-def get_num_attr_array(ds, ranked_features, start, end, step):
-    if end == -1 or end > ranked_features.shape[0]:
-        end = ranked_features.shape[0]
+def get_num_attr_array(ds, ranked_features, start, end, step, sample_ids):
+    if end == -1 or end > sample_ids.sum():
+        end = sample_ids.sum()
 
     if start > ranked_features.shape[0]:
         start = 3 if ranked_features.shape[0] > 0 else 0
@@ -1118,7 +1118,7 @@ def run_batch_jobs_for_fset_size_reduction(method_handle,
                                             ranked_features,
                                             num_cpus_per_task : float=1.,
                                             num_gpus_per_task : float=0.,
-                                            num_cpus_for_job: int=-1,
+                                            num_cpus_for_job: int=None,
                                             num_gpus_for_job: int = 0,   
                                             local_mode=False):
     all_results = batch_jobs(method_handle, 
@@ -1173,7 +1173,7 @@ class ReduceIFRFeaturesByFishersMetricIteratively(Transform):
                  verbose_frequency: int = 10,
                  num_cpus_per_task: float = 1.,
                  num_gpus_per_task: float = 0.,
-                 num_cpus_for_job: int=-1,
+                 num_cpus_for_job: int=None,
                  num_gpus_for_job: int = 0,
                  local_mode: bool = False,
                  use_validation_set: bool = False,
@@ -1269,7 +1269,7 @@ class ReduceIFRFeaturesByClassificationIteratively(Transform):
                  verbose_frequency: int = 10,
                  num_cpus_per_task: float = 1.,
                  num_gpus_per_task: float = 0.,
-                 num_cpus_for_job: int=-1,
+                 num_cpus_for_job: int=None,
                  num_gpus_for_job: int = 0,
                  local_mode: bool = False,
                  validation_set_label=None,
