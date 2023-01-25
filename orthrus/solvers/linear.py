@@ -240,7 +240,7 @@ def LPPrimalDualPy(c, A, b, **kwargs):
         R_t = - torch.diag((a3_t * w_t)[:, 0]) - torch.mm(AXZI2_t, A_t.t())
         # import pdb;pdb.set_trace()
         # This will throw an exception if there are linear dependencies in the data
-        dp_t, _ = torch.solve(r_t.view(-1, 1), R_t)
+        dp_t = torch.linalg.solve(R_t, r_t.view(-1, 1))
         #
         dx_t = ((x_t * a5_t).view(-1) * (t1_t - torch.mm(A_t.t(), dp_t)).view(-1)).view(-1, 1)
 
