@@ -1241,7 +1241,7 @@ class Transform(Fit):
             self.fit_args['y'] = y
 
         #  add supervised labels to fit args
-        if self.fit_args['group_attr'] is not None:
+        if self.fit_args.get('group_attr', None) is not None:
             groups = ds.metadata.loc[training_ids, self.fit_args['group_attr']]
             self.fit_args['groups'] = groups
 
@@ -3584,6 +3584,7 @@ class WorkflowManager(Process):
             # add kwargs to a copy of self.workflow_method_args_copy
             # this lets the workflow_method to alter workflow_method_args_copy without affecting self.workflow_method_args
             self.workflow_method_args['n_iter'] = self.current_iter
+            self.workflow_method_args['workflow_name'] = self.process_name
             workflow_method_args_copy = self.workflow_method_args.copy()
             workflow_method_args_copy['results_from_previous_workflows'] = kwargs
             
