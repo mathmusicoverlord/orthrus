@@ -124,7 +124,7 @@ class OrthrusPipelineWorkflow():
         checkpoint_path = os.path.join(run_dir, filename)
         self.args['checkpoint_path']=checkpoint_path  
 
-        utils.log_kwargs_as_yaml(self.args, log_key)
+        utils.log_kwargs(self.args)
         utils.add_missing_kv_pairs(reformatted_kwargs, self.args)
 
         ds = ds.slice_dataset(sample_ids = sample_ids,

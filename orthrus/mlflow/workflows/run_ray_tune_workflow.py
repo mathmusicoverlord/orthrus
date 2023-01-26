@@ -60,7 +60,7 @@ def generate_placement_group_for_nested_parallelization(max_cuncurrent_trials,
                 assert available_gpus > 0
             except AssertionError as err:
                 msg = f"GPUs are not available to run the ray tune trials. The method received {num_cpus_for_job} from process_resource_requirements_for_job_. "\
-                    "After reserving {max_cuncurrent_trials * num_gpus_for_ray_trainable} GPUs for ray traiables, {available_gpus} were remaining."
+                    f"After reserving {max_cuncurrent_trials * num_gpus_for_ray_trainable} GPUs for ray traiables, {available_gpus} were remaining."
                 logger.error(msg)
                 raise AssertionError(msg)
 
@@ -249,7 +249,7 @@ class RayTuneForOrthrusPipelineWorkflow():
         n_iter= self.args.get('n_iter', None)
 
         run_dir, _, log_key = utils.get_results_dir_and_file_name(workflow_name, n_iter)
-        utils.log_kwargs_as_yaml(self.args, log_key)
+        utils.log_kwargs(self.args)
 
         # if not reformatted_kwargs.get('_args_already_generated', False):
         utils.add_missing_kv_pairs(reformatted_kwargs, self.args)

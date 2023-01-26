@@ -69,13 +69,23 @@ def get_results_dir_and_file_name(workflow_name, iter_num):
     
     return run_dir, filename, log_key
 
-def log_kwargs_as_yaml(kwargs, log_key):
+def log_kwargs(kwargs):
     ds = kwargs.pop('ds') if 'ds' in kwargs else None
     
     try:
-        mlflow.log_param(log_key,  yaml.dump(kwargs, allow_unicode=True, default_flow_style=False).replace('\n- ', '\n\n- '))
+        for k, v in kwargs.items():
+            mlflow.log_param(k,  v)
     except MlflowException as e:
-        logger.error(e, exc_info=True)
+        param_dir = os.path.join(urlparse(mlflow.get_artifact_uri()).path, '..', 'params')
+        param_file = os.path.join(param_dir, f'{k}')
+        # read lines from param file
+        with open(param_file, 'r') as f:
+            old_value = f.readlines()[0]
+        
+        os.remove(param_file)
+        new_value = old_value + ' | ' + v
+        logger.info(f'Found existing parameter :{k} with old value: {old_value}. Updating with new value: {new_value}')
+        mlflow.log_param(k,  new_value)
 
     if ds is not None:
         kwargs['ds'] = ds 
@@ -240,7 +250,16 @@ def setup_workflow_execution(experiment_id:str="0",
         logger.info('"local_mode" commandline argument value True passed, starting ray in local mode')
 
     address = os.environ.get("ip_head", None)
-    ray.init(address=address, local_mode = local_mode, num_cpus = num_cpus_for_job, num_gpus = num_gpus_for_job)
+    logger.info('Starting ray tune with the following parameters:')
+    logger.info(f'local_mode: {local_mode}')
+    
+    if address is not None:
+        logger.info(f'address: {address}')
+        ray.init(address=address, local_mode = local_mode)
+    else:
+        logger.info(f'num_cpus_for_job: {num_cpus_for_job}')
+        logger.info(f'num_gpus_for_job: {num_gpus_for_job}')
+        ray.init(local_mode = local_mode, num_cpus = num_cpus_for_job, num_gpus = num_gpus_for_job)
     
     return logger
 
