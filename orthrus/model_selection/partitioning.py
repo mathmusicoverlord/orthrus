@@ -4,7 +4,7 @@ one for each fold in the experiment. See sklearn.model_selection.KFold for an ex
 
 # imports
 import numpy as np
-from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.model_selection import StratifiedGroupKFold, StratifiedShuffleSplit
 import copy 
 import pandas as pd
 
@@ -65,3 +65,41 @@ class StratifiedGroupKFoldForEachUniqueY():
                         self.splits.append([train_list, test_list])
 
                 return self.splits
+
+
+class TrainValidationTestPartitioner():
+    '''
+    NOTE: this class is meant to be used with orthrus.core.pipeline.Pipeline only. 
+    The split method of this class returns a list of train-validation partitions, but the Pipeline
+    framework will automatically create test partition by using the remaining samples as the test partition.
+
+    This class creates train-validation-test partitions using the following scheme:
+    1. Partition the data into train-test sets using the partitioner provided in the constructor
+    2. For each train partition from the previous step: create train-validation set using StratifiedShuffleSplit
+
+    parameters:
+        partitioner - partitioner to use for creating train-test partitions
+        validation_set_size - fraction of samples to use for validation set
+        random_state - random state to use for StratifiedShuffleSplit
+
+    returns:
+        train-validation-test partitions
+    '''
+    def __init__(self, partitioner, validation_set_frac=0.2, random_state=0):
+        self.partitioner = partitioner
+        self.validation_set_frac = validation_set_frac
+        self.random_state = random_state
+
+    def split(self, x, y, groups=None):
+        partitions = self.partitioner.split(x, y, groups)
+
+        # partitioner = copy.deepcopy(self.partitioner)
+        shuffle_partitioner = StratifiedShuffleSplit(n_splits=1, test_size=self.validation_set_frac, random_state=self.random_state)
+
+        for intermediate_partition, test in partitions:
+            intermediate_partition = np.array(intermediate_partition)
+            if groups is None:
+                train, validation = next(shuffle_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition]))
+            else:
+                train, validation = next(shuffle_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition], groups[intermediate_partition]))
+            yield intermediate_partition[train], intermediate_partition[validation]
