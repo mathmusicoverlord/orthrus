@@ -3365,11 +3365,11 @@ class ClassifyEmsemble(Classify):
 
     def _run(self, ds: DataSet, **kwargs) -> dict:
 
-        if self.feature_ids == None:
+        if self.feature_ids is None:
             # use all features
             feature_ids_df = pd.DataFrame([[ds.vardata.index.values]], columns=['Features'])
 
-        elif self.feature_ids == 'previous_process':
+        elif type(self.feature_ids)==str and self.feature_ids=='previous_process':
             # if the preceding process in the pipeline computes the features, it must be present in kwargs
             try:
                 feature_ids_df = kwargs['features_df']
@@ -3379,7 +3379,7 @@ class ClassifyEmsemble(Classify):
                 sys.exit(0)
 
         elif type(self.feature_ids) == pd.DataFrame:
-            # to be used when you want to suppy your own features (In a single partition case)
+            # to be used when you want to suppy your own features (When using one feature set for all batches)
             feature_ids_df = self.feature_ids
 
         elif type(self.feature_ids) == dict:
