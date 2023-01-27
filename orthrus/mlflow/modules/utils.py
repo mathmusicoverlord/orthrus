@@ -320,9 +320,10 @@ def log_report_scores(report: Report) -> None:
             for metric in split_scores.columns:
                 metric_split = metric.split(':')
                 score = split_scores.at[batch, metric]
-                if ~np.isnan(score):
+                if not pd.isna(score) and ~np.isnan(score):
                     mlflow.log_metric(f"{split_type}.{batch}.{'.'.join(metric_split)}", score)
 
+        split_scores = split_scores.fillna(0)
         # log means, standard dev, min, max
         split_scores_stats = {} 
         split_scores_stats['Mean'] = split_scores.mean(axis=0)
@@ -333,7 +334,7 @@ def log_report_scores(report: Report) -> None:
             for metric in stat_scores.index:
                 metric_split = metric.split(':')
                 score = stat_scores[metric]
-                if ~np.isnan(score):
+                if not pd.isna(score) and  ~np.isnan(score):
                     mlflow.log_metric(f"{split_type}.{stat}.{'.'.join(metric_split)}", score)
         
         # store violin plot
