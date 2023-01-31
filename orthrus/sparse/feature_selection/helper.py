@@ -1102,7 +1102,10 @@ def compute_fisher_score(embedding,
 
 def get_num_attr_array(ds, ranked_features, start, end, step, sample_ids):
     if end == -1 or end > sample_ids.sum():
-        end = sample_ids.sum()
+        try:
+            end = sample_ids.sum()
+        except AttributeError:
+            end = len(sample_ids)
 
     if start > ranked_features.shape[0]:
         start = 3 if ranked_features.shape[0] > 0 else 0
