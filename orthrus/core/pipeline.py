@@ -2312,7 +2312,26 @@ class Score(Process):
         return result
 
     def run(self, ds: DataSet, batch_args: dict = None) -> Tuple[DataSet, dict]:
+        
+        # In clase of classification with leave-one-out cross validation, the predicted labels for each batch are to be combined
+        # into a single prediction for the entire dataset. Next, the scores are computed for the entire dataset.
+        # check for loo_cv and set batch_args accordingly
+        if self.score_args.get('loo_cv', False):
+            batch_args_copy = deepcopy(batch_args)
+            pred_labels = None
+            for k, b in batch_args_copy.items():
+                tvt = batch_args_copy[k]['tvt_labels']
+                
+                class_labels = batch_args_copy[k]['class_labels']
+                if pred_labels is None :
+                    pred_labels = class_labels[tvt=='Test']
+                else:
+                    # concaternate pandas series
+                    pred_labels = pd.concat([pred_labels, class_labels[tvt=='Test']])
 
+            batch_args= {'batch':{'class_labels':pred_labels}}
+        
+        
         # run super
         ds, results = super(Score, self).run(ds, batch_args)
 
@@ -2340,7 +2359,17 @@ class Score(Process):
                             print()
             except AttributeError:
                 pass
+        
 
+        # for loo_cv there's going to be only one set of scores (since we combined all the prediction across the batches)
+        # Copy that result to all the batches to maintain consistency across different types of experiment.
+        if self.score_args.get('loo_cv', False):
+            class_pred_scores = results['batch']['class_pred_scores']
+            results = {}
+            for k in batch_args_copy.keys():
+                results[k] = {'class_pred_scores':class_pred_scores}
+
+            self.results_ = results
 
         return ds, results
 
@@ -2383,6 +2412,10 @@ class Score(Process):
         """
 
         def class_labels_scorer(y_true, y_pred, **kwargs):
+            try:
+                loo_cv = kwargs.pop('loo_cv')
+            except:
+                loo_cv = None   
 
             # apply plain scorer
             score = score_process(y_true.values.reshape(-1,), y_pred.values.reshape(-1,), **kwargs)
@@ -2392,7 +2425,9 @@ class Score(Process):
 
             # format the score with labels
             score = self._format_ndarray_output_with_labels(score, labels)
-
+            
+            if loo_cv is not None:
+                kwargs['loo_cv'] = loo_cv
             return score
 
         return class_labels_scorer
@@ -3660,3 +3695,157 @@ class WorkflowManager(Process):
 
         # return the latest result
         return {self.process_name: self.results[len(self.results)-1]}
+
+
+class DatasetSlicer(Process):
+        def __init__(self,
+                 process: object,
+                 process_name: str = None,
+                 slice_method = 'generate_slices',
+                 slice_attr = None,
+                 slice_group = None,
+                 slice_args = {},
+                 parallel: bool = False,
+                 verbosity: int = 1,
+                 partition_name='Train'):
+
+            # init with Process class
+            super(DatasetSlicer, self).__init__(process=process,
+                                                process_name=process_name,
+                                                parallel=parallel,
+                                                verbosity=verbosity,
+                                                )
+
+            self.partition_name = partition_name
+            self.slice_attr= slice_attr
+            self.slice_method = slice_method
+            self.slice_group = slice_group
+            self.slice_args = slice_args
+
+
+
+        def _run(self, ds: DataSet, **kwargs) -> dict:
+
+            # run the supers _preprocess method
+            ds_new = self._preprocess(ds, **kwargs)
+
+            # check for partition_slicer in kwargs
+            dataset_slicer = kwargs.get('dataset_slicer', None)
+
+            if dataset_slicer is not None:
+                raise ValueError("dataset_slicer is already present!")
+
+            # initialize partition result
+            result = dict()
+
+            # grab verbosity
+            verbosity = self.verbosity
+
+            # generate the split method
+            slice_method = eval("self.process." + self.slice_method)
+
+
+
+            # generate labels
+            if self.slice_attr is None:
+                label_dict = {}
+            else:
+                label_dict = dict(y=ds_new.metadata[self.slice_attr])
+
+            if self.slice_group is not None:
+                label_dict['groups'] = ds_new.metadata[self.slice_group]
+
+            # partition the dataset
+            if verbosity > 0:
+                print(r"Generating %s slice information..." % (self.process_name,))
+
+            slices = slice_method(ds_new.data, **label_dict, **self.slice_args)
+
+            # record training and test labels
+            slice_info = pd.DataFrame(index=[i for i in range(len(slices))], columns=['sample_ids', 'feature_ids'])
+
+            for k, v in slices.items():
+
+                if self.verbosity > 1:
+                    print("Generating slice %d...." % (k,))
+                
+                # append the slice info
+                slice_info.loc[k, 'sample_ids'] = ds_new.data.index[v['sample_ids']]
+                slice_info.loc[k, 'feature_ids'] = ds_new.data.columns[v['feature_ids']] if v['feature_ids'] is not None else None
+
+
+            # store the result
+            result['dataset_slicer'] = slice_info
+
+            # return to run method
+            return result
+
+        def run(self, ds: DataSet, batch_args: dict = None, append_labels=True) -> Tuple[DataSet, dict]:
+            """
+            See :py:meth:`Process.run` docstring.
+
+            Args:
+                ds (DataSet): See :py:meth:`Process.run` docstring.
+
+                batch_args (dict): See :py:meth:`Process.run` docstring.
+
+                append_labels (bool): If ``tvt_labels`` exist in :py:attr:`batch_args[batch]` then these labels will be
+                    appended to :py:attr:`Partition.results_`. Useful in the case of splitting training into
+                    training/validation and wanting to keep the original train/test labels. The default is True.
+
+            Returns:
+                Tuple[DataSet, dict] : See :py:meth:`Process.run` docstring.
+            """
+            # run the super first
+            super(DatasetSlicer, self).run(ds, batch_args)
+
+            # collect super results
+            results = dict()
+
+            # split into batches
+            for batch in self.results_:
+                dataset_slicer = self.results_[batch]['dataset_slicer']
+
+                for idx, row in dataset_slicer.iterrows():
+                    results[f'batch_{idx}']=dict(dataset_slicer = deepcopy(row), batch_id=idx, transform = self.generate_tranform(row))
+
+
+            try:
+                del results['batch']
+            except KeyError:
+                pass
+            
+            
+
+            # update results
+            self.results_ = results
+
+            # change run status
+            self.run_status_ = 1
+
+            return ds, self.results_
+
+        def generate_tranform(self, row, **kwargs):
+
+            def transform(ds):
+                return ds.slice_dataset(sample_ids=row['sample_ids'], 
+                                        feature_ids=row['feature_ids'])
+
+            return copy(transform)
+
+
+class PartitionSlicer():
+    def __init__(self,
+                partitioner,
+                partition_split_idx=0):
+        self.partitioner = partitioner
+        self.partition_split_idx = partition_split_idx
+
+    def generate_slices(self, X, y, groups=None):
+        splits = list(self.partitioner.split(X, y, groups))
+        splits = {i: {'sample_ids':splits[i][self.partition_split_idx], 'feature_ids': None} for i in range(len(splits))}
+        return splits
+    
+        # for k, v in splits.items():
+        #     print(np.unique(groups[v['sample_ids']]))
+
