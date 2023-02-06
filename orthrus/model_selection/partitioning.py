@@ -85,21 +85,52 @@ class TrainValidationTestPartitioner():
     returns:
         train-validation-test partitions
     '''
-    def __init__(self, partitioner, validation_set_frac=0.2, random_state=0):
-        self.partitioner = partitioner
-        self.validation_set_frac = validation_set_frac
+    def __init__(self, outer_partitioner, 
+                        inner_partitioner, 
+                        random_inner_partition=False, 
+                        random_state=42, 
+                        returns=['train', 'validation']):
+
+                        
+        self.outer_partitioner = outer_partitioner
+        self.inner_partitioner = inner_partitioner        
+        self.random_inner_partition = random_inner_partition
         self.random_state = random_state
+        self.returns = [x.lower() for x in returns]
 
     def split(self, x, y, groups=None):
-        partitions = self.partitioner.split(x, y, groups)
-
-        # partitioner = copy.deepcopy(self.partitioner)
-        shuffle_partitioner = StratifiedShuffleSplit(n_splits=1, test_size=self.validation_set_frac, random_state=self.random_state)
-
+        np.random.seed(self.random_state)
+        partitions = self.outer_partitioner.split(x, y, groups)
         for intermediate_partition, test in partitions:
+            if 'train' not in self.returns and 'validation' not in self.returns:
+                yield test
+
             intermediate_partition = np.array(intermediate_partition)
             if groups is None:
-                train, validation = next(shuffle_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition]))
+                splits = list(self.inner_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition]))
             else:
-                train, validation = next(shuffle_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition], groups[intermediate_partition]))
-            yield intermediate_partition[train], intermediate_partition[validation]
+                splits = list(self.inner_partitioner.split(x.iloc[intermediate_partition], y[intermediate_partition], groups[intermediate_partition]))
+
+            if len(splits) > 1:
+                if self.random_inner_partition == False:
+                    inner_partition_number = 0
+                else:
+                    
+                    inner_partition_number = np.random.randint(0, len(splits))
+          
+                train =  intermediate_partition[splits[inner_partition_number][0]]
+                validation = intermediate_partition[[splits[inner_partition_number][1]]]
+            else:
+                train =  intermediate_partition[splits[0]]
+                validation = intermediate_partition[[splits[1]]]
+
+
+            rets = []
+            if 'train' in self.returns:
+                rets.append(train)
+            if 'validation' in self.returns:
+                rets.append(validation)
+            if 'test' in self.returns:
+                rets.append(test)
+            
+            yield rets
