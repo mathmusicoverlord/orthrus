@@ -180,7 +180,10 @@ def process_args(parser):
     remaining_args = {}
     unknown = (x for x in (a.split('=') for a in unknown) if len(x) >1)
     for k, v in ((k.lstrip('-'), v) for k,v in unknown):
-        remaining_args[k] = ast.literal_eval(v)
+        try:
+            remaining_args[k] = ast.literal_eval(v)
+        except ValueError:
+            remaining_args[k] = v
 
     args_dict = vars(args)
     args_dict.update(remaining_args)
