@@ -310,11 +310,16 @@ class RayTuneForOrthrusPipelineWorkflow():
         results = tuner.fit()
 
         #get best results
-        best_results = results.get_best_result(mode=tune_search_alg.mode, metric=tune_search_alg.metric)    
+        try:
+            mode = tune_search_alg.mode
+        except AttributeError:
+            mode = self.args.get('sort_mode', 'max')
+            
+        best_results = results.get_best_result(mode=mode, metric=tune_search_alg.metric)    
         best_config = best_results.config
 
         # sort results
-        ascending = True if tune_search_alg.mode == 'min' else False
+        ascending = True if mode == 'min' else False
         sorted_results = results.get_dataframe().sort_values(by=tune_search_alg.metric, ascending= ascending)
 
         # save the sorted results
