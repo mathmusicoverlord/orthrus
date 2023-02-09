@@ -1,4 +1,5 @@
 import logging
+import ray
 logger = logging.getLogger(__name__)
 
 def evaluate_ssvm_ifr_tune(result, **kwargs):
@@ -14,27 +15,41 @@ def evaluate_ssvm_ifr_tune(result, **kwargs):
     if tune_config is not None:
         # check ssvm C values
         ssvm_C_search_space = tune_config['ssvm_C']
-        value_range = ssvm_C_search_space.upper - ssvm_C_search_space.lower
+        if type(ssvm_C_search_space) == dict:
+            ssvm_C_search_space = ssvm_C_search_space['grid_search']
+            if type(ssvm_C_search_space) == range:
+                ssvm_c_lower = ssvm_C_search_space.start
+                ssvm_c_upper = ssvm_C_search_space.stop
+            elif type(ssvm_C_search_space) == list:
+                ssvm_c_lower = min(ssvm_C_search_space)
+                ssvm_c_upper = max(ssvm_C_search_space)
+        elif type(ssvm_C_search_space) == ray.tune.search.sample.Integer:
+            ssvm_c_lower = ssvm_C_search_space.lower
+            ssvm_c_upper = ssvm_C_search_space.upper
+        else:
+            raise ValueError(f'Unknown type for ssvm_C search space: {type(ssvm_C_search_space)}')
+
+        value_range = ssvm_c_upper - ssvm_c_lower
 
     
-        if best_config_from_last_iteration['ssvm_C'] - ssvm_C_search_space.lower == 0:
+        if best_config_from_last_iteration['ssvm_C'] - ssvm_c_lower == 0:
             # move the search space to the left
             logger.warn(f'The best ssvm C parameter value ({best_config_from_last_iteration["ssvm_C"]}) was found by tuning ' \
-                f'is very close to the lower end of search space [{ssvm_C_search_space.lower}, {ssvm_C_search_space.upper-1}]')
-            ssvm_C_search_space.lower -= (value_range - int(.4 * value_range))
-            ssvm_C_search_space.upper -= (value_range - int(.4 * value_range))
-            logger.info(f'New ssvm_C search space [{ssvm_C_search_space.lower}, {ssvm_C_search_space.upper-1}]')
+                f'is very close to the lower end of search space [{ssvm_c_lower}, {ssvm_c_upper-1}]')
+            ssvm_c_lower -= (value_range - int(.4 * value_range))
+            ssvm_c_upper -= (value_range - int(.4 * value_range))
+            logger.info(f'New ssvm_C search space [{ssvm_c_lower}, {ssvm_c_upper-1}]')
 
             verdict = 'warn'
 
 
-        elif (ssvm_C_search_space.upper-1) - best_config_from_last_iteration['ssvm_C'] == 0 :
+        elif (ssvm_c_upper-1) - best_config_from_last_iteration['ssvm_C'] == 0 :
             # move the search space to the right
             logger.warn(f'The ssvm C parameter value ({best_config_from_last_iteration["ssvm_C"]}) was found by tuning ' \
-                f'is very close to the upper end of search space [{ssvm_C_search_space.lower}, {ssvm_C_search_space.upper-1}]')
-            ssvm_C_search_space.lower += (value_range - int(.4 * value_range))
-            ssvm_C_search_space.upper += (value_range - int(.4 * value_range))
-            logger.info(f'New ssvm_C search space [{ssvm_C_search_space.lower}, {ssvm_C_search_space.upper-1}]')
+                f'is very close to the upper end of search space [{ssvm_c_lower}, {ssvm_c_upper-1}]')
+            ssvm_c_lower += (value_range - int(.4 * value_range))
+            ssvm_c_upper += (value_range - int(.4 * value_range))
+            logger.info(f'New ssvm_C search space [{ssvm_c_lower}, {ssvm_c_upper-1}]')
 
             verdict = 'warn'
 
