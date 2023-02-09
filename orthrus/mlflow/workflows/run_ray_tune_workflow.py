@@ -242,6 +242,31 @@ class RayTuneForOrthrusPipelineWorkflow():
         tune_search_alg = deepcopy(self.args.pop('tune_search_alg')) if 'tune_search_alg' in self.args else None
         tune_scheduler = deepcopy(self.args.pop('tune_scheduler')) if 'tune_scheduler' in self.args else None
 
+        # check if attributes are available for sorting the results of the workflow
+        try:
+            mode = tune_search_alg.mode
+        except AttributeError:
+            try:
+                mode = self.args['results_sort_mode']
+            except KeyError as e:
+                logger.error('The "mode" to be used for sorting the results of the workflow is not specified. Please specify the mode to be used for sorting the results of the workflow. \
+                            This can be done by either using a search algorithm that has "mode" attribute or by adding a k-v pair, with the key being "results_sort_mode", in the dictionary returned by get_workflow_args_handle method.')
+                
+                raise KeyError(e)
+        
+        try:
+            metric = tune_search_alg.metric
+            attribute_error_raised = False
+        except AttributeError:
+            attribute_error_raised = True
+        if attribute_error_raised or metric is None:
+            try:
+                metric = self.args['metric']
+            except KeyError as e:
+                logger.error('The "metric" to be used for sorting the results of the workflow is not specified. Please specify the metric to be used for sorting the results of the workflow. \
+                            This can be done by either using a search algorithm that has "metric" attribute or by adding a k-v pair, with the key being "metric", in the dictionary returned by get_workflow_args_handle method.')
+                raise KeyError(e)
+
         resume_unfinished = self.args.get('resume_unfinished', True)
         restart_errored = self.args.get('restart_errored', True)
         max_failures= self.args.get('max_failures', 1)
@@ -310,17 +335,12 @@ class RayTuneForOrthrusPipelineWorkflow():
         results = tuner.fit()
 
         #get best results
-        try:
-            mode = tune_search_alg.mode
-        except AttributeError:
-            mode = self.args.get('sort_mode', 'max')
-            
-        best_results = results.get_best_result(mode=mode, metric=tune_search_alg.metric)    
+        best_results = results.get_best_result(mode=mode, metric=metric)    
         best_config = best_results.config
 
         # sort results
         ascending = True if mode == 'min' else False
-        sorted_results = results.get_dataframe().sort_values(by=tune_search_alg.metric, ascending= ascending)
+        sorted_results = results.get_dataframe().sort_values(by=metric, ascending= ascending)
 
         # save the sorted results
         sorted_results.to_csv(os.path.join(run_dir, 'results_df.csv'))
