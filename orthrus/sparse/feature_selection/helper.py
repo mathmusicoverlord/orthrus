@@ -1107,6 +1107,8 @@ def get_num_attr_array(ds, ranked_features, start, end, step, sample_ids):
         except AttributeError:
             end = len(sample_ids)
 
+    end = end if end < ranked_features.shape[0] else ranked_features.shape[0]
+
     if start > ranked_features.shape[0]:
         start = 3 if ranked_features.shape[0] > 0 else 0
         # raise Exception('start value greater than the number of features present in the feature set')
