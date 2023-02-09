@@ -333,6 +333,7 @@ class RayTuneForOrthrusPipelineWorkflow():
         
         # run tuner
         results = tuner.fit()
+        logger.info('Ray Tune run completed.')
 
         #get best results
         best_results = results.get_best_result(mode=mode, metric=metric)    
@@ -355,6 +356,7 @@ class RayTuneForOrthrusPipelineWorkflow():
         
         # process the results
         if self.process_workflow_results is not None:
+            logger.info('Processing workflow results...')
             self.process_workflow_results(results_location = run_dir, results = sorted_results)
 
         # set description

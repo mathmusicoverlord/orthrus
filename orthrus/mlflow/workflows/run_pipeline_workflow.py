@@ -142,8 +142,10 @@ class OrthrusPipelineWorkflow():
         # run the pipeline on the data
         pipeline.run(ds, checkpoint=checkpoint)
 
+        logger.info(f'Finished running the pipeline: {workflow_name}.')
         # process the results of the pipeline
         if self.process_workflow_results is not None:        
+            logger.info(f'Processing the results of the pipeline: {workflow_name}.')
             self.process_workflow_results(results_location = run_dir, results = pipeline)
 
         # set description 
